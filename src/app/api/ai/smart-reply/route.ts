@@ -1,0 +1,53 @@
+import { NextResponse } from "next/server";
+import { getCurrentUser } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { generateSmartReply } from "@/lib/gemini";
+
+export async function POST(req: Request) {
+  const user = await getCurrentUser();
+  if (!user || !user.workspaceId)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const { conversationId } = await req.json();
+  if (!conversationId)
+    return NextResponse.json(
+      { error: "Conversation ID required" },
+      { status: 400 }
+    );
+
+  const conversation = await prisma.conversation.findUnique({
+    where: { id: conversationId },
+    include: {
+      contact: true,
+      messages: { orderBy: { createdAt: "desc" }, take: 10 },
+    },
+  });
+
+  if (!conversation)
+    return NextResponse.json(
+      { error: "Conversation not found" },
+      { status: 404 }
+    );
+
+  const history = conversation.messages
+    .reverse()
+    .map(
+      (m: any) =>
+        `${m.direction === "INBOUND" ? conversation.contact.name : "Staff"}: ${m.content}`
+    )
+    .join("\n");
+  const lastInbound = conversation.messages
+    .filter((m: any) => m.direction === "INBOUND")
+    .pop();
+
+  const workspace = await prisma.workspace.findUnique({
+    where: { id: user.workspaceId },
+  });
+  const replies = await generateSmartReply(
+    workspace?.name || "Business",
+    history,
+    lastInbound?.content || "Hello"
+  );
+
+  return NextResponse.json({ replies });
+}
