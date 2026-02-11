@@ -1,0 +1,57 @@
+import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+
+export async function GET(req: Request) {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.workspaceId) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    try {
+        const conversations = await prisma.conversation.findMany({
+            where: {
+                workspaceId: session.user.workspaceId,
+                isActive: true,
+            },
+            include: {
+                contact: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        phone: true,
+                    }
+                },
+                messages: {
+                    orderBy: { createdAt: 'desc' },
+                    take: 1,
+                    select: {
+                        content: true,
+                        createdAt: true,
+                        isAutomated: true,
+                    }
+                }
+            },
+            orderBy: {
+                lastMessageAt: 'desc',
+            }
+        });
+
+        // Format for UI
+        const formatted = conversations.map(c => ({
+            id: c.id,
+            contactName: c.contact.name,
+            contactEmail: c.contact.email,
+            lastMessage: c.messages[0]?.content || "No messages yet",
+            lastMessageAt: c.lastMessageAt,
+            unreadCount: c.unreadCount,
+        }));
+
+        return NextResponse.json(formatted);
+    } catch (error) {
+        console.error("Inbox Error:", error);
+        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    }
+}

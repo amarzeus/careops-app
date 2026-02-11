@@ -1,5 +1,7 @@
 generator client {
-  provider = "prisma-client-js"
+  provider   = "prisma-client-js"
+  output     = "../src/generated/prisma"
+  engineType = "library"
 }
 
 datasource db {
@@ -39,13 +41,6 @@ enum MessageDirection {
   OUTBOUND
 }
 
-enum MessageStatus {
-  SENT
-  DELIVERED
-  READ
-  FAILED
-}
-
 enum AutomationTrigger {
   NEW_CONTACT
   BOOKING_CREATED
@@ -64,11 +59,11 @@ enum WorkspaceStatus {
 // ──── Models ────
 
 model User {
-  id           String    @id @default(cuid())
-  email        String    @unique
+  id           String     @id @default(cuid())
+  email        String     @unique
   name         String
   passwordHash String
-  role         UserRole  @default(STAFF)
+  role         UserRole   @default(STAFF)
   workspaceId  String?
   workspace    Workspace? @relation(fields: [workspaceId], references: [id])
 
@@ -77,8 +72,6 @@ model User {
   otpExpires    DateTime?
   emailVerified DateTime?
   googleId      String?   @unique
-  phone         String?
-  phoneVerified DateTime?
 
   // Permissions
   canAccessInbox     Boolean @default(true)
@@ -93,14 +86,14 @@ model User {
 }
 
 model Workspace {
-  id           String          @id @default(cuid())
-  name         String
-  address      String?
-  timezone     String          @default("UTC")
-  contactEmail String?
-  contactPhone String?
-  status       WorkspaceStatus @default(ONBOARDING)
-  onboardingStep Int           @default(1)
+  id             String          @id @default(cuid())
+  name           String
+  address        String?
+  timezone       String          @default("UTC")
+  contactEmail   String?
+  contactPhone   String?
+  status         WorkspaceStatus @default(ONBOARDING)
+  onboardingStep Int             @default(1)
 
   // Email configuration
   emailProvider    String?
@@ -133,11 +126,11 @@ model Workspace {
 }
 
 model Contact {
-  id          String  @id @default(cuid())
+  id          String    @id @default(cuid())
   name        String
   email       String?
   phone       String?
-  source      String  @default("form")
+  source      String    @default("form")
   notes       String?
   workspaceId String
   workspace   Workspace @relation(fields: [workspaceId], references: [id])
@@ -153,13 +146,12 @@ model Contact {
 }
 
 model Service {
-  id          String  @id @default(cuid())
+  id          String    @id @default(cuid())
   name        String
   description String?
-  duration    Int     // in minutes
-  price       Float   @default(0.0)
+  duration    Int // in minutes
   location    String?
-  isActive    Boolean @default(true)
+  isActive    Boolean   @default(true)
   workspaceId String
   workspace   Workspace @relation(fields: [workspaceId], references: [id])
 
@@ -194,11 +186,11 @@ model Booking {
 }
 
 model ContactForm {
-  id             String  @id @default(cuid())
+  id             String    @id @default(cuid())
   name           String
-  fields         String  @default("[]")
-  isActive       Boolean @default(true)
-  slug           String  @unique @default(cuid())
+  fields         String    @default("[]")
+  isActive       Boolean   @default(true)
+  slug           String    @unique @default(cuid())
   welcomeMessage String?
   workspaceId    String
   workspace      Workspace @relation(fields: [workspaceId], references: [id])
@@ -208,14 +200,14 @@ model ContactForm {
 }
 
 model IntakeForm {
-  id          String  @id @default(cuid())
+  id          String    @id @default(cuid())
   name        String
   description String?
-  fields      String  @default("[]")
-  isActive    Boolean @default(true)
-  slug        String  @unique @default(cuid())
+  fields      String    @default("[]")
+  isActive    Boolean   @default(true)
+  slug        String    @unique @default(cuid())
   serviceId   String?
-  service     Service? @relation(fields: [serviceId], references: [id])
+  service     Service?  @relation(fields: [serviceId], references: [id])
   workspaceId String
   workspace   Workspace @relation(fields: [workspaceId], references: [id])
 
@@ -226,17 +218,17 @@ model IntakeForm {
 }
 
 model FormSubmission {
-  id           String     @id @default(cuid())
-  data         String     @default("{}")
-  status       FormStatus @default(PENDING)
+  id           String      @id @default(cuid())
+  data         String      @default("{}")
+  status       FormStatus  @default(PENDING)
   intakeFormId String?
   intakeForm   IntakeForm? @relation(fields: [intakeFormId], references: [id])
   contactId    String
-  contact      Contact    @relation(fields: [contactId], references: [id])
+  contact      Contact     @relation(fields: [contactId], references: [id])
   bookingId    String?
-  booking      Booking?   @relation(fields: [bookingId], references: [id])
+  booking      Booking?    @relation(fields: [bookingId], references: [id])
   workspaceId  String
-  workspace    Workspace  @relation(fields: [workspaceId], references: [id])
+  workspace    Workspace   @relation(fields: [workspaceId], references: [id])
 
   sentAt      DateTime?
   completedAt DateTime?
@@ -247,12 +239,12 @@ model FormSubmission {
 }
 
 model InventoryItem {
-  id          String  @id @default(cuid())
+  id          String    @id @default(cuid())
   name        String
   description String?
-  quantity    Int     @default(0)
-  threshold   Int     @default(5)
-  unit        String  @default("units")
+  quantity    Int       @default(0)
+  threshold   Int       @default(5)
+  unit        String    @default("units")
   vendorName  String?
   vendorEmail String?
   vendorPhone String?
@@ -264,13 +256,13 @@ model InventoryItem {
 }
 
 model Conversation {
-  id            String   @id @default(cuid())
+  id            String    @id @default(cuid())
   subject       String?
-  isActive      Boolean  @default(true)
-  lastMessageAt DateTime @default(now())
-  unreadCount   Int      @default(0)
-  contactId     String   @unique
-  contact       Contact  @relation(fields: [contactId], references: [id])
+  isActive      Boolean   @default(true)
+  lastMessageAt DateTime  @default(now())
+  unreadCount   Int       @default(0)
+  contactId     String    @unique
+  contact       Contact   @relation(fields: [contactId], references: [id])
   workspaceId   String
   workspace     Workspace @relation(fields: [workspaceId], references: [id])
 
@@ -285,7 +277,6 @@ model Message {
   content        String
   channel        MessageChannel   @default(EMAIL)
   direction      MessageDirection @default(OUTBOUND)
-  status         MessageStatus    @default(SENT)
   isAutomated    Boolean          @default(false)
   conversationId String
   conversation   Conversation     @relation(fields: [conversationId], references: [id])
@@ -310,12 +301,12 @@ model AutomationRule {
 }
 
 model Alert {
-  id        String  @id @default(cuid())
-  type      String
-  title     String
-  message   String
-  isRead    Boolean @default(false)
-  actionUrl String?
+  id          String    @id @default(cuid())
+  type        String
+  title       String
+  message     String
+  isRead      Boolean   @default(false)
+  actionUrl   String?
   workspaceId String
   workspace   Workspace @relation(fields: [workspaceId], references: [id])
 

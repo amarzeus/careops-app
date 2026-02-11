@@ -54,10 +54,10 @@ export default function LandingPage() {
           <span className="text-blue-600">Every Operation.</span>
         </h1>
         <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-10">
-          Stop juggling disconnected tools. CareOps unifies bookings, leads, forms, inventory, 
+          Stop juggling disconnected tools. CareOps unifies bookings, leads, forms, inventory,
           and communication into one intelligent platform for service businesses.
         </p>
-        <div className="flex items-center justify-center gap-4">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link href="/register">
             <Button size="lg" className="bg-blue-600 hover:bg-blue-700 h-12 px-8 text-base">
               Start Free <ArrowRight className="w-4 h-4 ml-2" />
