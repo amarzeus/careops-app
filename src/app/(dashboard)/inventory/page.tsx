@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Package, Plus, AlertTriangle, Edit2, Trash2, Save, X } from "lucide-react";
+import { Package, Plus, AlertTriangle, Edit2, Trash2, Save, X, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,19 +19,37 @@ interface InventoryItem {
 
 export default function InventoryPage() {
   const [items, setItems] = useState<InventoryItem[]>([]);
+  const [forecast, setForecast] = useState<Record<string, { daysRemaining: number | string; confidence: string }>>({});
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   const [editQty, setEditQty] = useState("");
   const [newItem, setNewItem] = useState({ name: "", description: "", quantity: "0", threshold: "5", unit: "units", vendorName: "", vendorEmail: "", vendorPhone: "" });
 
-  useEffect(() => { fetchItems(); }, []);
+  useEffect(() => {
+    fetchItems();
+    fetchForecast();
+  }, []);
 
   const fetchItems = async () => {
     try {
       const res = await fetch("/api/inventory");
       if (res.ok) setItems((await res.json()).items);
-    } catch {} finally { setLoading(false); }
+    } catch { } finally { setLoading(false); }
+  };
+
+  const fetchForecast = async () => {
+    try {
+      const res = await fetch("/api/ai/inventory-forecast", { method: "POST" });
+      if (res.ok) {
+        const data = await res.json();
+        const forecastMap: any = {};
+        data.forecast.forEach((f: any) => {
+          forecastMap[f.name] = f;
+        });
+        setForecast(forecastMap);
+      }
+    } catch { }
   };
 
   const createItem = async () => {
@@ -57,7 +75,7 @@ export default function InventoryPage() {
       <Header title="Inventory" subtitle={`${items.length} items tracked${lowStockCount > 0 ? ` | ${lowStockCount} low stock` : ""}`}>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild><Button className="bg-blue-600 hover:bg-blue-700"><Plus className="w-4 h-4 mr-2" />Add Item</Button></DialogTrigger>
-          <DialogContent>
+          <DialogContent className="sm:max-w-md">
             <DialogHeader><DialogTitle>Add Inventory Item</DialogTitle><DialogDescription>Track resources used in your business.</DialogDescription></DialogHeader>
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
@@ -74,7 +92,7 @@ export default function InventoryPage() {
                   <div className="space-y-2"><Label>Vendor Email</Label><Input type="email" value={newItem.vendorEmail} onChange={e => setNewItem(p => ({ ...p, vendorEmail: e.target.value }))} /></div>
                 </div>
               </div>
-              <Button onClick={createItem} className="w-full bg-blue-600 hover:bg-blue-700">Add Item</Button>
+              <Button onClick={createItem} className="w-full bg-blue-600 hover:bg-blue-700 font-bold">Create Item</Button>
             </div>
           </DialogContent>
         </Dialog>
@@ -85,45 +103,72 @@ export default function InventoryPage() {
             {[...Array(6)].map((_, i) => <div key={i} className="h-40 bg-gray-100 rounded-xl animate-pulse" />)}
           </div>
         ) : items.length === 0 ? (
-          <div className="text-center py-20"><Package className="w-16 h-16 text-gray-300 mx-auto mb-4" /><h3 className="text-lg font-medium text-gray-500">No inventory items</h3><p className="text-sm text-gray-400 mt-1">Add items to start tracking your resources</p></div>
+          <div className="text-center py-20 bg-white rounded-2xl border-2 border-dashed border-gray-100 italic transition-colors">
+            <Package className="w-16 h-16 text-gray-200 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-400">Your inventory is empty</h3>
+            <p className="text-sm text-gray-400 mt-1">Start tracking supplies to see AI forecasting in action.</p>
+          </div>
         ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {items.map(item => {
               const isLow = item.quantity <= item.threshold;
+              const itemForecast = forecast[item.name];
               const pct = item.threshold > 0 ? Math.min((item.quantity / (item.threshold * 3)) * 100, 100) : 100;
+
               return (
-                <Card key={item.id} className={cn(isLow && "border-red-200 bg-red-50/30")}>
-                  <CardContent className="pt-6">
-                    <div className="flex items-start justify-between mb-3">
-                      <div>
-                        <p className="font-medium">{item.name}</p>
-                        {item.description && <p className="text-xs text-gray-500 mt-0.5">{item.description}</p>}
+                <Card key={item.id} className={cn("transition-all hover:shadow-md border-0 bg-white shadow-sm overflow-hidden", isLow && "ring-1 ring-red-100")}>
+                  <CardContent className="p-0">
+                    <div className="p-6">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="min-w-0 flex-1">
+                          <p className="font-bold text-gray-900 truncate">{item.name}</p>
+                          {item.description && <p className="text-xs text-gray-500 mt-1 truncate">{item.description}</p>}
+                        </div>
+                        <div className="flex flex-col items-end gap-2">
+                          {isLow && <Badge variant="destructive" className="animate-pulse shadow-sm text-[10px] font-bold px-1.5 h-5 uppercase tracking-tighter">Critical</Badge>}
+                          {itemForecast && (
+                            <div className="flex items-center gap-1 text-[10px] font-bold text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-100">
+                              <Sparkles className="w-2.5 h-2.5" />
+                              {itemForecast.daysRemaining} days left
+                            </div>
+                          )}
+                        </div>
                       </div>
-                      {isLow && <Badge variant="destructive" className="shrink-0"><AlertTriangle className="w-3 h-3 mr-1" />Low</Badge>}
-                    </div>
-                    <div className="mb-3">
-                      {editId === item.id ? (
-                        <div className="flex items-center gap-2">
-                          <Input type="number" value={editQty} onChange={e => setEditQty(e.target.value)} className="h-8 w-20" />
-                          <Button size="sm" variant="ghost" onClick={() => updateQuantity(item.id)}><Save className="w-3 h-3" /></Button>
-                          <Button size="sm" variant="ghost" onClick={() => setEditId(null)}><X className="w-3 h-3" /></Button>
+
+                      <div className="mb-4">
+                        {editId === item.id ? (
+                          <div className="flex items-center gap-2">
+                            <Input type="number" autoFocus value={editQty} onChange={e => setEditQty(e.target.value)} className="h-10 w-24 text-lg font-bold" />
+                            <Button size="icon" className="bg-green-600 hover:bg-green-700 shrink-0" onClick={() => updateQuantity(item.id)}><Save className="w-4 h-4" /></Button>
+                            <Button variant="outline" size="icon" className="shrink-0" onClick={() => setEditId(null)}><X className="w-4 h-4" /></Button>
+                          </div>
+                        ) : (
+                          <div className="flex items-baseline gap-1 cursor-pointer group" onClick={() => { setEditId(item.id); setEditQty(String(item.quantity)); }}>
+                            <span className="text-3xl font-black text-gray-900 tracking-tighter">{item.quantity}</span>
+                            <span className="text-sm font-medium text-gray-500 uppercase">{item.unit}</span>
+                            <Edit2 className="w-3.5 h-3.5 text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity ml-1" />
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-[10px] uppercase font-bold tracking-widest text-gray-400">
+                          <span>Stock Level</span>
+                          <span>Threshold: {item.threshold}</span>
                         </div>
-                      ) : (
-                        <div className="flex items-baseline gap-1 cursor-pointer" onClick={() => { setEditId(item.id); setEditQty(String(item.quantity)); }}>
-                          <span className="text-2xl font-bold">{item.quantity}</span>
-                          <span className="text-sm text-gray-500">{item.unit}</span>
-                          <Edit2 className="w-3 h-3 text-gray-400 ml-1" />
-                        </div>
-                      )}
+                        <Progress value={pct} className={cn("h-2 bg-gray-100", isLow && "[&>div]:bg-red-500")} />
+                      </div>
                     </div>
-                    <Progress value={pct} className={cn("h-1.5", isLow && "[&>div]:bg-red-500")} />
-                    <div className="flex items-center justify-between mt-2">
-                      <span className="text-xs text-gray-500">Threshold: {item.threshold} {item.unit}</span>
-                      <Button variant="ghost" size="sm" className="text-red-500 h-6 px-2" onClick={() => deleteItem(item.id)}>
-                        <Trash2 className="w-3 h-3" />
+
+                    <div className="px-6 py-3 bg-gray-50/50 flex items-center justify-between border-t border-gray-50">
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider italic">Vendor</span>
+                        <span className="text-xs font-semibold text-gray-600 truncate max-w-[120px]">{item.vendorName || "Not assigned"}</span>
+                      </div>
+                      <Button variant="ghost" size="sm" className="text-red-400 hover:text-red-600 h-8 px-2" onClick={() => deleteItem(item.id)}>
+                        <Trash2 className="w-3.5 h-3.5" />
                       </Button>
                     </div>
-                    {item.vendorName && <p className="text-xs text-gray-400 mt-2">Vendor: {item.vendorName}</p>}
                   </CardContent>
                 </Card>
               );

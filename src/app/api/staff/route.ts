@@ -85,3 +85,52 @@ export async function POST(req: Request) {
 
   return NextResponse.json({ staff: staffUser }, { status: 201 });
 }
+
+export async function PUT(req: Request) {
+  const user = await getCurrentUser();
+  if (!user || !user.workspaceId)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (user.role !== "OWNER")
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+
+  const { id, name, email, password, canAccessInbox, canAccessBookings, canAccessForms, canAccessInventory } = await req.json();
+  if (!id) return NextResponse.json({ error: "User ID is required" }, { status: 400 });
+
+  const existingUser = await prisma.user.findUnique({
+    where: { id },
+  });
+
+  if (!existingUser || existingUser.workspaceId !== user.workspaceId) {
+    return NextResponse.json({ error: "User not found" }, { status: 404 });
+  }
+
+  const updateData: any = {
+    name,
+    email,
+    canAccessInbox,
+    canAccessBookings,
+    canAccessForms,
+    canAccessInventory,
+  };
+
+  if (password) {
+    updateData.passwordHash = await hashPassword(password);
+  }
+
+  const staff = await prisma.user.update({
+    where: { id },
+    data: updateData,
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      canAccessInbox: true,
+      canAccessBookings: true,
+      canAccessForms: true,
+      canAccessInventory: true,
+    },
+  });
+
+  return NextResponse.json({ staff });
+}

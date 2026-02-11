@@ -42,3 +42,33 @@ export async function POST(req: Request) {
 
   return NextResponse.json({ form }, { status: 201 });
 }
+
+export async function PUT(req: Request) {
+  const user = await getCurrentUser();
+  if (!user || !user.workspaceId)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (user.role !== "OWNER")
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+
+  const { id, name, fields, welcomeMessage } = await req.json();
+  if (!id) return NextResponse.json({ error: "Form ID is required" }, { status: 400 });
+
+  const existingForm = await prisma.contactForm.findUnique({
+    where: { id },
+  });
+
+  if (!existingForm || existingForm.workspaceId !== user.workspaceId) {
+    return NextResponse.json({ error: "Form not found" }, { status: 404 });
+  }
+
+  const form = await prisma.contactForm.update({
+    where: { id },
+    data: {
+      name,
+      fields: fields ? JSON.stringify(fields) : undefined,
+      welcomeMessage,
+    },
+  });
+
+  return NextResponse.json({ form });
+}

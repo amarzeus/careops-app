@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import {
   MessageSquare, Send, Sparkles, Mail, Smartphone,
-  Search, Clock, User, ChevronRight
+  Search, Clock, User, ChevronRight, Activity
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -53,6 +53,26 @@ export default function InboxPage() {
   const [search, setSearch] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  const filteredConversations = conversations.filter(c =>
+    c.contact.name.toLowerCase().includes(search.toLowerCase()) ||
+    c.contact.email?.toLowerCase().includes(search.toLowerCase()) ||
+    c.subject?.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const formatTime = (dateStr: string) => {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    if (diffMins < 1) return "now";
+    if (diffMins < 60) return `${diffMins}m`;
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) return `${diffHours}h`;
+    const diffDays = Math.floor(diffHours / 24);
+    if (diffDays < 7) return `${diffDays}d`;
+    return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  };
+
   useEffect(() => {
     fetchConversations();
   }, []);
@@ -72,7 +92,7 @@ export default function InboxPage() {
         const data = await res.json();
         setConversations(data.conversations);
       }
-    } catch {} finally { setLoading(false); }
+    } catch { } finally { setLoading(false); }
   };
 
   const fetchMessages = async (id: string) => {
@@ -84,7 +104,7 @@ export default function InboxPage() {
         // Update unread in list
         setConversations(prev => prev.map(c => c.id === id ? { ...c, unreadCount: 0 } : c));
       }
-    } catch {}
+    } catch { }
   };
 
   const sendMessage = async () => {
@@ -102,38 +122,49 @@ export default function InboxPage() {
         fetchMessages(selectedId);
         fetchConversations();
       }
-    } catch {} finally { setSending(false); }
+    } catch { } finally { setSending(false); }
   };
 
-  const fetchSmartReplies = async () => {
-    if (!selectedId) return;
-    setShowSmartReplies(true);
+  const refineWithAI = async () => {
+    if (!newMessage.trim()) return;
+    setSending(true);
+
     try {
-      const res = await fetch("/api/ai/smart-reply", {
+      const res = await fetch("/api/ai/refine-message", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ conversationId: selectedId }),
+        body: JSON.stringify({ content: newMessage }),
       });
       if (res.ok) {
         const data = await res.json();
-        setSmartReplies(data.replies);
+        setNewMessage(data.refined);
       }
-    } catch {}
+    } catch { } finally { setSending(false); }
   };
 
-  const filteredConversations = conversations.filter(c =>
-    c.contact.name.toLowerCase().includes(search.toLowerCase()) ||
-    c.contact.email?.toLowerCase().includes(search.toLowerCase())
-  );
-
-  const formatTime = (date: string) => {
-    const d = new Date(date);
-    const now = new Date();
-    const diff = now.getTime() - d.getTime();
-    if (diff < 60000) return "Just now";
-    if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
-    if (diff < 86400000) return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-    return d.toLocaleDateString([], { month: "short", day: "numeric" });
+  const fetchSmartReplies = async () => {
+    if (!selectedConvo) return;
+    try {
+      const messages = selectedConvo.conversation.messages || [];
+      const lastMessage = messages.find(m => m.direction === "INBOUND");
+      if (!lastMessage) return;
+      const history = messages.map(m => `${m.direction === "INBOUND" ? "Customer" : "Staff"}: ${m.content}`).join("\n");
+      const res = await fetch("/api/ai/smart-reply", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          conversationHistory: history,
+          lastMessage: lastMessage.content,
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setSmartReplies(data.replies || []);
+        setShowSmartReplies(true);
+      }
+    } catch {
+      setSmartReplies([]);
+    }
   };
 
   return (
@@ -154,9 +185,9 @@ export default function InboxPage() {
                 {[...Array(5)].map((_, i) => <div key={i} className="h-16 bg-gray-100 rounded-lg animate-pulse" />)}
               </div>
             ) : filteredConversations.length === 0 ? (
-              <div className="p-8 text-center">
-                <MessageSquare className="w-10 h-10 text-gray-300 mx-auto mb-3" />
-                <p className="text-sm text-gray-500">No conversations yet</p>
+              <div className="p-8 text-center text-gray-400">
+                <MessageSquare className="w-10 h-10 mx-auto mb-3 opacity-20" />
+                <p className="text-sm">No conversations found</p>
               </div>
             ) : (
               <div className="py-1">
@@ -200,7 +231,7 @@ export default function InboxPage() {
           {selectedConvo ? (
             <>
               {/* Thread Header */}
-              <div className="px-6 py-4 bg-white border-b flex items-center justify-between">
+              <div className="px-6 py-4 bg-white border-b flex items-center justify-between shadow-sm">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-sm font-medium text-blue-700">
                     {selectedConvo.conversation.contact.name.charAt(0).toUpperCase()}
@@ -226,15 +257,15 @@ export default function InboxPage() {
                   {selectedConvo.conversation.messages.map((msg) => (
                     <div key={msg.id} className={cn("flex", msg.direction === "OUTBOUND" ? "justify-end" : "justify-start")}>
                       <div className={cn(
-                        "max-w-[70%] rounded-2xl px-4 py-2.5",
+                        "max-w-[70%] rounded-2xl px-4 py-2.5 shadow-sm",
                         msg.direction === "OUTBOUND"
                           ? "bg-blue-600 text-white rounded-br-md"
-                          : "bg-white text-gray-800 shadow-sm rounded-bl-md"
+                          : "bg-white text-gray-800 rounded-bl-md"
                       )}>
-                        <p className="text-sm">{msg.content}</p>
-                        <div className={cn("flex items-center gap-2 mt-1", msg.direction === "OUTBOUND" ? "text-blue-200" : "text-gray-400")}>
+                        <p className="text-sm leading-relaxed">{msg.content}</p>
+                        <div className={cn("flex items-center gap-2 mt-1 opacity-70", msg.direction === "OUTBOUND" ? "text-blue-100" : "text-gray-400")}>
                           <span className="text-[10px]">{formatTime(msg.createdAt)}</span>
-                          {msg.isAutomated && <Badge variant="secondary" className="text-[9px] px-1 py-0">Auto</Badge>}
+                          {msg.isAutomated && <Badge variant="secondary" className="text-[9px] px-1 py-0 bg-white/20 text-blue-50">Auto</Badge>}
                           {msg.sender && <span className="text-[10px]">{msg.sender.name}</span>}
                         </div>
                       </div>
@@ -246,18 +277,18 @@ export default function InboxPage() {
 
               {/* Smart Replies */}
               {showSmartReplies && smartReplies.length > 0 && (
-                <div className="px-6 py-2 bg-purple-50 border-t border-purple-200">
-                  <p className="text-xs text-purple-600 font-medium mb-2 flex items-center gap-1">
-                    <Sparkles className="w-3 h-3" /> AI Suggestions
+                <div className="px-6 py-2 bg-purple-50 border-t border-purple-100 italic">
+                  <p className="text-[10px] text-purple-600 font-bold mb-2 flex items-center gap-1 uppercase tracking-wider">
+                    <Sparkles className="w-3 h-3" /> AI Smart Suggestions
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {smartReplies.map((reply, i) => (
                       <button
                         key={i}
                         onClick={() => { setNewMessage(reply); setShowSmartReplies(false); }}
-                        className="text-xs bg-white border border-purple-200 rounded-full px-3 py-1.5 hover:bg-purple-100 transition-colors text-purple-800"
+                        className="text-xs bg-white border border-purple-100 rounded-full px-4 py-2 hover:bg-purple-100 transition-colors text-purple-800 shadow-sm"
                       >
-                        {reply.substring(0, 60)}{reply.length > 60 ? "..." : ""}
+                        {reply}
                       </button>
                     ))}
                   </div>
@@ -267,8 +298,8 @@ export default function InboxPage() {
               {/* Compose */}
               <div className="px-6 py-4 bg-white border-t">
                 <div className="flex gap-2">
-                  <Button variant="ghost" size="icon" onClick={fetchSmartReplies} title="AI Smart Reply">
-                    <Sparkles className="w-4 h-4 text-purple-500" />
+                  <Button variant="ghost" size="icon" onClick={fetchSmartReplies} title="AI Smart Reply" className="hover:text-purple-600">
+                    <Sparkles className="w-4 h-4" />
                   </Button>
                   <Textarea
                     placeholder="Type your message..."
@@ -278,6 +309,9 @@ export default function InboxPage() {
                     className="flex-1 min-h-[40px] max-h-32 resize-none"
                     rows={1}
                   />
+                  <Button variant="outline" size="icon" onClick={refineWithAI} disabled={sending || !newMessage.trim()} title="Refine with AI" className="text-purple-600 border-purple-100 hover:bg-purple-50">
+                    <Activity className="w-4 h-4" />
+                  </Button>
                   <Button onClick={sendMessage} disabled={sending || !newMessage.trim()} className="bg-blue-600 hover:bg-blue-700">
                     <Send className="w-4 h-4" />
                   </Button>

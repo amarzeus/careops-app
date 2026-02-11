@@ -57,3 +57,31 @@ export async function POST(req: Request) {
 
   return NextResponse.json({ item }, { status: 201 });
 }
+
+export async function PUT(req: Request) {
+  const user = await getCurrentUser();
+  if (!user || !user.workspaceId)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (user.role !== "OWNER")
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+
+  const { id, name, quantity, threshold, unit } = await req.json();
+  if (!id) return NextResponse.json({ error: "ID is required" }, { status: 400 });
+
+  const existingItem = await prisma.inventoryItem.findFirst({
+    where: { id, workspaceId: user.workspaceId },
+  });
+  if (!existingItem) return NextResponse.json({ error: "Item not found" }, { status: 404 });
+
+  const item = await prisma.inventoryItem.update({
+    where: { id },
+    data: {
+      name,
+      quantity: quantity ? parseInt(String(quantity)) : undefined,
+      threshold: threshold ? parseInt(String(threshold)) : undefined,
+      unit,
+    },
+  });
+
+  return NextResponse.json({ item });
+}
