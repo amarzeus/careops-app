@@ -161,66 +161,49 @@ function buildStepStatus(step: number, info: Record<string, any>): string {
     case 1:
       return `BUSINESS TYPE: ${businessType}
 THIS STEP — Workspace fields:
-  name: ${ws.name ? `"${ws.name}" [FILLED]` : "[EMPTY - REQUIRED]"}
-  address: ${ws.address ? `"${ws.address}" [FILLED]` : "[EMPTY]"}
-  timezone: ${ws.timezone && ws.timezone !== "UTC" ? `"${ws.timezone}" [FILLED]` : `"UTC" [DEFAULT - suggest based on location]`}
-  contactEmail: ${ws.contactEmail ? `"${ws.contactEmail}" [FILLED]` : "[EMPTY - REQUIRED]"}
-  contactPhone: ${ws.contactPhone ? `"${ws.contactPhone}" [FILLED]` : "[EMPTY - OPTIONAL]"}`;
+${JSON.stringify(ws, null, 2)}`;
 
     case 2:
       return `BUSINESS TYPE: ${businessType}
-COMPLETED: Workspace="${ws.name}" (${ws.address || "no address"})
 THIS STEP — Email/SMS fields:
-  emailFromName: ${email.emailFromName ? `"${email.emailFromName}" [FILLED]` : "[EMPTY]"}
-  emailFromAddress: ${email.emailFromAddress ? `"${email.emailFromAddress}" [FILLED]` : "[EMPTY]"}
-  emailConfigured: ${email.emailConfigured ? "true [ENABLED]" : "false [DISABLED]"}
-SUGGESTION: Use "${ws.name || "Business"}" as sender name, "${ws.contactEmail || ""}" as sender email.`;
+${JSON.stringify(email, null, 2)}`;
 
     case 3:
       return `BUSINESS TYPE: ${businessType}
-COMPLETED: Workspace="${ws.name}", Email=${email.emailConfigured ? "Enabled" : "Disabled"}
-THIS STEP — Contact Form fields:
-  formName: ${cf.name && cf.name !== "Contact Us" ? `"${cf.name}" [FILLED]` : `"Contact Us" [DEFAULT]`}
-  welcomeMessage: ${cf.welcomeMessage && cf.welcomeMessage !== "Thank you for reaching out! We'll get back to you shortly." ? `[CUSTOMIZED]` : "[DEFAULT - suggest custom based on business type]"}`;
+THIS STEP — Contact Form:
+${JSON.stringify(cf, null, 2)}`;
 
     case 4:
       return `BUSINESS TYPE: ${businessType}
-COMPLETED: Workspace="${ws.name}", Email=${email.emailConfigured ? "Enabled" : "Disabled"}, Contact Form="${cf.name || "Contact Us"}"
 THIS STEP — Services/Bookings:
-  Current services (${svcs.length}): ${svcs.length > 0 ? svcs.map((s: any) => `"${s.name}" (${s.duration}min)`).join(", ") : "NONE YET — suggest services based on business type"}
-  Address for location default: "${ws.address || ""}"`;
+EXISTING SERVICES (Full Details):
+${JSON.stringify(svcs, null, 2)}`;
 
     case 5:
       return `BUSINESS TYPE: ${businessType}
-COMPLETED: Workspace="${ws.name}", Email=${email.emailConfigured ? "Enabled" : "Disabled"}, Contact Form="${cf.name || "Contact Us"}", Services=${svcs.length > 0 ? svcs.map((s: any) => s.name).join(", ") : "none"}
-THIS STEP — Intake Forms (post-booking):
-  Current intake forms (${forms.length}): ${forms.length > 0 ? forms.map((f: any) => `"${f.name}"`).join(", ") : "NONE YET — suggest forms with questions based on business type"}`;
+THIS STEP — Intake Forms:
+EXISTING FORMS (Full Details):
+${JSON.stringify(forms, null, 2)}`;
 
     case 6:
       return `BUSINESS TYPE: ${businessType}
-COMPLETED: Workspace="${ws.name}", Services=${svcs.length}, Intake Forms=${forms.length}
-THIS STEP — Inventory/Resources:
-  Current items (${inv.length}): ${inv.length > 0 ? inv.map((i: any) => `"${i.name}" (${i.quantity} ${i.unit})`).join(", ") : "NONE YET — suggest inventory items based on business type"}`;
+THIS STEP — Inventory:
+EXISTING ITEMS (Full Details):
+${JSON.stringify(inv, null, 2)}`;
 
     case 7:
       return `BUSINESS TYPE: ${businessType}
-COMPLETED: Workspace="${ws.name}", Services=${svcs.length}, Forms=${forms.length}, Inventory=${inv.length}
-THIS STEP — Staff (OPTIONAL):
-  Current staff (${staff.length}): ${staff.length > 0 ? staff.map((s: any) => `"${s.name}" (${s.email})`).join(", ") : "NONE — this step can be skipped"}`;
+THIS STEP — Staff:
+EXISTING STAFF (Full Details):
+${JSON.stringify(staff, null, 2)}`;
 
     case 8:
       return `BUSINESS TYPE: ${businessType}
 ACTIVATION CHECKLIST:
-  Workspace: ${ws.name ? `"${ws.name}" [OK]` : "[MISSING]"}
-  Communication: ${email.emailConfigured ? "[OK]" : "[NOT CONFIGURED]"}
-  Contact Form: ${cf.name ? `"${cf.name}" [OK]` : "[MISSING]"}
-  Services: ${svcs.length > 0 ? `${svcs.length} service(s) [OK]` : "[NONE]"}
-  Intake Forms: ${forms.length > 0 ? `${forms.length} form(s) [OK]` : "[NONE - optional]"}
-  Inventory: ${inv.length > 0 ? `${inv.length} item(s) [OK]` : "[NONE - optional]"}
-  Staff: ${staff.length > 0 ? `${staff.length} member(s) [OK]` : "[NONE - optional]"}`;
+${JSON.stringify({ ws, email, cf, serviceCount: svcs.length, formCount: forms.length, invCount: inv.length, staffCount: staff.length }, null, 2)}`;
 
     default:
-      return JSON.stringify(info);
+      return JSON.stringify(info, null, 2);
   }
 }
 
@@ -268,17 +251,20 @@ export async function aiOnboardingAssistant(
   currentStep: number,
   businessInfo: Record<string, any>,
   conversationHistory: Array<{ role: "user" | "assistant"; content: string }> = []
-): Promise<{ message: string; extractedData: Record<string, any> | null; shouldAdvance: boolean }> {
+): Promise<{ message: string; extractedData: Record<string, any> | null; shouldAdvance: boolean; navigationAction: { type: "jump"; targetStep: number } | null }> {
+  console.log("🤖 AI Assistant Called | Step:", currentStep);
+  console.log("📝 Business Context:", JSON.stringify(businessInfo, null, 2));
+
 
   // Step definitions — only extraction schema, no vague "goals"
   const stepSchemas: Record<number, { title: string; schema: string }> = {
     1: { title: "Workspace Setup", schema: '{ "name": "...", "address": "...", "timezone": "...", "contactEmail": "...", "contactPhone": "..." }' },
     2: { title: "Email & SMS", schema: '{ "emailFromName": "...", "emailFromAddress": "...", "emailConfigured": true }' },
     3: { title: "Contact Form", schema: '{ "formName": "...", "welcomeMessage": "..." }' },
-    4: { title: "Bookings / Services", schema: '{ "addServices": [{ "name": "...", "duration": "30", "location": "...", "startTime": "09:00", "endTime": "17:00" }] }' },
-    5: { title: "Intake Forms", schema: '{ "addIntakeForms": [{ "name": "...", "description": "...", "questions": ["Q1", "Q2", "Q3"] }] }' },
-    6: { title: "Inventory", schema: '{ "addInventoryItems": [{ "name": "...", "quantity": "100", "threshold": "10", "unit": "boxes" }] }' },
-    7: { title: "Staff", schema: '{ "addStaffMember": { "name": "...", "email": "...", "password": "..." } }' },
+    4: { title: "Bookings / Services", schema: '{ "addServices": [{ "name": "...", "duration": "30", "location": "...", "startTime": "09:00", "endTime": "17:00" }], "updateServices": [{ "name": "...", "duration": "...", "location": "...", "startTime": "...", "endTime": "..." }], "removeServices": ["Exact Name"] }' },
+    5: { title: "Intake Forms", schema: '{ "addIntakeForms": [{ "name": "...", "description": "...", "fields": "[]" }], "updateIntakeForms": [{ "name": "...", "description": "...", "fields": "..." }], "removeIntakeForms": ["Exact Name"] }' },
+    6: { title: "Inventory", schema: '{ "addInventoryItems": [{ "name": "...", "quantity": "...", "threshold": "...", "unit": "..." }], "updateInventoryItems": [{ "name": "...", "quantity": "...", "threshold": "...", "unit": "..." }], "removeInventoryItems": ["Exact Name"] }' },
+    7: { title: "Staff", schema: '{ "addStaffMember": { "name": "...", "email": "...", "role": "STAFF" }, "updateStaffMember": { "email": "...", "name": "...", "role": "..." }, "removeStaffMember": "email@address.com" }' },
     8: { title: "Activate", schema: 'null' },
   };
 
@@ -287,65 +273,67 @@ export async function aiOnboardingAssistant(
   const isGreeting = userMessage.startsWith("__GREETING__");
   const actualMessage = isGreeting ? "I just arrived on this step. Give me a proactive fire-up greeting." : userMessage;
 
-  const systemPrompt = `You are CareOps AI — a proactive onboarding concierge that sets up businesses. You don't just ask questions — you TAKE ACTION and suggest complete configurations.
+  const systemPrompt = `You are CareOps AI — a proactive onboarding concierge.
 
 ═══════════════════════════════════════════
   CURRENT STEP: ${currentStep} of 8 — "${stepInfo.title}"
 ═══════════════════════════════════════════
 
-## STEP-SPECIFIC STATUS (READ CAREFULLY):
+## STEP STATUS (FULL CONTEXT):
 ${stepStatus}
 
-## YOUR BEHAVIOR RULES
+## BEHAVIOR RULES:
 
-1. **FOCUS LOCK**: You are ONLY working on Step ${currentStep} ("${stepInfo.title}"). NEVER mention, ask about, or reference ANY other step. Previous steps are DONE. Future steps don't exist yet.
+1. **EXECUTE REQUIRED ACTION**:
+   - Look at "REQUIRED_ACTION" in the status above.
+   - If it says "ASK: ...", you **MUST** ask that question in your response.
+   - Do NOT just acknowledge "Updated". Acknowledge AND ASK.
 
-2. **FIRE-UP GREETING**: When the user just arrives on this step (first message or greeting), you MUST:
-   - Acknowledge what's been completed so far in ONE brief phrase
-   - Immediately suggest a complete configuration for THIS step based on the business type
-   - For Steps 4-6: Proactively generate items and ask "Should I add these?"
-   - Example: "Great, your workspace is set up! For your dental clinic, I'd suggest these services: Checkup (30min), Cleaning (45min), Consultation (20min). Want me to add them?"
+2. **FOCUS & NAVIGATION**: 
+   - Focus on Step ${currentStep}.
+   - **EXCEPTION**: If user asks to "go back" or "change [previous step]", return "navigationAction": { "type": "jump", "targetStep": [number] }.
 
-3. **PROACTIVE DATA EXTRACTION**: Extract ALL possible data from every user message. If the user says "yes", "sounds good", "do it", "set it up" — immediately generate and return the suggested data in extractedData. 
+2. **INTERACTION STYLE**:
+   - **IF GREETING (User just arrived)**: 
+     - **Steps 1-3 (Setup)**: You MUST ask a direct question for the first [EMPTY] field. Example: "What is the business email address?" (Do not just say "Let's set up email").
+     - **Steps 4-8 (Lists)**: Suggest a full list of items based on business type and ask "Should I add these?".
+     - **DO NOT** be repetitive ("Hello! CareOps here!"). Be efficient.
+   - **IF ONGOING**: 
+     - Acknowledge input briefly (e.g., "Got it", "Updated").
+     - **IMMEDIATELY** asking for the *NEXT* missing [EMPTY] field in the same message.
+     - **DO NOT WAIT** for the user to ask "what's next?". YOU lead the flow.
+     - If all fields are filled, ask: "Everything looks good here. Ready to move to the next step?"
 
-4. **SMART DEFAULTS by business type**:
-   - Dental: services (Checkup 30m, Cleaning 45m, Root Canal 60m, Consultation 20m), forms (Patient Intake, Medical History), inventory (Gloves, Masks, Bibs, X-ray film)
-   - Salon/Spa: services (Haircut 30m, Color 90m, Manicure 45m, Facial 60m), forms (Client Preferences, Allergy Checklist), inventory (Shampoo, Conditioner, Hair dye, Towels)
-   - Medical: services (Consultation 30m, Follow-up 15m, Physical 45m), forms (Medical History, Insurance Info), inventory (Gloves, Syringes, Bandages)
-   - Fitness: services (PT Session 60m, Group Class 45m, Assessment 30m), forms (Health Questionnaire, Waiver), inventory (Towels, Mats, Sanitizer)
-   - Consulting: services (Discovery Call 30m, Strategy Session 60m, Follow-up 30m), forms (Client Questionnaire, NDA/Agreement), inventory (Notepads, Printed materials)
-   - Generic: services (Consultation 30m, Service Appointment 60m, Follow-up 30m), forms (Client Information), inventory (Office Supplies, Cleaning supplies)
+3. **SMART DEFAULTS (Business Type: ${businessInfo.workspace?.name ? "Inferred" : "Generic"})**:
+   - Use the context to suggest relevant services/forms if fields are empty.
+   - **STRICT TIMEZONES**: Map location to: UTC, America/New_York, America/Chicago, America/Denver, America/Los_Angeles, Asia/Kolkata, Europe/London.
 
-    5. **NEVER REPEAT**: If a field is marked [FILLED] above, do NOT ask about it again. Only ask about [EMPTY] fields. If items (services/forms/inventory) are already listed, do NOT suggest the same ones again.
+4. **DATA EXTRACTION**:
+   - Extract ALL provided data.
+   - If user says "use defaults" or "yes", generate the full configuration for this step.
 
-    6. **CONCISE RESPONSES**: 2-3 sentences max. Sound natural and confident. No bullet points in message.
+5. **JSON ONLY**: Return ONLY the JSON object. No markdown. No text outside JSON.
 
-    7. **ADVANCE LOGIC**: Set shouldAdvance=true ONLY when:
-       - Steps 1-3: All required fields are filled
-       - Steps 4-6: User confirms they're done adding items OR says "continue/next" OR after a bulk add if no other questions asked.
-       - Step 7: User says skip/done/next OR confirms after adding staff
-       - Step 8: User confirms activation
-       - **CRITICAL**: If the user says "continue", "next", "skip", or "go on", ALWAYS set shouldAdvance=true.
-
-    8. **BULK ADD RESPONSE**: When you extract bulk data (addServices, addIntakeForms, etc.):
-       - Your message MUST confirm the action AND ask if they are done.
-       - Example: "I've added those 3 services. Ready to move to the next step?"
-       - Do NOT just say "Okay, I'll add them."
-
-    ## EXTRACTION SCHEMA for Step ${currentStep}:
+## EXTRACTION SCHEMA for Step ${currentStep}:
 ${stepInfo.schema}
 
-## SINGLE-ITEM ALTERNATIVES (also accepted):
-Step 4: { "addService": { "name": "...", "duration": "30", ... } }
-Step 5: { "addIntakeForm": { "name": "...", "description": "...", "questions": [...] } }
-Step 6: { "addInventoryItem": { "name": "...", "quantity": "...", "threshold": "...", "unit": "..." } }
-
-## JSON RESPONSE FORMAT (STRICT — return ONLY this):
+## JSON RESPONSE FORMAT:
 {
-  "message": "Your conversational response",
+  "message": "Conversational response (max 2 sentences)",
   "extractedData": <schema object or null>,
-  "shouldAdvance": false
-}`;
+  "shouldAdvance": false,
+  "navigationAction": null or { "type": "jump", "targetStep": <number> }
+}
+
+## REFERENCE - STEP MAP (Use this to resolve "targetStep"):
+1: Workspace (Name, Address, Phone)
+2: Communication (Email, SMS)
+3: Contact Form (Public form, Welcome message)
+4: Bookings (Services, Durations, Prices)
+5: Intake Forms (Post-booking questions)
+6: Inventory (Items, Stock, Thresholds)
+7: Staff (Team members, Access)
+8: Activate (Review & Launch)`;
 
   try {
     const model = genAI.getGenerativeModel({
@@ -361,15 +349,24 @@ Step 6: { "addInventoryItem": { "name": "...", "quantity": "...", "threshold": "
     const text = result.response.text();
 
     try {
-      const cleaned = text.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+      // Robust JSON extraction: match first { to last }
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      const cleaned = jsonMatch ? jsonMatch[0] : text.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+
       const parsed = JSON.parse(cleaned);
       return {
         message: parsed.message || "Let me help you with that.",
         extractedData: parsed.extractedData || null,
         shouldAdvance: !!parsed.shouldAdvance,
+        navigationAction: parsed.navigationAction || null
       };
-    } catch {
-      return { message: text, extractedData: null, shouldAdvance: false };
+    } catch (parseError) {
+      console.warn("AI JSON Parse Error:", parseError, "Text received:", text);
+      // Fallback: if text looks like a normal message, treat it as one
+      if (!text.includes("{")) {
+        return { message: text, extractedData: null, shouldAdvance: false, navigationAction: null };
+      }
+      throw parseError; // Re-throw to outer catch if it really was broken JSON
     }
   } catch (err: any) {
     console.error("AI Onboarding Error:", err?.message || err);
@@ -377,6 +374,13 @@ Step 6: { "addInventoryItem": { "name": "...", "quantity": "...", "threshold": "
       message: "I had a small hiccup processing that. Could you try again?",
       extractedData: null,
       shouldAdvance: false,
+      navigationAction: null
     };
   }
 }
+export type AIOnboardingResponse = {
+  message: string;
+  extractedData: Record<string, any> | null;
+  shouldAdvance: boolean;
+  navigationAction: { type: "jump"; targetStep: number } | null;
+};

@@ -35,9 +35,11 @@ export function DotGlobe({ voiceState, amplitude, size = 180 }: DotGlobeProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animRef = useRef<number>(0);
   const rotationRef = useRef(0);
-  const pointsRef = useRef(generateSpherePoints(300, size * 0.35));
-  const smoothAmpRef = useRef(0);
-  const timeRef = useRef(0);
+  /* Use a ref for amplitude to avoid re-triggering the effect on every frame */
+  const amplitudeRef = useRef(amplitude);
+  useEffect(() => {
+    amplitudeRef.current = amplitude;
+  }, [amplitude]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -47,6 +49,7 @@ export function DotGlobe({ voiceState, amplitude, size = 180 }: DotGlobeProps) {
 
     // HiDPI support
     const dpr = window.devicePixelRatio || 1;
+    // ... (rest of setup)
     canvas.width = size * dpr;
     canvas.height = size * dpr;
     ctx.scale(dpr, dpr);
@@ -54,14 +57,15 @@ export function DotGlobe({ voiceState, amplitude, size = 180 }: DotGlobeProps) {
     const centerX = size / 2;
     const centerY = size / 2;
     const focalLength = size * 1.2;
-    const points = pointsRef.current;
+    // ...
+    // ...
 
     const draw = () => {
       ctx.clearRect(0, 0, size, size);
       timeRef.current += 0.016;
 
-      // Smooth amplitude
-      const targetAmp = amplitude;
+      // Smooth amplitude - READ FROM REF
+      const targetAmp = amplitudeRef.current;
       smoothAmpRef.current += (targetAmp - smoothAmpRef.current) * 0.15;
       const amp = smoothAmpRef.current;
 
@@ -79,8 +83,11 @@ export function DotGlobe({ voiceState, amplitude, size = 180 }: DotGlobeProps) {
       const cosT = Math.cos(tiltAngle);
       const sinT = Math.sin(tiltAngle);
 
+      const points = pointsRef.current; // access ref here
+
       // Sort points by z-depth for proper rendering
       const projected = points.map((p, idx) => {
+        // ... (rest of points logic is same)
         // Displacement based on state and amplitude
         let dx = p.x, dy = p.y, dz = p.z;
 
@@ -171,7 +178,7 @@ export function DotGlobe({ voiceState, amplitude, size = 180 }: DotGlobeProps) {
 
     draw();
     return () => cancelAnimationFrame(animRef.current);
-  }, [voiceState, amplitude, size]);
+  }, [voiceState, size]); // REMOVED amplitude from dependency array
 
   return (
     <canvas
@@ -183,7 +190,7 @@ export function DotGlobe({ voiceState, amplitude, size = 180 }: DotGlobeProps) {
 }
 
 // ---- Voice Engine Hook ----
-export function useVoiceEngine(onTranscript: (text: string) => Promise<string>) {
+export function useVoiceEngine(onTranscript: (text: string, context?: any) => Promise<string>) {
   const [voiceState, setVoiceState] = useState<VoiceState>("idle");
   const [transcript, setTranscript] = useState("");
   const [interimTranscript, setInterimTranscript] = useState("");
@@ -191,6 +198,15 @@ export function useVoiceEngine(onTranscript: (text: string) => Promise<string>) 
   const [isMuted, setIsMuted] = useState(false);
   const [amplitude, setAmplitude] = useState(0);
   const [error, setError] = useState<string | null>(null);
+
+  // Continuous Mode State
+  const [continuousMode, setContinuousModeState] = useState(false);
+  const continuousModeRef = useRef(false);
+
+  const setContinuousMode = useCallback((active: boolean) => {
+    setContinuousModeState(active);
+    continuousModeRef.current = active;
+  }, []);
 
   const recognitionRef = useRef<any>(null);
   const synthRef = useRef<SpeechSynthesis | null>(null);
@@ -203,6 +219,12 @@ export function useVoiceEngine(onTranscript: (text: string) => Promise<string>) 
 
   useEffect(() => {
     synthRef.current = window.speechSynthesis;
+    // Load voices early
+    if (window.speechSynthesis.onvoiceschanged !== undefined) {
+      window.speechSynthesis.onvoiceschanged = () => {
+        // Just trigger a re-render or ensure voices are loaded
+      };
+    }
     return () => {
       cleanup();
     };
@@ -210,7 +232,7 @@ export function useVoiceEngine(onTranscript: (text: string) => Promise<string>) 
 
   const cleanup = useCallback(() => {
     if (recognitionRef.current) {
-      try { recognitionRef.current.stop(); } catch {}
+      try { recognitionRef.current.stop(); } catch { }
       recognitionRef.current = null;
     }
     if (silenceTimerRef.current) {
@@ -231,7 +253,7 @@ export function useVoiceEngine(onTranscript: (text: string) => Promise<string>) 
 
   const stopListening = useCallback(() => {
     if (recognitionRef.current) {
-      try { recognitionRef.current.stop(); } catch {}
+      try { recognitionRef.current.stop(); } catch { }
       recognitionRef.current = null;
     }
     if (silenceTimerRef.current) {
@@ -241,15 +263,22 @@ export function useVoiceEngine(onTranscript: (text: string) => Promise<string>) 
   }, []);
 
   const stopSpeaking = useCallback(() => {
-    if (synthRef.current) synthRef.current.cancel();
+    if (synthRef.current) {
+      synthRef.current.cancel();
+    }
     utteranceRef.current = null;
   }, []);
 
   // Audio amplitude monitoring
   const startAmplitudeMonitoring = useCallback((stream: MediaStream) => {
     try {
+      // CLEAR PREVIOUS LOOP
+      cancelAnimationFrame(ampFrameRef.current);
+
       const audioCtx = new AudioContext();
       const analyser = audioCtx.createAnalyser();
+      // ...
+      // ...
       analyser.fftSize = 256;
       const source = audioCtx.createMediaStreamSource(stream);
       source.connect(analyser);
@@ -272,9 +301,14 @@ export function useVoiceEngine(onTranscript: (text: string) => Promise<string>) 
     }
   }, []);
 
+  // Forward declaration for startListening to be used in speak callback
+  const startListeningRef = useRef<() => void>(() => { });
+
   const speak = useCallback((text: string) => {
     if (!synthRef.current || isMuted) {
-      setVoiceState("idle");
+      setVoiceState(continuousModeRef.current ? "listening" : "idle");
+      // If continuous and muted (which is weird but possible), we might want to restart listening immediately
+      if (continuousModeRef.current && !isMuted) startListeningRef.current();
       return;
     }
 
@@ -312,25 +346,41 @@ export function useVoiceEngine(onTranscript: (text: string) => Promise<string>) 
     if (preferred) utterance.voice = preferred;
 
     utterance.onend = () => {
-      setVoiceState("idle");
       setAmplitude(0);
       cancelAnimationFrame(ampFrameRef.current);
       utteranceRef.current = null;
+
+      if (continuousModeRef.current && !isMuted) {
+        // Auto-restart listening after speaking
+        startListeningRef.current();
+      } else {
+        setVoiceState("idle");
+      }
     };
     utterance.onerror = () => {
-      setVoiceState("idle");
       setAmplitude(0);
       cancelAnimationFrame(ampFrameRef.current);
       utteranceRef.current = null;
+      setVoiceState("idle");
     };
 
     utteranceRef.current = utterance;
     synthRef.current.speak(utterance);
     animateSpeakAmp();
-  }, [isMuted]);
+  }, [isMuted, continuousMode]);
 
   const processTranscript = useCallback(async (text: string) => {
     if (!text.trim()) return;
+
+    // Check for exit commands
+    if (text.toLowerCase().match(/^(stop|cancel|exit|goodbye|bye)$/)) {
+      stopSpeaking();
+      setVoiceState("idle");
+      setContinuousMode(false);
+      setAiResponse("Voice mode ended.");
+      return;
+    }
+
     setVoiceState("processing");
     setTranscript(text);
     setInterimTranscript("");
@@ -350,14 +400,18 @@ export function useVoiceEngine(onTranscript: (text: string) => Promise<string>) 
     analyserRef.current = null;
 
     try {
-      const response = await onTranscript(text);
+      // Pass window.location.href or other context if needed
+      const response = await onTranscript(text, {
+        url: window.location.pathname,
+        title: document.title
+      });
       setAiResponse(response);
       speak(response);
     } catch {
       setError("Failed to get AI response.");
       setVoiceState("idle");
     }
-  }, [onTranscript, speak]);
+  }, [onTranscript, speak, stopSpeaking]);
 
   const startListening = useCallback(async () => {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
@@ -366,11 +420,14 @@ export function useVoiceEngine(onTranscript: (text: string) => Promise<string>) 
       return;
     }
 
+    // Stop speaking if currently speaking (interrupt)
     stopSpeaking();
+
     setError(null);
     setTranscript("");
     setInterimTranscript("");
-    setAiResponse("");
+    // Keep AI response visible until new one
+    // setAiResponse(""); 
 
     // Get mic stream for amplitude analysis
     try {
@@ -410,35 +467,53 @@ export function useVoiceEngine(onTranscript: (text: string) => Promise<string>) 
           stopListening();
           processTranscript(text.trim());
         }
-      }, 1500);
+      }, 1500); // 1.5s silence detection
     };
 
     recognition.onerror = (event: any) => {
-      if (event.error === "no-speech" || event.error === "aborted") return;
+      if (event.error === "no-speech") {
+        // If in continuous mode and no speech, just restart or stay listening?
+        // For now, let's just ignore no-speech errors in continuous mode to prevent loop crashes
+        return;
+      }
+      if (event.error === "aborted") return;
+
       setError(`Mic error: ${event.error}`);
       setVoiceState("idle");
+      setContinuousMode(false);
     };
 
     recognition.onend = () => {
-      // handled by silence timer
+      // handled by silence timer usually
     };
 
     recognitionRef.current = recognition;
     recognition.start();
   }, [stopSpeaking, stopListening, processTranscript, startAmplitudeMonitoring]);
 
+  // Assign to ref for use in speak callback
+  useEffect(() => {
+    startListeningRef.current = startListening;
+  }, [startListening]);
+
   const handleMicClick = useCallback(() => {
     if (voiceState === "listening") {
+      // User manually stopped listening
       const text = transcript || interimTranscript;
       stopListening();
       if (text.trim()) processTranscript(text.trim());
-      else setVoiceState("idle");
+      else {
+        setVoiceState("idle");
+        setContinuousMode(false); // Manual stop exits continuous mode
+      }
     } else if (voiceState === "speaking") {
+      // Interrupt speaking
       stopSpeaking();
-      setVoiceState("idle");
-      setAmplitude(0);
+      startListening(); // Immediately start listening again (interrupt to talk)
+      setContinuousMode(true);
     } else if (voiceState === "idle") {
       startListening();
+      setContinuousMode(true); // Explicit start enables continuous mode
     }
   }, [voiceState, transcript, interimTranscript, stopListening, stopSpeaking, startListening, processTranscript]);
 
@@ -447,6 +522,7 @@ export function useVoiceEngine(onTranscript: (text: string) => Promise<string>) 
     stopSpeaking();
     cleanup();
     setVoiceState("idle");
+    setContinuousMode(false);
     setTranscript("");
     setInterimTranscript("");
     setAiResponse("");
@@ -465,6 +541,9 @@ export function useVoiceEngine(onTranscript: (text: string) => Promise<string>) 
     handleMicClick,
     setIsMuted: (m: boolean) => { setIsMuted(m); if (m) stopSpeaking(); },
     stop,
+    // Expose speak manually for greetings
+    speak,
+    setContinuousMode
   };
 }
 
@@ -473,13 +552,38 @@ interface InlineVoiceModeProps {
   onTranscript: (text: string) => Promise<string>;
   onClose: () => void;
   className?: string;
+  autoStart?: boolean;
+  initialGreeting?: string;
 }
 
-export function InlineVoiceMode({ onTranscript, onClose, className }: InlineVoiceModeProps) {
+export function InlineVoiceMode({ onTranscript, onClose, className, autoStart = true, initialGreeting }: InlineVoiceModeProps) {
   const {
     voiceState, transcript, interimTranscript, aiResponse,
     isMuted, amplitude, error, handleMicClick, setIsMuted, stop,
+    speak, setContinuousMode
   } = useVoiceEngine(onTranscript);
+
+  // Auto-start and Greet
+  const hasStartedRef = useRef(false);
+
+  useEffect(() => {
+    if (!hasStartedRef.current && autoStart) {
+      hasStartedRef.current = true;
+
+      // Slight delay to ensure components are ready
+      setTimeout(() => {
+        if (initialGreeting) {
+          speak(initialGreeting);
+          // The engine's speak method will auto-trigger listening after speech ends if continuous mode is on.
+          // So we set continuous mode to true here.
+          setContinuousMode(true);
+        } else {
+          // Just start listening
+          handleMicClick();
+        }
+      }, 500);
+    }
+  }, [autoStart, initialGreeting, speak, handleMicClick, setContinuousMode]);
 
   const handleClose = () => {
     stop();
@@ -605,5 +709,115 @@ export function VoiceAssistantFAB({ onClick, pulse = false }: { onClick: () => v
       )}
       <Mic className="w-6 h-6 text-white group-hover:scale-110 transition-transform" />
     </button>
+  );
+}
+
+// ---- Global Voice Overlay ----
+import { motion, AnimatePresence } from "framer-motion";
+
+interface GlobalVoiceOverlayProps {
+  voiceState: VoiceState;
+  transcript: string;
+  interimTranscript: string;
+  aiResponse: string;
+  amplitude: number;
+  onClose: () => void;
+  isMuted: boolean;
+  toggleMute: () => void;
+}
+
+export function GlobalVoiceOverlay({
+  voiceState,
+  transcript,
+  interimTranscript,
+  aiResponse,
+  amplitude,
+  onClose,
+  isMuted,
+  toggleMute
+}: GlobalVoiceOverlayProps) {
+  // Only show if not idle
+  const isVisible = voiceState !== "idle" || transcript || aiResponse;
+
+  return (
+    <AnimatePresence>
+      {isVisible && (
+        <motion.div
+          initial={{ opacity: 0, y: 50, scale: 0.9 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: 50, scale: 0.9 }}
+          className="fixed bottom-24 right-6 z-50 w-80 md:w-96 bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl border border-indigo-100 overflow-hidden"
+        >
+          {/* Header */}
+          <div className="bg-gradient-to-r from-indigo-50 to-purple-50 px-4 py-3 flex items-center justify-between border-b border-indigo-100/50">
+            <div className="flex items-center gap-2">
+              <div className={cn(
+                "w-2 h-2 rounded-full",
+                voiceState === "listening" && "bg-red-500 animate-pulse",
+                voiceState === "processing" && "bg-purple-500 animate-pulse",
+                voiceState === "speaking" && "bg-emerald-500 animate-pulse",
+                voiceState === "idle" && "bg-gray-400"
+              )} />
+              <span className="text-xs font-semibold text-indigo-900 uppercase tracking-wide">
+                {voiceState === "listening" ? "Listening..." :
+                  voiceState === "processing" ? "Thinking..." :
+                    voiceState === "speaking" ? "Speaking..." : "Ready"}
+              </span>
+            </div>
+            <div className="flex gap-1">
+              <button onClick={toggleMute} className="p-1.5 hover:bg-white/50 rounded-full text-indigo-400 hover:text-indigo-600 transition-colors">
+                {isMuted ? <VolumeX size={14} /> : <Volume2 size={14} />}
+              </button>
+              <button onClick={onClose} className="p-1.5 hover:bg-red-50 rounded-full text-gray-400 hover:text-red-500 transition-colors">
+                <X size={14} />
+              </button>
+            </div>
+          </div>
+
+          {/* Visualizer Region */}
+          <div className="h-32 bg-gradient-to-b from-white to-indigo-50/30 flex items-center justify-center relative">
+            <DotGlobe voiceState={voiceState} amplitude={amplitude} size={120} />
+            {/* Icon Overlay */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              {voiceState === "idle" && <Mic className="text-gray-300 w-6 h-6" />}
+            </div>
+          </div>
+
+          {/* Transcript Region */}
+          <div className="px-4 py-3 max-h-48 overflow-y-auto space-y-3 bg-white">
+            {(transcript || interimTranscript) && (
+              <motion.div
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="flex gap-2"
+              >
+                <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center shrink-0 mt-0.5">
+                  <span className="text-[10px] font-bold text-gray-500">YOU</span>
+                </div>
+                <p className="text-sm text-gray-700 leading-relaxed">
+                  {transcript}
+                  <span className="text-gray-400 italic">{interimTranscript}</span>
+                </p>
+              </motion.div>
+            )}
+
+            {aiResponse && (
+              <motion.div
+                initial={{ opacity: 0, x: 10 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="flex gap-2"
+              >
+                <div className="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center shrink-0 mt-0.5">
+                  <span className="text-[10px] font-bold text-indigo-600">AI</span>
+                </div>
+                <p className="text-sm text-indigo-900 leading-relaxed">
+                  {aiResponse}
+                </p>
+              </motion.div>
+            )}
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }

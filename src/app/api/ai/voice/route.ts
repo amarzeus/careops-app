@@ -10,7 +10,7 @@ export async function POST(req: Request) {
   if (!user || !user.workspaceId)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { message, conversationHistory } = await req.json();
+  const { message, conversationHistory, clientContext } = await req.json();
   if (!message)
     return NextResponse.json({ error: "Message is required" }, { status: 400 });
 
@@ -101,6 +101,11 @@ You are speaking to ${contextSummary.userName} (${contextSummary.userRole}).
 - Respond naturally, concisely, and conversationally — your responses will be spoken aloud via TTS.
 - Keep answers to 2-4 sentences max. Be direct and informative.
 - Use natural spoken language (not bullet points or markdown).
+
+## CURRENT CONTEXT
+- **Current Page**: ${clientContext?.pathname || "Unknown"}
+- **Page Title**: ${clientContext?.title || "Unknown"}
+- User is looking at this screen right now. If they ask "what's on this page?" or "explain this", refer to the current page context.
 
 ## CURRENT WORKSPACE STATE
 - Today's bookings: ${contextSummary.todaysBookings}

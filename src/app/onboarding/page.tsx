@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import {
   Building2, Mail, FileText, Calendar, ClipboardList,
   Package, Users, Rocket, Sparkles, Send, Check,
-  ArrowRight, ArrowLeft, Mic, Activity, MessageSquare
+  ArrowRight, ArrowLeft, Mic, Activity, MessageSquare, Edit2, Trash2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -128,9 +128,10 @@ export default function OnboardingPage() {
       setChatMessages([{ role: "assistant", content: aiMessage }]);
 
       // Apply any extracted data from proactive AI (e.g., auto-suggestions)
-      if (data.extractedData) {
+      // DISABLED: Prevent auto-fill on greeting to avoid hallucinations. User must confirm.
+      /* if (data.extractedData) {
         applyExtractedData(data.extractedData);
-      }
+      } */
     } catch (e) {
       setChatMessages([{ role: "assistant", content: "Hi! I'm here to help you set up this step. Tell me about your business or say 'set it up' and I'll suggest everything." }]);
     } finally {
@@ -250,7 +251,9 @@ export default function OnboardingPage() {
         applyExtractedData(data.extractedData);
       }
 
-      if (data.shouldAdvance) {
+      if (data.navigationAction && data.navigationAction.type === "jump") {
+        setCurrentStep(data.navigationAction.targetStep);
+      } else if (data.shouldAdvance) {
         setAutoAdvance(true);
       }
 
@@ -295,7 +298,12 @@ export default function OnboardingPage() {
         ...(data.welcomeMessage && { welcomeMessage: data.welcomeMessage }),
       }));
     } else if (currentStep === 4) {
-      // Support bulk services
+      // Step 4: Services
+      if (data.removeServices && Array.isArray(data.removeServices)) {
+        const toRemove = data.removeServices.map((n: string) => n.toLowerCase());
+        setServices(prev => prev.filter(s => !toRemove.includes(s.name.toLowerCase())));
+      }
+
       if (data.addServices && Array.isArray(data.addServices)) {
         const newServices = data.addServices
           .filter((s: any) => s.name && !services.some(existing => existing.name === s.name))
@@ -310,6 +318,23 @@ export default function OnboardingPage() {
         if (newServices.length > 0) {
           setServices(prev => [...prev, ...newServices]);
         }
+      }
+
+      if (data.updateServices && Array.isArray(data.updateServices)) {
+        const updates = data.updateServices;
+        setServices(prev => prev.map(s => {
+          const match = updates.find((u: any) => u.name && u.name.toLowerCase() === s.name.toLowerCase());
+          if (match) {
+            return {
+              ...s,
+              ...(match.duration && { duration: String(match.duration) }),
+              ...(match.location && { location: match.location }),
+              ...(match.startTime && { startTime: match.startTime }),
+              ...(match.endTime && { endTime: match.endTime })
+            };
+          }
+          return s;
+        }));
       } else if (data.addService) {
         const s = data.addService;
         if (s.name) {
@@ -334,7 +359,11 @@ export default function OnboardingPage() {
         });
       }
     } else if (currentStep === 5) {
-      // Support bulk intake forms
+      if (data.removeIntakeForms && Array.isArray(data.removeIntakeForms)) {
+        const toRemove = data.removeIntakeForms.map((n: string) => n.toLowerCase());
+        setIntakeForms(prev => prev.filter(f => !toRemove.includes(f.name.toLowerCase())));
+      }
+
       if (data.addIntakeForms && Array.isArray(data.addIntakeForms)) {
         const newForms = data.addIntakeForms
           .filter((f: any) => f.name && !intakeForms.some(existing => existing.name === f.name))
@@ -346,6 +375,21 @@ export default function OnboardingPage() {
         if (newForms.length > 0) {
           setIntakeForms(prev => [...prev, ...newForms]);
         }
+      }
+
+      if (data.updateIntakeForms && Array.isArray(data.updateIntakeForms)) {
+        const updates = data.updateIntakeForms;
+        setIntakeForms(prev => prev.map(f => {
+          const match = updates.find((u: any) => u.name && u.name.toLowerCase() === f.name.toLowerCase());
+          if (match) {
+            return {
+              ...f,
+              ...(match.description && { description: match.description }),
+              ...(match.fields && { fields: typeof match.fields === 'string' ? match.fields : JSON.stringify(match.fields) })
+            };
+          }
+          return f;
+        }));
       } else if (data.addIntakeForm) {
         const f = data.addIntakeForm;
         if (f.name) {
@@ -371,7 +415,11 @@ export default function OnboardingPage() {
         });
       }
     } else if (currentStep === 6) {
-      // Support bulk inventory items
+      if (data.removeInventoryItems && Array.isArray(data.removeInventoryItems)) {
+        const toRemove = data.removeInventoryItems.map((n: string) => n.toLowerCase());
+        setInventoryItems(prev => prev.filter(i => !toRemove.includes(i.name.toLowerCase())));
+      }
+
       if (data.addInventoryItems && Array.isArray(data.addInventoryItems)) {
         const newItems = data.addInventoryItems
           .filter((item: any) => item.name && !inventoryItems.some(existing => existing.name === item.name))
@@ -384,6 +432,22 @@ export default function OnboardingPage() {
         if (newItems.length > 0) {
           setInventoryItems(prev => [...prev, ...newItems]);
         }
+      }
+
+      if (data.updateInventoryItems && Array.isArray(data.updateInventoryItems)) {
+        const updates = data.updateInventoryItems;
+        setInventoryItems(prev => prev.map(item => {
+          const match = updates.find((u: any) => u.name && u.name.toLowerCase() === item.name.toLowerCase());
+          if (match) {
+            return {
+              ...item,
+              ...(match.quantity && { quantity: String(match.quantity) }),
+              ...(match.threshold && { threshold: String(match.threshold) }),
+              ...(match.unit && { unit: match.unit })
+            };
+          }
+          return item;
+        }));
       } else if (data.addInventoryItem) {
         const item = data.addInventoryItem;
         if (item.name) {
@@ -406,6 +470,11 @@ export default function OnboardingPage() {
         });
       }
     } else if (currentStep === 7) {
+      if (data.removeStaffMember) {
+        const toRemove = data.removeStaffMember.toLowerCase();
+        setStaffMembers(prev => prev.filter(s => s.email.toLowerCase() !== toRemove));
+      }
+
       if (data.addStaffMember) {
         const s = data.addStaffMember;
         if (s.name && s.email) {
@@ -416,6 +485,22 @@ export default function OnboardingPage() {
               password: s.password || "welcome123"
             }]);
           }
+        }
+      }
+
+      if (data.updateStaffMember) {
+        const u = data.updateStaffMember;
+        if (u.email) {
+          setStaffMembers(prev => prev.map(s => {
+            if (s.email.toLowerCase() === u.email.toLowerCase()) {
+              return {
+                ...s,
+                ...(u.name && { name: u.name }),
+                ...(u.role && { role: u.role })
+              };
+            }
+            return s;
+          }));
         }
       } else if (data.updateLastStaffMember) {
         const u = data.updateLastStaffMember;
@@ -595,6 +680,15 @@ export default function OnboardingPage() {
     }
   };
 
+  const removeService = (index: number) => {
+    setServices(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const editService = (index: number) => {
+    setNewService(services[index]);
+    removeService(index);
+  };
+
   const addIntakeForm = () => {
     if (newIntakeForm.name) {
       setIntakeForms(prev => [...prev, { ...newIntakeForm }]);
@@ -602,11 +696,29 @@ export default function OnboardingPage() {
     }
   };
 
+  const removeIntakeForm = (index: number) => {
+    setIntakeForms(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const editIntakeForm = (index: number) => {
+    setNewIntakeForm(intakeForms[index]);
+    removeIntakeForm(index);
+  };
+
   const addInventoryItem = () => {
     if (newItem.name) {
       setInventoryItems(prev => [...prev, { ...newItem }]);
       setNewItem({ name: "", quantity: "0", threshold: "5", unit: "units" });
     }
+  };
+
+  const removeInventoryItem = (index: number) => {
+    setInventoryItems(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const editInventoryItem = (index: number) => {
+    setNewItem(inventoryItems[index]);
+    removeInventoryItem(index);
   };
 
   const addStaffMember = () => {
@@ -745,12 +857,20 @@ export default function OnboardingPage() {
                 <Label className="text-[10px] font-bold uppercase text-gray-500">Added Services ({services.length})</Label>
                 <div className="max-h-[120px] overflow-y-auto space-y-1 pr-1">
                   {services.map((s, i) => (
-                    <div key={i} className="flex items-center justify-between p-2 border rounded bg-white text-xs animate-fade-in">
+                    <div key={i} className="flex items-center justify-between p-2 border rounded bg-white text-xs animate-fade-in group hover:border-blue-200 transition-colors">
                       <div>
                         <p className="font-medium">{s.name}</p>
                         <p className="text-[10px] text-gray-500">{s.duration}m | {s.startTime}-{s.endTime} {s.location ? `| ${s.location}` : ""}</p>
                       </div>
-                      <Badge variant="outline" className="text-green-600 border-green-200 bg-green-50 text-[10px] h-5 px-1">Added</Badge>
+                      <div className="flex items-center gap-1">
+                        <Button variant="ghost" size="icon" className="h-6 w-6 text-gray-400 hover:text-blue-600" onClick={() => editService(i)}>
+                          <Edit2 className="h-3 w-3" />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-6 w-6 text-gray-400 hover:text-red-600" onClick={() => removeService(i)}>
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                        <Badge variant="outline" className="text-green-600 border-green-200 bg-green-50 text-[10px] h-5 px-1 ml-1">Added</Badge>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -780,14 +900,22 @@ export default function OnboardingPage() {
                 <Label className="text-[10px] font-bold uppercase text-gray-500">Added Forms ({intakeForms.length})</Label>
                 <div className="max-h-[120px] overflow-y-auto space-y-1 pr-1">
                   {intakeForms.map((f, i) => (
-                    <div key={i} className="flex items-center justify-between p-2 border rounded bg-white text-xs animate-fade-in">
+                    <div key={i} className="flex items-center justify-between p-2 border rounded bg-white text-xs animate-fade-in group hover:border-blue-200 transition-colors">
                       <div>
                         <p className="font-medium">{f.name}</p>
                         {f.fields && JSON.parse(f.fields).length > 0 && (
                           <p className="text-[10px] text-gray-500">{JSON.parse(f.fields).length} Questions</p>
                         )}
                       </div>
-                      <Badge variant="outline" className="text-green-600 border-green-200 bg-green-50 text-[10px] h-5 px-1">Added</Badge>
+                      <div className="flex items-center gap-1">
+                        <Button variant="ghost" size="icon" className="h-6 w-6 text-gray-400 hover:text-blue-600" onClick={() => editIntakeForm(i)}>
+                          <Edit2 className="h-3 w-3" />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-6 w-6 text-gray-400 hover:text-red-600" onClick={() => removeIntakeForm(i)}>
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                        <Badge variant="outline" className="text-green-600 border-green-200 bg-green-50 text-[10px] h-5 px-1 ml-1">Added</Badge>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -1021,6 +1149,7 @@ export default function OnboardingPage() {
                     onTranscript={handleVoiceTranscript}
                     onClose={() => setVoiceMode(false)}
                     className="h-full"
+                    initialGreeting="Hi! I'm ready to help you set up your business."
                   />
                 ) : (
                   <div className="h-full overflow-y-auto p-4 space-y-3">
@@ -1050,29 +1179,29 @@ export default function OnboardingPage() {
                 )}
               </CardContent>
               {!voiceMode && (
-              <div className="p-4 border-t">
-                <div className="flex gap-2">
-                  <Input
-                    placeholder="Ask me anything about setup..."
-                    value={chatInput}
-                    onChange={e => setChatInput(e.target.value)}
-                    onKeyDown={e => e.key === "Enter" && sendChatMessage()}
-                    className="flex-1"
-                  />
-                  <Button
-                    size="icon"
-                    variant="outline"
-                    onClick={() => setVoiceMode(true)}
-                    className="border-indigo-200 text-indigo-600 hover:bg-indigo-50 hover:text-indigo-700 shrink-0"
-                    title="Voice mode"
-                  >
-                    <Mic className="w-4 h-4" />
-                  </Button>
-                  <Button size="icon" onClick={() => sendChatMessage()} disabled={chatLoading || !chatInput.trim()} className="bg-blue-600 hover:bg-blue-700 shrink-0">
-                    <Send className="w-4 h-4" />
-                  </Button>
+                <div className="p-4 border-t">
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="Ask me anything about setup..."
+                      value={chatInput}
+                      onChange={e => setChatInput(e.target.value)}
+                      onKeyDown={e => e.key === "Enter" && sendChatMessage()}
+                      className="flex-1"
+                    />
+                    <Button
+                      size="icon"
+                      variant="outline"
+                      onClick={() => setVoiceMode(true)}
+                      className="border-indigo-200 text-indigo-600 hover:bg-indigo-50 hover:text-indigo-700 shrink-0"
+                      title="Voice mode"
+                    >
+                      <Mic className="w-4 h-4" />
+                    </Button>
+                    <Button size="icon" onClick={() => sendChatMessage()} disabled={chatLoading || !chatInput.trim()} className="bg-blue-600 hover:bg-blue-700 shrink-0">
+                      <Send className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </div>
-              </div>
               )}
             </Card>
           </div>
