@@ -1,12 +1,11 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sendEmail, buildEmailTemplate } from "@/lib/email";
 
 export async function GET(req: Request) {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.workspaceId) {
+    const user = await getCurrentUser();
+    if (!user?.workspaceId) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -24,7 +23,7 @@ export async function GET(req: Request) {
             include: { contact: true }
         });
 
-        if (!conversation || conversation.workspaceId !== session.user.workspaceId) {
+        if (!conversation || conversation.workspaceId !== user.workspaceId) {
             return NextResponse.json({ error: "Not found" }, { status: 404 });
         }
 
@@ -47,8 +46,8 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.workspaceId) {
+    const user = await getCurrentUser();
+    if (!user?.workspaceId) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -61,7 +60,7 @@ export async function POST(req: Request) {
             include: { contact: true, workspace: true }
         });
 
-        if (!conversation || conversation.workspaceId !== session.user.workspaceId) {
+        if (!conversation || conversation.workspaceId !== user.workspaceId) {
             return NextResponse.json({ error: "Not found" }, { status: 404 });
         }
 
@@ -72,7 +71,7 @@ export async function POST(req: Request) {
                 content,
                 direction: "OUTBOUND",
                 channel: "EMAIL", // Default for now
-                senderId: session.user.id,
+                senderId: user.id,
                 status: "SENT"
             }
         });

@@ -41,8 +41,8 @@ export async function POST(req: Request) {
     data: {
       name,
       description,
-      quantity: quantity || 0,
-      threshold: threshold || 5,
+      quantity: quantity ? parseInt(String(quantity)) : 0,
+      threshold: threshold ? parseInt(String(threshold)) : 5,
       unit: unit || "units",
       vendorName,
       vendorEmail,

@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export async function GET(req: Request, { params }: { params: { workspaceId: string } }) {
+export async function GET(req: Request, { params }: { params: Promise<{ workspaceId: string }> }) {
+    const { workspaceId } = await params;
     try {
         const workspace = await prisma.workspace.findUnique({
-            where: { id: params.workspaceId },
+            where: { id: workspaceId },
             select: {
                 id: true,
                 name: true,

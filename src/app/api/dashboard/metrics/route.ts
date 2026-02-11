@@ -1,19 +1,18 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { startOfDay, endOfDay, addDays, subHours } from "date-fns";
 import { generateDashboardInsights } from "@/lib/gemini";
 
 export async function GET() {
-    constsession = await getServerSession(authOptions);
-    // In a real app, use session.user.workspaceId
+    const user = await getCurrentUser();
+    // In a real app, use user.workspaceId
     // For prototype, we'll fetch the first active workspace or use a hardcoded fallback if needed
     // But our onboarding flow sets up a user/workspace, so we should rely on that if possible.
     // Given the current auth implementation might be mocked or minimal, let's try to find the workspace from the session or fallback.
 
     // FAILSAFE: If no session, try to find the most recently active workspace for demo purposes
-    let workspaceId = session?.user?.workspaceId;
+    let workspaceId = user?.workspaceId;
 
     if (!workspaceId) {
         const demoWs = await prisma.workspace.findFirst({
@@ -91,7 +90,7 @@ export async function GET() {
             where: {
                 conversation: { workspaceId },
                 direction: "INBOUND",
-                isRead: false
+                status: { not: "READ" }
             }
         }),
         prisma.user.findFirst({ where: { workspaceId } }) // Get business name context
@@ -107,7 +106,7 @@ export async function GET() {
 
     const metrics = {
         totalBookings: bookingsToday + bookingsUpcoming, // rough aggregation
-        completedBookings,
+        completedBookings: bookingsCompleted,
         newContacts,
         pendingForms,
         lowStockItems: lowStockCount,

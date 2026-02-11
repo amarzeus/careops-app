@@ -82,8 +82,7 @@ export async function POST(req: Request) {
                 notes: notes,
                 serviceId: service.id,
                 contactId: dbContact.id,
-                workspaceId: service.workspaceId,
-                price: service.price // Snapshot price
+                workspaceId: service.workspaceId
             }
         });
 
