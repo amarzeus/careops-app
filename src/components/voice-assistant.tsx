@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { Mic, MicOff, X, Volume2, VolumeX, MessageSquare } from "lucide-react";
+import { Mic, MicOff, X, Volume2, VolumeX, MessageSquare, Send } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 // ---- Types ----
@@ -35,11 +36,20 @@ export function DotGlobe({ voiceState, amplitude, size = 180 }: DotGlobeProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animRef = useRef<number>(0);
   const rotationRef = useRef(0);
+  const timeRef = useRef(0);
+  const smoothAmpRef = useRef(0);
+  const pointsRef = useRef(generateSpherePoints(160, size * 0.35));
+
   /* Use a ref for amplitude to avoid re-triggering the effect on every frame */
   const amplitudeRef = useRef(amplitude);
+
   useEffect(() => {
     amplitudeRef.current = amplitude;
   }, [amplitude]);
+
+  useEffect(() => {
+    pointsRef.current = generateSpherePoints(160, size * 0.35);
+  }, [size]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -190,7 +200,7 @@ export function DotGlobe({ voiceState, amplitude, size = 180 }: DotGlobeProps) {
 }
 
 // ---- Voice Engine Hook ----
-export function useVoiceEngine(onTranscript: (text: string, context?: any) => Promise<string>) {
+export function useVoiceEngine(onTranscript: (text: string, context?: any, history?: any[]) => Promise<string>) {
   const [voiceState, setVoiceState] = useState<VoiceState>("idle");
   const [transcript, setTranscript] = useState("");
   const [interimTranscript, setInterimTranscript] = useState("");
@@ -198,6 +208,8 @@ export function useVoiceEngine(onTranscript: (text: string, context?: any) => Pr
   const [isMuted, setIsMuted] = useState(false);
   const [amplitude, setAmplitude] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [history, setHistory] = useState<Array<{ role: "user" | "assistant"; content: string }>>([]);
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   // Continuous Mode State
   const [continuousMode, setContinuousModeState] = useState(false);
@@ -384,6 +396,7 @@ export function useVoiceEngine(onTranscript: (text: string, context?: any) => Pr
     setVoiceState("processing");
     setTranscript(text);
     setInterimTranscript("");
+    setHistory(prev => [...prev.slice(-19), { role: "user", content: text }]);
     // Stop mic audio analysis
     cancelAnimationFrame(ampFrameRef.current);
     setAmplitude(0);
@@ -401,11 +414,13 @@ export function useVoiceEngine(onTranscript: (text: string, context?: any) => Pr
 
     try {
       // Pass window.location.href or other context if needed
+      const currentHistory = [...history, { role: "user" as const, content: text }];
       const response = await onTranscript(text, {
         url: window.location.pathname,
         title: document.title
-      });
+      }, currentHistory);
       setAiResponse(response);
+      setHistory(prev => [...prev.slice(-19), { role: "assistant", content: response }]);
       speak(response);
     } catch {
       setError("Failed to get AI response.");
@@ -538,9 +553,18 @@ export function useVoiceEngine(onTranscript: (text: string, context?: any) => Pr
     isMuted,
     amplitude,
     error,
+    history,
+    isChatOpen,
+    setIsChatOpen,
     handleMicClick,
+    sendMessage: processTranscript,
     setIsMuted: (m: boolean) => { setIsMuted(m); if (m) stopSpeaking(); },
     stop,
+    clearHistory: () => {
+      setHistory([]);
+      setAiResponse("");
+      setTranscript("");
+    },
     // Expose speak manually for greetings
     speak,
     setContinuousMode
@@ -559,12 +583,28 @@ interface InlineVoiceModeProps {
 export function InlineVoiceMode({ onTranscript, onClose, className, autoStart = true, initialGreeting }: InlineVoiceModeProps) {
   const {
     voiceState, transcript, interimTranscript, aiResponse,
-    isMuted, amplitude, error, handleMicClick, setIsMuted, stop,
-    speak, setContinuousMode
+    isMuted, amplitude, error, history, handleMicClick, setIsMuted, stop,
+    speak, setContinuousMode, sendMessage
   } = useVoiceEngine(onTranscript);
 
   // Auto-start and Greet
   const hasStartedRef = useRef(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [inputText, setInputText] = useState("");
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [history, interimTranscript]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (inputText.trim()) {
+      sendMessage(inputText.trim());
+      setInputText("");
+    }
+  };
 
   useEffect(() => {
     if (!hasStartedRef.current && autoStart) {
@@ -628,102 +668,166 @@ export function InlineVoiceMode({ onTranscript, onClose, className, autoStart = 
       </div>
 
       {/* Dot Globe */}
-      <div className="flex-1 flex items-center justify-center relative">
+      <div className="flex-1 flex items-center justify-center relative min-h-[140px]">
         <button
           onClick={handleMicClick}
           disabled={voiceState === "processing"}
           className="cursor-pointer relative group"
           title={voiceState === "idle" ? "Click to speak" : voiceState === "listening" ? "Click to stop" : ""}
         >
-          <DotGlobe voiceState={voiceState} amplitude={amplitude} size={160} />
+          <DotGlobe voiceState={voiceState} amplitude={amplitude} size={140} />
           {/* Center mic icon overlay */}
           <div className={cn(
             "absolute inset-0 flex items-center justify-center transition-opacity duration-300",
             voiceState === "idle" ? "opacity-60 group-hover:opacity-100" : "opacity-0"
           )}>
-            <div className="w-12 h-12 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center shadow-sm">
-              <Mic className="w-5 h-5 text-indigo-600" />
+            <div className="w-10 h-10 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center shadow-sm">
+              <Mic className="w-4 h-4 text-indigo-600" />
             </div>
           </div>
           {/* Stop icon when listening */}
           {voiceState === "listening" && (
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                <MicOff className="w-4 h-4 text-white/80" />
+              <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                <MicOff className="w-3.5 h-3.5 text-white/80" />
               </div>
             </div>
           )}
         </button>
       </div>
 
-      {/* Transcript area */}
-      <div className="w-full px-3 pb-2 shrink-0 space-y-1.5 max-h-[100px] overflow-y-auto">
+      {/* Chat History area */}
+      <div 
+        ref={scrollRef}
+        className="w-full px-3 py-4 flex-1 overflow-y-auto space-y-4 min-h-0 border-t border-gray-100 bg-white"
+      >
+        {history.map((msg, idx) => (
+          <div key={idx} className={cn(
+            "flex gap-2",
+            msg.role === "user" ? "flex-row-reverse" : "flex-row"
+          )}>
+            <div className={cn(
+              "w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5",
+              msg.role === "user" ? "bg-indigo-600" : "bg-gray-100"
+            )}>
+              <span className={cn(
+                "text-[8px] font-bold",
+                msg.role === "user" ? "text-white" : "text-gray-500"
+              )}>
+                {msg.role === "user" ? "YOU" : "AI"}
+              </span>
+            </div>
+            <div className={cn(
+              "max-w-[85%] px-3 py-2 rounded-2xl text-[11px] leading-relaxed",
+              msg.role === "user" ? "bg-indigo-600 text-white rounded-tr-none" : "bg-gray-100 text-gray-700 rounded-tl-none"
+            )}>
+              {msg.content}
+            </div>
+          </div>
+        ))}
+        {interimTranscript && (
+          <div className="flex flex-row-reverse gap-2">
+            <div className="w-6 h-6 rounded-full bg-indigo-400 flex items-center justify-center shrink-0 mt-0.5">
+              <span className="text-[8px] font-bold text-white">YOU</span>
+            </div>
+            <div className="max-w-[85%] px-3 py-2 rounded-2xl bg-indigo-400/10 text-gray-400 text-[11px] italic rounded-tr-none border border-indigo-100">
+              {interimTranscript}
+            </div>
+          </div>
+        )}
         {error && (
-          <p className="text-[11px] text-red-500 text-center">{error}</p>
+          <p className="text-[10px] text-red-500 text-center">{error}</p>
         )}
-        {(transcript || interimTranscript) && (
-          <div className="voice-text-reveal">
-            <p className="text-[11px] text-gray-600 bg-gray-50 rounded-lg px-3 py-2 leading-relaxed">
-              <span className="text-[9px] text-gray-400 font-semibold uppercase">You: </span>
-              {transcript}
-              {interimTranscript && <span className="text-gray-400 italic"> {interimTranscript}</span>}
-            </p>
-          </div>
-        )}
-        {aiResponse && (
-          <div className="voice-text-reveal">
-            <p className="text-[11px] text-gray-600 bg-indigo-50 rounded-lg px-3 py-2 leading-relaxed">
-              <span className="text-[9px] text-indigo-400 font-semibold uppercase">AI: </span>
-              {aiResponse}
-            </p>
-          </div>
-        )}
-        {voiceState === "idle" && !transcript && !aiResponse && !error && (
-          <p className="text-[10px] text-gray-400 text-center py-1">
-            Tap the globe to start speaking
-          </p>
-        )}
+      </div>
+
+      {/* Chat Input Region */}
+      <div className="w-full px-3 py-3 border-t border-gray-100 bg-gray-50/50 shrink-0">
+        <form onSubmit={handleSubmit} className="relative flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handleMicClick}
+            className={cn(
+              "p-1.5 rounded-full transition-all",
+              voiceState === "listening" 
+                ? "bg-red-500 text-white animate-pulse" 
+                : "bg-white border border-gray-200 text-gray-500 hover:text-indigo-600"
+            )}
+          >
+            <Mic size={14} />
+          </button>
+          <input
+            type="text"
+            value={inputText}
+            onChange={(e) => setInputText(e.target.value)}
+            placeholder="Type a message..."
+            className="flex-1 bg-white border border-gray-200 rounded-full px-3 py-1.5 text-[11px] focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-sm"
+          />
+          <button
+            type="submit"
+            disabled={!inputText.trim() || voiceState === "processing"}
+            className={cn(
+              "p-1.5 rounded-full transition-all",
+              inputText.trim() && voiceState !== "processing" 
+                ? "bg-indigo-600 text-white shadow-sm hover:bg-indigo-700" 
+                : "bg-gray-100 text-gray-400"
+            )}
+          >
+            <Send size={14} />
+          </button>
+        </form>
       </div>
     </div>
   );
 }
 
+
 // ---- Floating Action Button ----
-export function VoiceAssistantFAB({ onClick, pulse = false }: { onClick: () => void; pulse?: boolean }) {
+export function VoiceAssistantFAB({ 
+  onClick,
+  isOpen = false,
+  pulse = false 
+}: { 
+  onClick: () => void; 
+  isOpen?: boolean;
+  pulse?: boolean 
+}) {
   return (
     <button
       onClick={onClick}
-      className={cn(
-        "fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full",
-        "bg-gradient-to-br from-indigo-500 to-purple-600",
-        "flex items-center justify-center shadow-lg",
-        "hover:shadow-xl hover:scale-105 transition-all duration-300",
-        "group"
-      )}
+      className="fixed bottom-6 right-6 z-[9999] w-14 h-14 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-2xl hover:scale-105 transition-all duration-300 group text-white border-2 border-white/20"
+      style={{ right: '24px', bottom: '24px', left: 'auto' }}
     >
       {pulse && (
-        <>
-          <span className="absolute inset-0 rounded-full bg-indigo-400/30 voice-pulse-ring" />
-          <span className="absolute inset-0 rounded-full bg-indigo-400/20 voice-pulse-ring-delay" />
-        </>
+        <span className="absolute inset-0 rounded-full bg-indigo-400/40 animate-ping" />
       )}
-      <Mic className="w-6 h-6 text-white group-hover:scale-110 transition-transform" />
+      {isOpen ? (
+        <X className="w-6 h-6" />
+      ) : (
+        <MessageSquare className="w-6 h-6 group-hover:scale-110 transition-transform" />
+      )}
     </button>
   );
 }
 
-// ---- Global Voice Overlay ----
-import { motion, AnimatePresence } from "framer-motion";
 
+
+
+
+
+// ---- Global Voice Overlay ----
 interface GlobalVoiceOverlayProps {
   voiceState: VoiceState;
   transcript: string;
   interimTranscript: string;
   aiResponse: string;
+  history: Array<{ role: "user" | "assistant"; content: string }>;
   amplitude: number;
   onClose: () => void;
   isMuted: boolean;
   toggleMute: () => void;
+  onSendMessage: (text: string) => void;
+  onMicClick: () => void;
+  isChatOpen: boolean;
 }
 
 export function GlobalVoiceOverlay({
@@ -731,13 +835,34 @@ export function GlobalVoiceOverlay({
   transcript,
   interimTranscript,
   aiResponse,
+  history,
   amplitude,
   onClose,
   isMuted,
-  toggleMute
+  toggleMute,
+  onSendMessage,
+  onMicClick,
+  isChatOpen
 }: GlobalVoiceOverlayProps) {
-  // Only show if not idle
-  const isVisible = voiceState !== "idle" || transcript || aiResponse;
+  // Show if explicitly open
+  const isVisible = isChatOpen;
+  const [inputText, setInputText] = useState("");
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll to bottom of history
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [history, interimTranscript, isVisible]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (inputText.trim()) {
+      onSendMessage(inputText.trim());
+      setInputText("");
+    }
+  };
 
   return (
     <AnimatePresence>
@@ -746,10 +871,11 @@ export function GlobalVoiceOverlay({
           initial={{ opacity: 0, y: 50, scale: 0.9 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 50, scale: 0.9 }}
-          className="fixed bottom-24 right-6 z-50 w-80 md:w-96 bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl border border-indigo-100 overflow-hidden"
+          className="fixed bottom-24 right-6 z-50 w-80 md:w-96 bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl border border-indigo-100 overflow-hidden flex flex-col max-h-[600px] h-[500px]"
+          style={{ right: '24px', bottom: '96px', left: 'auto' }}
         >
           {/* Header */}
-          <div className="bg-gradient-to-r from-indigo-50 to-purple-50 px-4 py-3 flex items-center justify-between border-b border-indigo-100/50">
+          <div className="bg-gradient-to-r from-indigo-50 to-purple-50 px-4 py-3 flex items-center justify-between border-b border-indigo-100/50 shrink-0">
             <div className="flex items-center gap-2">
               <div className={cn(
                 "w-2 h-2 rounded-full",
@@ -761,7 +887,7 @@ export function GlobalVoiceOverlay({
               <span className="text-xs font-semibold text-indigo-900 uppercase tracking-wide">
                 {voiceState === "listening" ? "Listening..." :
                   voiceState === "processing" ? "Thinking..." :
-                    voiceState === "speaking" ? "Speaking..." : "Ready"}
+                    voiceState === "speaking" ? "Speaking..." : "CareOps AI"}
               </span>
             </div>
             <div className="flex gap-1">
@@ -775,49 +901,109 @@ export function GlobalVoiceOverlay({
           </div>
 
           {/* Visualizer Region */}
-          <div className="h-32 bg-gradient-to-b from-white to-indigo-50/30 flex items-center justify-center relative">
-            <DotGlobe voiceState={voiceState} amplitude={amplitude} size={120} />
-            {/* Icon Overlay */}
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              {voiceState === "idle" && <Mic className="text-gray-300 w-6 h-6" />}
-            </div>
+          <div className="h-20 bg-gradient-to-b from-white to-indigo-50/30 flex items-center justify-center relative shrink-0 border-b border-gray-50">
+            <DotGlobe voiceState={voiceState} amplitude={amplitude} size={90} />
           </div>
 
-          {/* Transcript Region */}
-          <div className="px-4 py-3 max-h-48 overflow-y-auto space-y-3 bg-white">
-            {(transcript || interimTranscript) && (
-              <motion.div
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="flex gap-2"
-              >
-                <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center shrink-0 mt-0.5">
-                  <span className="text-[10px] font-bold text-gray-500">YOU</span>
-                </div>
-                <p className="text-sm text-gray-700 leading-relaxed">
-                  {transcript}
-                  <span className="text-gray-400 italic">{interimTranscript}</span>
-                </p>
-              </motion.div>
+          {/* Transcript/History Region */}
+          <div 
+            ref={scrollRef}
+            className="px-4 py-4 overflow-y-auto space-y-4 bg-white flex-1 min-h-0"
+          >
+            {history.length === 0 && !interimTranscript && (
+              <p className="text-xs text-center text-gray-400 py-4">
+                How can I help you today?
+              </p>
             )}
 
-            {aiResponse && (
+            {history.map((msg, idx) => (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, x: msg.role === "user" ? 10 : -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                className={cn(
+                  "flex gap-2",
+                  msg.role === "user" ? "flex-row-reverse" : "flex-row"
+                )}
+              >
+                <div className={cn(
+                  "w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5",
+                  msg.role === "user" ? "bg-indigo-600" : "bg-gray-100"
+                )}>
+                  <span className={cn(
+                    "text-[8px] font-bold",
+                    msg.role === "user" ? "text-white" : "text-gray-500"
+                  )}>
+                    {msg.role === "user" ? "YOU" : "AI"}
+                  </span>
+                </div>
+                <div className={cn(
+                  "px-3 py-2 rounded-2xl text-sm leading-relaxed max-w-[85%]",
+                  msg.role === "user" 
+                    ? "bg-indigo-600 text-white rounded-tr-none" 
+                    : "bg-gray-100 text-gray-800 rounded-tl-none"
+                )}>
+                  {msg.content}
+                </div>
+              </motion.div>
+            ))}
+
+            {interimTranscript && (
               <motion.div
                 initial={{ opacity: 0, x: 10 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="flex gap-2"
+                className="flex flex-row-reverse gap-2"
               >
-                <div className="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center shrink-0 mt-0.5">
-                  <span className="text-[10px] font-bold text-indigo-600">AI</span>
+                <div className="w-6 h-6 rounded-full bg-indigo-400 flex items-center justify-center shrink-0 mt-0.5">
+                  <span className="text-[8px] font-bold text-white">YOU</span>
                 </div>
-                <p className="text-sm text-indigo-900 leading-relaxed">
-                  {aiResponse}
-                </p>
+                <div className="px-3 py-2 rounded-2xl bg-indigo-400/10 text-gray-400 text-sm italic rounded-tr-none border border-indigo-100">
+                  {interimTranscript}
+                </div>
               </motion.div>
             )}
+          </div>
+
+          {/* Chat Input Region */}
+          <div className="p-3 border-t border-gray-100 bg-gray-50/50 shrink-0">
+            <form onSubmit={handleSubmit} className="relative flex items-center gap-2">
+              <button
+                type="button"
+                onClick={onMicClick}
+                className={cn(
+                  "p-2 rounded-full transition-all",
+                  voiceState === "listening" 
+                    ? "bg-red-500 text-white animate-pulse" 
+                    : "bg-white border border-gray-200 text-gray-500 hover:text-indigo-600"
+                )}
+              >
+                <Mic size={16} />
+              </button>
+              <input
+                type="text"
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+                placeholder="Type a message..."
+                className="flex-1 bg-white border border-gray-200 rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-sm"
+              />
+              <button
+                type="submit"
+                disabled={!inputText.trim() || voiceState === "processing"}
+                className={cn(
+                  "p-2 rounded-full transition-all",
+                  inputText.trim() && voiceState !== "processing" 
+                    ? "bg-indigo-600 text-white shadow-md hover:bg-indigo-700" 
+                    : "bg-gray-100 text-gray-400"
+                )}
+              >
+                <Send size={16} />
+              </button>
+            </form>
           </div>
         </motion.div>
       )}
     </AnimatePresence>
   );
 }
+
+

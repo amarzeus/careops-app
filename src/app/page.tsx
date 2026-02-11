@@ -55,7 +55,7 @@ export default function LandingPage() {
         </h1>
         <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-10">
           Stop juggling disconnected tools. CareOps unifies bookings, leads, forms, inventory,
-          and communication into one intelligent platform for service businesses.
+          and communication into one intelligent platform. <span className="text-indigo-600 font-medium">Click the mic below to ask our AI how we can help your business!</span>
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link href="/register">

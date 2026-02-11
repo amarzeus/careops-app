@@ -6,7 +6,7 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Public routes that don't need auth
-  const publicRoutes = ["/login", "/register", "/verify-otp", "/book", "/contact", "/form", "/api/public", "/api/auth/login", "/api/auth/register", "/api/auth/verify-otp", "/api/auth/resend-otp", "/api/auth/send-sms-otp", "/api/auth/google", "/api/test/seed"];
+  const publicRoutes = ["/login", "/register", "/verify-otp", "/book", "/contact", "/form", "/api/public", "/api/auth/login", "/api/auth/register", "/api/auth/verify-otp", "/api/auth/resend-otp", "/api/auth/send-sms-otp", "/api/auth/google", "/api/test/seed", "/api/ai/voice"];
   const isPublicRoute = publicRoutes.some((route) => pathname.startsWith(route));
 
   if (isPublicRoute || pathname === "/") {

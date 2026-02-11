@@ -7,93 +7,95 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
 export async function POST(req: Request) {
   const user = await getCurrentUser();
-  if (!user || !user.workspaceId)
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
   const { message, conversationHistory, clientContext } = await req.json();
+
   if (!message)
     return NextResponse.json({ error: "Message is required" }, { status: 400 });
 
-  const wid = user.workspaceId;
+  let systemPrompt = "";
+  let contextSummary: any = {};
 
-  // Gather workspace context for the AI
-  const [
-    workspace,
-    bookingsToday,
-    bookingsUpcoming,
-    contactsCount,
-    unreadConversations,
-    pendingForms,
-    lowStockItems,
-    recentAlerts,
-    servicesCount,
-    staffCount,
-  ] = await Promise.all([
-    prisma.workspace.findUnique({ where: { id: wid } }),
-    prisma.booking.count({
-      where: {
-        workspaceId: wid,
-        date: {
-          gte: new Date(new Date().setHours(0, 0, 0, 0)),
-          lt: new Date(new Date().setHours(23, 59, 59, 999)),
+  if (user && user.workspaceId) {
+    const wid = user.workspaceId;
+
+    // Gather workspace context for the AI
+    const [
+      workspace,
+      bookingsToday,
+      bookingsUpcoming,
+      contactsCount,
+      unreadConversations,
+      pendingForms,
+      lowStockItems,
+      recentAlerts,
+      servicesCount,
+      staffCount,
+    ] = await Promise.all([
+      prisma.workspace.findUnique({ where: { id: wid } }),
+      prisma.booking.count({
+        where: {
+          workspaceId: wid,
+          date: {
+            gte: new Date(new Date().setHours(0, 0, 0, 0)),
+            lt: new Date(new Date().setHours(23, 59, 59, 999)),
+          },
         },
-      },
-    }),
-    prisma.booking.count({
-      where: {
-        workspaceId: wid,
-        date: { gt: new Date() },
-        status: { in: ["PENDING", "CONFIRMED"] },
-      },
-    }),
-    prisma.contact.count({ where: { workspaceId: wid } }),
-    prisma.conversation.count({
-      where: { workspaceId: wid, unreadCount: { gt: 0 } },
-    }),
-    prisma.formSubmission.count({
-      where: { workspaceId: wid, status: { in: ["PENDING", "SENT"] } },
-    }),
-    prisma.inventoryItem.findMany({
-      where: { workspaceId: wid },
-    }),
-    prisma.alert.findMany({
-      where: { workspaceId: wid, isRead: false },
-      orderBy: { createdAt: "desc" },
-      take: 5,
-    }),
-    prisma.service.count({ where: { workspaceId: wid } }),
-    prisma.user.count({ where: { workspaceId: wid, role: "STAFF" } }),
-  ]);
+      }),
+      prisma.booking.count({
+        where: {
+          workspaceId: wid,
+          date: { gt: new Date() },
+          status: { in: ["PENDING", "CONFIRMED"] },
+        },
+      }),
+      prisma.contact.count({ where: { workspaceId: wid } }),
+      prisma.conversation.count({
+        where: { workspaceId: wid, unreadCount: { gt: 0 } },
+      }),
+      prisma.formSubmission.count({
+        where: { workspaceId: wid, status: { in: ["PENDING", "SENT"] } },
+      }),
+      prisma.inventoryItem.findMany({
+        where: { workspaceId: wid },
+      }),
+      prisma.alert.findMany({
+        where: { workspaceId: wid, isRead: false },
+        orderBy: { createdAt: "desc" },
+        take: 5,
+      }),
+      prisma.service.count({ where: { workspaceId: wid } }),
+      prisma.user.count({ where: { workspaceId: wid, role: "STAFF" } }),
+    ]);
 
-  const lowStock = lowStockItems.filter(
-    (item: any) => item.quantity <= item.threshold
-  );
+    const lowStock = lowStockItems.filter(
+      (item: any) => item.quantity <= item.threshold
+    );
 
-  const contextSummary = {
-    workspaceName: workspace?.name || "Unknown",
-    todaysBookings: bookingsToday,
-    upcomingBookings: bookingsUpcoming,
-    totalContacts: contactsCount,
-    unreadMessages: unreadConversations,
-    pendingForms: pendingForms,
-    lowStockItems: lowStock.map((i: any) => ({
-      name: i.name,
-      qty: i.quantity,
-      threshold: i.threshold,
-      unit: i.unit,
-    })),
-    unreadAlerts: recentAlerts.map((a: any) => ({
-      type: a.type,
-      title: a.title,
-      message: a.message,
-    })),
-    totalServices: servicesCount,
-    totalStaff: staffCount,
-    userName: user.name,
-    userRole: user.role,
-  };
+    contextSummary = {
+      workspaceName: workspace?.name || "Unknown",
+      todaysBookings: bookingsToday,
+      upcomingBookings: bookingsUpcoming,
+      totalContacts: contactsCount,
+      unreadMessages: unreadConversations,
+      pendingForms: pendingForms,
+      lowStockItems: lowStock.map((i: any) => ({
+        name: i.name,
+        qty: i.quantity,
+        threshold: i.threshold,
+        unit: i.unit,
+      })),
+      unreadAlerts: recentAlerts.map((a: any) => ({
+        type: a.type,
+        title: a.title,
+        message: a.message,
+      })),
+      totalServices: servicesCount,
+      totalStaff: staffCount,
+      userName: user.name,
+      userRole: user.role,
+    };
 
-  const systemPrompt = `You are CareOps AI — a voice-first operations assistant for "${contextSummary.workspaceName}".
+    systemPrompt = `You are CareOps AI — a voice-first operations assistant for "${contextSummary.workspaceName}".
 You are speaking to ${contextSummary.userName} (${contextSummary.userRole}).
 
 ## YOUR PERSONALITY
@@ -137,19 +139,46 @@ When relevant, suggest where to go:
 - Inventory: /inventory (stock tracking)
 - Staff: /staff (team management)
 - Automation: /automation (rules)
-- Settings: /settings (configuration)
+- Settings: /settings (configuration)`;
+  } else {
+    // PUBLIC / VISITOR MODE
+    systemPrompt = `You are CareOps AI — a friendly and knowledgeable voice assistant for the CareOps platform.
+You are speaking to a visitor on our landing page who is exploring the platform.
+
+## ABOUT CAREOPS
+CareOps is a unified operations platform designed to replace multiple disconnected tools for service businesses.
+Key Features and Benefits:
+- **Smart Bookings**: No more back-and-forth emails. Automated booking pages and reminders.
+- **Unified Inbox**: Manage Email and SMS in one place. AI helps draft perfect responses.
+- **Dynamic Forms**: Automated intake forms that sync with your records.
+- **Inventory Management**: Real-time tracking with "low stock" alerts and auto-vendor emails.
+- **Automation Engine**: Create custom workflows, like "Send a thank you note after a booking is completed."
+- **AI Insights**: Gemini AI analyzes your business data to provide growth suggestions.
+
+## YOUR GOALS
+1. **Educate**: Explain how these features help save time and grow a business.
+2. **Engage**: Be conversational, warm, and inviting.
+3. **Convert**: If the visitor seems interested, suggest they click "Get Started Free" to try it out.
+4. **Speak Naturally**: Keep responses to 2-3 sentences max. Avoid lists. Use spoken-friendly language.
+
+## CONTEXT
+- **User Status**: Guest Visitor (Stranger)
+- **Location**: Landing Page`;
+  }
+
+  const finalPrompt = `${systemPrompt}
 
 ## RESPONSE FORMAT
 Return ONLY a valid JSON object:
 {
   "message": "Your natural spoken response (2-4 sentences, conversational)",
-  "action": null or { "type": "navigate", "path": "/inbox" }
+  "action": null or { "type": "navigate", "path": "/register" }
 }`;
 
   try {
     const model = genAI.getGenerativeModel({
       model: "gemini-2.0-flash",
-      systemInstruction: systemPrompt,
+      systemInstruction: finalPrompt,
       generationConfig: { responseMimeType: "application/json" },
     });
 

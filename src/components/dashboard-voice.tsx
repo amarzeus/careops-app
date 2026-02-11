@@ -14,24 +14,21 @@ interface ChatMsg {
 export function DashboardVoice() {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
-  const historyRef = useRef<ChatMsg[]>([]);
 
-  const handleTranscript = useCallback(async (text: string): Promise<string> => {
-    historyRef.current = [...historyRef.current, { role: "user", content: text }];
-
+  const handleTranscript = useCallback(async (text: string, context?: any, history?: any[]): Promise<string> => {
     try {
       const res = await fetch("/api/ai/voice", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           message: text,
-          conversationHistory: historyRef.current.slice(-10),
+          conversationHistory: history,
+          clientContext: context
         }),
       });
 
       const data = await res.json();
       const aiMessage = data.message || "I'm here to help with your business.";
-      historyRef.current = [...historyRef.current, { role: "assistant", content: aiMessage }];
 
       // Handle navigation actions
       if (data.action?.type === "navigate" && data.action?.path) {

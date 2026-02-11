@@ -16,6 +16,7 @@ interface VoiceContextType {
     handleMicClick: () => void;
     setIsMuted: (muted: boolean) => void;
     stop: () => void;
+    clearHistory: () => void;
 }
 
 const VoiceContext = createContext<VoiceContextType | null>(null);
@@ -34,7 +35,7 @@ export function VoiceProvider({ children }: { children: React.ReactNode }) {
     const [hasGreeted, setHasGreeted] = useState(false);
 
     // Define the API handler
-    const handleTranscript = async (text: string, clientContext?: any) => {
+    const handleTranscript = async (text: string, clientContext?: any, history?: any[]) => {
         try {
             const response = await fetch("/api/ai/voice", {
                 method: "POST",
@@ -45,7 +46,7 @@ export function VoiceProvider({ children }: { children: React.ReactNode }) {
                         ...clientContext,
                         pathname,
                     },
-                    // We could send history here if we tracked it in context
+                    conversationHistory: history,
                 }),
             });
             const data = await response.json();
@@ -70,6 +71,34 @@ export function VoiceProvider({ children }: { children: React.ReactNode }) {
     };
 
     const engine = useVoiceEngine(handleTranscript);
+    const [lastUserId, setLastUserId] = useState<string | null>(null);
+
+    // Watch for Auth changes
+    useEffect(() => {
+        const checkAuth = async () => {
+            try {
+                const res = await fetch("/api/auth/me");
+                if (res.ok) {
+                    const data = await res.json();
+                    const currentId = data.user?.id || null;
+                    if (currentId !== lastUserId) {
+                        // User changed (logged in or swapped accounts)
+                        engine.clearHistory();
+                        setLastUserId(currentId);
+                        setHasGreeted(false); // Allow fresh greeting for new user
+                    }
+                } else if (lastUserId !== null) {
+                    // Logged out
+                    engine.clearHistory();
+                    setLastUserId(null);
+                }
+            } catch (err) {
+                console.error("Auth check error in VoiceProvider:", err);
+            }
+        };
+
+        checkAuth();
+    }, [pathname, lastUserId, engine]);
 
     // Proactive Greeting on Mount (once per session ideally)
     useEffect(() => {
@@ -93,7 +122,8 @@ export function VoiceProvider({ children }: { children: React.ReactNode }) {
             {!isInlinePage && (
                 <>
                     <VoiceAssistantFAB
-                        onClick={engine.handleMicClick}
+                        onClick={() => engine.setIsChatOpen(!engine.isChatOpen)}
+                        isOpen={engine.isChatOpen}
                         pulse={engine.voiceState === "listening" || engine.voiceState === "speaking"}
                     />
                     <GlobalVoiceOverlay
@@ -101,10 +131,14 @@ export function VoiceProvider({ children }: { children: React.ReactNode }) {
                         transcript={engine.transcript}
                         interimTranscript={engine.interimTranscript}
                         aiResponse={engine.aiResponse}
+                        history={engine.history}
                         amplitude={engine.amplitude}
-                        onClose={engine.stop}
+                        onClose={() => { engine.stop(); engine.setIsChatOpen(false); }}
                         isMuted={engine.isMuted}
                         toggleMute={() => engine.setIsMuted(!engine.isMuted)}
+                        onSendMessage={engine.sendMessage}
+                        onMicClick={engine.handleMicClick}
+                        isChatOpen={engine.isChatOpen}
                     />
                 </>
             )}

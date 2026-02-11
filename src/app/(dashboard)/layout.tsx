@@ -1,7 +1,6 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { Sidebar } from "@/components/layout/sidebar";
-import { DashboardVoice } from "@/components/dashboard-voice";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const user = await getCurrentUser();
@@ -19,7 +18,6 @@ export default async function DashboardLayout({ children }: { children: React.Re
       <main className="lg:ml-64 min-h-screen">
         {children}
       </main>
-      <DashboardVoice />
     </div>
   );
 }
