@@ -26,7 +26,7 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
       },
     });
 
-    await transporter.sendMail({
+    const info = await transporter.sendMail({
       from: process.env.EMAIL_FROM || "noreply@careops.com",
       to: options.to,
       subject: options.subject,
@@ -34,16 +34,26 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
       html: options.html,
     });
 
+    // In development, ALWAYS log the email content
+    if (process.env.NODE_ENV !== "production") {
+      console.log("------------------------------------------");
+      console.log("EMAIL SENT (DEV MODE) - LOGGING CONTENT");
+      console.log("Subject:", options.subject);
+      console.log("To:", options.to);
+      console.log("HTML Preview:", options.html?.substring(0, 200) + "...");
+      console.log("------------------------------------------");
+    }
+
     return true;
   } catch (error) {
     console.error("Email send error:", error);
-    // In development or if email fails, log the content so we can see the OTP
-    if (process.env.NODE_ENV !== "production" || true) {
+    // Log content on failure too
+    if (process.env.NODE_ENV !== "production") {
       console.log("------------------------------------------");
-      console.log("EMAIL FAILED OR DEV MODE - LOGGING CONTENT");
+      console.log("EMAIL FAILED - LOGGING CONTENT");
       console.log("Subject:", options.subject);
       console.log("To:", options.to);
-      console.log("HTML:", options.html);
+      console.log("HTML Preview:", options.html?.substring(0, 200) + "...");
       console.log("------------------------------------------");
     }
     return false;
