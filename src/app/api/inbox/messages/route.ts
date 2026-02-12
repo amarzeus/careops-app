@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sendEmail, buildEmailTemplate } from "@/lib/email";
+import { sendSMS } from "@/lib/sms";
+import { sendWhatsAppMessage } from "@/lib/msg91";
+import { isAvailable as isWhatsAppAvailable } from "@/lib/whatsapp";
 
 export async function GET(req: Request) {
     const user = await getCurrentUser();
@@ -53,7 +56,7 @@ export async function POST(req: Request) {
 
     try {
         const body = await req.json();
-        const { conversationId, content } = body;
+        const { conversationId, content, channel: requestedChannel } = body;
 
         const conversation = await prisma.conversation.findUnique({
             where: { id: conversationId },
@@ -64,13 +67,30 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Not found" }, { status: 404 });
         }
 
+        // Determine the best delivery channel
+        const contact = conversation.contact;
+        const workspace = conversation.workspace;
+        let deliveryChannel: "EMAIL" | "SMS" | "WHATSAPP" = "EMAIL";
+
+        if (requestedChannel === "whatsapp" && contact.phone && isWhatsAppAvailable()) {
+            deliveryChannel = "WHATSAPP";
+        } else if (requestedChannel === "sms" && contact.phone && workspace.smsConfigured) {
+            deliveryChannel = "SMS";
+        } else if (contact.email && workspace.emailConfigured) {
+            deliveryChannel = "EMAIL";
+        } else if (contact.phone && isWhatsAppAvailable()) {
+            deliveryChannel = "WHATSAPP";
+        } else if (contact.phone && workspace.smsConfigured) {
+            deliveryChannel = "SMS";
+        }
+
         // 1. Create Message
         const message = await prisma.message.create({
             data: {
                 conversationId,
                 content,
                 direction: "OUTBOUND",
-                channel: "EMAIL", // Default for now
+                channel: deliveryChannel,
                 senderId: user.id,
                 status: "SENT"
             }
@@ -82,26 +102,52 @@ export async function POST(req: Request) {
             data: { lastMessageAt: new Date() }
         });
 
-        // 3. Send actual Email (if configured)
-        if (conversation.workspace.emailConfigured && conversation.contact.email) {
-            try {
-                await sendEmail({
-                    to: conversation.contact.email,
-                    subject: conversation.subject || `Message from ${conversation.workspace.name}`,
-                    html: buildEmailTemplate("New Message", `<p>${content}</p>`)
-                });
-                await prisma.message.update({
-                    where: { id: message.id },
-                    data: { status: "DELIVERED" } // Optimistic
-                });
-            } catch (err) {
-                console.error("Failed to send email reply", err);
-                await prisma.message.update({
-                    where: { id: message.id },
-                    data: { status: "FAILED" }
-                });
-            }
+        // 3. Deliver via selected channel
+        let delivered = false;
+
+        switch (deliveryChannel) {
+            case "EMAIL":
+                if (workspace.emailConfigured && contact.email) {
+                    try {
+                        await sendEmail({
+                            to: contact.email,
+                            subject: conversation.subject || `Message from ${workspace.name}`,
+                            html: buildEmailTemplate("New Message", `<p>${content}</p>`)
+                        });
+                        delivered = true;
+                    } catch (err) {
+                        console.error("Failed to send email reply", err);
+                    }
+                }
+                break;
+
+            case "WHATSAPP":
+                if (contact.phone) {
+                    try {
+                        const result = await sendWhatsAppMessage(contact.phone, content);
+                        delivered = result.success;
+                    } catch (err) {
+                        console.error("Failed to send WhatsApp reply", err);
+                    }
+                }
+                break;
+
+            case "SMS":
+                if (contact.phone) {
+                    try {
+                        delivered = await sendSMS({ to: contact.phone, body: content });
+                    } catch (err) {
+                        console.error("Failed to send SMS reply", err);
+                    }
+                }
+                break;
         }
+
+        // Update message status
+        await prisma.message.update({
+            where: { id: message.id },
+            data: { status: delivered ? "DELIVERED" : "FAILED" }
+        });
 
         return NextResponse.json(message);
     } catch (error) {

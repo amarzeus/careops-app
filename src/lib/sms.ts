@@ -4,7 +4,7 @@
  * so that callers don't need to change, while removing the Twilio dependency.
  */
 
-import { sendSMS as msg91SendSMS } from "@/lib/msg91";
+import { sendSMS as msg91SendSMS, type MSG91SMSResult } from "@/lib/msg91";
 
 interface SMSOptions {
   to: string;
@@ -12,7 +12,8 @@ interface SMSOptions {
 }
 
 export async function sendSMS(options: SMSOptions): Promise<boolean> {
-  return msg91SendSMS(options.to, options.body);
+  const result: MSG91SMSResult = await msg91SendSMS(options.to, options.body);
+  return result.success;
 }
 
 export function buildOTPMessage(otp: string): string {

@@ -21,6 +21,14 @@ export async function POST(req: Request) {
       });
     }
 
+    // Rate limiting: prevent spamming resets (5 min cooldown)
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+    if (user.updatedAt > fiveMinutesAgo) {
+       return NextResponse.json({ 
+        message: "If an account exists with this email, a password reset link has been sent." 
+      });
+    }
+
     // Generate a temporary password
     const tempPassword = uuidv4().slice(0, 12);
     const hashedPassword = await hashPassword(tempPassword);

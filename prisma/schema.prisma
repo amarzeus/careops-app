@@ -31,6 +31,7 @@ enum FormStatus {
 enum MessageChannel {
   EMAIL
   SMS
+  WHATSAPP
   SYSTEM
 }
 
@@ -75,6 +76,7 @@ model User {
   // Auth fields
   otpCode       String?
   otpExpires    DateTime?
+  otpChannel    String?   // "email", "sms", "whatsapp" — which channel last OTP was sent on
   emailVerified DateTime?
   googleId      String?   @unique
   phone         String?
@@ -114,6 +116,11 @@ model Workspace {
   smsApiKey     String?
   smsFromNumber String?
   smsConfigured Boolean @default(false)
+
+  // WhatsApp configuration
+  whatsappProvider         String?
+  whatsappIntegratedNumber String?
+  whatsappConfigured       Boolean @default(false)
 
   // Relations
   users           User[]

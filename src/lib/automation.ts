@@ -1,5 +1,7 @@
 import { prisma } from "./prisma";
 import { sendEmail, buildEmailTemplate } from "./email";
+import { sendSMS } from "./sms";
+import { sendWelcomeMessage, sendBookingConfirmation, isAvailable as isWhatsAppAvailable } from "./whatsapp";
 import { generateWelcomeMessage, generateBookingConfirmation } from "./gemini";
 import type { AutomationRule, Workspace, AutomationTrigger } from "@prisma/client";
 
@@ -95,7 +97,7 @@ export async function executeRule(
 
 async function handleNewContact(workspace: Workspace, data: Record<string, unknown>) {
   const contact = data.contact as ContactData | undefined;
-  if (!contact?.email) return;
+  if (!contact?.email && !contact?.phone) return;
 
   const welcomeMsg = await generateWelcomeMessage(workspace.name, contact.name);
 
@@ -114,18 +116,21 @@ async function handleNewContact(workspace: Workspace, data: Record<string, unkno
     });
   }
 
-  await prisma.message.create({
-    data: {
-      content: welcomeMsg,
-      channel: "EMAIL",
-      direction: "OUTBOUND",
-      isAutomated: true,
-      conversationId: conversation.id,
-    },
-  });
+  // Determine the best channel and create the message record
+  let channel: "EMAIL" | "SMS" | "WHATSAPP" = "EMAIL";
 
   // Send actual email
-  if (workspace.emailConfigured) {
+  if (contact.email && workspace.emailConfigured) {
+    await prisma.message.create({
+      data: {
+        content: welcomeMsg,
+        channel: "EMAIL",
+        direction: "OUTBOUND",
+        isAutomated: true,
+        conversationId: conversation.id,
+      },
+    });
+
     await sendEmail({
       to: contact.email,
       subject: `Welcome to ${workspace.name}`,
@@ -135,6 +140,38 @@ async function handleNewContact(workspace: Workspace, data: Record<string, unkno
       ),
     });
   }
+
+  // Also send via WhatsApp if contact has phone and WhatsApp is configured
+  if (contact.phone && isWhatsAppAvailable()) {
+    channel = "WHATSAPP";
+    await prisma.message.create({
+      data: {
+        content: welcomeMsg,
+        channel: "WHATSAPP",
+        direction: "OUTBOUND",
+        isAutomated: true,
+        conversationId: conversation.id,
+      },
+    });
+
+    await sendWelcomeMessage(contact.phone, contact.name, workspace.name);
+  }
+
+  // Fallback to SMS if WhatsApp is not available but contact has phone
+  if (contact.phone && !isWhatsAppAvailable() && workspace.smsConfigured) {
+    channel = "SMS";
+    await prisma.message.create({
+      data: {
+        content: welcomeMsg,
+        channel: "SMS",
+        direction: "OUTBOUND",
+        isAutomated: true,
+        conversationId: conversation.id,
+      },
+    });
+
+    await sendSMS({ to: contact.phone, body: welcomeMsg });
+  }
 }
 
 async function handleBookingCreated(workspace: Workspace, data: Record<string, unknown>) {
@@ -142,7 +179,8 @@ async function handleBookingCreated(workspace: Workspace, data: Record<string, u
   const contact = data.contact as ContactData | undefined;
   const service = data.service as ServiceData | undefined;
 
-  if (!contact?.email || !booking) return;
+  if (!contact || !booking) return;
+  if (!contact.email && !contact.phone) return;
 
   const confirmationMsg = await generateBookingConfirmation(
     workspace.name,
@@ -166,17 +204,18 @@ async function handleBookingCreated(workspace: Workspace, data: Record<string, u
     });
   }
 
-  await prisma.message.create({
-    data: {
-      content: confirmationMsg,
-      channel: "EMAIL",
-      direction: "OUTBOUND",
-      isAutomated: true,
-      conversationId: conversation.id,
-    },
-  });
+  // Send via Email
+  if (contact.email && workspace.emailConfigured) {
+    await prisma.message.create({
+      data: {
+        content: confirmationMsg,
+        channel: "EMAIL",
+        direction: "OUTBOUND",
+        isAutomated: true,
+        conversationId: conversation.id,
+      },
+    });
 
-  if (workspace.emailConfigured) {
     await sendEmail({
       to: contact.email,
       subject: `Booking Confirmation - ${workspace.name}`,
@@ -185,6 +224,42 @@ async function handleBookingCreated(workspace: Workspace, data: Record<string, u
         `<p>${confirmationMsg}</p>`
       ),
     });
+  }
+
+  // Send via WhatsApp (if available and contact has phone)
+  if (contact.phone && isWhatsAppAvailable()) {
+    await prisma.message.create({
+      data: {
+        content: confirmationMsg,
+        channel: "WHATSAPP",
+        direction: "OUTBOUND",
+        isAutomated: true,
+        conversationId: conversation.id,
+      },
+    });
+
+    await sendBookingConfirmation(
+      contact.phone,
+      contact.name,
+      service?.name || "Appointment",
+      new Date(booking.date).toLocaleString(),
+      workspace.name
+    );
+  }
+
+  // Fallback to SMS
+  if (contact.phone && !isWhatsAppAvailable() && workspace.smsConfigured) {
+    await prisma.message.create({
+      data: {
+        content: confirmationMsg,
+        channel: "SMS",
+        direction: "OUTBOUND",
+        isAutomated: true,
+        conversationId: conversation.id,
+      },
+    });
+
+    await sendSMS({ to: contact.phone, body: confirmationMsg });
   }
 
   // Send intake forms linked to this service

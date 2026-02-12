@@ -16,27 +16,11 @@ import { Progress } from "@/components/ui/progress";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { InlineVoiceMode } from "@/components/voice-assistant";
-import { cn } from "@/lib/utils";
-
-const steps = [
-  { id: 1, title: "Workspace", icon: Building2, description: "Set up your business" },
-  { id: 2, title: "Communication", icon: Mail, description: "Email & SMS" },
-  { id: 3, title: "Contact Form", icon: FileText, description: "Lead capture" },
-  { id: 4, title: "Bookings", icon: Calendar, description: "Services & availability" },
-  { id: 5, title: "Intake Forms", icon: ClipboardList, description: "Post-booking forms" },
-  { id: 6, title: "Inventory", icon: Package, description: "Track resources" },
-  { id: 7, title: "Staff", icon: Users, description: "Team members" },
-  { id: 8, title: "Activate", icon: Rocket, description: "Go live!" },
-];
-
-interface ChatMessage {
-  role: "user" | "assistant";
-  content: string;
-}
+import { AIChatCard } from "@/components/onboarding/ai-chat-card";
 
 export default function OnboardingPage() {
   const router = useRouter();
+
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
@@ -1123,87 +1107,16 @@ export default function OnboardingPage() {
 
           {/* AI Chat Panel */}
           <div className="lg:col-span-2 order-first lg:order-last mb-4 lg:mb-0">
-            <Card className="h-[400px] sm:h-[450px] lg:h-[500px] flex flex-col">
-              <CardHeader className="pb-3 border-b">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
-                    <Sparkles className="w-4 h-4 text-purple-600" />
-                  </div>
-                  <div className="flex-1">
-                    <CardTitle className="text-sm">AI Setup Assistant</CardTitle>
-                    <CardDescription className="text-xs">Powered by Gemini — Text or Voice</CardDescription>
-                  </div>
-                  {/* Voice mode toggle button in header */}
-                  <button
-                    onClick={() => setVoiceMode(!voiceMode)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-[11px] font-semibold hover:from-indigo-600 hover:to-purple-700 transition-all hover:scale-105 shadow-sm"
-                  >
-                    {voiceMode ? <MessageSquare className="w-3.5 h-3.5" /> : <Mic className="w-3.5 h-3.5" />}
-                    {voiceMode ? "Chat" : "Voice"}
-                  </button>
-                </div>
-              </CardHeader>
-              <CardContent className="flex-1 overflow-hidden p-0">
-                {voiceMode ? (
-                  <InlineVoiceMode
-                    onTranscript={handleVoiceTranscript}
-                    onClose={() => setVoiceMode(false)}
-                    className="h-full"
-                    initialGreeting="Hi! I'm ready to help you set up your business."
-                  />
-                ) : (
-                  <div className="h-full overflow-y-auto p-4 space-y-3">
-                    {chatMessages.map((msg, i) => (
-                      <div key={i} className={cn("flex", msg.role === "user" ? "justify-end" : "justify-start")}>
-                        <div className={cn(
-                          "max-w-[85%] rounded-2xl px-4 py-2.5 text-sm animate-fade-in",
-                          msg.role === "user" ? "bg-blue-600 text-white rounded-br-md" : "bg-gray-100 text-gray-800 rounded-bl-md"
-                        )}>
-                          {msg.content}
-                        </div>
-                      </div>
-                    ))}
-                    {chatLoading && (
-                      <div className="flex justify-start">
-                        <div className="bg-gray-100 rounded-2xl rounded-bl-md px-4 py-3">
-                          <div className="flex gap-1">
-                            <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-                            <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-                            <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                    <div ref={chatEndRef} />
-                  </div>
-                )}
-              </CardContent>
-              {!voiceMode && (
-                <div className="p-4 border-t">
-                  <div className="flex gap-2">
-                    <Input
-                      placeholder="Ask me anything about setup..."
-                      value={chatInput}
-                      onChange={e => setChatInput(e.target.value)}
-                      onKeyDown={e => e.key === "Enter" && sendChatMessage()}
-                      className="flex-1"
-                    />
-                    <Button
-                      size="icon"
-                      variant="outline"
-                      onClick={() => setVoiceMode(true)}
-                      className="border-indigo-200 text-indigo-600 hover:bg-indigo-50 hover:text-indigo-700 shrink-0"
-                      title="Voice mode"
-                    >
-                      <Mic className="w-4 h-4" />
-                    </Button>
-                    <Button size="icon" onClick={() => sendChatMessage()} disabled={chatLoading || !chatInput.trim()} className="bg-blue-600 hover:bg-blue-700 shrink-0">
-                      <Send className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </Card>
+            <AIChatCard
+              chatMessages={chatMessages}
+              chatLoading={chatLoading}
+              chatInput={chatInput}
+              setChatInput={setChatInput}
+              onSendMessage={() => sendChatMessage()}
+              voiceMode={voiceMode}
+              setVoiceMode={setVoiceMode}
+              onVoiceTranscript={handleVoiceTranscript}
+            />
           </div>
         </div>
       </div>

@@ -12,8 +12,14 @@ import { addHours, startOfDay, endOfDay, addDays } from "date-fns";
  * Should be called periodically (e.g., every hour via cron).
  * Verifiable via: GET /api/automation/scheduler
  */
-export async function GET() {
+export async function GET(req: Request) {
   try {
+    // secure with CRON_SECRET
+    const authHeader = req.headers.get("authorization");
+    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const now = new Date();
     const tomorrow = addDays(now, 1);
     const tomorrowStart = startOfDay(tomorrow);

@@ -43,6 +43,7 @@ export async function GET(req: Request) {
             id: c.id,
             contactName: c.contact.name,
             contactEmail: c.contact.email,
+            contactPhone: c.contact.phone || null,
             lastMessage: c.messages[0]?.content || "No messages yet",
             lastMessageAt: c.lastMessageAt,
             unreadCount: c.unreadCount,

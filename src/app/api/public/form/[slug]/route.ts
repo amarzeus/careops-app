@@ -49,9 +49,22 @@ export async function POST(
     if (!form)
       return NextResponse.json({ error: "Form not found" }, { status: 404 });
 
+    const submission = await prisma.formSubmission.create({
+      data: {
+        intakeFormId: form.id,
+        workspaceId: form.workspaceId,
+        contactId: data.contactId, // Expecting contactId in payload
+        status: "COMPLETED",
+        data: JSON.stringify(data),
+        completedAt: new Date(),
+        sentAt: new Date(), // Immediate completion
+      },
+    });
+
     return NextResponse.json({
       success: true,
       message: "Form submitted successfully",
+      submissionId: submission.id,
     });
   } catch (error) {
     console.error("Form submission error:", error);
