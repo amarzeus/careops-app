@@ -1,16 +1,14 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { Plus, Search, Filter, Calendar as CalendarIcon, List } from "lucide-react";
+import React, { useEffect, useState, useCallback } from "react";
+import { Plus, Search, Filter, Calendar as CalendarIcon, List, ChevronRight, Clock } from "lucide-react";
 import { Booking, Contact, Service } from "@prisma/client";
 import { format, parseISO } from "date-fns";
 
+import { Header } from "@/components/layout/header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Header } from "@/components/layout/header";
-import { toast } from "@/hooks/use-toast";
 import {
   Popover,
   PopoverContent,
@@ -18,10 +16,9 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
-
 import { BookingList } from "@/components/bookings/booking-list";
-import { BookingDialog } from "@/components/bookings/booking-dialog";
 import { FullCalendar } from "@/components/bookings/full-calendar";
+import { BookingDialog } from "@/components/bookings/booking-dialog";
 
 interface BookingWithRelations extends Booking {
   contact: Contact;
@@ -30,117 +27,94 @@ interface BookingWithRelations extends Booking {
 
 export default function BookingsPage() {
   const [bookings, setBookings] = useState<BookingWithRelations[]>([]);
-  const [services, setServices] = useState<Service[]>([]);
   const [contacts, setContacts] = useState<Contact[]>([]);
+  const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
-  
-  // Dialog State
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedBooking, setSelectedBooking] = useState<BookingWithRelations | null>(null);
-  const [initialDialogDate, setInitialDialogDate] = useState<Date | undefined>(undefined);
-
-  // Filter State
+  const [viewMode, setViewMode] = useState<"list" | "calendar">("calendar");
   const [searchTerm, setSearchTerm] = useState("");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
-  const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
 
-  useEffect(() => {
-    fetchAll();
-  }, []);
+  // Dialog state
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState<BookingWithRelations | null>(null);
+  const [initialDialogDate, setInitialDialogDate] = useState<Date | undefined>();
 
-  const fetchAll = async () => {
+  const fetchData = useCallback(async () => {
+    setLoading(true);
     try {
-      const [bookRes, svcRes, conRes] = await Promise.all([
+      const [bookingsRes, contactsRes, servicesRes] = await Promise.all([
         fetch("/api/bookings"),
-        fetch("/api/services"),
         fetch("/api/contacts"),
+        fetch("/api/services")
       ]);
-      
-      if (bookRes.ok) {
-        const data = await bookRes.json();
-        // Ensure dates are Date objects if needed, or handle strings. 
-        // Prisma returns strings for dates in JSON. 
-        // But our components might expect Date objects or strings.
-        // The BookingList expects BookingWithRelations which extends Booking (Prisma types have Date).
-        // However, JSON serialization turns Dates to strings.
-        // We might need to map them back to Dates if we strictly follow the type, 
-        // OR rely on the fact that JS handles it loosely, but TypeScript might complain.
-        // For safety, let's map dates.
-        const parsedBookings = data.bookings.map((b: any) => ({
+
+      if (bookingsRes.ok) {
+        const data = await bookingsRes.json();
+        setBookings((data.bookings || []).map((b: any) => ({
           ...b,
           date: new Date(b.date),
           endTime: new Date(b.endTime),
           createdAt: new Date(b.createdAt),
           updatedAt: new Date(b.updatedAt),
-        }));
-        setBookings(parsedBookings);
+        })));
       }
-      if (svcRes.ok) setServices((await svcRes.json()).services);
-      if (conRes.ok) setContacts((await conRes.json()).contacts);
+
+      if (contactsRes.ok) {
+        const data = await contactsRes.json();
+        setContacts(data.contacts || []);
+      }
+
+      if (servicesRes.ok) {
+        const data = await servicesRes.json();
+        setServices(data.services || []);
+      }
     } catch (error) {
-      toast({ title: "Error", description: "Failed to load data", variant: "destructive" });
+      console.error("Error fetching data:", error);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const handleCreateOrUpdate = async (data: any) => {
-    try {
-      // Combine date and time
-      const dateTime = new Date(data.date);
-      const [hours, minutes] = data.time.split(":");
-      dateTime.setHours(parseInt(hours), parseInt(minutes));
-
-      const payload = {
-        serviceId: data.serviceId,
-        contactId: data.contactId,
-        date: dateTime.toISOString(),
-        notes: data.notes,
-      };
-
-      let res;
-      if (selectedBooking) {
-        res = await fetch(`/api/bookings/${selectedBooking.id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-      } else {
-        res = await fetch("/api/bookings", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-      }
-
-      if (!res.ok) throw new Error("Operation failed");
-      
-      toast({ 
-        title: "Success", 
-        description: `Booking ${selectedBooking ? "updated" : "created"} successfully`,
-        variant: "default" // success variant is not standard in shadcn toast unless customized, using default
-      });
-      
-      fetchAll();
-    } catch (error) {
-      throw error; // Let the dialog handle the error state
-    }
-  };
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const handleStatusUpdate = async (id: string, status: string) => {
     try {
-      const res = await fetch(`/api/bookings/${id}`, {
-        method: "PUT",
+      const response = await fetch(`/api/bookings/${id}`, {
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status }),
       });
-      if (!res.ok) throw new Error("Failed to update status");
-      
-      toast({ title: "Updated", description: `Booking status changed to ${status}` });
-      fetchAll();
+
+      if (response.ok) {
+        fetchData();
+      }
     } catch (error) {
-      toast({ title: "Error", description: "Failed to update status", variant: "destructive" });
+      console.error("Error updating status:", error);
+    }
+  };
+
+  const handleBookingSubmit = async (data: any) => {
+    const url = selectedBooking ? `/api/bookings/${selectedBooking.id}` : "/api/bookings";
+    const method = selectedBooking ? "PATCH" : "POST";
+
+    try {
+      const response = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      if (response.ok) {
+        fetchData();
+      } else {
+        throw new Error("Failed to save booking");
+      }
+    } catch (error) {
+      console.error("Error saving booking:", error);
+      throw error;
     }
   };
 
@@ -160,16 +134,14 @@ export default function BookingsPage() {
   const filterBookings = (list: BookingWithRelations[]) => {
     let filtered = list;
 
-    // Search
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
-      filtered = filtered.filter(b => 
+      filtered = filtered.filter(b =>
         b.contact.name.toLowerCase().includes(term) ||
         b.service.name.toLowerCase().includes(term)
       );
     }
 
-    // Date Range
     if (dateFrom) {
       filtered = filtered.filter(b => b.date >= new Date(dateFrom));
     }
@@ -185,7 +157,7 @@ export default function BookingsPage() {
   const getTabBookings = (tab: string) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    
+
     const filtered = filterBookings(bookings);
 
     switch (tab) {
@@ -204,169 +176,154 @@ export default function BookingsPage() {
     }
   };
 
+  const stats = {
+    today: getTabBookings("today").length,
+    upcoming: getTabBookings("upcoming").length,
+    completed: bookings.filter(b => b.status === "COMPLETED").length,
+    noShow: bookings.filter(b => b.status === "NO_SHOW").length,
+  };
+
   return (
-    <div className="flex flex-col h-full">
+    <div className="h-screen overflow-hidden flex flex-col bg-slate-50/20">
+      {/* Fixed Sticky Header */}
       <Header title="Bookings" subtitle="Manage appointments and schedules">
-        <div className="flex items-center gap-2">
-           <div className="flex bg-muted rounded-lg p-1">
-              <Button 
-                variant={viewMode === "list" ? "secondary" : "ghost"} 
-                size="sm" 
-                onClick={() => setViewMode("list")}
-                className="h-7 px-3"
-              >
-                <List className="w-4 h-4 mr-2" /> List
-              </Button>
-              <Button 
-                variant={viewMode === "calendar" ? "secondary" : "ghost"} 
-                size="sm" 
-                onClick={() => setViewMode("calendar")}
-                className="h-7 px-3"
-              >
-                <CalendarIcon className="w-4 h-4 mr-2" /> Calendar
-              </Button>
-           </div>
-           <Button onClick={() => handleNewBooking()} className="bg-primary">
-            <Plus className="w-4 h-4 mr-2" /> New Booking
+        <div className="flex items-center gap-4">
+          {/* List/Calendar Switcher */}
+          <div className="flex bg-slate-100 p-0.5 rounded-lg border border-slate-200">
+            <Button
+              variant={viewMode === "list" ? "secondary" : "ghost"}
+              size="sm"
+              onClick={() => setViewMode("list")}
+              className={cn("h-7 px-3 text-[10px] font-bold rounded-md", viewMode === "list" && "bg-white shadow-sm")}
+            >
+              <List className="w-3.5 h-3.5 mr-1.5" /> List
+            </Button>
+            <Button
+              variant={viewMode === "calendar" ? "secondary" : "ghost"}
+              size="sm"
+              onClick={() => setViewMode("calendar")}
+              className={cn("h-7 px-3 text-[10px] font-bold rounded-md", viewMode === "calendar" && "bg-white shadow-sm")}
+            >
+              <CalendarIcon className="w-3.5 h-3.5 mr-1.5" /> Calendar
+            </Button>
+          </div>
+
+          <Button onClick={() => handleNewBooking()} className="h-8 px-4 bg-primary text-[11px] font-bold rounded-lg shadow-sm">
+            <Plus className="w-3.5 h-3.5 mr-1.5" /> New Booking
           </Button>
         </div>
       </Header>
 
-      <div className="flex-1 p-6 space-y-6">
-        {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Card>
-            <CardContent className="p-4 flex flex-col items-center justify-center">
-              <span className="text-2xl font-bold">{getTabBookings("today").length}</span>
-              <span className="text-xs text-muted-foreground">Today</span>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4 flex flex-col items-center justify-center">
-              <span className="text-2xl font-bold">{getTabBookings("upcoming").length}</span>
-              <span className="text-xs text-muted-foreground">Upcoming</span>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4 flex flex-col items-center justify-center">
-              <span className="text-2xl font-bold text-green-600">
-                {bookings.filter(b => b.status === "COMPLETED").length}
-              </span>
-              <span className="text-xs text-muted-foreground">Completed</span>
-            </CardContent>
-          </Card>
-           <Card>
-            <CardContent className="p-4 flex flex-col items-center justify-center">
-              <span className="text-2xl font-bold text-destructive">
-                {bookings.filter(b => b.status === "NO_SHOW").length}
-              </span>
-              <span className="text-xs text-muted-foreground">No Show</span>
-            </CardContent>
-          </Card>
-        </div>
+      {/* Main Content Area - Non-Scrolling Body */}
+      <div className="flex-1 overflow-hidden p-6 flex flex-col gap-6">
+        <div className="max-w-[1600px] mx-auto w-full flex-1 flex flex-col gap-6 min-h-0">
 
-        {viewMode === "list" ? (
-          <>
-            {/* Filters */}
-            <div className="flex flex-col sm:flex-row gap-4 items-end sm:items-center">
-              <div className="relative flex-1 w-full">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search bookings..."
-                  className="pl-8"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-              <div className="flex items-center gap-2 w-full sm:w-auto">
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant={"outline"}
-                      className={cn(
-                        "w-[130px] justify-start text-left font-normal h-9 text-xs",
-                        !dateFrom && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-3 w-3" />
-                      {dateFrom ? format(parseISO(dateFrom), "MMM d") : "From Date"}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="end">
-                    <Calendar
-                      mode="single"
-                      selected={dateFrom ? parseISO(dateFrom) : undefined}
-                      onSelect={(date) => setDateFrom(date ? format(date, "yyyy-MM-dd") : "")}
-                      initialFocus
+          {/* Professional B2B Stats Cards */}
+          <div className="grid grid-cols-4 gap-4 shrink-0">
+            {[
+              { label: "Today's Bookings", val: stats.today, icon: CalendarIcon, color: "blue" },
+              { label: "Upcoming Bookings", val: stats.upcoming, icon: Clock, color: "amber" },
+              { label: "Completed services", val: stats.completed, icon: Plus, color: "emerald", rotate: true },
+              { label: "No Show alerts", val: stats.noShow, icon: Filter, color: "rose" },
+            ].map((s) => (
+              <Card key={s.label} className="border border-border/40 shadow-sm bg-white overflow-hidden group">
+                <CardContent className="p-4 relative">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <p className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-1">{s.label}</p>
+                      <h3 className="text-2xl font-black text-slate-900 tracking-tight leading-none">{s.val}</h3>
+                    </div>
+                    <div className={cn(
+                      "p-3 rounded-xl transition-transform group-hover:scale-110 shadow-sm border border-black/5",
+                      s.color === "blue" && "bg-blue-50 text-blue-600",
+                      s.color === "amber" && "bg-amber-50 text-amber-600",
+                      s.color === "emerald" && "bg-emerald-50 text-emerald-600",
+                      s.color === "rose" && "bg-rose-50 text-rose-600",
+                    )}>
+                      <s.icon className={cn("w-5 h-5", s.rotate && "rotate-45")} />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          <div className="flex-1 bg-white rounded-xl border border-border/40 shadow-sm overflow-hidden flex flex-col min-h-0">
+            {viewMode === "list" ? (
+              <div className="flex flex-col h-full">
+                {/* Inline Filters for List View */}
+                <div className="p-3 border-b border-border/40 bg-slate-50/30 flex flex-col md:flex-row gap-2 items-center">
+                  <div className="relative flex-1">
+                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground/60" />
+                    <Input
+                      placeholder="Search bookings..."
+                      className="pl-8 h-8 text-[11px] bg-white border-slate-200 rounded-lg"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
                     />
-                  </PopoverContent>
-                </Popover>
+                  </div>
+                  <div className="flex items-center gap-1.5 bg-white p-0.5 rounded-lg border border-slate-200">
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button variant="ghost" className="h-7 px-2 text-[10px] font-medium text-slate-500">
+                          <CalendarIcon className="mr-1.5 h-3 w-3 opacity-60" />
+                          {dateFrom ? format(parseISO(dateFrom), "MMM d") : "Start Date"}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="end">
+                        <Calendar
+                          mode="single"
+                          selected={dateFrom ? parseISO(dateFrom) : undefined}
+                          onSelect={(date) => setDateFrom(date ? format(date, "yyyy-MM-dd") : "")}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <div className="h-3 w-px bg-slate-200" />
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button variant="ghost" className="h-7 px-2 text-[10px] font-medium text-slate-500">
+                          <CalendarIcon className="mr-1.5 h-3 w-3 opacity-60" />
+                          {dateTo ? format(parseISO(dateTo), "MMM d") : "End Date"}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="end">
+                        <Calendar
+                          mode="single"
+                          selected={dateTo ? parseISO(dateTo) : undefined}
+                          onSelect={(date) => setDateTo(date ? format(date, "yyyy-MM-dd") : "")}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+                </div>
 
-                <span className="text-xs text-muted-foreground">to</span>
-
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant={"outline"}
-                      className={cn(
-                        "w-[130px] justify-start text-left font-normal h-9 text-xs",
-                        !dateTo && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-3 w-3" />
-                      {dateTo ? format(parseISO(dateTo), "MMM d") : "To Date"}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="end">
-                    <Calendar
-                      mode="single"
-                      selected={dateTo ? parseISO(dateTo) : undefined}
-                      onSelect={(date) => setDateTo(date ? format(date, "yyyy-MM-dd") : "")}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-
-                {(dateFrom || dateTo) && (
-                    <Button variant="ghost" size="icon" onClick={() => { setDateFrom(""); setDateTo(""); }} className="h-9 w-9">
-                        <Filter className="h-4 w-4" />
-                    </Button>
-                )}
-              </div>
-            </div>
-
-            <Tabs defaultValue="all" className="w-full">
-              <TabsList>
-                <TabsTrigger value="all">All</TabsTrigger>
-                <TabsTrigger value="today">Today</TabsTrigger>
-                <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
-                <TabsTrigger value="completed">Completed</TabsTrigger>
-              </TabsList>
-              
-              {["all", "today", "upcoming", "completed"].map((tab) => (
-                <TabsContent key={tab} value={tab} className="mt-4">
-                  <BookingList 
-                    bookings={getTabBookings(tab)} 
+                <div className="flex-1 overflow-y-auto">
+                  <BookingList
+                    bookings={getTabBookings("all")}
                     onStatusUpdate={handleStatusUpdate}
                     onEdit={handleEdit}
                   />
-                </TabsContent>
-              ))}
-            </Tabs>
-          </>
-        ) : (
-          <FullCalendar
-            bookings={bookings}
-            onEdit={handleEdit}
-            onNewBooking={handleNewBooking}
-          />
-        )}
+                </div>
+              </div>
+            ) : (
+              <div className="flex-1 overflow-hidden">
+                <FullCalendar
+                  bookings={bookings}
+                  onEdit={handleEdit}
+                  onNewBooking={handleNewBooking}
+                />
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
       <BookingDialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}
-        onSubmit={handleCreateOrUpdate}
+        onSubmit={handleBookingSubmit}
         contacts={contacts}
         services={services}
         initialData={selectedBooking}

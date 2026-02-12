@@ -2,61 +2,118 @@
 
 import * as React from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
-import { DayPicker } from "react-day-picker"
-
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isToday } from "date-fns"
 import { cn } from "@/lib/utils"
-import { buttonVariants } from "@/components/ui/button"
 
-export type CalendarProps = React.ComponentProps<typeof DayPicker>
+export type CalendarProps = {
+    className?: string
+    selected?: Date
+    onSelect?: (date: Date | undefined) => void
+    mode?: "single"
+    initialFocus?: boolean
+    showOutsideDays?: boolean
+    classNames?: any
+}
 
+/**
+ * Optimized Calendar component for CareOps.
+ * Fixes misalignment by using a unified 7-column grid for both headers and days.
+ */
 function Calendar({
     className,
-    classNames,
-    showOutsideDays = true,
-    ...props
+    selected,
+    onSelect,
 }: CalendarProps) {
+    // Prototype focused on current month/Feb 2026
+    const [currentDate, setCurrentDate] = React.useState(new Date(2026, 1, 1))
+
+    const days = React.useMemo(() => {
+        const start = startOfMonth(currentDate)
+        const end = endOfMonth(currentDate)
+        const startDay = start.getDay() // 0 = Sunday
+        const padding = Array.from({ length: startDay })
+        const monthDays = eachDayOfInterval({ start, end })
+        return { padding, monthDays }
+    }, [currentDate])
+
+    const nextMonth = () => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1))
+    const prevMonth = () => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1))
+
     return (
-        <DayPicker
-            showOutsideDays={showOutsideDays}
-            className={cn("p-3", className)}
-            classNames={{
-                months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
-                month: "space-y-4",
-                caption: "flex justify-center pt-1 relative items-center",
-                caption_label: "text-sm font-medium",
-                nav: "space-x-1 flex items-center",
-                nav_button: cn(
-                    buttonVariants({ variant: "outline" }),
-                    "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100"
-                ),
-                nav_button_previous: "absolute left-1",
-                nav_button_next: "absolute right-1",
-                table: "w-full border-collapse space-y-1",
-                head_row: "flex",
-                head_cell:
-                    "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]",
-                row: "flex w-full mt-2",
-                cell: "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
-                day: cn(
-                    buttonVariants({ variant: "ghost" }),
-                    "h-9 w-9 p-0 font-normal aria-selected:opacity-100"
-                ),
-                day_range_end: "day-range-end",
-                day_selected:
-                    "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
-                day_today: "bg-accent text-accent-foreground",
-                day_outside:
-                    "day-outside text-muted-foreground aria-selected:bg-accent/50 aria-selected:text-muted-foreground",
-                day_disabled: "text-muted-foreground opacity-50",
-                day_range_middle:
-                    "aria-selected:bg-accent aria-selected:text-accent-foreground",
-                day_hidden: "invisible",
-                ...classNames,
-            }}
-            {...props}
-        />
+        <div className={cn("p-4 bg-white rounded-2xl shadow-xl border border-border/40 w-[300px] select-none", className)}>
+            {/* Navigation Header */}
+            <div className="flex items-center justify-between mb-5 px-1">
+                <span className="text-[13px] font-bold text-slate-900 tracking-tight">
+                    {format(currentDate, "MMMM yyyy")}
+                </span>
+                <div className="flex items-center gap-1">
+                    <button
+                        type="button"
+                        onClick={prevMonth}
+                        className="p-1.5 hover:bg-slate-100 rounded-lg transition-all text-slate-400 hover:text-slate-900 active:scale-95"
+                    >
+                        <ChevronLeft className="w-4 h-4" />
+                    </button>
+                    <button
+                        type="button"
+                        onClick={nextMonth}
+                        className="p-1.5 hover:bg-slate-100 rounded-lg transition-all text-slate-400 hover:text-slate-900 active:scale-95"
+                    >
+                        <ChevronRight className="w-4 h-4" />
+                    </button>
+                </div>
+            </div>
+
+            {/* Unified 7-Column Grid */}
+            <div className="grid grid-cols-7 text-center items-center">
+                {/* Structure: Day Names (First 7 children) */}
+                {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((day) => (
+                    <div
+                        key={day}
+                        className="text-[10px] font-bold text-slate-300 uppercase tracking-[0.1em] py-3 flex items-center justify-center h-8"
+                    >
+                        {day}
+                    </div>
+                ))}
+
+                {/* Structure: Month Padding */}
+                {days.padding.map((_, i) => (
+                    <div key={`pad-${i}`} className="aspect-square" />
+                ))}
+
+                {/* Structure: Date buttons (Sequential blocks) */}
+                {days.monthDays.map((day) => {
+                    const isSelected = selected && isSameDay(day, selected)
+                    const isTod = isToday(day)
+
+                    return (
+                        <button
+                            key={day.toISOString()}
+                            type="button"
+                            onClick={() => onSelect?.(day)}
+                            className={cn(
+                                "aspect-square text-[13px] flex items-center justify-center rounded-xl m-0.5 transition-all duration-200 relative group",
+                                isSelected
+                                    ? "bg-primary text-white font-bold shadow-lg shadow-primary/20 scale-[1.05]"
+                                    : "text-slate-600 hover:bg-slate-50 font-medium active:scale-95",
+                                isTod && !isSelected && "text-primary font-bold"
+                            )}
+                        >
+                            {format(day, "d")}
+                            {isTod && !isSelected && (
+                                <div className="absolute bottom-1 w-1 h-1 bg-primary rounded-full" />
+                            )}
+                            {!isSelected && (
+                                <div className="absolute inset-0 bg-primary/5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity" />
+                            )}
+                        </button>
+                    )
+                })}
+            </div>
+        </div>
     )
 }
+
 Calendar.displayName = "Calendar"
 
 export { Calendar }
