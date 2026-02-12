@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { Plus, Search, Filter, Calendar as CalendarIcon, List } from "lucide-react";
 import { Booking, Contact, Service } from "@prisma/client";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Header } from "@/components/layout/header";
 import { toast } from "@/hooks/use-toast";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { cn } from "@/lib/utils";
 
 import { BookingList } from "@/components/bookings/booking-list";
 import { BookingDialog } from "@/components/bookings/booking-dialog";
@@ -272,21 +279,56 @@ export default function BookingsPage() {
                 />
               </div>
               <div className="flex items-center gap-2 w-full sm:w-auto">
-                <Input 
-                    type="date" 
-                    className="w-auto" 
-                    value={dateFrom} 
-                    onChange={e => setDateFrom(e.target.value)} 
-                />
-                <span className="text-sm text-muted-foreground">to</span>
-                <Input 
-                    type="date" 
-                    className="w-auto" 
-                    value={dateTo} 
-                    onChange={e => setDateTo(e.target.value)} 
-                />
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant={"outline"}
+                      className={cn(
+                        "w-[130px] justify-start text-left font-normal h-9 text-xs",
+                        !dateFrom && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-3 w-3" />
+                      {dateFrom ? format(parseISO(dateFrom), "MMM d") : "From Date"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="end">
+                    <Calendar
+                      mode="single"
+                      selected={dateFrom ? parseISO(dateFrom) : undefined}
+                      onSelect={(date) => setDateFrom(date ? format(date, "yyyy-MM-dd") : "")}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+
+                <span className="text-xs text-muted-foreground">to</span>
+
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant={"outline"}
+                      className={cn(
+                        "w-[130px] justify-start text-left font-normal h-9 text-xs",
+                        !dateTo && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-3 w-3" />
+                      {dateTo ? format(parseISO(dateTo), "MMM d") : "To Date"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="end">
+                    <Calendar
+                      mode="single"
+                      selected={dateTo ? parseISO(dateTo) : undefined}
+                      onSelect={(date) => setDateTo(date ? format(date, "yyyy-MM-dd") : "")}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+
                 {(dateFrom || dateTo) && (
-                    <Button variant="ghost" size="icon" onClick={() => { setDateFrom(""); setDateTo(""); }}>
+                    <Button variant="ghost" size="icon" onClick={() => { setDateFrom(""); setDateTo(""); }} className="h-9 w-9">
                         <Filter className="h-4 w-4" />
                     </Button>
                 )}

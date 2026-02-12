@@ -17,6 +17,23 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AIChatCard } from "@/components/onboarding/ai-chat-card";
+import { cn } from "@/lib/utils";
+
+interface ChatMessage {
+  role: "user" | "assistant";
+  content: string;
+}
+
+const steps = [
+  { id: 1, title: "Workspace", description: "Set up your business identity", icon: Building2 },
+  { id: 2, title: "Communication", description: "Configure email and SMS", icon: Mail },
+  { id: 3, title: "Contact Form", description: "Define your public intake form", icon: FileText },
+  { id: 4, title: "Services", description: "Set up your booking services", icon: Calendar },
+  { id: 5, title: "Intake Forms", description: "Post-booking customer forms", icon: ClipboardList },
+  { id: 6, title: "Inventory", description: "Track your stock levels", icon: Package },
+  { id: 7, title: "Staff", description: "Invite your team members", icon: Users },
+  { id: 8, title: "Activation", description: "Review and go live", icon: Rocket },
+];
 
 export default function OnboardingPage() {
   const router = useRouter();

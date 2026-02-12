@@ -23,6 +23,7 @@ import {
   setMinutes,
   getHours,
   getMinutes,
+  isWithinInterval,
 } from "date-fns";
 import {
   ChevronLeft,
@@ -30,6 +31,7 @@ import {
   Clock,
   MapPin,
   Calendar as CalendarIcon,
+  MoreHorizontal,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -41,9 +43,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Card } from "@/components/ui/card";
 import { Booking, Contact, Service } from "@prisma/client";
 
-// Types matching the parent component
+// Types
 export interface BookingWithRelations extends Booking {
   contact: Contact;
   service: Service;
@@ -57,13 +60,16 @@ interface FullCalendarProps {
 
 type ViewMode = "month" | "week" | "day";
 
-const STATUS_COLORS: Record<string, string> = {
-  CONFIRMED: "bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100",
-  PENDING: "bg-yellow-50 text-yellow-700 border-yellow-200 hover:bg-yellow-100",
-  COMPLETED: "bg-green-50 text-green-700 border-green-200 hover:bg-green-100",
-  CANCELLED: "bg-red-50 text-red-700 border-red-200 hover:bg-red-100 opacity-60",
-  NO_SHOW: "bg-red-50 text-red-700 border-red-200 hover:bg-red-100 opacity-60",
+// Premium color palette (lighter backgrounds, stronger accents)
+const STATUS_STYLES: Record<string, string> = {
+  CONFIRMED: "bg-blue-50/80 border-l-4 border-blue-500 text-blue-700 hover:bg-blue-100",
+  PENDING: "bg-yellow-50/80 border-l-4 border-yellow-500 text-yellow-700 hover:bg-yellow-100",
+  COMPLETED: "bg-green-50/80 border-l-4 border-green-500 text-green-700 hover:bg-green-100",
+  CANCELLED: "bg-red-50/50 border-l-4 border-red-300 text-red-600/70 opacity-80 hover:opacity-100",
+  NO_SHOW: "bg-red-50/50 border-l-4 border-red-300 text-red-600/70 opacity-80 hover:opacity-100",
 };
+
+const HOUR_HEIGHT = 50; // More compact height
 
 export function FullCalendar({ bookings, onEdit, onNewBooking }: FullCalendarProps) {
   const [view, setView] = useState<ViewMode>("week");
@@ -73,7 +79,7 @@ export function FullCalendar({ bookings, onEdit, onNewBooking }: FullCalendarPro
   // Scroll to 8 AM on mount/view change
   useEffect(() => {
     if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollTop = 480; // 8 AM * 60px
+      scrollContainerRef.current.scrollTop = 8 * HOUR_HEIGHT; 
     }
   }, [view]);
 
@@ -123,54 +129,52 @@ export function FullCalendar({ bookings, onEdit, onNewBooking }: FullCalendarPro
   // --- Renderers ---
 
   const renderMonthView = () => (
-    <div className="flex flex-col h-full border rounded-lg overflow-hidden bg-background shadow-sm">
+    <div className="flex flex-col h-full bg-white rounded-lg overflow-hidden">
       {/* Weekday Headers */}
-      <div className="grid grid-cols-7 border-b bg-muted/40">
+      <div className="grid grid-cols-7 border-b border-border/50">
         {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
-          <div key={day} className="p-3 text-center text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+          <div key={day} className="py-3 text-center text-[11px] font-semibold text-muted-foreground uppercase tracking-widest">
             {day}
           </div>
         ))}
       </div>
       
       {/* Calendar Grid */}
-      <div className="grid grid-cols-7 flex-1 auto-rows-fr">
+      <div className="grid grid-cols-7 flex-1 auto-rows-fr bg-muted/5">
         {monthDays.map((day) => {
           const isSelectedMonth = isSameMonth(day, currentDate);
           const dayBookings = bookings.filter((b) => isSameDay(new Date(b.date), day));
+          const isTodayDate = isToday(day);
           
           return (
             <div
               key={day.toISOString()}
               className={cn(
-                "min-h-[120px] p-2 border-b border-r hover:bg-muted/5 transition-colors cursor-pointer relative group",
-                !isSelectedMonth && "bg-muted/5 text-muted-foreground",
-                isToday(day) && "bg-blue-50/30"
+                "min-h-[100px] p-2 border-b border-r border-border/40 hover:bg-white transition-all cursor-pointer relative group flex flex-col",
+                !isSelectedMonth && "bg-muted/10 text-muted-foreground/50",
+                isTodayDate && "bg-blue-50/10"
               )}
               onClick={() => {
                 const d = new Date(day);
-                d.setHours(9, 0); // Default to 9 AM
+                d.setHours(9, 0); 
                 onNewBooking(d);
               }}
             >
-              <div className="flex justify-between items-start mb-1">
+              <div className="flex justify-between items-center mb-1">
                 <span
                   className={cn(
-                    "text-sm font-medium w-7 h-7 flex items-center justify-center rounded-full transition-colors",
-                    isToday(day) ? "bg-blue-600 text-white shadow-sm" : "text-foreground group-hover:bg-muted"
+                    "text-xs font-medium w-6 h-6 flex items-center justify-center rounded-full transition-all",
+                    isTodayDate 
+                      ? "bg-primary text-primary-foreground shadow-sm" 
+                      : "text-muted-foreground group-hover:text-foreground"
                   )}
                 >
                   {format(day, "d")}
                 </span>
-                {dayBookings.length > 0 && (
-                   <span className="text-[10px] font-medium text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">
-                     {dayBookings.length}
-                   </span>
-                )}
               </div>
               
-              <div className="space-y-1 mt-1 overflow-y-auto max-h-[85px] custom-scrollbar">
-                {dayBookings.slice(0, 4).map((booking) => (
+              <div className="space-y-1 mt-1 overflow-y-auto max-h-[80px] no-scrollbar">
+                {dayBookings.slice(0, 3).map((booking) => (
                   <div
                     key={booking.id}
                     onClick={(e) => {
@@ -178,16 +182,16 @@ export function FullCalendar({ bookings, onEdit, onNewBooking }: FullCalendarPro
                       onEdit(booking);
                     }}
                     className={cn(
-                      "text-[10px] px-1.5 py-1 rounded border truncate font-medium cursor-pointer shadow-sm transition-all hover:scale-[1.02]",
-                      STATUS_COLORS[booking.status] || "bg-gray-100 border-gray-200"
+                      "text-[10px] px-1.5 py-1 rounded-sm truncate font-medium cursor-pointer transition-all hover:scale-[1.02] shadow-sm",
+                      STATUS_STYLES[booking.status]?.replace("border-l-4", "border-l-2") || "bg-gray-100"
                     )}
                   >
-                    {format(new Date(booking.date), "h:mm a")} {booking.contact.name}
+                    {format(new Date(booking.date), "h:mm a")} {booking.contact.name.split(" ")[0]}
                   </div>
                 ))}
-                {dayBookings.length > 4 && (
-                    <div className="text-[10px] text-muted-foreground pl-1 font-medium">
-                        + {dayBookings.length - 4} more
+                {dayBookings.length > 3 && (
+                    <div className="text-[9px] text-muted-foreground pl-1 font-medium">
+                        +{dayBookings.length - 3} more
                     </div>
                 )}
               </div>
@@ -199,59 +203,68 @@ export function FullCalendar({ bookings, onEdit, onNewBooking }: FullCalendarPro
   );
 
   const renderTimeGrid = (days: Date[]) => (
-    <div className="flex flex-col h-full border rounded-lg overflow-hidden bg-background shadow-sm">
+    <div className="flex flex-col h-full bg-white rounded-lg overflow-hidden">
       {/* Header Row */}
-      <div className="flex border-b bg-muted/5">
-        <div className="w-16 flex-shrink-0 border-r bg-muted/10"></div> {/* Time Label Gutter */}
+      <div className="flex border-b border-border/50 sticky top-0 bg-white z-20 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
+        <div className="w-14 flex-shrink-0 border-r border-transparent"></div> {/* Gutter */}
         <div className="flex flex-1">
-          {days.map((day) => (
-            <div 
-              key={day.toISOString()} 
-              className={cn(
-                "flex-1 text-center py-3 border-r last:border-r-0 transition-colors",
-                isToday(day) && "bg-blue-50/30"
-              )}
-            >
-              <div className="text-xs text-muted-foreground font-semibold uppercase tracking-wider mb-1">{format(day, "EEE")}</div>
-              <div className={cn(
-                "text-lg font-bold w-9 h-9 flex items-center justify-center rounded-full mx-auto transition-all",
-                isToday(day) ? "bg-blue-600 text-white shadow-md scale-110" : "text-foreground hover:bg-muted"
-              )}>
-                {format(day, "d")}
+          {days.map((day) => {
+            const isTodayDate = isToday(day);
+            return (
+              <div 
+                key={day.toISOString()} 
+                className={cn(
+                  "flex-1 text-center py-3 border-r border-border/30 last:border-r-0 transition-colors",
+                  isTodayDate && "bg-blue-50/20"
+                )}
+              >
+                <div className={cn(
+                  "text-[10px] font-semibold uppercase tracking-widest mb-1",
+                  isTodayDate ? "text-primary" : "text-muted-foreground"
+                )}>
+                  {format(day, "EEE")}
+                </div>
+                <div className={cn(
+                  "text-lg font-light w-8 h-8 flex items-center justify-center rounded-full mx-auto transition-all",
+                  isTodayDate ? "bg-primary text-primary-foreground shadow-md font-medium" : "text-foreground"
+                )}>
+                  {format(day, "d")}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
       {/* Scrollable Time Grid */}
       <div 
         ref={scrollContainerRef}
-        className="flex flex-1 overflow-y-auto relative custom-scrollbar bg-white"
+        className="flex flex-1 overflow-y-auto relative bg-white"
         style={{ height: '600px' }}
       >
-        <div className="flex w-full min-h-[1440px] relative"> {/* 1440px = 24h * 60px/hr */}
+        <div className="flex w-full relative" style={{ height: 24 * HOUR_HEIGHT }}>
           
           {/* Time Labels Column */}
-          <div className="w-16 flex-shrink-0 border-r bg-background select-none sticky left-0 z-20">
+          <div className="w-14 flex-shrink-0 border-r border-border/40 select-none sticky left-0 z-20 bg-white">
             {timeSlots.map((hour) => (
-              <div key={hour} className="h-[60px] relative">
-                <span className="absolute -top-3 right-2 text-xs text-muted-foreground font-medium bg-background px-1">
-                  {hour === 0 ? "12 AM" : hour < 12 ? `${hour} AM` : hour === 12 ? "12 PM" : `${hour - 12} PM`}
+              <div key={hour} className="relative" style={{ height: HOUR_HEIGHT }}>
+                <span className="absolute -top-2 right-2 text-[10px] text-muted-foreground/70 font-medium font-mono">
+                  {hour === 0 ? "12AM" : hour < 12 ? `${hour}AM` : hour === 12 ? "12PM" : `${hour - 12}PM`}
                 </span>
               </div>
             ))}
           </div>
 
           {/* Grid Content */}
-          <div className="flex flex-1 relative">
+          <div className="flex flex-1 relative bg-[url('/grid-pattern.svg')]">
             
-            {/* Horizontal Hour Lines (Background) */}
+            {/* Horizontal Hour Lines */}
             <div className="absolute inset-0 w-full pointer-events-none z-0">
                {timeSlots.map((hour) => (
                  <div 
                     key={`line-${hour}`} 
-                    className="h-[60px] border-b border-gray-100 w-full"
+                    className="border-b border-dashed border-gray-100 w-full"
+                    style={{ height: HOUR_HEIGHT }}
                  />
                ))}
             </div>
@@ -259,26 +272,30 @@ export function FullCalendar({ bookings, onEdit, onNewBooking }: FullCalendarPro
             {/* Day Columns */}
             {days.map((day, colIndex) => {
               const dayBookings = bookings.filter((b) => isSameDay(new Date(b.date), day));
+              const isTodayDate = isToday(day);
               
               return (
-                <div key={day.toISOString()} className="flex-1 border-r last:border-r-0 relative group min-w-[100px]">
+                <div key={day.toISOString()} className={cn(
+                  "flex-1 border-r border-dashed border-gray-100 last:border-r-0 relative group min-w-[100px]",
+                  isTodayDate && "bg-blue-50/5"
+                )}>
                    
-                   {/* Current Time Indicator Line (if today) */}
-                   {isToday(day) && (
+                   {/* Current Time Indicator */}
+                   {isTodayDate && (
                      <div 
-                        className="absolute w-full border-t-2 border-red-500 z-30 pointer-events-none flex items-center"
-                        style={{ top: `${getHours(new Date()) * 60 + getMinutes(new Date())}px` }}
+                        className="absolute w-full border-t-2 border-red-500/80 z-30 pointer-events-none flex items-center shadow-[0_0_8px_rgba(239,68,68,0.4)]"
+                        style={{ top: `${(getHours(new Date()) * 60 + getMinutes(new Date())) * (HOUR_HEIGHT / 60)}px` }}
                      >
-                        <div className="w-2 h-2 bg-red-500 rounded-full -ml-1"></div>
+                        <div className="w-2.5 h-2.5 bg-red-500 rounded-full -ml-[5px] ring-2 ring-white"></div>
                      </div>
                    )}
 
-                   {/* Clickable Slots (Hour blocks) */}
+                   {/* Clickable Slots */}
                    {timeSlots.map((hour) => (
                       <div 
                         key={`slot-${hour}`}
-                        className="h-[60px] w-full absolute hover:bg-blue-50/30 cursor-pointer z-10 transition-colors"
-                        style={{ top: `${hour * 60}px` }}
+                        className="w-full absolute hover:bg-muted/20 cursor-pointer z-10 transition-colors"
+                        style={{ top: hour * HOUR_HEIGHT, height: HOUR_HEIGHT }}
                         onClick={() => {
                             const d = new Date(day);
                             d.setHours(hour, 0);
@@ -287,14 +304,17 @@ export function FullCalendar({ bookings, onEdit, onNewBooking }: FullCalendarPro
                       />
                    ))}
 
-                   {/* Booking Events */}
+                   {/* Events */}
                    {dayBookings.map((booking) => {
                       const start = new Date(booking.date);
                       const end = new Date(booking.endTime);
                       
                       const startMinutes = getHours(start) * 60 + getMinutes(start);
                       const durationMinutes = differenceInMinutes(end, start);
-                      const height = Math.max(durationMinutes, 30); // Min height 30px (30 mins)
+                      
+                      // Calculate position based on HOUR_HEIGHT (e.g. 50px per 60min)
+                      const top = startMinutes * (HOUR_HEIGHT / 60);
+                      const height = Math.max(durationMinutes * (HOUR_HEIGHT / 60), 24); // Min height 24px
 
                       return (
                         <div
@@ -304,35 +324,30 @@ export function FullCalendar({ bookings, onEdit, onNewBooking }: FullCalendarPro
                             onEdit(booking);
                           }}
                           style={{
-                            top: `${startMinutes}px`, // 1px per minute
+                            top: `${top}px`,
                             height: `${height}px`,
-                            left: "4px",
-                            right: "4px",
+                            left: "3px",
+                            right: "3px",
                           }}
                           className={cn(
-                            "absolute z-20 rounded-md border shadow-sm cursor-pointer overflow-hidden transition-all hover:z-30 hover:shadow-md hover:scale-[1.02] flex flex-col p-2",
-                            STATUS_COLORS[booking.status] || "bg-gray-100 border-gray-200"
+                            "absolute z-20 rounded-sm shadow-sm cursor-pointer overflow-hidden transition-all hover:z-30 hover:shadow-md hover:translate-y-[-1px] flex flex-col p-1.5",
+                            STATUS_STYLES[booking.status] || "bg-gray-100"
                           )}
                         >
-                          <div className="flex items-start justify-between gap-1">
-                             <span className="font-semibold text-xs truncate leading-tight">
+                          <div className="flex items-center gap-1.5">
+                             <span className="font-semibold text-[11px] truncate leading-tight">
                                {booking.service.name}
                              </span>
-                             {height > 40 && (
-                                <Avatar className="h-4 w-4 text-[8px]">
-                                    <AvatarFallback className="bg-white/50 text-foreground">
-                                        {booking.contact.name.substring(0, 1).toUpperCase()}
-                                    </AvatarFallback>
-                                </Avatar>
-                             )}
                           </div>
                           
-                          <div className="text-[10px] font-medium opacity-90 truncate mt-0.5">
-                            {booking.contact.name}
-                          </div>
+                          {height > 30 && (
+                            <div className="text-[10px] font-medium opacity-80 truncate mt-0.5 flex items-center gap-1">
+                              <span className="truncate">{booking.contact.name}</span>
+                            </div>
+                          )}
                           
-                          {height > 45 && (
-                             <div className="flex items-center gap-1 mt-auto text-[10px] opacity-75">
+                          {height > 50 && (
+                             <div className="flex items-center gap-1 mt-auto text-[9px] opacity-70 font-mono">
                                <Clock className="w-3 h-3" />
                                <span>
                                  {format(start, "h:mm")} - {format(end, "h:mm a")}
@@ -352,53 +367,61 @@ export function FullCalendar({ bookings, onEdit, onNewBooking }: FullCalendarPro
   );
 
   return (
-    <div className="flex flex-col h-full space-y-4 animate-in fade-in-50 duration-500">
+    <Card className="flex flex-col h-full shadow-sm border-border/60 overflow-hidden bg-gray-50/50">
       {/* Calendar Toolbar */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-card p-4 rounded-lg border shadow-sm">
+      <div className="flex flex-col sm:flex-row items-center justify-between p-4 bg-white border-b border-border/40 gap-4">
         
         {/* Navigation Group */}
-        <div className="flex items-center gap-4">
-            <h2 className="text-xl font-bold tracking-tight min-w-[200px]">{headerTitle}</h2>
-            
-            <div className="flex items-center gap-1 bg-muted/50 p-1 rounded-lg">
-                <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-background shadow-sm" onClick={prev}>
-                    <ChevronLeft className="h-4 w-4" />
+        <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-start">
+            <div className="flex items-center rounded-lg border border-border/50 bg-white shadow-sm p-0.5">
+                <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md hover:bg-muted" onClick={prev}>
+                    <ChevronLeft className="h-4 w-4 text-muted-foreground" />
                 </Button>
-                <Button variant="ghost" size="sm" className="h-8 px-3 text-xs font-medium hover:bg-background shadow-sm" onClick={goToToday}>
+                <Button variant="ghost" size="sm" className="h-7 px-3 text-xs font-medium hover:bg-muted" onClick={goToToday}>
                     Today
                 </Button>
-                <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-background shadow-sm" onClick={next}>
-                    <ChevronRight className="h-4 w-4" />
+                <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md hover:bg-muted" onClick={next}>
+                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
                 </Button>
             </div>
+            
+            <h2 className="text-lg font-semibold tracking-tight min-w-[160px] text-center sm:text-left ml-2">
+                {headerTitle}
+            </h2>
         </div>
 
         {/* Actions Group */}
-        <div className="flex items-center gap-3 w-full sm:w-auto">
-            <Select value={view} onValueChange={(v) => setView(v as ViewMode)}>
-                <SelectTrigger className="w-[110px] h-9">
-                    <SelectValue />
-                </SelectTrigger>
-                <SelectContent align="end">
-                    <SelectItem value="month">Month</SelectItem>
-                    <SelectItem value="week">Week</SelectItem>
-                    <SelectItem value="day">Day</SelectItem>
-                </SelectContent>
-            </Select>
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+            <div className="bg-muted/50 p-0.5 rounded-lg border border-border/20 flex">
+                {(['month', 'week', 'day'] as ViewMode[]).map((m) => (
+                    <button
+                        key={m}
+                        onClick={() => setView(m)}
+                        className={cn(
+                            "px-3 py-1 text-xs font-medium rounded-md capitalize transition-all",
+                            view === m 
+                                ? "bg-white text-foreground shadow-sm border border-border/10" 
+                                : "text-muted-foreground hover:text-foreground hover:bg-white/50"
+                        )}
+                    >
+                        {m}
+                    </button>
+                ))}
+            </div>
             
-            <Button onClick={() => onNewBooking(currentDate)} className="h-9 shadow-sm bg-primary hover:bg-primary/90">
-                <CalendarIcon className="w-4 h-4 mr-2" />
-                New Booking
+            <Button onClick={() => onNewBooking(currentDate)} size="sm" className="h-8 shadow-sm bg-primary text-primary-foreground hover:bg-primary/90 text-xs px-4">
+                <CalendarIcon className="w-3.5 h-3.5 mr-2" />
+                Add Booking
             </Button>
         </div>
       </div>
 
       {/* Main Calendar Area */}
-      <div className="flex-1 bg-background rounded-lg">
+      <div className="flex-1 bg-white overflow-hidden relative">
         {view === "month" && renderMonthView()}
         {view === "week" && renderTimeGrid(weekDays)}
         {view === "day" && renderTimeGrid([currentDate])}
       </div>
-    </div>
+    </Card>
   );
 }
