@@ -34,17 +34,20 @@ export default function InventoryPage() {
             const data = await res.json();
             setItems(data.items);
 
-            // Mock forecast generation
-            const mockForecast: any = {};
-            data.items.forEach((item: any) => {
-                if (item.quantity > 0) {
-                    mockForecast[item.name] = {
-                        daysRemaining: Math.floor(Math.random() * 30) + 5,
-                        confidence: "High"
-                    };
+            // AI Forecast
+            try {
+                const forecastRes = await fetch("/api/ai/inventory-forecast", { method: "POST" });
+                if (forecastRes.ok) {
+                    const fData = await forecastRes.json();
+                    const forecastMap: Record<string, { daysRemaining: number; confidence: string }> = {};
+                    fData.forecast.forEach((f: any) => {
+                        forecastMap[f.name] = { daysRemaining: f.daysRemaining, confidence: f.confidence };
+                    });
+                    setForecast(forecastMap);
                 }
-            });
-            setForecast(mockForecast);
+            } catch (err) {
+                console.error("AI Forecast failed", err);
+            }
         } catch (error) {
             toast({ title: "Error", description: "Could not load inventory", variant: "destructive" });
         } finally {

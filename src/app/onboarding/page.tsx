@@ -55,8 +55,8 @@ export default function OnboardingPage() {
   const [contactForm, setContactForm] = useState({ id: "", name: "Contact Us", welcomeMessage: "Thank you for reaching out! We'll get back to you shortly." });
   const [services, setServices] = useState<Array<{ id?: string; name: string; duration: string; location: string; availableDays: string; startTime: string; endTime: string }>>([]);
   const [newService, setNewService] = useState({ name: "", duration: "30", location: "", availableDays: "1,2,3,4,5", startTime: "09:00", endTime: "17:00" });
-  const [intakeForms, setIntakeForms] = useState<Array<{ id?: string; name: string; description: string; fields?: string; serviceId?: string }>>([]);
-  const [newIntakeForm, setNewIntakeForm] = useState({ name: "", description: "", serviceId: "" });
+  const [intakeForms, setIntakeForms] = useState<Array<{ id?: string; name: string; description: string; fields?: string; serviceId?: string; documents?: string }>>([]);
+  const [newIntakeForm, setNewIntakeForm] = useState<{ name: string; description: string; serviceId: string; documents: Array<{ name: string; url: string }> }>({ name: "", description: "", serviceId: "", documents: [] });
   const [inventoryItems, setInventoryItems] = useState<Array<{ id?: string; name: string; quantity: string; threshold: string; unit: string }>>([]);
   const [newItem, setNewItem] = useState({ name: "", quantity: "0", threshold: "5", unit: "units" });
   const [staffMembers, setStaffMembers] = useState<Array<{ id?: string; name: string; email: string; password: string }>>([]);
@@ -693,8 +693,8 @@ export default function OnboardingPage() {
 
   const addIntakeForm = () => {
     if (newIntakeForm.name) {
-      setIntakeForms(prev => [...prev, { ...newIntakeForm }]);
-      setNewIntakeForm({ name: "", description: "", serviceId: "" });
+      setIntakeForms(prev => [...prev, { ...newIntakeForm, documents: JSON.stringify(newIntakeForm.documents) }]);
+      setNewIntakeForm({ name: "", description: "", serviceId: "", documents: [] });
     }
   };
 
@@ -704,7 +704,11 @@ export default function OnboardingPage() {
 
   const editIntakeForm = (index: number) => {
     const form = intakeForms[index];
-    setNewIntakeForm({ ...form, serviceId: form.serviceId || "" });
+    let docs = [];
+    try {
+      docs = JSON.parse(form.documents || "[]");
+    } catch {}
+    setNewIntakeForm({ ...form, serviceId: form.serviceId || "", documents: docs });
     removeIntakeForm(index);
   };
 
@@ -728,6 +732,26 @@ export default function OnboardingPage() {
     if (newStaff.name && newStaff.email && newStaff.password) {
       setStaffMembers(prev => [...prev, { ...newStaff }]);
       setNewStaff({ name: "", email: "", password: "" });
+    }
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files?.length) return;
+    const file = e.target.files[0];
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await fetch("/api/upload", { method: "POST", body: formData });
+      if (res.ok) {
+        const data = await res.json();
+        setNewIntakeForm(prev => ({
+          ...prev,
+          documents: [...prev.documents, { name: data.name, url: data.url }]
+        }));
+      }
+    } catch (error) {
+      console.error("Upload error", error);
     }
   };
 
@@ -908,6 +932,15 @@ export default function OnboardingPage() {
                   </SelectContent>
                 </Select>
                 <p className="text-[10px] text-gray-500">Form will be sent automatically when this service is booked.</p>
+              </div>
+              <div className="space-y-1">
+                <Label className="text-[10px] font-bold uppercase text-gray-500">Documents (Agreement, etc.)</Label>
+                <Input type="file" onChange={handleFileUpload} className="h-8 text-sm" />
+                {newIntakeForm.documents.map((doc, i) => (
+                  <div key={i} className="flex items-center gap-1 text-[10px] text-blue-600">
+                    <FileText className="w-3 h-3" /> {doc.name}
+                  </div>
+                ))}
               </div>
               <Button onClick={addIntakeForm} size="sm" className="w-full bg-blue-600 hover:bg-blue-700 h-8 text-xs" disabled={!newIntakeForm.name}>Add Form</Button>
             </div>

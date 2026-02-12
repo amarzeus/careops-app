@@ -26,18 +26,16 @@ export async function POST(req: Request) {
   if (user.role !== "OWNER")
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-  const { name, description, fields, serviceId } = await req.json();
+  const { name, description, fields, serviceId, documents } = await req.json();
   if (!name)
-    return NextResponse.json(
-      { error: "Form name is required" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Form name is required" }, { status: 400 });
 
   const form = await prisma.intakeForm.create({
     data: {
       name,
       description,
       fields: fields ? JSON.stringify(fields) : "[]",
+      documents: documents || "[]",
       serviceId,
       workspaceId: user.workspaceId,
     },
@@ -51,7 +49,7 @@ export async function PUT(req: Request) {
   if (!user || !user.workspaceId)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { id, name, description, fields, serviceId } = await req.json();
+  const { id, name, description, fields, serviceId, documents } = await req.json();
   if (!id) return NextResponse.json({ error: "Form ID is required" }, { status: 400 });
 
   const existingForm = await prisma.intakeForm.findUnique({
@@ -68,6 +66,7 @@ export async function PUT(req: Request) {
       name,
       description,
       fields: fields ? JSON.stringify(fields) : undefined,
+      documents,
       serviceId,
     },
   });

@@ -241,6 +241,7 @@ model IntakeForm {
   name        String
   description String?
   fields      String  @default("[]")
+  documents   String  @default("[]") // JSON: [{ name, url }]
   isActive    Boolean @default(true)
   slug        String  @unique @default(cuid())
   serviceId   String?

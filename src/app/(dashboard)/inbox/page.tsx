@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Loader2, ArrowLeft, Phone, MoreVertical, MessageSquare } from "lucide-react";
+import { Loader2, ArrowLeft, Phone, MoreVertical, MessageSquare, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
@@ -16,6 +16,7 @@ export default function InboxPage() {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [messages, setMessages] = useState<MessageDTO[]>([]);
   const [inputText, setInputText] = useState("");
+  const [suggestions, setSuggestions] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMessages, setLoadingMessages] = useState(false);
   const [sending, setSending] = useState(false);
@@ -62,6 +63,17 @@ export default function InboxPage() {
           setConversations((prev) =>
             prev.map((c) => (c.id === activeId ? { ...c, unreadCount: 0 } : c))
           );
+
+          // Fetch Smart Replies
+          try {
+            const aiRes = await fetch(`/api/ai/smart-reply?conversationId=${activeId}`);
+            if (aiRes.ok) {
+              const aiData = await aiRes.json();
+              setSuggestions(aiData.replies || []);
+            }
+          } catch (e) {
+            console.error("AI Reply error", e);
+          }
         }
       } catch (error) {
         console.error("Failed to load messages", error);
@@ -89,6 +101,7 @@ export default function InboxPage() {
 
     setMessages((prev) => [...prev, tempMsg]);
     setInputText("");
+    setSuggestions([]);
     setSending(true);
 
     try {
@@ -224,6 +237,20 @@ export default function InboxPage() {
                   loading={loadingMessages} 
                   contactName={activeConversation.contactName}
                 />
+                {suggestions.length > 0 && (
+                  <div className="px-4 py-2 flex gap-2 overflow-x-auto bg-gray-50 border-t border-gray-100 no-scrollbar">
+                    {suggestions.map((s, i) => (
+                      <button 
+                        key={i} 
+                        onClick={() => setInputText(s)} 
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-purple-100 rounded-full text-xs text-purple-700 hover:bg-purple-50 whitespace-nowrap shadow-sm transition-colors"
+                      >
+                        <Sparkles className="w-3 h-3 text-purple-500" /> 
+                        {s.length > 50 ? s.substring(0, 50) + "..." : s}
+                      </button>
+                    ))}
+                  </div>
+                )}
                 <ChatInput 
                   inputText={inputText}
                   setInputText={setInputText}
