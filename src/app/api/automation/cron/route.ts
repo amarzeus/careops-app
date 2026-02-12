@@ -37,10 +37,20 @@ export async function GET(req: Request) {
                     status: { in: ["PENDING", "CONFIRMED"] },
                     date: { gte: now, lte: in24Hours },
                 },
-                include: { contact: true, service: true },
+                include: { 
+                    contact: {
+                        include: { conversation: true }
+                    }, 
+                    service: true 
+                },
             });
 
             for (const booking of upcomingBookings) {
+                // Check if automation is paused for this conversation
+                if (booking.contact.conversation && !booking.contact.conversation.isActive) {
+                    continue;
+                }
+
                 // Check if reminder already sent (avoid duplicates)
                 const alreadySent = await prisma.automationLog.findFirst({
                     where: {
@@ -107,10 +117,20 @@ export async function GET(req: Request) {
                     status: { in: ["PENDING", "SENT"] },
                     createdAt: { lte: addHours(now, -48) },
                 },
-                include: { contact: true, intakeForm: true },
+                include: { 
+                    contact: {
+                        include: { conversation: true }
+                    }, 
+                    intakeForm: true 
+                },
             });
 
             for (const form of pendingForms) {
+                // Check if automation is paused for this conversation
+                if (form.contact.conversation && !form.contact.conversation.isActive) {
+                    continue;
+                }
+
                 // Check if reminder already sent for this form recently
                 const alreadySent = await prisma.automationLog.findFirst({
                     where: {

@@ -92,6 +92,12 @@ export function Sidebar({ userName, userRole, workspaceName }: SidebarProps) {
         {navItems.map((item) => {
           const isActive = pathname === item.href || pathname?.startsWith(item.href + "/");
           const badgeCount = item.badgeKey ? badges[item.badgeKey] : 0;
+          
+          // Role-Based Visibility
+          if (userRole !== "OWNER" && (item.href === "/settings" || item.href === "/automation")) {
+            return null;
+          }
+
           return (
             <Link
               key={item.href}
