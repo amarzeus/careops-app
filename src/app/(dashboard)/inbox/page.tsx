@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { format } from "date-fns";
 import {
-    MessageSquare, User, Search, Send, Sparkles, Wand2,
+    MessageSquare, User, Search, Send,
     MoreVertical, Phone, Mail, Clock, Loader2, ArrowLeft,
     Inbox as InboxIcon, SmartphoneIcon, X,
 } from "lucide-react";
@@ -44,8 +44,7 @@ export default function InboxPage() {
     const [loading, setLoading] = useState(true);
     const [loadingMessages, setLoadingMessages] = useState(false);
     const [sending, setSending] = useState(false);
-    const [aiSuggestions, setAiSuggestions] = useState<string[]>([]);
-    const [loadingAI, setLoadingAI] = useState(false);
+
     const [searchQuery, setSearchQuery] = useState("");
     const [mobileShowChat, setMobileShowChat] = useState(false);
 
@@ -90,7 +89,7 @@ export default function InboxPage() {
 
         const fetchMessages = async () => {
             setLoadingMessages(true);
-            setAiSuggestions([]); // Clear old suggestions
+
             try {
                 const res = await fetch(`/api/inbox/messages?conversationId=${activeId}`);
                 if (res.ok) {
@@ -138,7 +137,7 @@ export default function InboxPage() {
         setMessages((prev) => [...prev, tempMsg]);
         setInputText("");
         setSending(true);
-        setAiSuggestions([]);
+
 
         try {
             const res = await fetch("/api/inbox/messages", {
@@ -201,50 +200,7 @@ export default function InboxPage() {
 
     const activeConversation = conversations.find((c) => c.id === activeId);
 
-    // AI Smart Reply - calls real API
-    const handleSmartReply = async () => {
-        if (!activeId) return;
-        setLoadingAI(true);
-        try {
-            const res = await fetch("/api/ai/smart-reply", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ conversationId: activeId }),
-            });
-            if (res.ok) {
-                const data = await res.json();
-                setAiSuggestions(data.replies || []);
-            }
-        } catch {
-            setAiSuggestions([
-                "Thank you for reaching out. I'll look into that for you.",
-                "I appreciate your message. Let me check and get back to you.",
-                "Thanks for contacting us. How can I assist you further?",
-            ]);
-        } finally {
-            setLoadingAI(false);
-        }
-    };
 
-    // AI Refine Message
-    const handleRefineMessage = async () => {
-        if (!inputText.trim()) return;
-        setLoadingAI(true);
-        try {
-            const res = await fetch("/api/ai/refine-message", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ content: inputText }),
-            });
-            if (res.ok) {
-                const data = await res.json();
-                setInputText(data.refined || inputText);
-            }
-        } catch {
-            /* keep original text on error */
-        }
-        setLoadingAI(false);
-    };
 
     // Select conversation (with mobile handling)
     const handleSelectConversation = (id: string) => {
@@ -520,48 +476,10 @@ export default function InboxPage() {
 
             {/* Input Area */}
             <div className="p-3 sm:p-4 bg-white border-t border-gray-200">
-                {aiSuggestions.length > 0 && (
-                    <div className="flex gap-2 mb-3 overflow-x-auto pb-2">
-                        {aiSuggestions.map((sugg, i) => (
-                            <button
-                                key={i}
-                                onClick={() => {
-                                    setInputText(sugg);
-                                    setAiSuggestions([]);
-                                }}
-                                className="whitespace-nowrap px-3 py-1.5 rounded-full bg-purple-50 text-purple-700 text-xs font-medium border border-purple-100 hover:bg-purple-100 transition-colors flex items-center gap-1"
-                            >
-                                <Sparkles className="w-3 h-3" /> {sugg}
-                            </button>
-                        ))}
-                    </div>
-                )}
+
 
                 <div className="flex items-end gap-2 bg-white rounded-xl border border-gray-300 p-2 focus-within:ring-2 focus-within:ring-blue-100 focus-within:border-blue-400 transition-all">
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className="text-purple-600 hover:bg-purple-50 h-8 w-8 mb-1 shrink-0"
-                        onClick={handleSmartReply}
-                        disabled={loadingAI}
-                        title="AI Smart Replies"
-                    >
-                        {loadingAI ? (
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                        ) : (
-                            <Sparkles className="w-4 h-4" />
-                        )}
-                    </Button>
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className="text-amber-600 hover:bg-amber-50 h-8 w-8 mb-1 shrink-0"
-                        onClick={handleRefineMessage}
-                        disabled={loadingAI || !inputText.trim()}
-                        title="Refine message with AI"
-                    >
-                        <Wand2 className="w-4 h-4" />
-                    </Button>
+
                     <Textarea
                         value={inputText}
                         onChange={(e) => setInputText(e.target.value)}

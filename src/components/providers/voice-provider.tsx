@@ -114,7 +114,7 @@ export function VoiceProvider({ children }: { children: React.ReactNode }) {
         }
     }, [hasGreeted]);
 
-    const isInlinePage = pathname?.startsWith("/onboarding");
+    const isInlinePage = pathname?.startsWith("/onboarding") || pathname?.startsWith("/inbox");
 
     return (
         <VoiceContext.Provider value={engine}>
