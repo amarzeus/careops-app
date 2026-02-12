@@ -12,7 +12,7 @@ interface MetricCardProps {
   trend?: { value: number; label: string };
   alert?: boolean;
   href?: string;
-  color?: "blue" | "emerald" | "violet" | "amber" | "red";
+  color?: "blue" | "emerald" | "violet" | "amber" | "red" | "gray";
 }
 
 const colorMap = {
@@ -21,6 +21,7 @@ const colorMap = {
   violet: { bg: "bg-violet-50", icon: "text-violet-600", ring: "ring-violet-200" },
   amber: { bg: "bg-amber-50", icon: "text-amber-600", ring: "ring-amber-200" },
   red: { bg: "bg-red-50", icon: "text-red-600", ring: "ring-red-200" },
+  gray: { bg: "bg-gray-50", icon: "text-gray-600", ring: "ring-gray-200" },
 };
 
 export function MetricCard({

@@ -26,6 +26,8 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "@/hooks/use-toast";
 import Link from "next/link";
+import { HoverExpandCard } from "@/components/dashboard/hover-expand-card";
+import { cn } from "@/lib/utils";
 
 /** Dashboard data shape from /api/dashboard/metrics */
 interface DashboardData {
@@ -116,6 +118,9 @@ export default function DashboardPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50/50 p-4 lg:p-6 space-y-6">
+        <div className="grid lg:grid-cols-3 gap-6">
+          {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-48 rounded-xl" />)}
+        </div>
         <div className="space-y-3">
           <Skeleton className="h-8 w-48" />
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -166,157 +171,170 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      {/* Main Content - Tighter spacing, max height optimized for 1080p/1440p without scroll if possible */}
-      <main className="flex-1 p-4 lg:p-6 max-w-[1600px] mx-auto w-full flex flex-col gap-4 lg:gap-5 overflow-hidden">
+      {/* Main Content */}
+      <main className="flex-1 p-4 lg:p-6 max-w-[1600px] mx-auto w-full flex flex-col gap-5 overflow-hidden">
 
-        {/* ══════ 1. High Priority Action Items (Top Row) ══════ */}
-        <section>
-          {/* <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-2">
-            <Sparkles className="w-3.5 h-3.5 text-primary" />
-            At a Glance
-          </h2> */}
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
-            <MetricCard
-              title="Today's Bookings"
-              value={m.bookingsToday}
-              icon={Calendar}
-              description={m.bookingsUpcoming > 0 ? `+${m.bookingsUpcoming} upcoming` : "No upcoming"}
-              color="blue"
-              href="/bookings"
-              trend={{ value: m.bookingsToday, label: "" }}
-            />
-            <MetricCard
-              title="Inbox attention"
-              value={m.unansweredMessages}
-              icon={MessageSquare}
-              description="Unanswered messages"
-              color={m.unansweredMessages > 0 ? "red" : "emerald"}
-              alert={m.unansweredMessages > 0}
-              href="/inbox"
-              trend={m.unansweredMessages > 0 ? { value: m.unansweredMessages, label: "" } : undefined}
-            />
-            <MetricCard
-              title="Pending Forms"
-              value={m.pendingForms}
-              icon={FileText}
-              description={`${m.overdueForms} overdue`}
-              color={m.overdueForms > 0 ? "amber" : "violet"}
-              alert={m.overdueForms > 0}
-              href="/forms"
-            />
-            <MetricCard
-              title="Inventory Alert"
-              value={m.criticalItems}
-              icon={Package}
-              description={`${m.lowStockItems} low stock`}
-              color={m.criticalItems > 0 ? "red" : "emerald"}
-              alert={m.criticalItems > 0}
-              href="/inventory"
-            />
-          </div>
+        {/* ══════ 1. Operational Metrics (Top Row) ══════ */}
+        <section className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 lg:gap-4">
+          <MetricCard
+            title="Today's Bookings"
+            value={m.bookingsToday}
+            icon={Calendar}
+            color="blue"
+            href="/bookings"
+            trend={{ value: m.bookingsToday, label: "" }}
+          />
+          <MetricCard
+            title="Inbox"
+            value={m.unansweredMessages}
+            icon={MessageSquare}
+            color={m.unansweredMessages > 0 ? "amber" : "emerald"}
+            alert={m.unansweredMessages > 0}
+            href="/inbox"
+          />
+          <MetricCard
+            title="Pending Forms"
+            value={m.pendingForms}
+            icon={FileText}
+            color={m.overdueForms > 0 ? "amber" : "violet"}
+            alert={m.overdueForms > 0}
+            href="/forms"
+          />
+          <MetricCard
+            title="New Leads"
+            value={m.newContacts}
+            icon={Users}
+            color="emerald"
+            href="/inbox"
+          />
+          <MetricCard
+            title="Completed"
+            value={m.bookingsCompleted}
+            icon={CheckCircle}
+            color="gray"
+            href="/bookings"
+          />
         </section>
 
-        {/* ══════ 2. Main Operational View (Middle Section) ══════ */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6 flex-1 min-h-0">
+        {/* ══════ 2. High Priority Attention Section (Middle Row) ══════ */}
+        {/* ══════ 2. High Priority Attention Section (Middle Row) ══════ */}
+        <section className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
 
-          {/* Main Chart Column (2/3) */}
-          <div className="lg:col-span-2 space-y-4 flex flex-col h-full">
-            {/* Reduced height for chart container */}
-            <div className="flex-1 min-h-[300px]">
-              <PerformanceChart data={data?.chartData || []} />
-            </div>
-
-            {/* Secondary Metrics Grid - More compact */}
-            <div className="grid grid-cols-4 gap-3">
-              <Card className="shadow-none border bg-white/50 p-0">
-                <CardContent className="p-3 text-center">
-                  <div className="text-xl font-bold text-gray-900">{m.newContacts}</div>
-                  <div className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wide">New Leads</div>
-                </CardContent>
-              </Card>
-              <Card className="shadow-none border bg-white/50 p-0">
-                <CardContent className="p-3 text-center">
-                  <div className="text-xl font-bold text-gray-900">{m.bookingsCompleted}</div>
-                  <div className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wide">Completed</div>
-                </CardContent>
-              </Card>
-              <Card className="shadow-none border bg-white/50 p-0">
-                <CardContent className="p-3 text-center">
-                  <div className="text-xl font-bold text-gray-900">{m.totalContacts}</div>
-                  <div className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wide">Clients</div>
-                </CardContent>
-              </Card>
-              <Card className="shadow-none border bg-white/50 p-0">
-                <CardContent className="p-3 text-center">
-                  <div className="text-xl font-bold text-gray-900">{m.completedForms}</div>
-                  <div className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wide">Forms</div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-
-          {/* Right Sidebar Column (1/3) */}
-          <div className="space-y-4 flex flex-col h-full overflow-y-auto pr-1">
-            <TodaysSchedule bookings={data?.todaysBookings || []} />
-
-            {/* Key Alerts - priority */}
-            <KeyAlerts alerts={data?.keyAlerts || []} />
-
-            {/* AI Insights - Compact */}
-            {data?.aiInsights && data.aiInsights.length > 0 && (
-              <Card className="bg-gradient-to-br from-violet-50 to-white border-violet-100 shadow-sm">
-                <CardHeader className="pb-2 pt-3 px-4">
-                  <CardTitle className="text-xs font-semibold text-violet-900 flex items-center gap-2">
-                    <Sparkles className="w-3.5 h-3.5 text-violet-600" />
-                    AI Suggestions
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2 px-4 pb-3">
-                  {data.aiInsights.slice(0, 2).map((insight, i) => (
-                    <div key={i} className="flex gap-2.5 items-start p-2.5 rounded-md bg-white/60 border border-violet-100/50 hover:bg-white transition-colors">
-                      <div className="mt-1">
-                        <div className="w-1.5 h-1.5 rounded-full bg-violet-400" />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-xs text-gray-700 leading-snug mb-1 truncate">{insight.message}</p>
-                        <Badge variant="secondary" className="text-[9px] h-4 px-1 bg-violet-100 text-violet-700 hover:bg-violet-200">
-                          {insight.action}
-                        </Badge>
-                      </div>
+          {/* A. Attention Required (Key Alerts) */}
+          <HoverExpandCard
+            title="Attention Required"
+            icon={AlertTriangle}
+            count={(data?.keyAlerts?.length || 0)}
+            countLabel={data?.keyAlerts?.length ? `${data.keyAlerts.length}` : undefined}
+            headerColorClass="text-amber-900"
+            iconColorClass="text-amber-600"
+            previewText={data?.keyAlerts?.length ? `${data.keyAlerts.length} items` : "All clear"}
+            className="h-[72px]"
+          >
+            {data?.keyAlerts && data.keyAlerts.length > 0 ? (
+              <div className="space-y-2">
+                {data.keyAlerts.map((alert, i) => (
+                  <button
+                    key={i}
+                    onClick={() => alert.link && (window.location.href = alert.link)}
+                    className="w-full flex items-start gap-3 p-2.5 rounded-lg border bg-white hover:bg-gray-50 transition-colors text-left group/item"
+                  >
+                    <div className={cn("w-2 h-2 rounded-full mt-1.5 shrink-0",
+                      alert.priority === 'critical' ? 'bg-red-500' :
+                        alert.priority === 'high' ? 'bg-amber-500' : 'bg-blue-500')}
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-medium text-gray-900 leading-tight group-hover/item:text-primary transition-colors">{alert.message}</p>
+                      <p className="text-[10px] text-gray-500 mt-0.5 uppercase tracking-wide">{alert.category}</p>
                     </div>
-                  ))}
-                </CardContent>
-              </Card>
+                    <ArrowRight className="w-3.5 h-3.5 text-gray-400 mt-0.5 shrink-0 group-hover/item:text-gray-600" />
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-4 text-xs text-gray-500">No alerts needing attention.</div>
             )}
+          </HoverExpandCard>
 
-            {/* Inventory Details Compact */}
-            {data?.lowStockDetails && data.lowStockDetails.length > 0 && (
-              <Card className="border-red-100 bg-red-50/10 shadow-sm">
-                <CardHeader className="pb-2 pt-3 px-4 border-b border-red-50">
-                  <CardTitle className="text-xs font-semibold text-gray-900 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <AlertTriangle className="w-3.5 h-3.5 text-red-600" />
-                      Critical Stock
+          {/* B. AI Suggestions */}
+          <HoverExpandCard
+            title="AI Suggestions"
+            icon={Sparkles}
+            count={(data?.aiInsights?.length || 0)}
+            headerColorClass="text-violet-900"
+            iconColorClass="text-violet-600"
+            previewText={data?.aiInsights?.length ? `${data.aiInsights.length} insights` : "No insights"}
+            className="h-[72px]"
+          >
+            {data?.aiInsights && data.aiInsights.length > 0 ? (
+              <div className="space-y-2">
+                {data.aiInsights.slice(0, 3).map((insight, i) => (
+                  <div key={i} className="flex gap-2.5 items-start p-2.5 rounded-md bg-white border border-violet-100 hover:border-violet-200 transition-colors">
+                    <div className="mt-1">
+                      <div className="w-1.5 h-1.5 rounded-full bg-violet-400" />
                     </div>
-                    <Link href="/inventory" className="text-[10px] font-medium text-red-600 hover:underline">
-                      View All
-                    </Link>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="pt-3 px-4 grid gap-2">
-                  {data.lowStockDetails.slice(0, 3).map((item) => (
-                    <div key={item.id} className="flex items-center justify-between text-xs">
-                      <span className="font-medium text-gray-900 truncate max-w-[100px]">{item.name}</span>
-                      <span className="font-mono text-red-600 font-bold">{item.quantity} / {item.threshold}</span>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs text-gray-700 leading-snug mb-1">{insight.message}</p>
+                      <Badge variant="secondary" className="text-[9px] h-4 px-1 bg-violet-50 text-violet-700 hover:bg-violet-100 border border-violet-100">
+                        {insight.action}
+                      </Badge>
                     </div>
-                  ))}
-                </CardContent>
-              </Card>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-4 opacity-50">
+                <p className="text-xs text-gray-500">No suggestions right now</p>
+              </div>
             )}
-          </div>
+          </HoverExpandCard>
+
+          {/* C. Critical Stock */}
+          <HoverExpandCard
+            title="Critical Stock"
+            icon={Package}
+            count={(data?.lowStockDetails?.length || 0)}
+            headerColorClass="text-red-900"
+            iconColorClass="text-red-600"
+            previewText={data?.lowStockDetails?.length ? `${data.lowStockDetails.length} items low` : "Stock OK"}
+            className="h-[72px]"
+          >
+            {data?.lowStockDetails && data.lowStockDetails.length > 0 ? (
+              <div className="space-y-2">
+                {data.lowStockDetails.slice(0, 5).map((item) => (
+                  <div key={item.id} className="flex items-center justify-between text-xs bg-white p-2.5 rounded border border-red-100">
+                    <span className="font-medium text-gray-900 truncate flex-1 pr-2" title={item.name}>{item.name}</span>
+                    <Badge variant="destructive" className="h-5 px-1.5 text-[10px]">{item.quantity} / {item.threshold}</Badge>
+                  </div>
+                ))}
+                <Link href="/inventory" className="block w-full">
+                  <Button variant="ghost" size="sm" className="w-full text-xs h-7 mt-1 text-red-600 hover:text-red-700 hover:bg-red-50">
+                    View All Inventory
+                  </Button>
+                </Link>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-4 opacity-50">
+                <CheckCircle className="w-6 h-6 text-emerald-300 mb-2" />
+                <p className="text-xs text-gray-500">Inventory levels healthy</p>
+              </div>
+            )}
+          </HoverExpandCard>
+        </section>
+
+      {/* ══════ 3. Visuals (Bottom Row) ══════ */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6 flex-1 min-h-0">
+        {/* Main Chart Column (2/3) */}
+        <div className="lg:col-span-2 flex flex-col h-full min-h-[300px]">
+          <PerformanceChart data={data?.chartData || []} />
         </div>
-      </main>
-    </div>
+
+        {/* Schedule (1/3) */}
+        <div className="flex flex-col h-full overflow-y-auto min-h-[300px]">
+          <TodaysSchedule bookings={data?.todaysBookings || []} />
+        </div>
+      </div>
+    </main>
+    </div >
   );
 }
