@@ -1,6 +1,38 @@
 import { prisma } from "./prisma";
 import { sendEmail, buildEmailTemplate } from "./email";
 import { generateWelcomeMessage, generateBookingConfirmation } from "./gemini";
+import type { AutomationRule, Workspace, AutomationTrigger } from "@prisma/client";
+
+/** Typed shape for automation context data */
+export interface ContactData {
+  id: string;
+  name: string;
+  email?: string | null;
+  phone?: string | null;
+}
+
+export interface ServiceData {
+  id: string;
+  name: string;
+  location?: string | null;
+}
+
+export interface BookingData {
+  id: string;
+  date: string | Date;
+}
+
+export interface InventoryData {
+  name: string;
+  quantity: number;
+  threshold: number;
+  unit: string;
+  vendorEmail?: string | null;
+}
+
+export interface FormData {
+  name: string;
+}
 
 export async function triggerAutomation(
   workspaceId: string,
@@ -14,20 +46,29 @@ export async function triggerAutomation(
     if (!workspace || workspace.status !== "ACTIVE") return;
 
     const rules = await prisma.automationRule.findMany({
-      where: { workspaceId, trigger: trigger as any, isActive: true },
+      where: { workspaceId, trigger: trigger as AutomationTrigger, isActive: true },
     });
 
     for (const rule of rules) {
-      await executeRule(rule, workspace, data);
+      // Support delayMinutes: schedule execution after delay
+      if (rule.delayMinutes > 0) {
+        setTimeout(() => {
+          executeRule(rule, workspace, data).catch((err) =>
+            console.error(`Delayed automation error (rule ${rule.id}):`, err)
+          );
+        }, rule.delayMinutes * 60 * 1000);
+      } else {
+        await executeRule(rule, workspace, data);
+      }
     }
   } catch (error) {
     console.error("Automation trigger error:", error);
   }
 }
 
-async function executeRule(
-  rule: any,
-  workspace: any,
+export async function executeRule(
+  rule: AutomationRule,
+  workspace: Workspace,
   data: Record<string, unknown>
 ) {
   switch (rule.trigger) {
@@ -43,11 +84,17 @@ async function executeRule(
     case "INVENTORY_LOW":
       await handleInventoryLow(workspace, data);
       break;
+    case "BEFORE_BOOKING":
+      await handleBeforeBooking(workspace, data);
+      break;
+    case "STAFF_REPLY":
+      await handleStaffReply(workspace, data);
+      break;
   }
 }
 
-async function handleNewContact(workspace: any, data: Record<string, unknown>) {
-  const contact = data.contact as any;
+async function handleNewContact(workspace: Workspace, data: Record<string, unknown>) {
+  const contact = data.contact as ContactData | undefined;
   if (!contact?.email) return;
 
   const welcomeMsg = await generateWelcomeMessage(workspace.name, contact.name);
@@ -90,19 +137,19 @@ async function handleNewContact(workspace: any, data: Record<string, unknown>) {
   }
 }
 
-async function handleBookingCreated(workspace: any, data: Record<string, unknown>) {
-  const booking = data.booking as any;
-  const contact = data.contact as any;
-  const service = data.service as any;
+async function handleBookingCreated(workspace: Workspace, data: Record<string, unknown>) {
+  const booking = data.booking as BookingData | undefined;
+  const contact = data.contact as ContactData | undefined;
+  const service = data.service as ServiceData | undefined;
 
-  if (!contact?.email) return;
+  if (!contact?.email || !booking) return;
 
   const confirmationMsg = await generateBookingConfirmation(
     workspace.name,
     contact.name,
     service?.name || "Appointment",
     new Date(booking.date).toLocaleString(),
-    service?.location
+    service?.location ?? undefined
   );
 
   let conversation = await prisma.conversation.findUnique({
@@ -198,9 +245,9 @@ async function handleBookingCreated(workspace: any, data: Record<string, unknown
   });
 }
 
-async function handleFormPending(workspace: any, data: Record<string, unknown>) {
-  const contact = data.contact as any;
-  const form = data.form as any;
+async function handleFormPending(workspace: Workspace, data: Record<string, unknown>) {
+  const contact = data.contact as ContactData | undefined;
+  const form = data.form as FormData | undefined;
 
   if (!contact?.email) return;
 
@@ -221,8 +268,69 @@ async function handleFormPending(workspace: any, data: Record<string, unknown>) 
   }
 }
 
-async function handleInventoryLow(workspace: any, data: Record<string, unknown>) {
-  const item = data.item as any;
+async function handleBeforeBooking(workspace: Workspace, data: Record<string, unknown>) {
+  const booking = data.booking as BookingData | undefined;
+  const contact = data.contact as ContactData | undefined;
+  const service = data.service as ServiceData | undefined;
+  
+  if (!contact?.email || !booking) return;
+  
+  const conversation = await prisma.conversation.findUnique({
+    where: { contactId: contact.id },
+  });
+  
+  if (!conversation) return;
+  
+  const reminderMsg = `Hi ${contact.name}, this is a reminder about your upcoming ${service?.name || "appointment"} at ${new Date(booking.date).toLocaleString()}. Please arrive on time. - ${workspace.name}`;
+  
+  await prisma.message.create({
+    data: {
+      content: reminderMsg,
+      channel: "EMAIL",
+      direction: "OUTBOUND",
+      isAutomated: true,
+      conversationId: conversation.id,
+    },
+  });
+  
+  if (workspace.emailConfigured) {
+    await sendEmail({
+      to: contact.email,
+      subject: `Reminder: Your appointment tomorrow - ${workspace.name}`,
+      html: buildEmailTemplate("Appointment Reminder", `<p>${reminderMsg}</p>`),
+    });
+  }
+  
+  await prisma.alert.create({
+    data: {
+      type: "automation",
+      title: "Booking Reminder Sent",
+      message: `Reminder sent to ${contact.name} for ${service?.name || "appointment"}`,
+      actionUrl: "/bookings",
+      workspaceId: workspace.id,
+    },
+  });
+}
+
+async function handleStaffReply(workspace: Workspace, data: Record<string, unknown>) {
+  const conversationId = data.conversationId as string;
+  if (!conversationId) return;
+  
+  // Log the automation pause
+  await prisma.alert.create({
+    data: {
+      type: "automation",
+      title: "Automation Paused",
+      message: `Automated messages paused for this conversation due to staff reply`,
+      actionUrl: "/inbox",
+      workspaceId: workspace.id,
+      isRead: true, // Don't show as unread since it's informational
+    },
+  });
+}
+
+async function handleInventoryLow(workspace: Workspace, data: Record<string, unknown>) {
+  const item = data.item as InventoryData;
 
   await prisma.alert.create({
     data: {

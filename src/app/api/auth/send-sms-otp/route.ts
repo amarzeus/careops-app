@@ -60,7 +60,7 @@ export async function POST(req: Request) {
 
     if (!sent) {
       return NextResponse.json(
-        { error: "Failed to send SMS. Check Twilio configuration." },
+        { error: "Failed to send SMS. Check MSG91 configuration." },
         { status: 500 }
       );
     }

@@ -1,24 +1,44 @@
 import { cookies } from "next/headers";
 import { prisma } from "./prisma";
 import bcrypt from "bcryptjs";
+import { createHmac, timingSafeEqual } from "crypto";
 
-const JWT_SECRET = process.env.JWT_SECRET || "careops-secret";
+const JWT_SECRET = process.env.JWT_SECRET;
 
-// Simple token encoding (base64 JSON with HMAC-like signature)
+if (!JWT_SECRET && process.env.NODE_ENV === "production") {
+  throw new Error("JWT_SECRET environment variable is required in production");
+}
+
+const SECRET = JWT_SECRET || "dev-only-careops-secret-change-me";
+
+/**
+ * Cryptographically-secure token encoding using HMAC-SHA256.
+ * Format: base64url(payload).hmac_signature
+ */
 function encodeToken(payload: Record<string, unknown>): string {
   const data = JSON.stringify({ ...payload, exp: Date.now() + 7 * 24 * 60 * 60 * 1000 });
   const encoded = Buffer.from(data).toString("base64url");
-  const signature = Buffer.from(JWT_SECRET + encoded).toString("base64url").slice(0, 32);
+  const signature = createHmac("sha256", SECRET).update(encoded).digest("base64url");
   return `${encoded}.${signature}`;
 }
 
 function decodeToken(token: string): Record<string, unknown> | null {
   try {
-    const [encoded, signature] = token.split(".");
-    const expectedSig = Buffer.from(JWT_SECRET + encoded).toString("base64url").slice(0, 32);
-    if (signature !== expectedSig) return null;
+    const parts = token.split(".");
+    if (parts.length !== 2) return null;
+    const [encoded, signature] = parts;
+
+    const expectedSig = createHmac("sha256", SECRET).update(encoded).digest("base64url");
+
+    // Timing-safe comparison to prevent timing attacks
+    const sigBuf = Buffer.from(signature, "base64url");
+    const expectedBuf = Buffer.from(expectedSig, "base64url");
+    if (sigBuf.length !== expectedBuf.length || !timingSafeEqual(sigBuf, expectedBuf)) {
+      return null;
+    }
+
     const data = JSON.parse(Buffer.from(encoded, "base64url").toString());
-    if (data.exp < Date.now()) return null;
+    if (typeof data.exp !== "number" || data.exp < Date.now()) return null;
     return data;
   } catch {
     return null;

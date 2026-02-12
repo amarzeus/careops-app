@@ -2,28 +2,52 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
-export async function generateAIResponse(prompt: string, context?: string): Promise<string> {
+// ──────────────────────────────────────────────
+// Core AI Engine
+// ──────────────────────────────────────────────
+
+async function callGemini(prompt: string, systemInstruction?: string, jsonMode = false): Promise<string> {
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    const config: Record<string, unknown> = {};
+    if (systemInstruction) config.systemInstruction = systemInstruction;
+    if (jsonMode) config.generationConfig = { responseMimeType: "application/json" };
 
-    const fullPrompt = context
-      ? `Context: ${context}\n\nTask: ${prompt}`
-      : prompt;
-
-    const result = await model.generateContent(fullPrompt);
-    const response = result.response;
-    return response.text();
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash", ...config });
+    const result = await model.generateContent(prompt);
+    return result.response.text();
   } catch (error) {
     console.error("Gemini AI error:", error);
-    return "I'm sorry, I couldn't process that request right now.";
+    throw new Error("AI processing failed");
   }
 }
 
-export async function generateWelcomeMessage(businessName: string, contactName: string): Promise<string> {
-  return generateAIResponse(
-    `Generate a warm, professional welcome message from "${businessName}" to a new contact named "${contactName}". Keep it under 3 sentences. Be friendly but professional. Don't use emojis. Just return the message text, nothing else.`
-  );
+function parseJSON<T>(text: string, fallback: T): T {
+  try {
+    const cleaned = text.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+    const match = cleaned.match(/[\[{][\s\S]*[\]}]/);
+    return match ? JSON.parse(match[0]) : fallback;
+  } catch {
+    return fallback;
+  }
 }
+
+// ──────────────────────────────────────────────
+// 1. Welcome Message Generation
+// ──────────────────────────────────────────────
+
+export async function generateWelcomeMessage(businessName: string, contactName: string): Promise<string> {
+  try {
+    return await callGemini(
+      `Generate a warm, professional welcome message from "${businessName}" to a new contact named "${contactName}". Keep it under 3 sentences. Be friendly but professional. Don't use emojis. Just return the message text, nothing else.`
+    );
+  } catch {
+    return `Welcome to ${businessName}, ${contactName}! We're glad you reached out. Our team will be in touch shortly.`;
+  }
+}
+
+// ──────────────────────────────────────────────
+// 2. Booking Confirmation
+// ──────────────────────────────────────────────
 
 export async function generateBookingConfirmation(
   businessName: string,
@@ -32,34 +56,56 @@ export async function generateBookingConfirmation(
   dateTime: string,
   location?: string
 ): Promise<string> {
-  return generateAIResponse(
-    `Generate a booking confirmation message from "${businessName}" to "${contactName}" for "${serviceName}" on ${dateTime}${location ? ` at ${location}` : ""}. Include key details and a professional tone. Keep it under 5 sentences. Just return the message text, nothing else.`
-  );
+  try {
+    return await callGemini(
+      `Generate a booking confirmation message from "${businessName}" to "${contactName}" for "${serviceName}" on ${dateTime}${location ? ` at ${location}` : ""}. Include key details and a professional tone. Keep it under 5 sentences. Just return the message text.`
+    );
+  } catch {
+    return `Your appointment for ${serviceName} has been confirmed for ${dateTime}${location ? ` at ${location}` : ""}. We look forward to seeing you, ${contactName}! - ${businessName}`;
+  }
 }
+
+// ──────────────────────────────────────────────
+// 3. Smart Reply V2 (Context-Aware)
+// ──────────────────────────────────────────────
 
 export async function generateSmartReply(
   businessName: string,
   conversationHistory: string,
   lastMessage: string
 ): Promise<string[]> {
-  const response = await generateAIResponse(
-    `You are an AI assistant for "${businessName}". Based on the conversation history and the last message, suggest 3 possible professional reply options. Return ONLY a JSON array of 3 strings, nothing else.
-    
-    Conversation history: ${conversationHistory}
-    Last message from customer: ${lastMessage}`
-  );
+  const systemPrompt = `You are an AI assistant for "${businessName}". You generate professional reply suggestions.
+
+RULES:
+- Each reply should be 1-2 sentences, professional, and contextually relevant.
+- Tone: Helpful, warm, and efficient. Avoid overly formal or robotic language.
+- If the customer asks about scheduling, mention booking availability.
+- If the customer has a complaint, be empathetic and solution-oriented.
+- If the customer asks about forms, guide them to complete required documents.
+- Use the business name naturally if appropriate.
+- Return ONLY a JSON array of exactly 3 strings.`;
 
   try {
-    const cleaned = response.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
-    return JSON.parse(cleaned);
+    const response = await callGemini(
+      `Conversation history:\n${conversationHistory}\n\nLatest message from customer: "${lastMessage}"\n\nGenerate 3 professional reply options as a JSON array of strings.`,
+      systemPrompt,
+      true
+    );
+    const parsed = parseJSON<string[]>(response, []);
+    if (parsed.length >= 3) return parsed.slice(0, 3);
+    throw new Error("Insufficient replies");
   } catch {
     return [
-      "Thank you for reaching out. Let me look into that for you.",
-      "I appreciate your message. I'll get back to you shortly with more details.",
-      "Thanks for contacting us. How can I assist you further?",
+      "Thank you for reaching out. I'd be happy to help with that.",
+      "I appreciate your message. Let me look into this for you right away.",
+      "Thanks for contacting us. Could you provide a few more details so I can assist you better?",
     ];
   }
 }
+
+// ──────────────────────────────────────────────
+// 4. Dashboard Insights (Enhanced)
+// ──────────────────────────────────────────────
 
 export async function generateDashboardInsights(data: {
   totalBookings: number;
@@ -69,84 +115,165 @@ export async function generateDashboardInsights(data: {
   lowStockItems: number;
   unreadMessages: number;
 }): Promise<Array<{ priority: "high" | "medium" | "low"; category: string; message: string; action: string }>> {
-  const response = await generateAIResponse(
-    `You are an AI business analytics assistant. Based on these metrics, provide 3 brief, high-impact, actionable insights.
-    
-    Metrics:
-    - Total bookings: ${data.totalBookings}
-    - Completed bookings: ${data.completedBookings}
-    - New contacts this week: ${data.newContacts}
-    - Pending forms: ${data.pendingForms}
-    - Low stock items: ${data.lowStockItems}
-    - Unread messages: ${data.unreadMessages}
-    
-    Return ONLY a JSON array of objects with:
-    - "priority": "high", "medium", or "low"
-    - "category": e.g., "Operations", "Inventory", "Communication"
-    - "message": the insight 
-    - "action": suggested next step
-    
-    Return ONLY the JSON array, nothing else.`
-  );
+  const systemPrompt = `You are CareOps AI, a top-tier business operations analyst. Based on metrics, provide brief, high-impact, actionable insights.
+
+RULES:
+- Provide exactly 3 insights.
+- Insights MUST be specific and actionable (e.g., "Call 3 leads", not "Follow up with leads").
+- Prioritize: 
+  1. Critical issues (unread messages, low stock, pending forms).
+  2. Revenue opportunities (pending bookings, new leads).
+  3. Operational optimizations.
+- Keep messages punchy and under 15 words.
+- Return ONLY a JSON array.`;
 
   try {
-    const cleaned = response.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
-    return JSON.parse(cleaned);
+    const response = await callGemini(
+      `Business metrics:
+- Total bookings: ${data.totalBookings}
+- Completed bookings: ${data.completedBookings}
+- New contacts this week: ${data.newContacts}
+- Pending forms: ${data.pendingForms}
+- Low stock items: ${data.lowStockItems}
+- Unread messages: ${data.unreadMessages}
+
+Return ONLY a JSON array of objects with: "priority" ("high"/"medium"/"low"), "category" (string), "message" (string), "action" (string).`,
+      systemPrompt,
+      true
+    );
+    const parsed = parseJSON<Array<{ priority: "high" | "medium" | "low"; category: string; message: string; action: string }>>(response, []);
+    if (parsed.length > 0) return parsed.slice(0, 5);
+    throw new Error("Empty insights");
   } catch {
-    return [
-      { priority: "medium", category: "Operations", message: "You have several pending forms to review.", action: "Go to Forms" },
-      { priority: "medium", category: "Communication", message: "New contacts are waiting for a reply.", action: "Open Inbox" }
-    ];
+    const insights: Array<{ priority: "high" | "medium" | "low"; category: string; message: string; action: string }> = [];
+    if (data.unreadMessages > 0) insights.push({ priority: "high", category: "Communication", message: `${data.unreadMessages} messages need your attention`, action: "Open Inbox" });
+    if (data.pendingForms > 0) insights.push({ priority: "medium", category: "Operations", message: `${data.pendingForms} forms waiting for completion`, action: "Review Forms" });
+    if (data.lowStockItems > 0) insights.push({ priority: "high", category: "Inventory", message: `${data.lowStockItems} items running low`, action: "Check Inventory" });
+    if (insights.length === 0) insights.push({ priority: "low", category: "System", message: "All operations running smoothly", action: "View Dashboard" });
+    return insights;
   }
 }
 
+// ──────────────────────────────────────────────
+// 5. Message Refinement
+// ──────────────────────────────────────────────
+
 export async function refineMessage(content: string, tone: string = "professional"): Promise<string> {
-  return generateAIResponse(
-    `Refine this message to be more ${tone}, polite, and professional. Keep the original meaning but make it sound world-class.
-    
-    Original: "${content}"
-    
-    Return ONLY the refined text.`
-  );
+  try {
+    return await callGemini(
+      `Refine this message to be more ${tone}, polite, and professional. Keep the original meaning but make it sound world-class. Only return the refined text, nothing else.\n\nOriginal: "${content}"`
+    );
+  } catch {
+    return content;
+  }
 }
 
-export async function generateInventoryForecast(items: Array<{ name: string; quantity: number; threshold: number; unit: string }>): Promise<Array<{ id: string; daysRemaining: number | string; confidence: string }>> {
+// ──────────────────────────────────────────────
+// 6. Inventory Forecast
+// ──────────────────────────────────────────────
+
+export async function generateInventoryForecast(
+  items: Array<{ name: string; quantity: number; threshold: number; unit: string }>
+): Promise<Array<{ name: string; daysRemaining: number | string; confidence: string }>> {
   if (items.length === 0) return [];
 
-  const response = await generateAIResponse(
-    `You are an inventory specialist. Based on current stock and thresholds, estimate how many days of stock are remaining for each item. 
-This is a heuristic estimate based on "low stock" meaning typical 3-5 days left.
+  try {
+    const response = await callGemini(
+      `You are an inventory specialist. Based on current stock and thresholds, estimate days of stock remaining for each item. Items at or below threshold typically have 3-5 days left. Zero quantity means "Critical".
 
 Items: ${JSON.stringify(items)}
 
-Return ONLY a JSON array of objects with:
-- "name": matching the item name
-- "daysRemaining": number (or "Critical" if 0)
-- "confidence": "high", "medium", or "low"
-
-Return ONLY the JSON array, nothing else.`
-  );
-
-  try {
-    const cleaned = response.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
-    return JSON.parse(cleaned);
+Return ONLY a JSON array of objects with: "name" (string), "daysRemaining" (number or "Critical"), "confidence" ("high"/"medium"/"low").`,
+      undefined,
+      true
+    );
+    return parseJSON(response, []);
   } catch {
-    return [];
+    return items.map(i => ({
+      name: i.name,
+      daysRemaining: i.quantity === 0 ? "Critical" : Math.max(1, Math.floor(i.quantity / Math.max(1, i.threshold) * 5)),
+      confidence: "low",
+    }));
   }
 }
 
-// ---- Helper: Build step-specific completion status ----
-function buildStepStatus(step: number, info: Record<string, any>): string {
-  const ws = info.workspace || {};
-  const email = info.emailConfig || {};
-  const cf = info.contactForm || {};
-  const svcs = info.services || [];
-  const forms = info.intakeForms || [];
-  const inv = info.inventoryItems || [];
-  const staff = info.staffMembers || [];
+// ──────────────────────────────────────────────
+// 7. Operations Summary (NEW - SOTA Feature)
+// ──────────────────────────────────────────────
 
-  // Infer business type from workspace name (heuristic)
-  const nameLower = (ws.name || "").toLowerCase();
+export async function generateOperationsSummary(data: {
+  bookingsToday: number;
+  bookingsCompleted: number;
+  bookingsNoShow: number;
+  newContacts: number;
+  unansweredMessages: number;
+  pendingForms: number;
+  lowStockItems: number;
+  businessName: string;
+}): Promise<string> {
+  try {
+    return await callGemini(
+      `Generate a concise operations summary for "${data.businessName}" in 3-4 sentences. Be specific with the numbers. Highlight what needs attention. End with one actionable recommendation.
+
+Today's Data:
+- Bookings today: ${data.bookingsToday}
+- Completed: ${data.bookingsCompleted}  
+- No-shows: ${data.bookingsNoShow}
+- New contacts: ${data.newContacts}
+- Unanswered messages: ${data.unansweredMessages}
+- Pending forms: ${data.pendingForms}
+- Low stock items: ${data.lowStockItems}
+
+Return only the summary text.`
+    );
+  } catch {
+    return `Today you have ${data.bookingsToday} bookings scheduled. ${data.unansweredMessages > 0 ? `${data.unansweredMessages} messages need attention. ` : ""}${data.lowStockItems > 0 ? `${data.lowStockItems} inventory items are running low. ` : ""}Keep operations running smoothly by staying on top of your inbox.`;
+  }
+}
+
+// ──────────────────────────────────────────────
+// 8. AI Message Composer (NEW - SOTA Feature)
+// ──────────────────────────────────────────────
+
+export async function composeMessage(
+  intent: string,
+  context: {
+    businessName: string;
+    contactName?: string;
+    serviceName?: string;
+    dateTime?: string;
+  }
+): Promise<string> {
+  try {
+    return await callGemini(
+      `You are a professional message composer for "${context.businessName}". 
+      
+Write a message based on this intent: "${intent}"
+${context.contactName ? `Contact: ${context.contactName}` : ""}
+${context.serviceName ? `Service: ${context.serviceName}` : ""}
+${context.dateTime ? `Date/Time: ${context.dateTime}` : ""}
+
+Keep it professional, warm, and under 4 sentences. Return only the message text.`
+    );
+  } catch {
+    return `Hi${context.contactName ? ` ${context.contactName}` : ""}, regarding your ${intent.toLowerCase()} — our team at ${context.businessName} will follow up shortly.`;
+  }
+}
+
+// ──────────────────────────────────────────────
+// 9. Onboarding Assistant (Preserved + Enhanced)
+// ──────────────────────────────────────────────
+
+function buildStepStatus(step: number, info: Record<string, unknown>): string {
+  const ws = (info.workspace || {}) as Record<string, unknown>;
+  const email = (info.emailConfig || {}) as Record<string, unknown>;
+  const cf = (info.contactForm || {}) as Record<string, unknown>;
+  const svcs = (info.services || []) as Array<unknown>;
+  const forms = (info.intakeForms || []) as Array<unknown>;
+  const inv = (info.inventoryItems || []) as Array<unknown>;
+  const staff = (info.staffMembers || []) as Array<unknown>;
+
+  const nameLower = (String(ws.name || "")).toLowerCase();
   let businessType = "service business";
   if (/dent/i.test(nameLower)) businessType = "dental clinic";
   else if (/salon|barber|beauty|hair|spa/i.test(nameLower)) businessType = "salon/spa";
@@ -158,69 +285,27 @@ function buildStepStatus(step: number, info: Record<string, any>): string {
   else if (/thera|counsel/i.test(nameLower)) businessType = "therapy practice";
 
   switch (step) {
-    case 1:
-      return `BUSINESS TYPE: ${businessType}
-THIS STEP — Workspace fields:
-${JSON.stringify(ws, null, 2)}`;
-
-    case 2:
-      return `BUSINESS TYPE: ${businessType}
-THIS STEP — Email/SMS fields:
-${JSON.stringify(email, null, 2)}`;
-
-    case 3:
-      return `BUSINESS TYPE: ${businessType}
-THIS STEP — Contact Form:
-${JSON.stringify(cf, null, 2)}`;
-
-    case 4:
-      return `BUSINESS TYPE: ${businessType}
-THIS STEP — Services/Bookings:
-EXISTING SERVICES (Full Details):
-${JSON.stringify(svcs, null, 2)}`;
-
-    case 5:
-      return `BUSINESS TYPE: ${businessType}
-THIS STEP — Intake Forms:
-EXISTING FORMS (Full Details):
-${JSON.stringify(forms, null, 2)}`;
-
-    case 6:
-      return `BUSINESS TYPE: ${businessType}
-THIS STEP — Inventory:
-EXISTING ITEMS (Full Details):
-${JSON.stringify(inv, null, 2)}`;
-
-    case 7:
-      return `BUSINESS TYPE: ${businessType}
-THIS STEP — Staff:
-EXISTING STAFF (Full Details):
-${JSON.stringify(staff, null, 2)}`;
-
-    case 8:
-      return `BUSINESS TYPE: ${businessType}
-ACTIVATION CHECKLIST:
-${JSON.stringify({ ws, email, cf, serviceCount: svcs.length, formCount: forms.length, invCount: inv.length, staffCount: staff.length }, null, 2)}`;
-
-    default:
-      return JSON.stringify(info, null, 2);
+    case 1: return `BUSINESS TYPE: ${businessType}\nTHIS STEP — Workspace fields:\n${JSON.stringify(ws, null, 2)}`;
+    case 2: return `BUSINESS TYPE: ${businessType}\nTHIS STEP — Email/SMS fields:\n${JSON.stringify(email, null, 2)}`;
+    case 3: return `BUSINESS TYPE: ${businessType}\nTHIS STEP — Contact Form:\n${JSON.stringify(cf, null, 2)}`;
+    case 4: return `BUSINESS TYPE: ${businessType}\nTHIS STEP — Services/Bookings:\nEXISTING SERVICES:\n${JSON.stringify(svcs, null, 2)}`;
+    case 5: return `BUSINESS TYPE: ${businessType}\nTHIS STEP — Intake Forms:\nEXISTING FORMS:\n${JSON.stringify(forms, null, 2)}`;
+    case 6: return `BUSINESS TYPE: ${businessType}\nTHIS STEP — Inventory:\nEXISTING ITEMS:\n${JSON.stringify(inv, null, 2)}`;
+    case 7: return `BUSINESS TYPE: ${businessType}\nTHIS STEP — Staff:\nEXISTING STAFF:\n${JSON.stringify(staff, null, 2)}`;
+    case 8: return `BUSINESS TYPE: ${businessType}\nACTIVATION CHECKLIST:\n${JSON.stringify({ ws, email, cf, serviceCount: svcs.length, formCount: forms.length, invCount: inv.length, staffCount: staff.length }, null, 2)}`;
+    default: return JSON.stringify(info, null, 2);
   }
 }
 
-// ---- Helper: Sanitize Gemini chat history ----
 function sanitizeGeminiHistory(
   history: Array<{ role: "user" | "assistant"; content: string }>
 ): Array<{ role: "user" | "model"; parts: [{ text: string }] }> {
   let msgs = history.filter(m => m.content && m.content.trim());
-
-  // Strip trailing user messages (the current one will be sent via sendMessage)
   while (msgs.length > 0 && msgs[msgs.length - 1].role === "user") {
     msgs = msgs.slice(0, -1);
   }
-
   if (msgs.length === 0) return [];
 
-  // Merge consecutive same-role messages to satisfy Gemini's alternating requirement
   const merged: Array<{ role: "user" | "assistant"; content: string }> = [];
   for (const msg of msgs) {
     if (merged.length > 0 && merged[merged.length - 1].role === msg.role) {
@@ -230,12 +315,9 @@ function sanitizeGeminiHistory(
     }
   }
 
-  // Ensure starts with "user"
   if (merged.length > 0 && merged[0].role === "assistant") {
     merged.unshift({ role: "user", content: "Hello, I'm setting up my business." });
   }
-
-  // Ensure ends with "model" (Gemini requirement for history)
   if (merged.length > 0 && merged[merged.length - 1].role === "user") {
     merged.pop();
   }
@@ -249,29 +331,24 @@ function sanitizeGeminiHistory(
 export async function aiOnboardingAssistant(
   userMessage: string,
   currentStep: number,
-  businessInfo: Record<string, any>,
+  businessInfo: Record<string, unknown>,
   conversationHistory: Array<{ role: "user" | "assistant"; content: string }> = []
-): Promise<{ message: string; extractedData: Record<string, any> | null; shouldAdvance: boolean; navigationAction: { type: "jump"; targetStep: number } | null }> {
-  console.log("🤖 AI Assistant Called | Step:", currentStep);
-  console.log("📝 Business Context:", JSON.stringify(businessInfo, null, 2));
-
-
-  // Step definitions — only extraction schema, no vague "goals"
+): Promise<{ message: string; extractedData: Record<string, unknown> | null; shouldAdvance: boolean; navigationAction: { type: "jump"; targetStep: number } | null }> {
   const stepSchemas: Record<number, { title: string; schema: string }> = {
     1: { title: "Workspace Setup", schema: '{ "name": "...", "address": "...", "timezone": "...", "contactEmail": "...", "contactPhone": "..." }' },
     2: { title: "Email & SMS", schema: '{ "emailFromName": "...", "emailFromAddress": "...", "emailConfigured": true }' },
     3: { title: "Contact Form", schema: '{ "formName": "...", "welcomeMessage": "..." }' },
-    4: { title: "Bookings / Services", schema: '{ "addServices": [{ "name": "...", "duration": "30", "location": "...", "startTime": "09:00", "endTime": "17:00" }], "updateServices": [{ "name": "...", "duration": "...", "location": "...", "startTime": "...", "endTime": "..." }], "removeServices": ["Exact Name"] }' },
-    5: { title: "Intake Forms", schema: '{ "addIntakeForms": [{ "name": "...", "description": "...", "fields": "[]" }], "updateIntakeForms": [{ "name": "...", "description": "...", "fields": "..." }], "removeIntakeForms": ["Exact Name"] }' },
-    6: { title: "Inventory", schema: '{ "addInventoryItems": [{ "name": "...", "quantity": "...", "threshold": "...", "unit": "..." }], "updateInventoryItems": [{ "name": "...", "quantity": "...", "threshold": "...", "unit": "..." }], "removeInventoryItems": ["Exact Name"] }' },
-    7: { title: "Staff", schema: '{ "addStaffMember": { "name": "...", "email": "...", "role": "STAFF" }, "updateStaffMember": { "email": "...", "name": "...", "role": "..." }, "removeStaffMember": "email@address.com" }' },
-    8: { title: "Activate", schema: 'null' },
+    4: { title: "Bookings / Services", schema: '{ "addServices": [{ "name": "...", "duration": "30", "location": "...", "startTime": "09:00", "endTime": "17:00" }], "updateServices": [...], "removeServices": ["Exact Name"] }' },
+    5: { title: "Intake Forms", schema: '{ "addIntakeForms": [{ "name": "...", "description": "...", "fields": "[]" }], "updateIntakeForms": [...], "removeIntakeForms": ["Exact Name"] }' },
+    6: { title: "Inventory", schema: '{ "addInventoryItems": [{ "name": "...", "quantity": "...", "threshold": "...", "unit": "..." }], "updateInventoryItems": [...], "removeInventoryItems": ["Exact Name"] }' },
+    7: { title: "Staff", schema: '{ "addStaffMember": { "name": "...", "email": "...", "role": "STAFF" }, "updateStaffMember": { "email": "...", ... }, "removeStaffMember": "email@address.com" }' },
+    8: { title: "Activate", schema: "null" },
   };
 
   const stepInfo = stepSchemas[currentStep] || { title: "Unknown", schema: "null" };
   const stepStatus = buildStepStatus(currentStep, businessInfo);
   const isGreeting = userMessage.startsWith("__GREETING__");
-  const actualMessage = isGreeting ? "I just arrived on this step. Give me a proactive fire-up greeting." : userMessage;
+  const actualMessage = isGreeting ? "I just arrived on this step. Give me a proactive greeting." : userMessage;
 
   const systemPrompt = `You are CareOps AI — a proactive onboarding concierge.
 
@@ -279,61 +356,30 @@ export async function aiOnboardingAssistant(
   CURRENT STEP: ${currentStep} of 8 — "${stepInfo.title}"
 ═══════════════════════════════════════════
 
-## STEP STATUS (FULL CONTEXT):
+## STEP STATUS:
 ${stepStatus}
 
 ## BEHAVIOR RULES:
-
-1. **EXECUTE REQUIRED ACTION**:
-   - Look at "REQUIRED_ACTION" in the status above.
-   - If it says "ASK: ...", you **MUST** ask that question in your response.
-   - Do NOT just acknowledge "Updated". Acknowledge AND ASK.
-
-2. **FOCUS & NAVIGATION**: 
-   - Focus on Step ${currentStep}.
-   - **EXCEPTION**: If user asks to "go back" or "change [previous step]", return "navigationAction": { "type": "jump", "targetStep": [number] }.
-
-2. **INTERACTION STYLE**:
-   - **IF GREETING (User just arrived)**: 
-     - **Steps 1-3 (Setup)**: You MUST ask a direct question for the first [EMPTY] field. Example: "What is the business email address?" (Do not just say "Let's set up email").
-     - **Steps 4-8 (Lists)**: Suggest a full list of items based on business type and ask "Should I add these?".
-     - **DO NOT** be repetitive ("Hello! CareOps here!"). Be efficient.
-   - **IF ONGOING**: 
-     - Acknowledge input briefly (e.g., "Got it", "Updated").
-     - **IMMEDIATELY** asking for the *NEXT* missing [EMPTY] field in the same message.
-     - **DO NOT WAIT** for the user to ask "what's next?". YOU lead the flow.
-     - If all fields are filled, ask: "Everything looks good here. Ready to move to the next step?"
-
-3. **SMART DEFAULTS (Business Type: ${businessInfo.workspace?.name ? "Inferred" : "Generic"})**:
-   - Use the context to suggest relevant services/forms if fields are empty.
-   - **STRICT TIMEZONES**: Map location to: UTC, America/New_York, America/Chicago, America/Denver, America/Los_Angeles, Asia/Kolkata, Europe/London.
-
-4. **DATA EXTRACTION**:
-   - Extract ALL provided data.
-   - If user says "use defaults" or "yes", generate the full configuration for this step.
-
-5. **JSON ONLY**: Return ONLY the JSON object. No markdown. No text outside JSON.
+1. Focus on Step ${currentStep}. Exception: if user asks to go back, return navigationAction.
+2. IF GREETING: Ask a direct question for the first empty field. For list steps (4-8), suggest items based on business type.
+3. IF ONGOING: Acknowledge briefly, then immediately ask for the next missing field.
+4. Extract ALL provided data into extractedData.
+5. If user says "yes" or "use defaults", generate full configuration.
+6. Return ONLY JSON. No markdown. No text outside JSON.
 
 ## EXTRACTION SCHEMA for Step ${currentStep}:
 ${stepInfo.schema}
 
-## JSON RESPONSE FORMAT:
+## JSON FORMAT:
 {
-  "message": "Conversational response (max 2 sentences)",
-  "extractedData": <schema object or null>,
+  "message": "max 2 sentences",
+  "extractedData": <schema or null>,
   "shouldAdvance": false,
   "navigationAction": null or { "type": "jump", "targetStep": <number> }
 }
 
-## REFERENCE - STEP MAP (Use this to resolve "targetStep"):
-1: Workspace (Name, Address, Phone)
-2: Communication (Email, SMS)
-3: Contact Form (Public form, Welcome message)
-4: Bookings (Services, Durations, Prices)
-5: Intake Forms (Post-booking questions)
-6: Inventory (Items, Stock, Thresholds)
-7: Staff (Team members, Access)
-8: Activate (Review & Launch)`;
+## STEP MAP:
+1: Workspace  2: Communication  3: Contact Form  4: Bookings  5: Intake Forms  6: Inventory  7: Staff  8: Activate`;
 
   try {
     const model = genAI.getGenerativeModel({
@@ -343,44 +389,32 @@ ${stepInfo.schema}
     });
 
     const geminiHistory = sanitizeGeminiHistory(conversationHistory);
-
     const chat = model.startChat({ history: geminiHistory });
     const result = await chat.sendMessage(actualMessage);
     const text = result.response.text();
 
-    try {
-      // Robust JSON extraction: match first { to last }
-      const jsonMatch = text.match(/\{[\s\S]*\}/);
-      const cleaned = jsonMatch ? jsonMatch[0] : text.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
-
-      const parsed = JSON.parse(cleaned);
-      return {
-        message: parsed.message || "Let me help you with that.",
-        extractedData: parsed.extractedData || null,
-        shouldAdvance: !!parsed.shouldAdvance,
-        navigationAction: parsed.navigationAction || null
-      };
-    } catch (parseError) {
-      console.warn("AI JSON Parse Error:", parseError, "Text received:", text);
-      // Fallback: if text looks like a normal message, treat it as one
-      if (!text.includes("{")) {
-        return { message: text, extractedData: null, shouldAdvance: false, navigationAction: null };
-      }
-      throw parseError; // Re-throw to outer catch if it really was broken JSON
-    }
-  } catch (err: any) {
-    console.error("AI Onboarding Error:", err?.message || err);
+    const parsed = parseJSON<Record<string, unknown>>(text, {});
+    return {
+      message: String(parsed.message || "Let me help you with that."),
+      extractedData: (parsed.extractedData as Record<string, unknown>) || null,
+      shouldAdvance: Boolean(parsed.shouldAdvance),
+      navigationAction: (parsed.navigationAction as { type: "jump"; targetStep: number }) || null,
+    };
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : "Unknown error";
+    console.error("AI Onboarding Error:", msg);
     return {
       message: "I had a small hiccup processing that. Could you try again?",
       extractedData: null,
       shouldAdvance: false,
-      navigationAction: null
+      navigationAction: null,
     };
   }
 }
+
 export type AIOnboardingResponse = {
   message: string;
-  extractedData: Record<string, any> | null;
+  extractedData: Record<string, unknown> | null;
   shouldAdvance: boolean;
   navigationAction: { type: "jump"; targetStep: number } | null;
 };

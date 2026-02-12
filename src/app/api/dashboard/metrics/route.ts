@@ -1,139 +1,299 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { startOfDay, endOfDay, addDays, subHours } from "date-fns";
+import { startOfDay, endOfDay, addDays, subDays } from "date-fns";
 import { generateDashboardInsights } from "@/lib/gemini";
 
+/** PRD Section 5 — Dashboard Metrics API
+ *  Returns all data needed for the Command Center:
+ *  1. Booking Overview (today, upcoming, completed, no-show, unconfirmed)
+ *  2. Leads & Conversations (new inquiries, ongoing, unanswered)
+ *  3. Forms Status (pending, overdue, completed)
+ *  4. Inventory Alerts (low-stock, critical)
+ *  5. Key Alerts with actionable links
+ *  6. Weekly trend data for the performance chart
+ */
 export async function GET() {
-    const user = await getCurrentUser();
-    // In a real app, use user.workspaceId
-    // For prototype, we'll fetch the first active workspace or use a hardcoded fallback if needed
-    // But our onboarding flow sets up a user/workspace, so we should rely on that if possible.
-    // Given the current auth implementation might be mocked or minimal, let's try to find the workspace from the session or fallback.
+  const user = await getCurrentUser();
+  const workspaceId = user?.workspaceId;
 
-    // FAILSAFE: If no session, try to find the most recently active workspace for demo purposes
-    let workspaceId = user?.workspaceId;
+  if (!workspaceId) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
-    if (!workspaceId) {
-        const demoWs = await prisma.workspace.findFirst({
-            orderBy: { createdAt: 'desc' },
-            include: { users: true }
-        });
-        if (demoWs) workspaceId = demoWs.id;
-    }
+  const now = new Date();
+  const dayStart = startOfDay(now);
+  const dayEnd = endOfDay(now);
+  const nextWeek = addDays(now, 7);
+  const last7Days = subDays(now, 7);
 
-    if (!workspaceId) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+  // ──── Parallelize ALL queries ────
+  const [
+    bookingsTodayList,
+    bookingsUpcoming,
+    bookingsCompleted,
+    bookingsNoShow,
+    bookingsUnconfirmed,
+    newContacts,
+    totalContacts,
+    ongoingConversations,
+    unansweredMessages,
+    pendingForms,
+    overdueForms,
+    completedForms,
+    totalFormSubmissions,
+    allInventoryItems,
+    unresolvedAlerts,
+    recentBookings7d,
+    recentContacts7d,
+  ] = await Promise.all([
+    // 1. Bookings Today (full objects for schedule)
+    prisma.booking.findMany({
+      where: {
+        workspaceId,
+        date: { gte: dayStart, lte: dayEnd },
+        status: { not: "CANCELLED" },
+      },
+      include: { service: true, contact: true },
+      orderBy: { date: "asc" },
+    }),
+    // 2. Upcoming Bookings (next 7 days)
+    prisma.booking.count({
+      where: {
+        workspaceId,
+        date: { gt: dayEnd, lte: nextWeek },
+        status: { in: ["PENDING", "CONFIRMED"] },
+      },
+    }),
+    // 3. Completed Bookings (all time)
+    prisma.booking.count({
+      where: { workspaceId, status: "COMPLETED" },
+    }),
+    // 4. No-Show Count
+    prisma.booking.count({
+      where: { workspaceId, status: "NO_SHOW" },
+    }),
+    // 5. Unconfirmed Bookings
+    prisma.booking.count({
+      where: { workspaceId, status: "PENDING" },
+    }),
+    // 6. New Contacts (last 7 days)
+    prisma.contact.count({
+      where: { workspaceId, createdAt: { gte: last7Days } },
+    }),
+    // 7. Total Contacts
+    prisma.contact.count({
+      where: { workspaceId },
+    }),
+    // 8. Ongoing Conversations
+    prisma.conversation.count({
+      where: { workspaceId, isActive: true },
+    }),
+    // 9. Unanswered Messages (inbound, not read)
+    prisma.message.count({
+      where: {
+        conversation: { workspaceId },
+        direction: "INBOUND",
+        status: { not: "READ" },
+      },
+    }),
+    // 10. Pending Forms
+    prisma.formSubmission.count({
+      where: { workspaceId, status: { in: ["PENDING", "SENT"] } },
+    }),
+    // 11. Overdue Forms
+    prisma.formSubmission.count({
+      where: { workspaceId, status: "OVERDUE" },
+    }),
+    // 12. Completed Forms
+    prisma.formSubmission.count({
+      where: { workspaceId, status: "COMPLETED" },
+    }),
+    // 13. Total Form Submissions
+    prisma.formSubmission.count({
+      where: { workspaceId },
+    }),
+    // 14. All Inventory Items (for threshold comparison)
+    prisma.inventoryItem.findMany({
+      where: { workspaceId },
+      select: {
+        id: true,
+        name: true,
+        quantity: true,
+        threshold: true,
+        unit: true,
+      },
+    }),
+    // 15. Unresolved Alerts
+    prisma.alert.findMany({
+      where: { workspaceId, isRead: false },
+      orderBy: { createdAt: "desc" },
+      take: 10,
+    }),
+    // 16. Bookings in last 7 days (for chart)
+    prisma.booking.findMany({
+      where: { workspaceId, createdAt: { gte: last7Days } },
+      select: { createdAt: true, status: true },
+    }),
+    // 17. Contacts in last 7 days (for chart)
+    prisma.contact.findMany({
+      where: { workspaceId, createdAt: { gte: last7Days } },
+      select: { createdAt: true },
+    }),
+  ]);
 
-    const now = new Date();
-    const dayStart = startOfDay(now);
-    const dayEnd = endOfDay(now);
-    const nextWeek = addDays(now, 7);
+  // ──── Compute derived metrics ────
+  const lowStockItems = allInventoryItems.filter(
+    (i) => i.quantity <= i.threshold
+  );
+  const criticalItems = allInventoryItems.filter(
+    (i) => i.quantity === 0 || i.quantity <= Math.floor(i.threshold * 0.3)
+  );
 
-    // Parallelize queries for performance
-    const [
-        bookingsToday,
-        bookingsUpcoming,
-        bookingsCompleted,
-        newContacts,
-        pendingForms,
-        lowStockItems,
-        unreadMessages,
-        users
-    ] = await Promise.all([
-        // 1. Bookings Today
-        prisma.booking.count({
-            where: {
-                workspaceId,
-                date: { gte: dayStart, lte: dayEnd },
-                status: { not: "CANCELLED" }
-            }
-        }),
-        // 2. Upcoming Bookings (Next 7 days)
-        prisma.booking.count({
-            where: {
-                workspaceId,
-                date: { gt: dayEnd, lte: nextWeek },
-                status: { not: "CANCELLED" }
-            }
-        }),
-        // 3. Completed Bookings (All time)
-        prisma.booking.count({
-            where: { workspaceId, status: "COMPLETED" }
-        }),
-        // 4. New Contacts (Last 7 days)
-        prisma.contact.count({
-            where: {
-                workspaceId,
-                createdAt: { gte: addDays(now, -7) }
-            }
-        }),
-        // 5. Pending Forms
-        prisma.formSubmission.count({
-            where: { workspaceId, status: "SENT" } // SENT means pending
-        }),
-        // 6. Low Stock Items
-        prisma.inventoryItem.count({
-            where: {
-                workspaceId,
-                quantity: { lte: prisma.inventoryItem.fields.threshold } // This syntax might be tricky in raw prisma count, let's use raw query or fetch and filter if needed. 
-                // Actually Prisma doesn't support field comparison in where clause directly without extensions.
-                // Let's fetch all items and filter in memory for now (assuming inventory isn't huge for small biz)
-                // OR just fetch items where quantity is low (absolute number) if we can't do relative.
-                // Correct approach for standard Prisma: fetch items and filter JS side or use raw query.
-                // For Hackathon speed/simplicity with small data: Fetch all.
-            }
-        }),
-        // 7. Unread Messages 
-        prisma.message.count({
-            where: {
-                conversation: { workspaceId },
-                direction: "INBOUND",
-                status: { not: "READ" }
-            }
-        }),
-        prisma.user.findFirst({ where: { workspaceId } }) // Get business name context
-    ]);
-
-    // Fix Low Stock Count: Prisma can't compare columns in `where`. 
-    // Fetch items and count manually.
-    const allItems = await prisma.inventoryItem.findMany({
-        where: { workspaceId },
-        select: { quantity: true, threshold: true }
+  // ──── Build weekly chart data ────
+  const chartData = [];
+  for (let d = 6; d >= 0; d--) {
+    const date = subDays(now, d);
+    const ds = startOfDay(date).getTime();
+    const dateStr = date.toLocaleDateString("en-US", { weekday: "short" });
+    const dayBookings = recentBookings7d.filter(
+      (b) => startOfDay(new Date(b.createdAt)).getTime() === ds
+    );
+    const dayContacts = recentContacts7d.filter(
+      (c) => startOfDay(new Date(c.createdAt)).getTime() === ds
+    );
+    chartData.push({
+      name: dateStr,
+      bookings: dayBookings.length,
+      leads: dayContacts.length,
+      completed: dayBookings.filter((b) => b.status === "COMPLETED").length,
     });
-    const lowStockCount = allItems.filter(i => i.quantity <= i.threshold).length;
+  }
 
-    const metrics = {
-        totalBookings: bookingsToday + bookingsUpcoming, // rough aggregation
-        completedBookings: bookingsCompleted,
-        newContacts,
-        pendingForms,
-        lowStockItems: lowStockCount,
-        unreadMessages
-    };
+  // ──── Build Key Alerts (PRD: every alert links to exact action) ────
+  type AlertItem = {
+    priority: "critical" | "high" | "medium" | "low";
+    category: string;
+    message: string;
+    action: string;
+    link: string;
+  };
+  const keyAlerts: AlertItem[] = [];
 
-    // AI Insights
-    // We can cache this or generate on fly. For hackathon, generate on fly.
-    let insights = [];
-    try {
-        insights = await generateDashboardInsights(metrics);
-    } catch (e) {
-        console.error("AI Insight Error", e);
-        // Fallback insights
-        insights = [{ priority: 'low', category: 'System', message: 'AI insights unavailable', action: 'Check settings' }];
-    }
-
-    return NextResponse.json({
-        metrics: {
-            bookingsToday,
-            bookingsUpcoming,
-            bookingsCompleted,
-            newContacts,
-            pendingForms,
-            lowStockItems: lowStockCount,
-            unreadMessages
-        },
-        insights
+  if (unansweredMessages > 0) {
+    keyAlerts.push({
+      priority: "critical",
+      category: "Communication",
+      message: `${unansweredMessages} unanswered message${unansweredMessages > 1 ? "s" : ""} waiting for reply`,
+      action: "Open Inbox",
+      link: "/inbox",
     });
+  }
+  if (bookingsUnconfirmed > 0) {
+    keyAlerts.push({
+      priority: "high",
+      category: "Bookings",
+      message: `${bookingsUnconfirmed} unconfirmed booking${bookingsUnconfirmed > 1 ? "s" : ""} need attention`,
+      action: "Review Bookings",
+      link: "/bookings",
+    });
+  }
+  if (overdueForms > 0) {
+    keyAlerts.push({
+      priority: "high",
+      category: "Forms",
+      message: `${overdueForms} overdue form${overdueForms > 1 ? "s" : ""} past deadline`,
+      action: "View Forms",
+      link: "/forms",
+    });
+  }
+  if (pendingForms > 0) {
+    keyAlerts.push({
+      priority: "medium",
+      category: "Forms",
+      message: `${pendingForms} form${pendingForms > 1 ? "s" : ""} waiting for completion`,
+      action: "View Submissions",
+      link: "/forms",
+    });
+  }
+  if (criticalItems.length > 0) {
+    keyAlerts.push({
+      priority: "critical",
+      category: "Inventory",
+      message: `${criticalItems.length} item${criticalItems.length > 1 ? "s" : ""} critically low or out of stock`,
+      action: "Manage Inventory",
+      link: "/inventory",
+    });
+  } else if (lowStockItems.length > 0) {
+    keyAlerts.push({
+      priority: "high",
+      category: "Inventory",
+      message: `${lowStockItems.length} item${lowStockItems.length > 1 ? "s" : ""} below restock threshold`,
+      action: "Check Inventory",
+      link: "/inventory",
+    });
+  }
+
+  // ──── AI Insights (non-blocking) ────
+  const metricsForAI = {
+    totalBookings: bookingsTodayList.length + bookingsUpcoming,
+    completedBookings: bookingsCompleted,
+    newContacts,
+    pendingForms,
+    lowStockItems: lowStockItems.length,
+    unreadMessages: unansweredMessages,
+  };
+
+  let aiInsights: Array<{
+    priority: "high" | "medium" | "low";
+    category: string;
+    message: string;
+    action: string;
+  }> = [];
+  try {
+    aiInsights = await generateDashboardInsights(metricsForAI);
+  } catch {
+    aiInsights = [];
+  }
+
+  return NextResponse.json({
+    metrics: {
+      bookingsToday: bookingsTodayList.length,
+      bookingsUpcoming,
+      bookingsCompleted,
+      bookingsNoShow,
+      bookingsUnconfirmed,
+      newContacts,
+      totalContacts,
+      ongoingConversations,
+      unansweredMessages,
+      pendingForms,
+      overdueForms,
+      completedForms,
+      totalFormSubmissions,
+      lowStockItems: lowStockItems.length,
+      criticalItems: criticalItems.length,
+      totalInventoryItems: allInventoryItems.length,
+    },
+    todaysBookings: bookingsTodayList.map((b) => ({
+      id: b.id,
+      time: new Date(b.date).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+      service: b.service.name,
+      contact: b.contact.name,
+      status: b.status,
+    })),
+    chartData,
+    keyAlerts,
+    aiInsights,
+    lowStockDetails: lowStockItems.map((i) => ({
+      id: i.id,
+      name: i.name,
+      quantity: i.quantity,
+      threshold: i.threshold,
+      unit: i.unit,
+    })),
+  });
 }

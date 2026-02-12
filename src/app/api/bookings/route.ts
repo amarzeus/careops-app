@@ -8,6 +8,7 @@ export async function GET() {
   if (!user || !user.workspaceId)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  console.log(`[API] Fetching bookings for workspace: ${user.workspaceId}`);
   const bookings = await prisma.booking.findMany({
     where: { workspaceId: user.workspaceId },
     include: {
@@ -18,6 +19,7 @@ export async function GET() {
     orderBy: { date: "desc" },
   });
 
+  console.log(`[API] Found ${bookings.length} bookings`);
   return NextResponse.json({ bookings });
 }
 

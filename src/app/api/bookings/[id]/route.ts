@@ -19,6 +19,7 @@ export async function PUT(
       ...(data.status && { status: data.status }),
       ...(data.notes !== undefined && { notes: data.notes }),
       ...(data.date && { date: new Date(data.date) }),
+      ...(data.serviceId && { serviceId: data.serviceId }),
     },
     include: { service: true, contact: true },
   });

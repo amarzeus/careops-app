@@ -8,9 +8,10 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Header } from "@/components/layout/header";
 import { cn } from "@/lib/utils";
+import { toast } from "@/hooks/use-toast";
 
 interface InventoryItem {
   id: string; name: string; description: string; quantity: number; threshold: number; unit: string;
@@ -25,6 +26,9 @@ export default function InventoryPage() {
   const [editId, setEditId] = useState<string | null>(null);
   const [editQty, setEditQty] = useState("");
   const [newItem, setNewItem] = useState({ name: "", description: "", quantity: "0", threshold: "5", unit: "units", vendorName: "", vendorEmail: "", vendorPhone: "" });
+  const [editDialogItem, setEditDialogItem] = useState<InventoryItem | null>(null);
+  const [editForm, setEditForm] = useState({ name: "", description: "", quantity: "", threshold: "", unit: "", vendorName: "", vendorEmail: "", vendorPhone: "" });
+  const [editSaving, setEditSaving] = useState(false);
 
   useEffect(() => {
     fetchItems();
@@ -35,7 +39,10 @@ export default function InventoryPage() {
     try {
       const res = await fetch("/api/inventory");
       if (res.ok) setItems((await res.json()).items);
-    } catch { } finally { setLoading(false); }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to load inventory";
+      toast({ title: "Error", description: message, variant: "destructive" });
+    } finally { setLoading(false); }
   };
 
   const fetchForecast = async () => {
@@ -43,29 +50,97 @@ export default function InventoryPage() {
       const res = await fetch("/api/ai/inventory-forecast", { method: "POST" });
       if (res.ok) {
         const data = await res.json();
-        const forecastMap: any = {};
-        data.forecast.forEach((f: any) => {
+        const forecastMap: Record<string, { daysRemaining: number | string; confidence: string }> = {};
+        data.forecast.forEach((f: { name: string; daysRemaining: number | string; confidence: string }) => {
           forecastMap[f.name] = f;
         });
         setForecast(forecastMap);
       }
-    } catch { }
+    } catch (error) {
+      console.error("Forecast fetch error:", error);
+    }
   };
+
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
   const createItem = async () => {
     if (!newItem.name) return;
-    await fetch("/api/inventory", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...newItem, quantity: parseInt(newItem.quantity), threshold: parseInt(newItem.threshold) }) });
-    setDialogOpen(false); setNewItem({ name: "", description: "", quantity: "0", threshold: "5", unit: "units", vendorName: "", vendorEmail: "", vendorPhone: "" }); fetchItems();
+    try {
+      const res = await fetch("/api/inventory", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...newItem, quantity: parseInt(newItem.quantity), threshold: parseInt(newItem.threshold) }) });
+      if (!res.ok) throw new Error("Failed to create item");
+      toast({ title: "Success", description: "Inventory item created", variant: "success" });
+      setDialogOpen(false); setNewItem({ name: "", description: "", quantity: "0", threshold: "5", unit: "units", vendorName: "", vendorEmail: "", vendorPhone: "" }); fetchItems();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Something went wrong";
+      toast({ title: "Error", description: message, variant: "destructive" });
+    }
   };
 
   const updateQuantity = async (id: string) => {
-    await fetch(`/api/inventory/${id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ quantity: parseInt(editQty) }) });
-    setEditId(null); fetchItems();
+    try {
+      const res = await fetch(`/api/inventory/${id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ quantity: parseInt(editQty) }) });
+      if (!res.ok) throw new Error("Failed to update quantity");
+      toast({ title: "Success", description: "Quantity updated", variant: "success" });
+      setEditId(null); fetchItems();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to update";
+      toast({ title: "Error", description: message, variant: "destructive" });
+    }
   };
 
   const deleteItem = async (id: string) => {
-    await fetch(`/api/inventory/${id}`, { method: "DELETE" });
-    fetchItems();
+    try {
+      const res = await fetch(`/api/inventory/${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Failed to delete item");
+      toast({ title: "Success", description: "Item deleted", variant: "success" });
+      setDeleteConfirmId(null);
+      fetchItems();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to delete";
+      toast({ title: "Error", description: message, variant: "destructive" });
+    }
+  };
+
+  const openEditItem = (item: InventoryItem) => {
+    setEditForm({
+      name: item.name,
+      description: item.description || "",
+      quantity: String(item.quantity),
+      threshold: String(item.threshold),
+      unit: item.unit || "units",
+      vendorName: item.vendorName || "",
+      vendorEmail: item.vendorEmail || "",
+      vendorPhone: item.vendorPhone || "",
+    });
+    setEditDialogItem(item);
+  };
+
+  const saveEditItem = async () => {
+    if (!editDialogItem || !editForm.name) return;
+    setEditSaving(true);
+    try {
+      const res = await fetch(`/api/inventory/${editDialogItem.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: editForm.name,
+          description: editForm.description,
+          quantity: parseInt(editForm.quantity),
+          threshold: parseInt(editForm.threshold),
+          unit: editForm.unit,
+          vendorName: editForm.vendorName,
+          vendorEmail: editForm.vendorEmail,
+          vendorPhone: editForm.vendorPhone,
+        }),
+      });
+      if (!res.ok) throw new Error("Failed to update item");
+      toast({ title: "Success", description: "Item updated", variant: "success" });
+      setEditDialogItem(null);
+      fetchItems();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to update";
+      toast({ title: "Error", description: message, variant: "destructive" });
+    } finally { setEditSaving(false); }
   };
 
   const lowStockCount = items.filter(i => i.quantity <= i.threshold).length;
@@ -160,15 +235,36 @@ export default function InventoryPage() {
                       </div>
                     </div>
 
-                    <div className="px-6 py-3 bg-gray-50/50 flex items-center justify-between border-t border-gray-50">
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider italic">Vendor</span>
-                        <span className="text-xs font-semibold text-gray-600 truncate max-w-[120px]">{item.vendorName || "Not assigned"}</span>
+                      <div className="px-6 py-3 bg-gray-50/50 flex items-center justify-between border-t border-gray-50">
+                        <div className="flex items-baseline gap-2">
+                          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider italic">Vendor</span>
+                          <span className="text-xs font-semibold text-gray-600 truncate max-w-[120px]">{item.vendorName || "Not assigned"}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Button variant="ghost" size="sm" className="text-gray-400 hover:text-blue-600 h-8 px-2" onClick={() => openEditItem(item)}>
+                            <Edit2 className="w-3.5 h-3.5" />
+                          </Button>
+                          <Dialog open={deleteConfirmId === item.id} onOpenChange={open => setDeleteConfirmId(open ? item.id : null)}>
+                          <DialogTrigger asChild>
+                            <Button variant="ghost" size="sm" className="text-red-400 hover:text-red-600 h-8 px-2">
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>Delete Inventory Item</DialogTitle>
+                              <DialogDescription>
+                                Are you sure you want to delete <span className="font-semibold">&quot;{item.name}&quot;</span>? This action cannot be undone.
+                              </DialogDescription>
+                            </DialogHeader>
+                            <DialogFooter className="gap-2">
+                              <Button variant="outline" onClick={() => setDeleteConfirmId(null)}>Cancel</Button>
+                              <Button variant="destructive" onClick={() => deleteItem(item.id)}>Delete</Button>
+                            </DialogFooter>
+                          </DialogContent>
+                          </Dialog>
+                        </div>
                       </div>
-                      <Button variant="ghost" size="sm" className="text-red-400 hover:text-red-600 h-8 px-2" onClick={() => deleteItem(item.id)}>
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </Button>
-                    </div>
                   </CardContent>
                 </Card>
               );
@@ -176,6 +272,39 @@ export default function InventoryPage() {
           </div>
         )}
       </div>
+
+      {/* Full Edit Dialog */}
+      <Dialog open={!!editDialogItem} onOpenChange={open => { if (!open) setEditDialogItem(null); }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Edit Inventory Item</DialogTitle>
+            <DialogDescription>Update all fields for this item.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2 col-span-2"><Label>Item Name *</Label><Input value={editForm.name} onChange={e => setEditForm(p => ({ ...p, name: e.target.value }))} /></div>
+              <div className="space-y-2"><Label>Quantity</Label><Input type="number" value={editForm.quantity} onChange={e => setEditForm(p => ({ ...p, quantity: e.target.value }))} /></div>
+              <div className="space-y-2"><Label>Low Stock Threshold</Label><Input type="number" value={editForm.threshold} onChange={e => setEditForm(p => ({ ...p, threshold: e.target.value }))} /></div>
+              <div className="space-y-2"><Label>Unit</Label><Input value={editForm.unit} onChange={e => setEditForm(p => ({ ...p, unit: e.target.value }))} /></div>
+              <div className="space-y-2"><Label>Description</Label><Input value={editForm.description} onChange={e => setEditForm(p => ({ ...p, description: e.target.value }))} /></div>
+            </div>
+            <div className="border-t pt-4 space-y-3">
+              <p className="text-sm font-medium text-gray-700">Vendor</p>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2"><Label>Name</Label><Input value={editForm.vendorName} onChange={e => setEditForm(p => ({ ...p, vendorName: e.target.value }))} /></div>
+                <div className="space-y-2"><Label>Email</Label><Input type="email" value={editForm.vendorEmail} onChange={e => setEditForm(p => ({ ...p, vendorEmail: e.target.value }))} /></div>
+                <div className="space-y-2 col-span-2"><Label>Phone</Label><Input value={editForm.vendorPhone} onChange={e => setEditForm(p => ({ ...p, vendorPhone: e.target.value }))} /></div>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <Button onClick={saveEditItem} className="flex-1 bg-blue-600 hover:bg-blue-700" disabled={editSaving}>
+                {editSaving ? "Saving..." : "Save Changes"}
+              </Button>
+              <Button variant="outline" onClick={() => setEditDialogItem(null)}>Cancel</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

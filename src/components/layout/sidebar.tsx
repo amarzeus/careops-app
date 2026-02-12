@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -11,15 +11,21 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
 const navItems = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/inbox", label: "Inbox", icon: MessageSquare },
-  { href: "/bookings", label: "Bookings", icon: Calendar },
-  { href: "/forms", label: "Forms", icon: FileText },
-  { href: "/inventory", label: "Inventory", icon: Package },
-  { href: "/staff", label: "Staff", icon: Users },
-  { href: "/automation", label: "Automation", icon: Zap },
-  { href: "/settings", label: "Settings", icon: Settings },
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, badgeKey: null },
+  { href: "/inbox", label: "Inbox", icon: MessageSquare, badgeKey: "inbox" as const },
+  { href: "/bookings", label: "Bookings", icon: Calendar, badgeKey: "bookings" as const },
+  { href: "/forms", label: "Forms", icon: FileText, badgeKey: null },
+  { href: "/inventory", label: "Inventory", icon: Package, badgeKey: "lowStock" as const },
+  { href: "/staff", label: "Staff", icon: Users, badgeKey: null },
+  { href: "/automation", label: "Automation", icon: Zap, badgeKey: null },
+  { href: "/settings", label: "Settings", icon: Settings, badgeKey: null },
 ];
+
+type BadgeCounts = {
+  inbox: number;
+  bookings: number;
+  lowStock: number;
+};
 
 interface SidebarProps {
   userName?: string;
@@ -31,6 +37,37 @@ export function Sidebar({ userName, userRole, workspaceName }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [badges, setBadges] = useState<BadgeCounts>({ inbox: 0, bookings: 0, lowStock: 0 });
+
+  useEffect(() => {
+    const fetchBadges = async () => {
+      try {
+        const [alertsRes, inventoryRes] = await Promise.all([
+          fetch("/api/alerts"),
+          fetch("/api/inventory"),
+        ]);
+        if (alertsRes.ok) {
+          const data = await alertsRes.json();
+          const unreadAlerts = (data.alerts || []).filter((a: { isRead: boolean }) => !a.isRead);
+          const inboxCount = unreadAlerts.filter((a: { type: string }) => a.type === "message").length;
+          const bookingCount = unreadAlerts.filter((a: { type: string }) => a.type === "booking").length;
+          setBadges(prev => ({ ...prev, inbox: inboxCount, bookings: bookingCount }));
+        }
+        if (inventoryRes.ok) {
+          const data = await inventoryRes.json();
+          const lowStock = (data.items || []).filter(
+            (i: { quantity: number; threshold: number }) => i.quantity <= i.threshold
+          ).length;
+          setBadges(prev => ({ ...prev, lowStock }));
+        }
+      } catch {
+        // Silently fail — badges are non-critical
+      }
+    };
+    fetchBadges();
+    const interval = setInterval(fetchBadges, 60000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleLogout = async () => {
     await fetch("/api/auth/logout", { method: "POST" });
@@ -54,6 +91,7 @@ export function Sidebar({ userName, userRole, workspaceName }: SidebarProps) {
       <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
         {navItems.map((item) => {
           const isActive = pathname === item.href || pathname?.startsWith(item.href + "/");
+          const badgeCount = item.badgeKey ? badges[item.badgeKey] : 0;
           return (
             <Link
               key={item.href}
@@ -67,7 +105,12 @@ export function Sidebar({ userName, userRole, workspaceName }: SidebarProps) {
               )}
             >
               <item.icon className={cn("w-5 h-5", isActive ? "text-blue-700" : "text-gray-400")} />
-              {item.label}
+              <span className="flex-1">{item.label}</span>
+              {badgeCount > 0 && (
+                <span className="min-w-[20px] h-5 px-1.5 flex items-center justify-center text-[10px] font-bold text-white bg-red-500 rounded-full">
+                  {badgeCount > 99 ? "99+" : badgeCount}
+                </span>
+              )}
             </Link>
           );
         })}
