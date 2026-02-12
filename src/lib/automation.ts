@@ -116,6 +116,9 @@ async function handleNewContact(workspace: Workspace, data: Record<string, unkno
     });
   }
 
+  // Check if automation is active for this conversation
+  if (!conversation.isActive) return;
+
   // Determine the best channel and create the message record
   let channel: "EMAIL" | "SMS" | "WHATSAPP" = "EMAIL";
 
@@ -203,6 +206,9 @@ async function handleBookingCreated(workspace: Workspace, data: Record<string, u
       },
     });
   }
+
+  // Check if automation is active for this conversation
+  if (!conversation.isActive) return;
 
   // Send via Email
   if (contact.email && workspace.emailConfigured) {
@@ -330,7 +336,7 @@ async function handleFormPending(workspace: Workspace, data: Record<string, unkn
     where: { contactId: contact.id },
   });
 
-  if (conversation) {
+  if (conversation && conversation.isActive) {
     await prisma.message.create({
       data: {
         content: `Reminder: You have a pending form "${form?.name}" that needs to be completed.`,
@@ -354,7 +360,7 @@ async function handleBeforeBooking(workspace: Workspace, data: Record<string, un
     where: { contactId: contact.id },
   });
   
-  if (!conversation) return;
+  if (!conversation || !conversation.isActive) return;
   
   const reminderMsg = `Hi ${contact.name}, this is a reminder about your upcoming ${service?.name || "appointment"} at ${new Date(booking.date).toLocaleString()}. Please arrive on time. - ${workspace.name}`;
   
@@ -390,6 +396,12 @@ async function handleBeforeBooking(workspace: Workspace, data: Record<string, un
 async function handleStaffReply(workspace: Workspace, data: Record<string, unknown>) {
   const conversationId = data.conversationId as string;
   if (!conversationId) return;
+
+  // Update conversation to pause automation
+  await prisma.conversation.update({
+    where: { id: conversationId },
+    data: { isActive: false },
+  });
   
   // Log the automation pause
   await prisma.alert.create({
