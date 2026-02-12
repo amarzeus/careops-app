@@ -186,8 +186,8 @@ export default function SettingsPage() {
     setChangingPassword(true);
     setPasswordMessage({ type: "", text: "" });
     try {
-      const res = await fetch("/api/user/change-password", {
-        method: "PUT",
+      const res = await fetch("/api/auth/change-password", {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ currentPassword, newPassword })
       });
@@ -266,12 +266,12 @@ export default function SettingsPage() {
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2"><Label>Business Name</Label><Input value={workspace?.name || ""} onChange={e => setWorkspace(p => p ? { ...p, name: e.target.value } : p)} /></div>
-                    <div className="space-y-2"><Label>Timezone</Label><Input value={workspace?.timezone || ""} onChange={e => setWorkspace(p => p ? { ...p, timezone: e.target.value } : p)} /></div>
-                  </div>
+                  <div className="space-y-2"><Label>Timezone</Label><Input value={workspace?.timezone || ""} onChange={e => setWorkspace(p => p ? { ...p, timezone: e.target.value } : p)} /></div>
+                </div>
                 <div className="space-y-2"><Label>Address</Label><Input value={workspace?.address || ""} onChange={e => setWorkspace(p => p ? { ...p, address: e.target.value } : p)} /></div>
                 <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2"><Label>Contact Email</Label><Input value={workspace?.contactEmail || ""} onChange={e => setWorkspace(p => p ? { ...p, contactEmail: e.target.value } : p)} /></div>
-                    <div className="space-y-2"><Label>Contact Phone</Label><Input value={workspace?.contactPhone || ""} onChange={e => setWorkspace(p => p ? { ...p, contactPhone: e.target.value } : p)} /></div>
+                  <div className="space-y-2"><Label>Contact Email</Label><Input value={workspace?.contactEmail || ""} onChange={e => setWorkspace(p => p ? { ...p, contactEmail: e.target.value } : p)} /></div>
+                  <div className="space-y-2"><Label>Contact Phone</Label><Input value={workspace?.contactPhone || ""} onChange={e => setWorkspace(p => p ? { ...p, contactPhone: e.target.value } : p)} /></div>
                 </div>
               </CardContent>
               <CardFooter className="bg-gray-50 border-t flex justify-between items-center px-6 py-4">

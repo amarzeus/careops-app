@@ -418,3 +418,153 @@ export type AIOnboardingResponse = {
   shouldAdvance: boolean;
   navigationAction: { type: "jump"; targetStep: number } | null;
 };
+
+// ──────────────────────────────────────────────
+// SOTA AI Brain: Intent Classification
+// ──────────────────────────────────────────────
+
+export interface ConversationIntent {
+  intent: "inquiry" | "complaint" | "booking_request" | "urgent" | "general" | "follow_up" | "cancellation";
+  confidence: number;
+  suggestedAction: string;
+  priority: "high" | "medium" | "low";
+}
+
+export async function classifyConversationIntent(
+  messageContent: string,
+  conversationHistory?: string[]
+): Promise<ConversationIntent> {
+  const historyContext = conversationHistory?.length
+    ? `\nConversation history (last ${conversationHistory.length} messages):\n${conversationHistory.join("\n")}`
+    : "";
+
+  const prompt = `Classify the intent of this customer message for a service-based business.
+
+Message: "${messageContent}"
+${historyContext}
+
+Respond in JSON with:
+{
+  "intent": one of: "inquiry", "complaint", "booking_request", "urgent", "general", "follow_up", "cancellation",
+  "confidence": 0.0-1.0,
+  "suggestedAction": brief suggestion for staff (max 50 chars),
+  "priority": "high" (urgent/complaint), "medium" (booking/inquiry), "low" (general/follow_up)
+}`;
+
+  const text = await callGemini(prompt, "You are an NLP intent classifier for a healthcare/service business inbox. Be precise and concise.", true);
+  return parseJSON<ConversationIntent>(text, {
+    intent: "general",
+    confidence: 0.5,
+    suggestedAction: "Review and respond",
+    priority: "medium",
+  });
+}
+
+// ──────────────────────────────────────────────
+// SOTA AI Brain: Operations Anomaly Detection
+// ──────────────────────────────────────────────
+
+export interface OperationsAnomaly {
+  type: string;
+  severity: "critical" | "warning" | "info";
+  description: string;
+  recommendation: string;
+  metric: string;
+  expectedRange: string;
+  actualValue: string;
+}
+
+export async function analyzeOperationsAnomalies(metrics: {
+  bookingsThisWeek: number;
+  bookingsLastWeek: number;
+  noShowRate: number;
+  averageNoShowRate: number;
+  newContactsThisWeek: number;
+  newContactsLastWeek: number;
+  pendingForms: number;
+  overdueForms: number;
+  lowStockItems: number;
+  totalItems: number;
+  unansweredMessages: number;
+  avgResponseTimeHours?: number;
+}): Promise<OperationsAnomaly[]> {
+  const prompt = `Analyze these business operations metrics and identify anomalies or concerning trends.
+
+Current Metrics:
+- Bookings this week: ${metrics.bookingsThisWeek} (last week: ${metrics.bookingsLastWeek})
+- No-show rate: ${(metrics.noShowRate * 100).toFixed(1)}% (average: ${(metrics.averageNoShowRate * 100).toFixed(1)}%)
+- New contacts this week: ${metrics.newContactsThisWeek} (last week: ${metrics.newContactsLastWeek})
+- Pending forms: ${metrics.pendingForms}, Overdue: ${metrics.overdueForms}
+- Low stock items: ${metrics.lowStockItems} of ${metrics.totalItems}
+- Unanswered messages: ${metrics.unansweredMessages}
+${metrics.avgResponseTimeHours ? `- Avg response time: ${metrics.avgResponseTimeHours.toFixed(1)}h` : ""}
+
+Return a JSON array of anomalies (empty array if operations look normal):
+[{
+  "type": "no_show_spike" | "booking_decline" | "inventory_crisis" | "communication_gap" | "form_backlog" | "lead_surge",
+  "severity": "critical" | "warning" | "info",
+  "description": "Brief description of the anomaly",
+  "recommendation": "Specific actionable recommendation",
+  "metric": "which metric is anomalous",
+  "expectedRange": "what normal looks like",
+  "actualValue": "what we're seeing"
+}]
+
+Only include genuine anomalies. Don't flag things that are normal. Max 3 anomalies.`;
+
+  const text = await callGemini(prompt, "You are an operations intelligence analyst. Only flag genuine anomalies. Be data-driven and precise.", true);
+  return parseJSON<OperationsAnomaly[]>(text, []);
+}
+
+// ──────────────────────────────────────────────
+// SOTA AI Brain: Lead/Contact Scoring
+// ──────────────────────────────────────────────
+
+export interface ContactScore {
+  score: number; // 0-100
+  grade: "A" | "B" | "C" | "D" | "F";
+  factors: { factor: string; impact: "positive" | "negative" | "neutral"; weight: number }[];
+  summary: string;
+  nextBestAction: string;
+}
+
+export async function scoreContact(contactData: {
+  name: string;
+  totalBookings: number;
+  completedBookings: number;
+  noShows: number;
+  cancelledBookings: number;
+  totalMessages: number;
+  formsCompleted: number;
+  formsPending: number;
+  daysSinceLastBooking: number;
+  daysSinceFirstContact: number;
+}): Promise<ContactScore> {
+  const prompt = `Score this contact/lead for a service-based business on a 0-100 scale.
+
+Contact Data:
+- Name: ${contactData.name}
+- Total bookings: ${contactData.totalBookings} (completed: ${contactData.completedBookings}, no-shows: ${contactData.noShows}, cancelled: ${contactData.cancelledBookings})
+- Messages exchanged: ${contactData.totalMessages}
+- Forms: ${contactData.formsCompleted} completed, ${contactData.formsPending} pending
+- Days since last booking: ${contactData.daysSinceLastBooking}
+- Days since first contact: ${contactData.daysSinceFirstContact}
+
+Respond in JSON:
+{
+  "score": 0-100 (higher = more engaged/valuable),
+  "grade": "A" (80+), "B" (60-79), "C" (40-59), "D" (20-39), "F" (0-19),
+  "factors": [{ "factor": "name", "impact": "positive|negative|neutral", "weight": 0.0-1.0 }],
+  "summary": "One sentence summary of this contact's engagement level",
+  "nextBestAction": "Specific action to take with this contact"
+}`;
+
+  const text = await callGemini(prompt, "You are a CRM lead scoring expert. Score based on engagement, reliability, and business value. Be data-driven.", true);
+  return parseJSON<ContactScore>(text, {
+    score: 50,
+    grade: "C",
+    factors: [],
+    summary: "Insufficient data for scoring",
+    nextBestAction: "Engage with this contact to learn more",
+  });
+}

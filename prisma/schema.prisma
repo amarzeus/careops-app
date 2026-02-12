@@ -305,8 +305,22 @@ model AutomationRule {
   workspaceId     String
   workspace       Workspace         @relation(fields: [workspaceId], references: [id])
 
+  logs AutomationLog[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model AutomationLog {
+  id        String  @id @default(cuid())
+  ruleId    String
+  rule      AutomationRule @relation(fields: [ruleId], references: [id])
+  trigger   String
+  status    String  @default("SUCCESS") // SUCCESS, FAILED, SKIPPED
+  details   String? // JSON string with execution details
+  recipient String? // Email/phone of recipient
+
+  createdAt DateTime @default(now())
 }
 
 model Alert {

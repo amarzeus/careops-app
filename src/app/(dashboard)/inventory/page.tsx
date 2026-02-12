@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Package, Plus, AlertTriangle, Edit2, Trash2, Save, X, Sparkles } from "lucide-react";
+import { Package, Plus, AlertTriangle, Edit2, Trash2, Save, X, Sparkles, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -145,6 +145,25 @@ export default function InventoryPage() {
 
   const lowStockCount = items.filter(i => i.quantity <= i.threshold).length;
 
+  const notifyVendor = async (item: InventoryItem) => {
+    if (!item.vendorEmail) {
+      toast({ title: "No vendor email", description: "Add a vendor email to this item first", variant: "destructive" });
+      return;
+    }
+    try {
+      const res = await fetch("/api/automation/vendor-alert", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ itemId: item.id }),
+      });
+      if (!res.ok) throw new Error("Failed to send vendor alert");
+      toast({ title: "Vendor Notified", description: `Reorder email sent to ${item.vendorEmail}`, variant: "success" });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to notify vendor";
+      toast({ title: "Error", description: message, variant: "destructive" });
+    }
+  };
+
   return (
     <div>
       <Header title="Inventory" subtitle={`${items.length} items tracked${lowStockCount > 0 ? ` | ${lowStockCount} low stock` : ""}`}>
@@ -235,16 +254,21 @@ export default function InventoryPage() {
                       </div>
                     </div>
 
-                      <div className="px-6 py-3 bg-gray-50/50 flex items-center justify-between border-t border-gray-50">
-                        <div className="flex items-baseline gap-2">
-                          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider italic">Vendor</span>
-                          <span className="text-xs font-semibold text-gray-600 truncate max-w-[120px]">{item.vendorName || "Not assigned"}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Button variant="ghost" size="sm" className="text-gray-400 hover:text-blue-600 h-8 px-2" onClick={() => openEditItem(item)}>
-                            <Edit2 className="w-3.5 h-3.5" />
+                    <div className="px-6 py-3 bg-gray-50/50 flex items-center justify-between border-t border-gray-50">
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider italic">Vendor</span>
+                        <span className="text-xs font-semibold text-gray-600 truncate max-w-[120px]">{item.vendorName || "Not assigned"}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        {isLow && item.vendorEmail && (
+                          <Button variant="outline" size="sm" className="text-orange-600 border-orange-200 hover:bg-orange-50 h-8 px-2 text-[10px] gap-1" onClick={() => notifyVendor(item)}>
+                            <Mail className="w-3 h-3" /> Notify Vendor
                           </Button>
-                          <Dialog open={deleteConfirmId === item.id} onOpenChange={open => setDeleteConfirmId(open ? item.id : null)}>
+                        )}
+                        <Button variant="ghost" size="sm" className="text-gray-400 hover:text-blue-600 h-8 px-2" onClick={() => openEditItem(item)}>
+                          <Edit2 className="w-3.5 h-3.5" />
+                        </Button>
+                        <Dialog open={deleteConfirmId === item.id} onOpenChange={open => setDeleteConfirmId(open ? item.id : null)}>
                           <DialogTrigger asChild>
                             <Button variant="ghost" size="sm" className="text-red-400 hover:text-red-600 h-8 px-2">
                               <Trash2 className="w-3.5 h-3.5" />
@@ -262,9 +286,9 @@ export default function InventoryPage() {
                               <Button variant="destructive" onClick={() => deleteItem(item.id)}>Delete</Button>
                             </DialogFooter>
                           </DialogContent>
-                          </Dialog>
-                        </div>
+                        </Dialog>
                       </div>
+                    </div>
                   </CardContent>
                 </Card>
               );

@@ -15,6 +15,10 @@ import {
   XCircle,
   Sparkles,
   ArrowRight,
+  Plus,
+  Send,
+  Activity,
+  Zap,
 } from "lucide-react";
 import { MetricCard } from "@/components/dashboard/metric-card";
 import { PerformanceChart } from "@/components/dashboard/performance-chart";
@@ -81,6 +85,13 @@ interface DashboardData {
     quantity: number;
     threshold: number;
     unit: string;
+  }>;
+  recentActivity: Array<{
+    id: string;
+    type: string;
+    message: string;
+    timestamp: string;
+    link?: string;
   }>;
 }
 
@@ -173,6 +184,35 @@ export default function DashboardPage() {
 
       {/* Main Content */}
       <main className="flex-1 p-4 lg:p-6 max-w-[1600px] mx-auto w-full flex flex-col gap-5 overflow-hidden">
+
+        {/* ══════ Quick Actions Bar ══════ */}
+        <section className="flex flex-wrap gap-2">
+          <Link href="/bookings">
+            <Button size="sm" className="gap-2 h-8 text-xs bg-blue-600 hover:bg-blue-700 text-white">
+              <Plus className="w-3.5 h-3.5" /> New Booking
+            </Button>
+          </Link>
+          <Link href="/inbox">
+            <Button size="sm" variant="outline" className="gap-2 h-8 text-xs">
+              <Send className="w-3.5 h-3.5" /> Send Message
+            </Button>
+          </Link>
+          <Link href="/forms">
+            <Button size="sm" variant="outline" className="gap-2 h-8 text-xs">
+              <FileText className="w-3.5 h-3.5" /> View Forms
+            </Button>
+          </Link>
+          <Link href="/inventory">
+            <Button size="sm" variant="outline" className="gap-2 h-8 text-xs">
+              <Package className="w-3.5 h-3.5" /> Check Inventory
+            </Button>
+          </Link>
+          <Link href="/automation">
+            <Button size="sm" variant="outline" className="gap-2 h-8 text-xs">
+              <Zap className="w-3.5 h-3.5" /> Automations
+            </Button>
+          </Link>
+        </section>
 
         {/* ══════ 1. Operational Metrics (Top Row) ══════ */}
         <section className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 lg:gap-4">
@@ -322,19 +362,54 @@ export default function DashboardPage() {
           </HoverExpandCard>
         </section>
 
-      {/* ══════ 3. Visuals (Bottom Row) ══════ */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6 flex-1 min-h-0">
-        {/* Main Chart Column (2/3) */}
-        <div className="lg:col-span-2 flex flex-col h-full min-h-[300px]">
-          <PerformanceChart data={data?.chartData || []} />
+        {/* ══════ 3. Visuals (Bottom Row) ══════ */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6 flex-1 min-h-0">
+          {/* Main Chart Column (2/3) */}
+          <div className="lg:col-span-2 flex flex-col h-full min-h-[300px]">
+            <PerformanceChart data={data?.chartData || []} />
+          </div>
+
+          {/* Schedule (1/3) */}
+          <div className="flex flex-col h-full overflow-y-auto min-h-[300px]">
+            <TodaysSchedule bookings={data?.todaysBookings || []} />
+          </div>
         </div>
 
-        {/* Schedule (1/3) */}
-        <div className="flex flex-col h-full overflow-y-auto min-h-[300px]">
-          <TodaysSchedule bookings={data?.todaysBookings || []} />
-        </div>
-      </div>
-    </main>
-    </div >
+        {/* ══════ 4. Activity Feed ══════ */}
+        {data?.recentActivity && data.recentActivity.length > 0 && (
+          <Card className="border-gray-200/80">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                <Activity className="w-4 h-4 text-gray-500" />
+                Recent Activity
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                {data.recentActivity.slice(0, 8).map((activity) => (
+                  <div
+                    key={activity.id}
+                    className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors text-xs"
+                    onClick={() => activity.link && (window.location.href = activity.link)}
+                  >
+                    <div className={cn("w-2 h-2 rounded-full shrink-0",
+                      activity.type === 'booking' ? 'bg-blue-500' :
+                        activity.type === 'contact' ? 'bg-emerald-500' :
+                          activity.type === 'form' ? 'bg-violet-500' :
+                            activity.type === 'inventory' ? 'bg-red-500' :
+                              activity.type === 'automation' ? 'bg-amber-500' : 'bg-gray-400'
+                    )} />
+                    <span className="flex-1 text-gray-700">{activity.message}</span>
+                    <span className="text-[10px] text-gray-400 whitespace-nowrap">
+                      {new Date(activity.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+      </main>
+    </div>
   );
 }

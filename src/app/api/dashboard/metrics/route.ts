@@ -46,6 +46,9 @@ export async function GET() {
     unresolvedAlerts,
     recentBookings7d,
     recentContacts7d,
+    recentBookingsActivity,
+    recentFormActivity,
+    recentContactActivity,
   ] = await Promise.all([
     // 1. Bookings Today (full objects for schedule)
     prisma.booking.findMany({
@@ -139,6 +142,27 @@ export async function GET() {
     prisma.contact.findMany({
       where: { workspaceId, createdAt: { gte: last7Days } },
       select: { createdAt: true },
+    }),
+    // 18. Recent bookings for activity feed
+    prisma.booking.findMany({
+      where: { workspaceId },
+      include: { service: true, contact: true },
+      orderBy: { createdAt: "desc" },
+      take: 5,
+    }),
+    // 19. Recent form submissions for activity feed
+    prisma.formSubmission.findMany({
+      where: { workspaceId },
+      include: { contact: true, intakeForm: true },
+      orderBy: { createdAt: "desc" },
+      take: 5,
+    }),
+    // 20. Recent contacts for activity feed
+    prisma.contact.findMany({
+      where: { workspaceId },
+      orderBy: { createdAt: "desc" },
+      take: 5,
+      select: { id: true, name: true, createdAt: true },
     }),
   ]);
 
@@ -295,5 +319,30 @@ export async function GET() {
       threshold: i.threshold,
       unit: i.unit,
     })),
+    recentActivity: [
+      ...recentBookingsActivity.map((b: { id: string; createdAt: Date; status: string; contact: { name: string }; service: { name: string } }) => ({
+        id: `booking-${b.id}`,
+        type: "booking",
+        message: `Booking ${b.status.toLowerCase()} — ${b.contact.name} for ${b.service.name}`,
+        timestamp: b.createdAt.toISOString(),
+        link: "/bookings",
+      })),
+      ...recentFormActivity.map((f: { id: string; createdAt: Date; status: string; contact: { name: string }; intakeForm: { name: string } | null }) => ({
+        id: `form-${f.id}`,
+        type: "form",
+        message: `Form ${f.status.toLowerCase()} — ${f.contact.name}${f.intakeForm ? ` (${f.intakeForm.name})` : ""}`,
+        timestamp: f.createdAt.toISOString(),
+        link: "/forms",
+      })),
+      ...recentContactActivity.map((c: { id: string; createdAt: Date; name: string }) => ({
+        id: `contact-${c.id}`,
+        type: "contact",
+        message: `New contact — ${c.name}`,
+        timestamp: c.createdAt.toISOString(),
+        link: "/inbox",
+      })),
+    ]
+      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+      .slice(0, 10),
   });
 }
