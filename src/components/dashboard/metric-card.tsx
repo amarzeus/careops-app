@@ -39,7 +39,7 @@ export function MetricCard({
   const content = (
     <div
       className={cn(
-        "relative overflow-hidden rounded-xl bg-white p-5 shadow-sm border transition-all",
+        "relative overflow-hidden rounded-xl bg-white p-4 shadow-sm border transition-all",
         href && "cursor-pointer hover:shadow-md",
         alert && "border-red-200 ring-1 ring-red-100"
       )}
@@ -47,32 +47,34 @@ export function MetricCard({
       role={href ? "button" : undefined}
       tabIndex={href ? 0 : undefined}
     >
-      <div className="flex items-start justify-between">
-        <div className="space-y-2">
-          <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">{title}</p>
-          <p className={cn("text-3xl font-black tracking-tight", alert ? "text-red-700" : "text-gray-900")}>
-            {value}
-          </p>
+      <div className="flex items-center justify-between gap-4">
+        <div className="space-y-1 min-w-0">
+          <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider truncate">{title}</p>
+          <div className="flex items-baseline gap-2">
+            <p className={cn("text-2xl font-bold tracking-tight", alert ? "text-red-700" : "text-gray-900")}>
+              {value}
+            </p>
+            {trend && (
+              <div className="flex items-center gap-0.5 transform translate-y-[2px]">
+                <span
+                  className={cn(
+                    "text-[10px] font-bold",
+                    trend.value >= 0 ? "text-emerald-600" : "text-red-600"
+                  )}
+                >
+                  {trend.value >= 0 ? "+" : ""}
+                  {trend.value}
+                </span>
+                <span className="text-[10px] text-gray-400 hidden xl:inline">{trend.label}</span>
+              </div>
+            )}
+          </div>
           {description && (
-            <p className="text-xs text-gray-500">{description}</p>
-          )}
-          {trend && (
-            <div className="flex items-center gap-1">
-              <span
-                className={cn(
-                  "text-xs font-bold",
-                  trend.value >= 0 ? "text-emerald-600" : "text-red-600"
-                )}
-              >
-                {trend.value >= 0 ? "+" : ""}
-                {trend.value}
-              </span>
-              <span className="text-xs text-gray-400">{trend.label}</span>
-            </div>
+            <p className="text-[11px] text-gray-500 truncate">{description}</p>
           )}
         </div>
-        <div className={cn("p-2.5 rounded-lg", colors.bg)}>
-          <Icon className={cn("w-5 h-5", colors.icon)} />
+        <div className={cn("p-2 rounded-lg shrink-0", colors.bg)}>
+          <Icon className={cn("w-4 h-4", colors.icon)} />
         </div>
       </div>
     </div>
