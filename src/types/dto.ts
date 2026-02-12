@@ -107,6 +107,8 @@ export interface WorkspaceSettingsDTO {
   emailConfigured: boolean;
   smsConfigured: boolean;
   whatsappConfigured: boolean;
+  googleCalendarConnected: boolean;
+  googleCalendarEmail: string | null;
 }
 
 export interface UserProfileDTO {

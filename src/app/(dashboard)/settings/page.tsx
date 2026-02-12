@@ -5,7 +5,7 @@ import { Link2, Settings, Shield, User } from "lucide-react";
 import { Header } from "@/components/layout/header";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { WorkspaceTab } from "@/components/settings/workspace-tab";
 import { ProfileTab } from "@/components/settings/profile-tab";
 import { IntegrationsTab } from "@/components/settings/integrations-tab";
@@ -14,6 +14,7 @@ import { WorkspaceSettingsDTO, UserProfileDTO } from "@/types/dto";
 
 export default function SettingsPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [workspace, setWorkspace] = useState<WorkspaceSettingsDTO | null>(null);
   const [user, setUser] = useState<UserProfileDTO | null>(null);
   const [loading, setLoading] = useState(true);
@@ -41,11 +42,31 @@ export default function SettingsPage() {
   const [testingSms, setTestingSms] = useState(false);
   const [testingWhatsApp, setTestingWhatsApp] = useState(false);
 
+  // Google Calendar states
+  const [connectingCalendar, setConnectingCalendar] = useState(false);
+  const [disconnectingCalendar, setDisconnectingCalendar] = useState(false);
+
   const [copied, setCopied] = useState("");
 
   useEffect(() => {
     Promise.all([fetchWorkspace(), fetchUser()]).finally(() => setLoading(false));
   }, []);
+
+  // Handle Google Calendar OAuth callback results
+  useEffect(() => {
+    const calendarStatus = searchParams.get("calendar");
+    if (calendarStatus === "success") {
+      toast({ title: "Connected", description: "Google Calendar connected successfully" });
+      fetchWorkspace(); // Refresh to get updated state
+      router.replace("/settings?tab=integrations");
+    } else if (calendarStatus === "error") {
+      toast({ title: "Connection Failed", description: "Could not connect Google Calendar. Please try again.", variant: "destructive" });
+      router.replace("/settings?tab=integrations");
+    } else if (calendarStatus === "denied") {
+      toast({ title: "Access Denied", description: "Calendar access was denied. Please grant permission to connect.", variant: "destructive" });
+      router.replace("/settings?tab=integrations");
+    }
+  }, [searchParams]);
 
   const fetchWorkspace = async () => {
     try {
@@ -181,6 +202,40 @@ export default function SettingsPage() {
     } finally { setTestingWhatsApp(false); }
   };
 
+  const handleConnectCalendar = async () => {
+    setConnectingCalendar(true);
+    try {
+      const res = await fetch("/api/integrations/google-calendar", { method: "POST" });
+      if (res.ok) {
+        const data = await res.json();
+        // Redirect user to Google OAuth consent screen
+        window.location.href = data.url;
+      } else {
+        const data = await res.json();
+        toast({ title: "Error", description: data.error || "Could not initiate calendar connection", variant: "destructive" });
+        setConnectingCalendar(false);
+      }
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to connect Google Calendar", variant: "destructive" });
+      setConnectingCalendar(false);
+    }
+  };
+
+  const handleDisconnectCalendar = async () => {
+    setDisconnectingCalendar(true);
+    try {
+      const res = await fetch("/api/integrations/google-calendar", { method: "DELETE" });
+      if (res.ok) {
+        toast({ title: "Disconnected", description: "Google Calendar has been disconnected" });
+        setWorkspace(prev => prev ? { ...prev, googleCalendarConnected: false, googleCalendarEmail: null } : null);
+      } else {
+        toast({ title: "Error", description: "Failed to disconnect", variant: "destructive" });
+      }
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to disconnect Google Calendar", variant: "destructive" });
+    } finally { setDisconnectingCalendar(false); }
+  };
+
   const copyToClipboard = (text: string, key: string) => {
     navigator.clipboard.writeText(text);
     setCopied(key); setTimeout(() => setCopied(""), 2000);
@@ -191,11 +246,13 @@ export default function SettingsPage() {
   const bookingUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/book/${workspace?.id}`;
   const contactFormUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/contact/${workspace?.id}`;
 
+  const defaultTab = searchParams.get("tab") || "workspace";
+
   return (
     <div>
       <Header title="Settings" subtitle="Manage your workspace and account" />
       <div className="p-6 max-w-4xl">
-        <Tabs defaultValue="workspace" className="space-y-6">
+        <Tabs defaultValue={defaultTab} className="space-y-6">
           <TabsList>
             <TabsTrigger value="workspace" className="flex items-center gap-2"><Settings className="w-4 h-4" /> Workspace</TabsTrigger>
             <TabsTrigger value="profile" className="flex items-center gap-2"><User className="w-4 h-4" /> Profile</TabsTrigger>
@@ -233,9 +290,13 @@ export default function SettingsPage() {
               onTestEmail={handleTestEmail}
               onTestSms={handleTestSms}
               onTestWhatsApp={handleTestWhatsApp}
+              onConnectCalendar={handleConnectCalendar}
+              onDisconnectCalendar={handleDisconnectCalendar}
               testingEmail={testingEmail}
               testingSms={testingSms}
               testingWhatsApp={testingWhatsApp}
+              connectingCalendar={connectingCalendar}
+              disconnectingCalendar={disconnectingCalendar}
             />
           </TabsContent>
 

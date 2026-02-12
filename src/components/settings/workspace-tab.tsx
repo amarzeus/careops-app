@@ -16,8 +16,6 @@ import { WorkspaceSettingsDTO } from "@/types/dto";
 
 interface WorkspaceTabProps {
   workspace: WorkspaceSettingsDTO | null;
-  setWorkspace: (w: WorkspaceSettingsDTO | null) => void; // Actually usually we merge partial
-  // Better: updateWorkspace field
   onUpdate: (data: Partial<WorkspaceSettingsDTO>) => void;
   onSave: () => void;
   saving: boolean;

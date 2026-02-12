@@ -122,6 +122,14 @@ model Workspace {
   whatsappIntegratedNumber String?
   whatsappConfigured       Boolean @default(false)
 
+  // Google Calendar integration
+  googleCalendarConnected     Boolean  @default(false)
+  googleCalendarAccessToken   String?
+  googleCalendarRefreshToken  String?
+  googleCalendarTokenExpiry   DateTime?
+  googleCalendarEmail         String?
+  googleCalendarId            String?  @default("primary")
+
   // Relations
   users           User[]
   contacts        Contact[]
@@ -193,6 +201,9 @@ model Booking {
   contact     Contact       @relation(fields: [contactId], references: [id])
   workspaceId String
   workspace   Workspace     @relation(fields: [workspaceId], references: [id])
+
+  // Google Calendar sync
+  googleCalendarEventId String?
 
   formSubmissions FormSubmission[]
 

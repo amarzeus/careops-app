@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import {
+  updateBookingCalendarEvent,
+  cancelBookingCalendarEvent,
+} from "@/lib/google-calendar";
 
 export async function PUT(
   req: Request,
@@ -24,6 +28,17 @@ export async function PUT(
     include: { service: true, contact: true },
   });
 
+  // Sync calendar event updates (fire-and-forget)
+  if (data.status === "CANCELLED" || data.status === "NO_SHOW") {
+    cancelBookingCalendarEvent(id, user.workspaceId).catch((err) =>
+      console.error("[Google Calendar] Cancel event error:", err)
+    );
+  } else if (data.date || data.serviceId) {
+    updateBookingCalendarEvent(id, user.workspaceId).catch((err) =>
+      console.error("[Google Calendar] Update event error:", err)
+    );
+  }
+
   return NextResponse.json({ booking });
 }
 
@@ -40,6 +55,11 @@ export async function DELETE(
     where: { id, workspaceId: user.workspaceId },
     data: { status: "CANCELLED" },
   });
+
+  // Cancel the Google Calendar event (fire-and-forget)
+  cancelBookingCalendarEvent(id, user.workspaceId).catch((err) =>
+    console.error("[Google Calendar] Cancel event error:", err)
+  );
 
   return NextResponse.json({ success: true });
 }

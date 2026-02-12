@@ -14,7 +14,7 @@ import { toast } from "@/hooks/use-toast";
 
 import { BookingList } from "@/components/bookings/booking-list";
 import { BookingDialog } from "@/components/bookings/booking-dialog";
-import { BookingCalendar } from "@/components/bookings/booking-calendar";
+import { FullCalendar } from "@/components/bookings/full-calendar";
 
 interface BookingWithRelations extends Booking {
   contact: Contact;
@@ -30,13 +30,13 @@ export default function BookingsPage() {
   // Dialog State
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState<BookingWithRelations | null>(null);
+  const [initialDialogDate, setInitialDialogDate] = useState<Date | undefined>(undefined);
 
   // Filter State
   const [searchTerm, setSearchTerm] = useState("");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
-  const [calendarDate, setCalendarDate] = useState<Date | undefined>(new Date());
 
   useEffect(() => {
     fetchAll();
@@ -139,11 +139,13 @@ export default function BookingsPage() {
 
   const handleEdit = (booking: BookingWithRelations) => {
     setSelectedBooking(booking);
+    setInitialDialogDate(undefined);
     setDialogOpen(true);
   };
 
-  const handleNewBooking = () => {
+  const handleNewBooking = (date?: Date) => {
     setSelectedBooking(null);
+    setInitialDialogDate(date);
     setDialogOpen(true);
   };
 
@@ -195,14 +197,6 @@ export default function BookingsPage() {
     }
   };
 
-  const calendarBookings = filterBookings(bookings).filter(b => {
-      if (!calendarDate) return true;
-      const d = new Date(b.date);
-      return d.getDate() === calendarDate.getDate() &&
-             d.getMonth() === calendarDate.getMonth() &&
-             d.getFullYear() === calendarDate.getFullYear();
-  });
-
   return (
     <div className="flex flex-col h-full">
       <Header title="Bookings" subtitle="Manage appointments and schedules">
@@ -225,7 +219,7 @@ export default function BookingsPage() {
                 <CalendarIcon className="w-4 h-4 mr-2" /> Calendar
               </Button>
            </div>
-           <Button onClick={handleNewBooking} className="bg-primary">
+           <Button onClick={() => handleNewBooking()} className="bg-primary">
             <Plus className="w-4 h-4 mr-2" /> New Booking
           </Button>
         </div>
@@ -319,23 +313,11 @@ export default function BookingsPage() {
             </Tabs>
           </>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-[300px_1fr] gap-6">
-            <BookingCalendar 
-              bookings={bookings}
-              selectedDate={calendarDate}
-              onSelectDate={setCalendarDate}
-            />
-            <div className="space-y-4">
-               <h3 className="font-semibold text-lg">
-                 {calendarDate ? format(calendarDate, "EEEE, MMMM do") : "Select a date"}
-               </h3>
-               <BookingList 
-                  bookings={calendarBookings} 
-                  onStatusUpdate={handleStatusUpdate}
-                  onEdit={handleEdit}
-                />
-            </div>
-          </div>
+          <FullCalendar
+            bookings={bookings}
+            onEdit={handleEdit}
+            onNewBooking={handleNewBooking}
+          />
         )}
       </div>
 
@@ -346,6 +328,7 @@ export default function BookingsPage() {
         contacts={contacts}
         services={services}
         initialData={selectedBooking}
+        initialDate={initialDialogDate}
       />
     </div>
   );

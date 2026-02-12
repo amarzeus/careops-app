@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { triggerAutomation } from "@/lib/automation";
+import { syncBookingToCalendar } from "@/lib/google-calendar";
 
 export async function GET() {
   const user = await getCurrentUser();
@@ -64,6 +65,11 @@ export async function POST(req: Request) {
     contact,
     service,
   });
+
+  // Sync to Google Calendar (fire-and-forget, never blocks booking flow)
+  syncBookingToCalendar(booking.id, user.workspaceId).catch((err) =>
+    console.error("[Google Calendar] Background sync error:", err)
+  );
 
   return NextResponse.json({ booking }, { status: 201 });
 }

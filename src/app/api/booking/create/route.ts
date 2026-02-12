@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { parseISO, addMinutes } from "date-fns";
 import { triggerAutomation } from "@/lib/automation";
+import { syncBookingToCalendar } from "@/lib/google-calendar";
 
 export async function POST(req: Request) {
     try {
@@ -90,6 +91,11 @@ export async function POST(req: Request) {
         // We don't await this to keep response fast, but for Vercel serverless we might need to await to ensure execution.
         // Let's await for reliability.
         await triggerAutomation(service.workspaceId, "BOOKING_CREATED", { booking, contact: dbContact, service });
+
+        // 6. Sync to Google Calendar (fire-and-forget, never blocks booking flow)
+        syncBookingToCalendar(booking.id, service.workspaceId).catch((err) =>
+            console.error("[Google Calendar] Background sync error:", err)
+        );
 
         return NextResponse.json({ success: true, bookingId: booking.id });
     } catch (error) {

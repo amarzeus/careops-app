@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -63,6 +63,7 @@ interface BookingDialogProps {
   contacts: Contact[];
   services: Service[];
   initialData?: Booking | null;
+  initialDate?: Date;
 }
 
 export function BookingDialog({
@@ -72,6 +73,7 @@ export function BookingDialog({
   contacts,
   services,
   initialData,
+  initialDate,
 }: BookingDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -88,10 +90,35 @@ export function BookingDialog({
       notes: initialData?.notes || "",
       contactId: initialData?.contactId || "",
       serviceId: initialData?.serviceId || "",
-      time: initialData ? format(new Date(initialData.date), "HH:mm") : "09:00",
-      date: initialData ? new Date(initialData.date) : new Date(),
+      time: initialData 
+          ? format(new Date(initialData.date), "HH:mm") 
+          : initialDate 
+            ? format(initialDate, "HH:mm") 
+            : "09:00",
+      date: initialData 
+          ? new Date(initialData.date) 
+          : initialDate || new Date(),
     },
   });
+
+  // Reset form when dialog opens or data changes
+  useEffect(() => {
+    if (open) {
+      reset({
+        notes: initialData?.notes || "",
+        contactId: initialData?.contactId || "",
+        serviceId: initialData?.serviceId || "",
+        time: initialData 
+            ? format(new Date(initialData.date), "HH:mm") 
+            : initialDate 
+              ? format(initialDate, "HH:mm") 
+              : "09:00",
+        date: initialData 
+            ? new Date(initialData.date) 
+            : initialDate || new Date(),
+      });
+    }
+  }, [open, initialData, initialDate, reset]);
 
   const onFormSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
