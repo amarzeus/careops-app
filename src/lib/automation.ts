@@ -47,8 +47,27 @@ export async function triggerAutomation(
     });
     if (!workspace || workspace.status !== "ACTIVE") return;
 
-    const rules = await prisma.automationRule.findMany({
-      where: { workspaceId, trigger: trigger as AutomationTrigger, isActive: true },
+    const [rules, webhooks] = await Promise.all([
+      prisma.automationRule.findMany({
+        where: { workspaceId, trigger: trigger as AutomationTrigger, isActive: true },
+      }),
+      prisma.webhook.findMany({
+        where: { workspaceId, event: trigger as AutomationTrigger, isActive: true },
+      }),
+    ]);
+
+    // Dispatch Webhooks (Fire-and-forget)
+    webhooks.forEach((hook) => {
+      fetch(hook.url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          event: trigger,
+          workspaceId,
+          timestamp: new Date().toISOString(),
+          payload: data,
+        }),
+      }).catch((err) => console.error(`Webhook failed (${hook.url}):`, err));
     });
 
     for (const rule of rules) {

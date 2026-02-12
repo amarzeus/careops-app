@@ -11,6 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { WorkspaceSettingsDTO } from "@/types/dto";
+import { WebhooksSection } from "@/components/settings/webhooks-section";
 
 interface IntegrationsTabProps {
   workspace: WorkspaceSettingsDTO | null;
@@ -266,6 +267,9 @@ export function IntegrationsTab({
           )}
         </CardContent>
       </Card>
+
+      {/* Webhooks Configuration */}
+      <WebhooksSection />
     </div>
   );
 }
