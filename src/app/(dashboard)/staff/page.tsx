@@ -76,7 +76,7 @@ export default function StaffPage() {
 
         try {
             // We'll try to DELETE. If route doesn't support it, we'll catch it.
-            const res = await fetch(`/api/staff?id=${id}`, { method: "DELETE" });
+            const res = await fetch(`/api/staff/${id}`, { method: "DELETE" });
             if (!res.ok) throw new Error("Delete not supported or failed");
 
             toast({ title: "Success", description: "Staff member removed" });

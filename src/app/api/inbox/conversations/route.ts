@@ -8,6 +8,10 @@ export async function GET(req: Request) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    if (user.role !== "OWNER" && !user.canAccessInbox) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     try {
         const conversations = await prisma.conversation.findMany({
             where: {

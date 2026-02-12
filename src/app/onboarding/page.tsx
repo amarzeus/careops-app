@@ -55,8 +55,8 @@ export default function OnboardingPage() {
   const [contactForm, setContactForm] = useState({ id: "", name: "Contact Us", welcomeMessage: "Thank you for reaching out! We'll get back to you shortly." });
   const [services, setServices] = useState<Array<{ id?: string; name: string; duration: string; location: string; availableDays: string; startTime: string; endTime: string }>>([]);
   const [newService, setNewService] = useState({ name: "", duration: "30", location: "", availableDays: "1,2,3,4,5", startTime: "09:00", endTime: "17:00" });
-  const [intakeForms, setIntakeForms] = useState<Array<{ id?: string; name: string; description: string; fields?: string }>>([]);
-  const [newIntakeForm, setNewIntakeForm] = useState({ name: "", description: "" });
+  const [intakeForms, setIntakeForms] = useState<Array<{ id?: string; name: string; description: string; fields?: string; serviceId?: string }>>([]);
+  const [newIntakeForm, setNewIntakeForm] = useState({ name: "", description: "", serviceId: "" });
   const [inventoryItems, setInventoryItems] = useState<Array<{ id?: string; name: string; quantity: string; threshold: string; unit: string }>>([]);
   const [newItem, setNewItem] = useState({ name: "", quantity: "0", threshold: "5", unit: "units" });
   const [staffMembers, setStaffMembers] = useState<Array<{ id?: string; name: string; email: string; password: string }>>([]);
@@ -568,6 +568,7 @@ export default function OnboardingPage() {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ onboardingStep: 5 }),
           });
+          await fetchCurrentStep(false);
           break;
         case 5:
           for (const form of intakeForms) {
@@ -693,7 +694,7 @@ export default function OnboardingPage() {
   const addIntakeForm = () => {
     if (newIntakeForm.name) {
       setIntakeForms(prev => [...prev, { ...newIntakeForm }]);
-      setNewIntakeForm({ name: "", description: "" });
+      setNewIntakeForm({ name: "", description: "", serviceId: "" });
     }
   };
 
@@ -702,7 +703,8 @@ export default function OnboardingPage() {
   };
 
   const editIntakeForm = (index: number) => {
-    setNewIntakeForm(intakeForms[index]);
+    const form = intakeForms[index];
+    setNewIntakeForm({ ...form, serviceId: form.serviceId || "" });
     removeIntakeForm(index);
   };
 
@@ -893,6 +895,19 @@ export default function OnboardingPage() {
               <div className="space-y-1">
                 <Label className="text-[10px] font-bold uppercase text-gray-500">Description</Label>
                 <Textarea placeholder="Please fill out this form..." value={newIntakeForm.description} onChange={e => setNewIntakeForm(prev => ({ ...prev, description: e.target.value }))} className="h-16 text-sm" />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-[10px] font-bold uppercase text-gray-500">Link to Service (Optional)</Label>
+                <Select value={newIntakeForm.serviceId || "none"} onValueChange={v => setNewIntakeForm(prev => ({ ...prev, serviceId: v === "none" ? "" : v }))}>
+                  <SelectTrigger className="h-8 text-sm"><SelectValue placeholder="Select a service..." /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">None (General Form)</SelectItem>
+                    {services.map((s, i) => (
+                      s.id ? <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem> : null
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-[10px] text-gray-500">Form will be sent automatically when this service is booked.</p>
               </div>
               <Button onClick={addIntakeForm} size="sm" className="w-full bg-blue-600 hover:bg-blue-700 h-8 text-xs" disabled={!newIntakeForm.name}>Add Form</Button>
             </div>

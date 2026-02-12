@@ -11,6 +11,9 @@ export async function PUT(
   if (!user || !user.workspaceId)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  if (user.role !== "OWNER" && !user.canAccessInventory)
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+
   const { id } = await params;
   const data = await req.json();
 
@@ -42,6 +45,9 @@ export async function DELETE(
   const user = await getCurrentUser();
   if (!user || !user.workspaceId)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  if (user.role !== "OWNER" && !user.canAccessInventory)
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const { id } = await params;
   await prisma.inventoryItem.delete({

@@ -8,6 +8,9 @@ export async function GET() {
   if (!user || !user.workspaceId)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  if (user.role !== "OWNER" && !user.canAccessInventory)
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+
   const items = await prisma.inventoryItem.findMany({
     where: { workspaceId: user.workspaceId },
     orderBy: { name: "asc" },
@@ -20,6 +23,9 @@ export async function POST(req: Request) {
   const user = await getCurrentUser();
   if (!user || !user.workspaceId)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  if (user.role !== "OWNER" && !user.canAccessInventory)
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const {
     name,
@@ -62,7 +68,7 @@ export async function PUT(req: Request) {
   const user = await getCurrentUser();
   if (!user || !user.workspaceId)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  if (user.role !== "OWNER")
+  if (user.role !== "OWNER" && !user.canAccessInventory)
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const { id, name, quantity, threshold, unit } = await req.json();

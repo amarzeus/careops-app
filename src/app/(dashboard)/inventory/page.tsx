@@ -97,7 +97,7 @@ export default function InventoryPage() {
             // But the UI has a delete button.
             // Let's implement DELETE in route.ts if missing.
             // For now, I'll try to call DELETE.
-            const res = await fetch(`/api/inventory?id=${id}`, { method: "DELETE" });
+            const res = await fetch(`/api/inventory/${id}`, { method: "DELETE" });
             if (!res.ok) throw new Error("Failed to delete");
 
             toast({ title: "Deleted", description: "Item removed from inventory" });

@@ -9,6 +9,9 @@ export async function GET() {
   if (!user || !user.workspaceId)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  if (user.role !== "OWNER" && !user.canAccessBookings)
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+
   console.log(`[API] Fetching bookings for workspace: ${user.workspaceId}`);
   const bookings = await prisma.booking.findMany({
     where: { workspaceId: user.workspaceId },
@@ -28,6 +31,9 @@ export async function POST(req: Request) {
   const user = await getCurrentUser();
   if (!user || !user.workspaceId)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  if (user.role !== "OWNER" && !user.canAccessBookings)
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const { serviceId, contactId, date, notes } = await req.json();
   if (!serviceId || !contactId || !date)
