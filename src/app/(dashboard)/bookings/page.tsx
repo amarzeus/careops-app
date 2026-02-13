@@ -34,6 +34,10 @@ export default function BookingsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
+  const [externalEvents, setExternalEvents] = useState<any[]>([]);
+
+  // Google Calendar Integration Status
+  const [isCalendarConnected, setIsCalendarConnected] = useState(false);
 
   // Dialog state
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -43,10 +47,11 @@ export default function BookingsPage() {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const [bookingsRes, contactsRes, servicesRes] = await Promise.all([
+      const [bookingsRes, contactsRes, servicesRes, calendarStatusRes] = await Promise.all([
         fetch("/api/bookings"),
         fetch("/api/contacts"),
-        fetch("/api/services")
+        fetch("/api/services"),
+        fetch("/api/integrations/google-calendar")
       ]);
 
       if (bookingsRes.ok) {
@@ -68,6 +73,27 @@ export default function BookingsPage() {
       if (servicesRes.ok) {
         const data = await servicesRes.json();
         setServices(data.services || []);
+      }
+
+      if (calendarStatusRes.ok) {
+        const status = await calendarStatusRes.json();
+        setIsCalendarConnected(status.connected);
+
+        // If connected, fetch events for the next 30 days and previous 7 days
+        if (status.connected) {
+          const timeMin = new Date();
+          timeMin.setDate(timeMin.getDate() - 7);
+          const timeMax = new Date();
+          timeMax.setDate(timeMax.getDate() + 30);
+
+          const eventsRes = await fetch(
+            `/api/integrations/google-calendar/events?timeMin=${timeMin.toISOString()}&timeMax=${timeMax.toISOString()}`
+          );
+          if (eventsRes.ok) {
+            const eventsData = await eventsRes.json();
+            setExternalEvents(eventsData.events || []);
+          }
+        }
       }
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -311,6 +337,7 @@ export default function BookingsPage() {
               <div className="flex-1 overflow-hidden">
                 <FullCalendar
                   bookings={bookings}
+                  externalEvents={externalEvents}
                   onEdit={handleEdit}
                   onNewBooking={handleNewBooking}
                 />

@@ -242,6 +242,51 @@ export async function listCalendars(
   return data.items || [];
 }
 
+/**
+ * List events from a calendar for a specific time range.
+ */
+export async function listCalendarEvents(
+  workspaceId: string,
+  timeMin: Date,
+  timeMax: Date
+): Promise<any[]> {
+  const accessToken = await getValidAccessToken(workspaceId);
+  if (!accessToken) return [];
+
+  const workspace = await prisma.workspace.findUnique({
+    where: { id: workspaceId },
+    select: { googleCalendarId: true },
+  });
+
+  const calendarId = workspace?.googleCalendarId || "primary";
+
+  const params = new URLSearchParams({
+    timeMin: timeMin.toISOString(),
+    timeMax: timeMax.toISOString(),
+    singleEvents: "true",
+    orderBy: "startTime",
+  });
+
+  try {
+    const res = await calendarFetch(
+      accessToken,
+      `/calendars/${encodeURIComponent(calendarId)}/events?${params.toString()}`
+    );
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error("[Google Calendar] List events failed:", errorText);
+      return [];
+    }
+
+    const data = await res.json();
+    return data.items || [];
+  } catch (error) {
+    console.error("[Google Calendar] List events error:", error);
+    return [];
+  }
+}
+
 // ──── CRUD Operations ────
 
 /**

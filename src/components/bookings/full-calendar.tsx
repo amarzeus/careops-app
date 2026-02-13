@@ -26,6 +26,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Clock,
+  Calendar,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -40,6 +41,7 @@ export interface BookingWithRelations extends Booking {
 
 interface FullCalendarProps {
   bookings: BookingWithRelations[];
+  externalEvents?: any[];
   onEdit: (booking: BookingWithRelations) => void;
   onNewBooking: (date?: Date) => void;
 }
@@ -52,11 +54,13 @@ const STATUS_STYLES: Record<string, string> = {
   COMPLETED: "bg-emerald-50/90 border-l-[3px] border-emerald-500 text-emerald-700 shadow-sm ring-1 ring-emerald-500/10 hover:bg-emerald-100",
   CANCELLED: "bg-slate-50/70 border-l-[3px] border-slate-300 text-slate-500/80 grayscale shadow-none hover:grayscale-0",
   NO_SHOW: "bg-rose-50/90 border-l-[3px] border-rose-500 text-rose-700 shadow-sm ring-1 ring-rose-500/10 hover:bg-rose-100",
+  EXTERNAL: "bg-purple-50/80 border-l-[3px] border-purple-400 text-purple-700 shadow-none ring-1 ring-purple-500/10 hover:bg-purple-100 opacity-80",
 };
 
 const HOUR_HEIGHT = 48; // Compact B2B scale (h-12 equivalent)
+const CALENDAR_LEFT_PADDING = 48; // Width of the time gutter
 
-export function FullCalendar({ bookings, onEdit, onNewBooking }: FullCalendarProps) {
+export function FullCalendar({ bookings, externalEvents = [], onEdit, onNewBooking }: FullCalendarProps) {
   const [view, setView] = useState<ViewMode>("week");
   const [currentDate, setCurrentDate] = useState(new Date());
   const [now, setNow] = useState(new Date());
@@ -126,6 +130,7 @@ export function FullCalendar({ bookings, onEdit, onNewBooking }: FullCalendarPro
         {monthDays.map((day) => {
           const isSelectedMonth = isSameMonth(day, currentDate);
           const dayBookings = bookings.filter((b) => isSameDay(new Date(b.date), day));
+          const dayExternalEvents = externalEvents.filter((e) => isSameDay(new Date(e.start), day));
           const isTodayDate = isToday(day);
 
           return (
@@ -165,6 +170,18 @@ export function FullCalendar({ bookings, onEdit, onNewBooking }: FullCalendarPro
                     )}
                   >
                     {format(new Date(booking.date), "H:mm")} {booking.contact.name.split(" ")[0]}
+                  </div>
+                ))}
+                {dayExternalEvents.map((event) => (
+                  <div
+                    key={event.id}
+                    className={cn(
+                      "text-[9px] px-1 py-0.5 rounded truncate font-medium border-l-2 shadow-sm leading-tight",
+                      STATUS_STYLES.EXTERNAL
+                    )}
+                    title={`${event.summary}\n(Google Calendar)`}
+                  >
+                    {format(new Date(event.start), "H:mm")} {event.summary}
                   </div>
                 ))}
               </div>
@@ -230,6 +247,7 @@ export function FullCalendar({ bookings, onEdit, onNewBooking }: FullCalendarPro
           <div className="flex-1 grid grid-cols-7">
             {daysList.map((day) => {
               const dayBookings = bookings.filter((b) => isSameDay(new Date(b.date), day));
+              const dayExternalEvents = externalEvents.filter((e) => isSameDay(new Date(e.start), day));
               const isTodayDate = isToday(day);
               const currentHour = getHours(now);
               const showTimeIndicator = isTodayDate && currentHour < 21 && currentHour >= 6;
@@ -289,6 +307,35 @@ export function FullCalendar({ bookings, onEdit, onNewBooking }: FullCalendarPro
                           <span className="text-[8px] font-black opacity-50 whitespace-nowrap">{format(start, "H:mm")}</span>
                         </div>
                         <div className="text-[9px] font-bold text-slate-700 truncate">{booking.contact.name}</div>
+                      </div>
+                    );
+                  })}
+
+                  {/* External Events (Google) */}
+                  {dayExternalEvents.map((event) => {
+                    const start = new Date(event.start);
+                    const end = new Date(event.end);
+                    const startMin = getHours(start) * 60 + getMinutes(start);
+                    const duration = Math.max(differenceInMinutes(end, start), 30); // Min 30 mins for visibility
+
+                    const top = startMin * (HOUR_HEIGHT / 60);
+                    const height = duration * (HOUR_HEIGHT / 60);
+
+                    return (
+                      <div
+                        key={event.id}
+                        style={{ top: `${top}px`, height: `${height}px` }}
+                        title={`${event.summary}\n(Google Calendar)`}
+                        className={cn(
+                          "absolute inset-x-0.5 z-10 rounded shadow-none border border-black/5 p-1 flex flex-col transition-all hover:z-20 hover:scale-[1.01] overflow-hidden leading-tight",
+                          STATUS_STYLES.EXTERNAL
+                        )}
+                      >
+                        <div className="flex items-center gap-1 mb-0.5">
+                          <Calendar className="w-2.5 h-2.5 opacity-50" />
+                          <span className="font-bold text-[9px] text-purple-900 truncate tracking-tight">{event.summary}</span>
+                        </div>
+                        <div className="text-[8px] font-black opacity-50">{format(start, "H:mm")} - {format(end, "H:mm")}</div>
                       </div>
                     );
                   })}
