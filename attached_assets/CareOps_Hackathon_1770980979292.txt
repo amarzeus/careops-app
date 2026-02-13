@@ -1,0 +1,414 @@
+🚀 CareOps Hackathon
+🧠 Hackathon Theme
+
+CareOps challenges you to build a single, unified operations platform prototype
+that replaces the chaos of disconnected tools used by service-based businesses.
+
+🚀 Project Overview
+
+Build a Unified Operations Platform (End-to-End Prototype)
+Most service businesses today run on tool chaos.
+One tool for leads.
+Another for bookings.
+Another for email or SMS.
+Another for forms.
+Another for inventory.
+Another for reports.
+None of these tools talk to each other.
+The result?
+
+🚀 CareOps Hackathon
+
+1
+
+Leads are missed
+Follow-ups are delayed
+Bookings fall through
+Forms remain incomplete
+Inventory runs out unexpectedly
+Owners have no real-time visibility
+Your task is to build one single platform that connects all of this into one clear
+operational system.
+
+🧩 1. Context & Problem (Simple Explanation)
+Service businesses struggle because:
+Information is scattered
+Teams work blindly
+Owners only find problems after damage is done
+This hackathon asks you to solve that by building:
+
+One system where the business can see, act, and operate clearly from a
+single dashboard.
+
+🛠️ 2. What You Are Building (In Simple Terms)
+
+You are building a web-based operations platform that allows a business to:
+Set up their workspace once
+Receive customer inquiries
+Accept bookings for services or meetings
+Communicate via email and SMS
+Automatically send forms after booking
+Track booking and customer status
+
+🚀 CareOps Hackathon
+
+2
+
+Track basic inventory or resources
+Receive alerts when attention is required
+Allow staff to manage daily work
+Allow owners to monitor everything from one dashboard
+
+🚫 Customers do NOT log in.
+
+All interactions happen via links, forms, and messages.
+
+👥 3. Users & Roles
+
+The system has only two internal roles.
+
+3.1 Business Owner (Admin)
+The owner:
+Sets up the business
+Configures the system
+Monitors performance
+Intervenes only when required
+This role focuses on visibility and control, not daily execution.
+
+3.2 Staff User
+Staff members:
+Handle customer communication
+Manage bookings
+Track form completion
+Update booking status
+They cannot:
+Change system configuration
+Modify automation rules
+
+🚀 CareOps Hackathon
+
+3
+
+Manage integrations
+
+🧭 4. Business Onboarding Flow (MOST IMPORTANT)
+This is the foundation of the entire product.
+
+After onboarding, the business must be fully operational without manual
+intervention.
+
+Step 1: Create Workspace
+The business owner:
+Creates an account
+Creates a workspace
+Enters:
+Business name
+Address (important for in-person services)
+Time zone
+Contact email
+
+⚠️ Nothing is active yet.
+Step 2: Set Up Email & SMS
+The business owner connects:
+Email service (confirmations, alerts)
+SMS service (reminders, short updates)
+Rules:
+At least one channel is mandatory
+All communication flows through integrations
+Failures must be logged and visible
+
+🚀 CareOps Hackathon
+
+4
+
+After this step:
+The Inbox becomes active
+
+Step 3: Create Contact Form
+The owner creates a public form with:
+Name
+Email or phone
+Optional message
+When submitted:
+A Contact is created
+A Conversation is started
+A welcome message is sent automatically
+
+Step 4: Set Up Bookings
+The owner defines:
+Service / meeting types
+Duration
+Availability (days & time slots)
+Location (for in-person meetings)
+This generates a public booking page.
+
+Step 5: Set Up Forms (Post-Booking)
+The owner uploads required forms:
+Intake form
+Agreement
+Supporting documents
+Forms are linked to booking types.
+
+🚀 CareOps Hackathon
+
+5
+
+When a booking occurs:
+Forms are sent automatically
+Completion status is tracked
+
+Step 6: Set Up Inventory / Resources
+The owner defines:
+Items or resources used per booking
+Quantity available
+Low-stock threshold
+This enables:
+Usage forecasting
+Automated alerts
+
+Step 7: Add Staff & Permissions
+The owner:
+Invites staff users
+Assigns permissions for:
+Inbox
+Bookings
+Forms
+Inventory visibility
+
+Step 8: Activate Workspace
+Before activation, the system verifies:
+Communication channel connected
+At least one booking type exists
+Availability is defined
+
+🚀 CareOps Hackathon
+
+6
+
+Once activated:
+Forms go live
+Booking links work
+Automation starts running
+
+📊 5. Business Dashboard (CRITICAL SECTION)
+This dashboard is NOT for doing work.
+It exists to answer one question only:
+
+“What is happening in my business right now?”
+
+Dashboard Must Clearly Show
+1. Booking Overview
+Today’s bookings
+Upcoming bookings
+Completed vs no-show count
+
+2. Leads & Conversations
+New inquiries
+Ongoing conversations
+Unanswered messages
+
+3. Forms Status
+Pending forms
+Overdue forms
+Completed forms
+
+4. Inventory Alerts
+🚀 CareOps Hackathon
+
+7
+
+Low-stock items
+Critical inventory warnings
+
+5. Key Alerts
+Missed messages
+Unconfirmed bookings
+Overdue forms
+Inventory risks
+
+👉 Every alert must link to the exact place where action is needed.
+
+💬 6. Inbox (Single Source of Communication)
+All communication lives here:
+Email
+SMS
+Automated messages
+Manual replies
+Rules:
+One contact → one conversation
+Full message history is preserved
+When staff replies → automation pauses
+
+👤 7. Customer Flow (No Login)
+Customers interact only through:
+Forms
+Booking pages
+Email/SMS
+
+🚀 CareOps Hackathon
+
+8
+
+Flow A: Contact First
+1. Customer submits contact form
+2. System:
+Creates contact
+Starts conversation
+Sends welcome message
+3. Staff replies
+4. Staff shares booking link
+5. Customer books
+
+Flow B: Book First
+1. Customer opens booking page
+2. Selects date & time
+3. Enters contact details
+System automatically:
+Creates contact
+Creates booking
+Sends confirmation
+Sends forms
+Schedules reminders
+
+🧑‍💻 8. Staff Daily Flow
+Staff log in to:
+
+1. Open Inbox
+2. Reply to customers
+3. Manage bookings
+
+🚀 CareOps Hackathon
+
+9
+
+4. Track form completion
+5. Mark bookings as completed or no-show
+Staff cannot change system logic.
+
+⚙️ 9. Automation Rules (Strict & Predictable)
+Automation must be event-based only.
+Required rules:
+New contact → welcome message
+Booking created → confirmation
+Before booking → reminder
+Pending form → reminder
+Inventory below threshold → alert
+Staff reply → automation stops
+
+🚫 No hidden logic
+🚫 No magic conditions
+
+📦 10. Inventory Alerts
+
+When inventory drops below threshold:
+Alert is sent (email or inbox)
+Alert appears on dashboard
+Event is logged
+
+🔌 11. Integrations
+
+At least two integrations must be implemented:
+Email provider
+SMS provider
+
+🚀 CareOps Hackathon
+
+10
+
+Calendar integration
+File storage
+Webhooks
+Integrations must:
+Be abstracted
+Fail gracefully
+Never break core flows
+
+📌 Refer to the Loom video for vision alignment and detailed understanding.
+
+🧰 Tech Expectations
+
+Frontend: React or Next.js with responsive design for different screen sizes
+Backend: FastAPI (Python) or Node.js
+Database: PostgreSQL must be scalable, reliable, and well-structured
+Integrations: Email, SMS, Calendar, Webhooks, etc.
+AI Usage: Gemini or any suitable AI model (optional, value-added)
+
+📝 Points to Note
+
+1. UI/UX: Clean, intuitive, and user-friendly design. Keep the flow smooth and
+simple.
+2. Code Quality: Follow best practices and maintain well-structured code.
+3. Deployment: Submit the deployment link and demo video.
+4. Code Submission: You are Not Required to submit your code. Winners will
+continue development as part of the founding team under expert guidance.
+This challenge focuses on Skills, AI leverage and creativity.
+5. Use of AI Tools: Set up Cursor or similar tools to improve productivity and
+speed act smartly.
+
+🚀 CareOps Hackathon
+
+11
+
+6. Discipline: We are strict about discipline and behavior, so make sure to
+consider this. Those who stay committed, consistent, and respectful until the
+end will receive a certificate in recognition of their efforts.
+
+📤 Submission Instructions
+1. Demo Video (3–5 minutes)
+Walk through:
+Worshiper flow
+Leader flow
+Content creation
+Messaging
+
+2. Deployment Link: Submit a working deployment link for review.
+3. Join the Telegram group for submissions: https://t.me/+aHXf5zBd1-Y2MWM9
+4. Submission Deadline : Saturday, End of the day 11:59 pm
+
+🏆 Prizes and Opportunities
+🥇 Hackathon Winner:
+
+The most functional and user-friendly platform creator will receive a fulltime job offer as a founding member with a high CTC and base pay.
+
+🎖️ Certificates:
+
+Participants with functional MVPs, even if not winners, will receive
+certificates of appreciation if their submissions are liked by the founders.
+
+🎖️ Prizes:
+
+Depending on the submissions, prizes may be distributed to the top 3
+winners. The prize amounts will be shared later.
+
+🌟 Closing Note
+🚀 CareOps Hackathon
+
+12
+
+This hackathon is more than a challenge it’s a chance to shape your future while
+working on one of the most advanced projects out there.
+It’s a test for your dedication and obsession towards your role not just how much
+you know, but how much you’re willing to figure out.
+It’s a test of skills over resumes in the era of AI, you’re completely free to use
+any AI tool to do this assignment. What matters is how smartly you use it and how
+much ownership you show.
+We want to work with people who enjoy challenges, the ones who keep pushing
+even when things break, and don’t stop until it finally works.
+Once you’re onboard, you’ll be working with a team of geniuses and on some
+seriously exciting stuff. But before that, you’ve got to prove you’re the right fit for
+this role.
+So yeah thank you for being here, and all the very best for this Hackathon!!
+We’re looking forward to connecting/working with the person who can ultimately
+get recognized as an winner of this challenge.
+Also, to those who stay till the end and give it their best shot but ultimately don’t
+end up winning, we’ll be giving a Certificate of Appreciation for their hard work,
+consistency, determination, and dedication. Cheers and ALL THE BEST!!!
+.
+
+😉🔥
+
+🚀 CareOps Hackathon
+
+13
+
+
