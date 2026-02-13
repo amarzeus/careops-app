@@ -1,10 +1,12 @@
-  import type { NextConfig } from "next";
+import type { NextConfig } from "next";
 
-  const nextConfig: NextConfig = {
-    typescript: {
-      ignoreBuildErrors: true,
-    },
-    output: 'standalone',
-  };
+const nextConfig: NextConfig = {
+  allowedDevOrigins: ["*"],
+  serverExternalPackages: ["better-sqlite3"],
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  output: 'standalone',
+};
 
-  export default nextConfig;
+export default nextConfig;
