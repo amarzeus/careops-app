@@ -1,242 +1,361 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import {
-  Calendar, Plus, Clock, User, MapPin, Filter,
-  CheckCircle, XCircle, AlertCircle, MoreHorizontal
-} from "lucide-react";
+import React, { useEffect, useState, useCallback } from "react";
+import { Plus, Search, Filter, Calendar as CalendarIcon, List, ChevronRight, Clock } from "lucide-react";
+import { Booking, Contact, Service } from "@prisma/client";
+import { format, parseISO } from "date-fns";
+
+import { Header } from "@/components/layout/header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
-import { Header } from "@/components/layout/header";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
+import { BookingList } from "@/components/bookings/booking-list";
+import { FullCalendar } from "@/components/bookings/full-calendar";
+import { BookingDialog } from "@/components/bookings/booking-dialog";
 
-interface Booking {
-  id: string;
-  date: string;
-  endTime: string;
-  status: string;
-  notes: string;
-  service: { id: string; name: string; duration: number; location: string };
-  contact: { id: string; name: string; email: string; phone: string };
-  createdAt: string;
+interface BookingWithRelations extends Booking {
+  contact: Contact;
+  service: Service;
 }
-
-interface Service {
-  id: string;
-  name: string;
-  duration: number;
-  location: string;
-}
-
-interface Contact {
-  id: string;
-  name: string;
-  email: string;
-}
-
-const statusConfig: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" | "success" | "warning" }> = {
-  PENDING: { label: "Pending", variant: "warning" },
-  CONFIRMED: { label: "Confirmed", variant: "default" },
-  COMPLETED: { label: "Completed", variant: "success" },
-  NO_SHOW: { label: "No Show", variant: "destructive" },
-  CANCELLED: { label: "Cancelled", variant: "secondary" },
-};
 
 export default function BookingsPage() {
-  const [bookings, setBookings] = useState<Booking[]>([]);
-  const [services, setServices] = useState<Service[]>([]);
+  const [bookings, setBookings] = useState<BookingWithRelations[]>([]);
   const [contacts, setContacts] = useState<Contact[]>([]);
+  const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [newBooking, setNewBooking] = useState({ serviceId: "", contactId: "", date: "", time: "" });
-  const [creating, setCreating] = useState(false);
+  const [viewMode, setViewMode] = useState<"list" | "calendar">("calendar");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
+  const [externalEvents, setExternalEvents] = useState<any[]>([]);
 
-  useEffect(() => {
-    fetchAll();
+  // Google Calendar Integration Status
+  const [isCalendarConnected, setIsCalendarConnected] = useState(false);
+
+  // Dialog state
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState<BookingWithRelations | null>(null);
+  const [initialDialogDate, setInitialDialogDate] = useState<Date | undefined>();
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const [bookingsRes, contactsRes, servicesRes, calendarStatusRes] = await Promise.all([
+        fetch("/api/bookings"),
+        fetch("/api/contacts"),
+        fetch("/api/services"),
+        fetch("/api/integrations/google-calendar")
+      ]);
+
+      if (bookingsRes.ok) {
+        const data = await bookingsRes.json();
+        setBookings((data.bookings || []).map((b: any) => ({
+          ...b,
+          date: new Date(b.date),
+          endTime: new Date(b.endTime),
+          createdAt: new Date(b.createdAt),
+          updatedAt: new Date(b.updatedAt),
+        })));
+      }
+
+      if (contactsRes.ok) {
+        const data = await contactsRes.json();
+        setContacts(data.contacts || []);
+      }
+
+      if (servicesRes.ok) {
+        const data = await servicesRes.json();
+        setServices(data.services || []);
+      }
+
+      if (calendarStatusRes.ok) {
+        const status = await calendarStatusRes.json();
+        setIsCalendarConnected(status.connected);
+
+        // If connected, fetch events for the next 30 days and previous 7 days
+        if (status.connected) {
+          const timeMin = new Date();
+          timeMin.setDate(timeMin.getDate() - 7);
+          const timeMax = new Date();
+          timeMax.setDate(timeMax.getDate() + 30);
+
+          const eventsRes = await fetch(
+            `/api/integrations/google-calendar/events?timeMin=${timeMin.toISOString()}&timeMax=${timeMax.toISOString()}`
+          );
+          if (eventsRes.ok) {
+            const eventsData = await eventsRes.json();
+            setExternalEvents(eventsData.events || []);
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  const fetchAll = async () => {
-    try {
-      const [bookRes, svcRes, conRes] = await Promise.all([
-        fetch("/api/bookings"),
-        fetch("/api/services"),
-        fetch("/api/contacts"),
-      ]);
-      if (bookRes.ok) setBookings((await bookRes.json()).bookings);
-      if (svcRes.ok) setServices((await svcRes.json()).services);
-      if (conRes.ok) setContacts((await conRes.json()).contacts);
-    } catch {} finally { setLoading(false); }
-  };
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
-  const createBooking = async () => {
-    if (!newBooking.serviceId || !newBooking.contactId || !newBooking.date || !newBooking.time) return;
-    setCreating(true);
+  const handleStatusUpdate = async (id: string, status: string) => {
     try {
-      const dateTime = `${newBooking.date}T${newBooking.time}`;
-      const res = await fetch("/api/bookings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ serviceId: newBooking.serviceId, contactId: newBooking.contactId, date: dateTime }),
-      });
-      if (res.ok) {
-        setDialogOpen(false);
-        setNewBooking({ serviceId: "", contactId: "", date: "", time: "" });
-        fetchAll();
-      }
-    } catch {} finally { setCreating(false); }
-  };
-
-  const updateStatus = async (id: string, status: string) => {
-    try {
-      await fetch(`/api/bookings/${id}`, {
-        method: "PUT",
+      const response = await fetch(`/api/bookings/${id}`, {
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status }),
       });
-      fetchAll();
-    } catch {}
-  };
 
-  const today = new Date().toISOString().split("T")[0];
-  const filterBookings = (tab: string) => {
-    switch (tab) {
-      case "today": return bookings.filter(b => b.date.startsWith(today));
-      case "upcoming": return bookings.filter(b => b.date > new Date().toISOString() && ["PENDING", "CONFIRMED"].includes(b.status));
-      case "completed": return bookings.filter(b => b.status === "COMPLETED");
-      default: return bookings;
+      if (response.ok) {
+        fetchData();
+      }
+    } catch (error) {
+      console.error("Error updating status:", error);
     }
   };
 
-  const formatDateTime = (date: string) => {
-    const d = new Date(date);
-    return {
-      date: d.toLocaleDateString([], { month: "short", day: "numeric", year: "numeric" }),
-      time: d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-    };
+  const handleBookingSubmit = async (data: any) => {
+    const url = selectedBooking ? `/api/bookings/${selectedBooking.id}` : "/api/bookings";
+    const method = selectedBooking ? "PATCH" : "POST";
+
+    try {
+      const response = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      if (response.ok) {
+        fetchData();
+      } else {
+        throw new Error("Failed to save booking");
+      }
+    } catch (error) {
+      console.error("Error saving booking:", error);
+      throw error;
+    }
   };
 
-  const renderBookingCard = (booking: Booking) => {
-    const { date, time } = formatDateTime(booking.date);
-    const config = statusConfig[booking.status] || statusConfig.PENDING;
+  const handleEdit = (booking: BookingWithRelations) => {
+    setSelectedBooking(booking);
+    setInitialDialogDate(undefined);
+    setDialogOpen(true);
+  };
 
-    return (
-      <div key={booking.id} className="flex items-center gap-4 p-4 bg-white rounded-lg border hover:shadow-sm transition-shadow">
-        <div className="w-14 text-center shrink-0">
-          <p className="text-xs text-gray-500">{date.split(" ")[0]}</p>
-          <p className="text-xl font-bold">{date.split(" ")[1]?.replace(",", "")}</p>
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
-            <p className="font-medium text-sm">{booking.contact.name}</p>
-            <Badge variant={config.variant}>{config.label}</Badge>
-          </div>
-          <div className="flex items-center gap-4 text-xs text-gray-500">
-            <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{booking.service.name}</span>
-            <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{time} ({booking.service.duration}min)</span>
-            {booking.service.location && <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{booking.service.location}</span>}
-          </div>
-        </div>
-        <div className="flex items-center gap-1">
-          {booking.status === "PENDING" && (
-            <Button size="sm" variant="outline" onClick={() => updateStatus(booking.id, "CONFIRMED")}>Confirm</Button>
-          )}
-          {booking.status === "CONFIRMED" && (
-            <>
-              <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white" onClick={() => updateStatus(booking.id, "COMPLETED")}>Complete</Button>
-              <Button size="sm" variant="outline" className="text-red-600" onClick={() => updateStatus(booking.id, "NO_SHOW")}>No-Show</Button>
-            </>
-          )}
-          {["PENDING", "CONFIRMED"].includes(booking.status) && (
-            <Button size="sm" variant="ghost" className="text-gray-400" onClick={() => updateStatus(booking.id, "CANCELLED")}>Cancel</Button>
-          )}
-        </div>
-      </div>
-    );
+  const handleNewBooking = (date?: Date) => {
+    setSelectedBooking(null);
+    setInitialDialogDate(date);
+    setDialogOpen(true);
+  };
+
+  // Filtering Logic
+  const filterBookings = (list: BookingWithRelations[]) => {
+    let filtered = list;
+
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      filtered = filtered.filter(b =>
+        b.contact.name.toLowerCase().includes(term) ||
+        b.service.name.toLowerCase().includes(term)
+      );
+    }
+
+    if (dateFrom) {
+      filtered = filtered.filter(b => b.date >= new Date(dateFrom));
+    }
+    if (dateTo) {
+      const end = new Date(dateTo);
+      end.setHours(23, 59, 59);
+      filtered = filtered.filter(b => b.date <= end);
+    }
+
+    return filtered;
+  };
+
+  const getTabBookings = (tab: string) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const filtered = filterBookings(bookings);
+
+    switch (tab) {
+      case "today":
+        return filtered.filter(b => {
+          const d = new Date(b.date);
+          d.setHours(0, 0, 0, 0);
+          return d.getTime() === today.getTime();
+        });
+      case "upcoming":
+        return filtered.filter(b => new Date(b.date) > new Date() && ["PENDING", "CONFIRMED"].includes(b.status));
+      case "completed":
+        return filtered.filter(b => b.status === "COMPLETED");
+      default:
+        return filtered;
+    }
+  };
+
+  const stats = {
+    today: getTabBookings("today").length,
+    upcoming: getTabBookings("upcoming").length,
+    completed: bookings.filter(b => b.status === "COMPLETED").length,
+    noShow: bookings.filter(b => b.status === "NO_SHOW").length,
   };
 
   return (
-    <div>
-      <Header title="Bookings" subtitle="Manage all your appointments">
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-blue-600 hover:bg-blue-700">
-              <Plus className="w-4 h-4 mr-2" /> New Booking
+    <div className="h-screen overflow-hidden flex flex-col bg-slate-50/20">
+      {/* Fixed Sticky Header */}
+      <Header title="Bookings" subtitle="Manage appointments and schedules">
+        <div className="flex items-center gap-4">
+          {/* List/Calendar Switcher */}
+          <div className="flex bg-slate-100 p-0.5 rounded-lg border border-slate-200">
+            <Button
+              variant={viewMode === "list" ? "secondary" : "ghost"}
+              size="sm"
+              onClick={() => setViewMode("list")}
+              className={cn("h-7 px-3 text-[10px] font-bold rounded-md", viewMode === "list" && "bg-white shadow-sm")}
+            >
+              <List className="w-3.5 h-3.5 mr-1.5" /> List
             </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Create New Booking</DialogTitle>
-              <DialogDescription>Schedule a new appointment for a contact.</DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label>Service</Label>
-                <Select value={newBooking.serviceId} onValueChange={v => setNewBooking(prev => ({ ...prev, serviceId: v }))}>
-                  <SelectTrigger><SelectValue placeholder="Select a service" /></SelectTrigger>
-                  <SelectContent>
-                    {services.map(s => <SelectItem key={s.id} value={s.id}>{s.name} ({s.duration}min)</SelectItem>)}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label>Contact</Label>
-                <Select value={newBooking.contactId} onValueChange={v => setNewBooking(prev => ({ ...prev, contactId: v }))}>
-                  <SelectTrigger><SelectValue placeholder="Select a contact" /></SelectTrigger>
-                  <SelectContent>
-                    {contacts.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Date</Label>
-                  <Input type="date" value={newBooking.date} onChange={e => setNewBooking(prev => ({ ...prev, date: e.target.value }))} />
-                </div>
-                <div className="space-y-2">
-                  <Label>Time</Label>
-                  <Input type="time" value={newBooking.time} onChange={e => setNewBooking(prev => ({ ...prev, time: e.target.value }))} />
-                </div>
-              </div>
-              <Button onClick={createBooking} className="w-full bg-blue-600 hover:bg-blue-700" disabled={creating}>
-                {creating ? "Creating..." : "Create Booking"}
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
+            <Button
+              variant={viewMode === "calendar" ? "secondary" : "ghost"}
+              size="sm"
+              onClick={() => setViewMode("calendar")}
+              className={cn("h-7 px-3 text-[10px] font-bold rounded-md", viewMode === "calendar" && "bg-white shadow-sm")}
+            >
+              <CalendarIcon className="w-3.5 h-3.5 mr-1.5" /> Calendar
+            </Button>
+          </div>
+
+          <Button onClick={() => handleNewBooking()} className="h-8 px-4 bg-primary text-[11px] font-bold rounded-lg shadow-sm">
+            <Plus className="w-3.5 h-3.5 mr-1.5" /> New Booking
+          </Button>
+        </div>
       </Header>
 
-      <div className="p-6">
-        <Tabs defaultValue="all">
-          <TabsList>
-            <TabsTrigger value="all">All ({bookings.length})</TabsTrigger>
-            <TabsTrigger value="today">Today ({filterBookings("today").length})</TabsTrigger>
-            <TabsTrigger value="upcoming">Upcoming ({filterBookings("upcoming").length})</TabsTrigger>
-            <TabsTrigger value="completed">Completed ({filterBookings("completed").length})</TabsTrigger>
-          </TabsList>
-          {["all", "today", "upcoming", "completed"].map(tab => (
-            <TabsContent key={tab} value={tab}>
-              <div className="space-y-2 mt-4">
-                {loading ? (
-                  [...Array(3)].map((_, i) => <div key={i} className="h-20 bg-gray-100 rounded-lg animate-pulse" />)
-                ) : filterBookings(tab).length === 0 ? (
-                  <div className="text-center py-12">
-                    <Calendar className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                    <p className="text-gray-500">No bookings found</p>
+      {/* Main Content Area - Non-Scrolling Body */}
+      <div className="flex-1 overflow-hidden p-6 flex flex-col gap-6">
+        <div className="max-w-[1600px] mx-auto w-full flex-1 flex flex-col gap-6 min-h-0">
+
+          {/* Professional B2B Stats Cards */}
+          <div className="grid grid-cols-4 gap-4 shrink-0">
+            {[
+              { label: "Today's Bookings", val: stats.today, icon: CalendarIcon, color: "blue" },
+              { label: "Upcoming Bookings", val: stats.upcoming, icon: Clock, color: "amber" },
+              { label: "Completed services", val: stats.completed, icon: Plus, color: "emerald", rotate: true },
+              { label: "No Show alerts", val: stats.noShow, icon: Filter, color: "rose" },
+            ].map((s) => (
+              <Card key={s.label} className="border border-border/40 shadow-sm bg-white overflow-hidden group">
+                <CardContent className="p-4 relative">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <p className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-1">{s.label}</p>
+                      <h3 className="text-2xl font-black text-slate-900 tracking-tight leading-none">{s.val}</h3>
+                    </div>
+                    <div className={cn(
+                      "p-3 rounded-xl transition-transform group-hover:scale-110 shadow-sm border border-black/5",
+                      s.color === "blue" && "bg-blue-50 text-blue-600",
+                      s.color === "amber" && "bg-amber-50 text-amber-600",
+                      s.color === "emerald" && "bg-emerald-50 text-emerald-600",
+                      s.color === "rose" && "bg-rose-50 text-rose-600",
+                    )}>
+                      <s.icon className={cn("w-5 h-5", s.rotate && "rotate-45")} />
+                    </div>
                   </div>
-                ) : (
-                  filterBookings(tab).map(renderBookingCard)
-                )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          <div className="flex-1 bg-white rounded-xl border border-border/40 shadow-sm overflow-hidden flex flex-col min-h-0">
+            {viewMode === "list" ? (
+              <div className="flex flex-col h-full">
+                {/* Inline Filters for List View */}
+                <div className="p-3 border-b border-border/40 bg-slate-50/30 flex flex-col md:flex-row gap-2 items-center">
+                  <div className="relative flex-1">
+                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground/60" />
+                    <Input
+                      placeholder="Search bookings..."
+                      className="pl-8 h-8 text-[11px] bg-white border-slate-200 rounded-lg"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                  </div>
+                  <div className="flex items-center gap-1.5 bg-white p-0.5 rounded-lg border border-slate-200">
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button variant="ghost" className="h-7 px-2 text-[10px] font-medium text-slate-500">
+                          <CalendarIcon className="mr-1.5 h-3 w-3 opacity-60" />
+                          {dateFrom ? format(parseISO(dateFrom), "MMM d") : "Start Date"}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="end">
+                        <Calendar
+                          mode="single"
+                          selected={dateFrom ? parseISO(dateFrom) : undefined}
+                          onSelect={(date) => setDateFrom(date ? format(date, "yyyy-MM-dd") : "")}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <div className="h-3 w-px bg-slate-200" />
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button variant="ghost" className="h-7 px-2 text-[10px] font-medium text-slate-500">
+                          <CalendarIcon className="mr-1.5 h-3 w-3 opacity-60" />
+                          {dateTo ? format(parseISO(dateTo), "MMM d") : "End Date"}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="end">
+                        <Calendar
+                          mode="single"
+                          selected={dateTo ? parseISO(dateTo) : undefined}
+                          onSelect={(date) => setDateTo(date ? format(date, "yyyy-MM-dd") : "")}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+                </div>
+
+                <div className="flex-1 overflow-y-auto">
+                  <BookingList
+                    bookings={getTabBookings("all")}
+                    onStatusUpdate={handleStatusUpdate}
+                    onEdit={handleEdit}
+                  />
+                </div>
               </div>
-            </TabsContent>
-          ))}
-        </Tabs>
+            ) : (
+              <div className="flex-1 overflow-hidden">
+                <FullCalendar
+                  bookings={bookings}
+                  externalEvents={externalEvents}
+                  onEdit={handleEdit}
+                  onNewBooking={handleNewBooking}
+                />
+              </div>
+            )}
+          </div>
+        </div>
       </div>
+
+      <BookingDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        onSubmit={handleBookingSubmit}
+        contacts={contacts}
+        services={services}
+        initialData={selectedBooking}
+        initialDate={initialDialogDate}
+      />
     </div>
   );
 }

@@ -1,35 +1,239 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Settings, Save, Link2, Copy, CheckCircle, ExternalLink, AlertTriangle } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
+import { Link2, Settings, Shield, User } from "lucide-react";
 import { Header } from "@/components/layout/header";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { toast } from "@/hooks/use-toast";
+import { useRouter, useSearchParams } from "next/navigation";
+import { WorkspaceTab } from "@/components/settings/workspace-tab";
+import { ProfileTab } from "@/components/settings/profile-tab";
+import { IntegrationsTab } from "@/components/settings/integrations-tab";
+import { SecurityTab } from "@/components/settings/security-tab";
+import { WorkspaceSettingsDTO, UserProfileDTO } from "@/types/dto";
 
 export default function SettingsPage() {
-  const [workspace, setWorkspace] = useState<any>(null);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [workspace, setWorkspace] = useState<WorkspaceSettingsDTO | null>(null);
+  const [user, setUser] = useState<UserProfileDTO | null>(null);
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
+
+  // Workspace State
+  const [savingWorkspace, setSavingWorkspace] = useState(false);
+  const [savedWorkspace, setSavedWorkspace] = useState(false);
+
+  // Profile State
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [savedProfile, setSavedProfile] = useState(false);
+
+  // Security State
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [changingPassword, setChangingPassword] = useState(false);
+  const [passwordMessage, setPasswordMessage] = useState({ type: "", text: "" });
+
+  // Delete Account State
+  const [deleteConfirmation, setDeleteConfirmation] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  // Test connection states
+  const [testingEmail, setTestingEmail] = useState(false);
+  const [testingSms, setTestingSms] = useState(false);
+  const [testingWhatsApp, setTestingWhatsApp] = useState(false);
+
+  // Google Calendar states
+  const [connectingCalendar, setConnectingCalendar] = useState(false);
+  const [disconnectingCalendar, setDisconnectingCalendar] = useState(false);
+
   const [copied, setCopied] = useState("");
 
-  useEffect(() => { fetchWorkspace(); }, []);
+  useEffect(() => {
+    Promise.all([fetchWorkspace(), fetchUser()]).finally(() => setLoading(false));
+  }, []);
+
+  // Handle Google Calendar OAuth callback results
+  useEffect(() => {
+    const calendarStatus = searchParams.get("calendar");
+    if (calendarStatus === "success") {
+      toast({ title: "Connected", description: "Google Calendar connected successfully" });
+      fetchWorkspace(); // Refresh to get updated state
+      router.replace("/settings?tab=integrations");
+    } else if (calendarStatus === "error") {
+      toast({ title: "Connection Failed", description: "Could not connect Google Calendar. Please try again.", variant: "destructive" });
+      router.replace("/settings?tab=integrations");
+    } else if (calendarStatus === "denied") {
+      toast({ title: "Access Denied", description: "Calendar access was denied. Please grant permission to connect.", variant: "destructive" });
+      router.replace("/settings?tab=integrations");
+    }
+  }, [searchParams]);
 
   const fetchWorkspace = async () => {
-    try { const res = await fetch("/api/workspace"); if (res.ok) setWorkspace((await res.json()).workspace); } catch {} finally { setLoading(false); }
+    try {
+      const res = await fetch("/api/workspace");
+      if (res.ok) setWorkspace((await res.json()).workspace);
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to load workspace", variant: "destructive" });
+    }
   };
 
-  const saveSettings = async () => {
-    setSaving(true);
+  const fetchUser = async () => {
     try {
-      await fetch("/api/workspace", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(workspace) });
-      setSaved(true); setTimeout(() => setSaved(false), 2000);
-    } catch {} finally { setSaving(false); }
+      const res = await fetch("/api/user");
+      if (res.ok) setUser((await res.json()).user);
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to load profile", variant: "destructive" });
+    }
+  };
+
+  const handleUpdateWorkspace = (data: Partial<WorkspaceSettingsDTO>) => {
+    setWorkspace(prev => prev ? { ...prev, ...data } : null);
+  };
+
+  const handleSaveWorkspace = async () => {
+    setSavingWorkspace(true);
+    try {
+      const res = await fetch("/api/workspace", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(workspace) });
+      if (!res.ok) throw new Error("Failed to save workspace");
+      toast({ title: "Success", description: "Workspace settings saved", variant: "default" });
+      setSavedWorkspace(true); setTimeout(() => setSavedWorkspace(false), 2000);
+    } catch (error) {
+      toast({ title: "Error", description: "Something went wrong", variant: "destructive" });
+    } finally { setSavingWorkspace(false); }
+  };
+
+  const handleUpdateProfile = (data: Partial<UserProfileDTO>) => {
+    setUser(prev => prev ? { ...prev, ...data } : null);
+  };
+
+  const handleSaveProfile = async () => {
+    setSavingProfile(true);
+    try {
+      const res = await fetch("/api/user", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: user?.name, phone: user?.phone }) });
+      if (!res.ok) throw new Error("Failed to save profile");
+      toast({ title: "Success", description: "Profile saved", variant: "default" });
+      setSavedProfile(true); setTimeout(() => setSavedProfile(false), 2000);
+    } catch (error) {
+      toast({ title: "Error", description: "Something went wrong", variant: "destructive" });
+    } finally { setSavingProfile(false); }
+  };
+
+  const handleChangePassword = async () => {
+    setChangingPassword(true);
+    setPasswordMessage({ type: "", text: "" });
+    try {
+      const res = await fetch("/api/auth/change-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ currentPassword, newPassword })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setPasswordMessage({ type: "success", text: "Password updated successfully" });
+        setCurrentPassword("");
+        setNewPassword("");
+      } else {
+        setPasswordMessage({ type: "error", text: data.error || "Failed to update password" });
+      }
+    } catch {
+      setPasswordMessage({ type: "error", text: "An error occurred" });
+    } finally {
+      setChangingPassword(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (deleteConfirmation !== "DELETE") return;
+    setIsDeleting(true);
+    try {
+      const res = await fetch("/api/user", { method: "DELETE" });
+      if (res.ok) {
+        router.push("/login");
+        router.refresh();
+      }
+    } catch (e) {
+      console.error(e);
+      setIsDeleting(false);
+    }
+  };
+
+  const handleTestEmail = async () => {
+    setTestingEmail(true);
+    try {
+      const res = await fetch("/api/settings/test-email", { method: "POST" });
+      if (res.ok) {
+        toast({ title: "Success", description: "Email connection test passed", variant: "default" });
+      } else {
+        const data = await res.json();
+        toast({ title: "Email Test Failed", description: data.error || "Could not connect", variant: "destructive" });
+      }
+    } catch (error) {
+      toast({ title: "Error", description: "Connection test failed", variant: "destructive" });
+    } finally { setTestingEmail(false); }
+  };
+
+  const handleTestSms = async () => {
+    setTestingSms(true);
+    try {
+      const res = await fetch("/api/settings/test-sms", { method: "POST" });
+      if (res.ok) {
+        toast({ title: "Success", description: "SMS connection test passed", variant: "default" });
+      } else {
+        const data = await res.json();
+        toast({ title: "SMS Test Failed", description: data.error || "Could not connect", variant: "destructive" });
+      }
+    } catch (error) {
+      toast({ title: "Error", description: "Connection test failed", variant: "destructive" });
+    } finally { setTestingSms(false); }
+  };
+
+  const handleTestWhatsApp = async () => {
+    setTestingWhatsApp(true);
+    try {
+      const res = await fetch("/api/settings/test-whatsapp", { method: "POST" });
+      if (res.ok) {
+        toast({ title: "Success", description: "WhatsApp connection test passed", variant: "default" });
+      } else {
+        const data = await res.json();
+        toast({ title: "WhatsApp Test Failed", description: data.error || "Could not connect", variant: "destructive" });
+      }
+    } catch (error) {
+      toast({ title: "Error", description: "WhatsApp connection test failed", variant: "destructive" });
+    } finally { setTestingWhatsApp(false); }
+  };
+
+  const handleConnectCalendar = async () => {
+    setConnectingCalendar(true);
+    try {
+      const res = await fetch("/api/integrations/google-calendar", { method: "POST" });
+      if (res.ok) {
+        const data = await res.json();
+        // Redirect user to Google OAuth consent screen
+        window.location.href = data.url;
+      } else {
+        const data = await res.json();
+        toast({ title: "Error", description: data.error || "Could not initiate calendar connection", variant: "destructive" });
+        setConnectingCalendar(false);
+      }
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to connect Google Calendar", variant: "destructive" });
+      setConnectingCalendar(false);
+    }
+  };
+
+  const handleDisconnectCalendar = async () => {
+    setDisconnectingCalendar(true);
+    try {
+      const res = await fetch("/api/integrations/google-calendar", { method: "DELETE" });
+      if (res.ok) {
+        toast({ title: "Disconnected", description: "Google Calendar has been disconnected" });
+        setWorkspace(prev => prev ? { ...prev, googleCalendarConnected: false, googleCalendarEmail: null } : null);
+      } else {
+        toast({ title: "Error", description: "Failed to disconnect", variant: "destructive" });
+      }
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to disconnect Google Calendar", variant: "destructive" });
+    } finally { setDisconnectingCalendar(false); }
   };
 
   const copyToClipboard = (text: string, key: string) => {
@@ -40,68 +244,78 @@ export default function SettingsPage() {
   if (loading) return <div className="p-8"><div className="animate-pulse space-y-4">{[...Array(3)].map((_, i) => <div key={i} className="h-40 bg-gray-100 rounded-xl" />)}</div></div>;
 
   const bookingUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/book/${workspace?.id}`;
+  const contactFormUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/contact/${workspace?.id}`;
+
+  const defaultTab = searchParams.get("tab") || "workspace";
 
   return (
     <div>
-      <Header title="Settings" subtitle="Configure your workspace">
-        <Button onClick={saveSettings} className="bg-blue-600 hover:bg-blue-700" disabled={saving}>
-          {saved ? <><CheckCircle className="w-4 h-4 mr-2" />Saved!</> : saving ? "Saving..." : <><Save className="w-4 h-4 mr-2" />Save Changes</>}
-        </Button>
-      </Header>
-      <div className="p-6 max-w-3xl space-y-6">
-        <Card>
-          <CardHeader><CardTitle>Workspace</CardTitle><CardDescription>Basic business information</CardDescription></CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2"><Label>Business Name</Label><Input value={workspace?.name || ""} onChange={e => setWorkspace((p: any) => ({ ...p, name: e.target.value }))} /></div>
-              <div className="space-y-2"><Label>Timezone</Label><Input value={workspace?.timezone || ""} onChange={e => setWorkspace((p: any) => ({ ...p, timezone: e.target.value }))} /></div>
-            </div>
-            <div className="space-y-2"><Label>Address</Label><Input value={workspace?.address || ""} onChange={e => setWorkspace((p: any) => ({ ...p, address: e.target.value }))} /></div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2"><Label>Contact Email</Label><Input value={workspace?.contactEmail || ""} onChange={e => setWorkspace((p: any) => ({ ...p, contactEmail: e.target.value }))} /></div>
-              <div className="space-y-2"><Label>Contact Phone</Label><Input value={workspace?.contactPhone || ""} onChange={e => setWorkspace((p: any) => ({ ...p, contactPhone: e.target.value }))} /></div>
-            </div>
-          </CardContent>
-        </Card>
+      <Header title="Settings" subtitle="Manage your workspace and account" />
+      <div className="p-6 max-w-4xl">
+        <Tabs defaultValue={defaultTab} className="space-y-6">
+          <TabsList>
+            <TabsTrigger value="workspace" className="flex items-center gap-2"><Settings className="w-4 h-4" /> Workspace</TabsTrigger>
+            <TabsTrigger value="profile" className="flex items-center gap-2"><User className="w-4 h-4" /> Profile</TabsTrigger>
+            <TabsTrigger value="integrations" className="flex items-center gap-2"><Link2 className="w-4 h-4" /> Integrations</TabsTrigger>
+            <TabsTrigger value="security" className="flex items-center gap-2"><Shield className="w-4 h-4" /> Security</TabsTrigger>
+          </TabsList>
 
-        <Card>
-          <CardHeader><CardTitle>Communication</CardTitle><CardDescription>Email and SMS configuration</CardDescription></CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between p-4 border rounded-lg">
-              <div><p className="font-medium text-sm">Email Enabled</p><p className="text-xs text-gray-500">Send automated emails</p></div>
-              <Switch checked={workspace?.emailConfigured || false} onCheckedChange={v => setWorkspace((p: any) => ({ ...p, emailConfigured: v }))} />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2"><Label>From Name</Label><Input value={workspace?.emailFromName || ""} onChange={e => setWorkspace((p: any) => ({ ...p, emailFromName: e.target.value }))} /></div>
-              <div className="space-y-2"><Label>From Address</Label><Input value={workspace?.emailFromAddress || ""} onChange={e => setWorkspace((p: any) => ({ ...p, emailFromAddress: e.target.value }))} /></div>
-            </div>
-          </CardContent>
-        </Card>
+          <TabsContent value="workspace">
+            <WorkspaceTab 
+              workspace={workspace}
+              onUpdate={handleUpdateWorkspace}
+              onSave={handleSaveWorkspace}
+              saving={savingWorkspace}
+              saved={savedWorkspace}
+              copyToClipboard={copyToClipboard}
+              copied={copied}
+              bookingUrl={bookingUrl}
+              contactFormUrl={contactFormUrl}
+            />
+          </TabsContent>
 
-        <Card>
-          <CardHeader><CardTitle>Public Links</CardTitle><CardDescription>Share these links with your customers</CardDescription></CardHeader>
-          <CardContent className="space-y-3">
-            <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-              <Link2 className="w-4 h-4 text-gray-400 shrink-0" />
-              <code className="text-xs flex-1 truncate">{bookingUrl}</code>
-              <Button variant="outline" size="sm" onClick={() => copyToClipboard(bookingUrl, "booking")}>
-                {copied === "booking" ? "Copied!" : "Copy"}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+          <TabsContent value="profile">
+            <ProfileTab 
+              user={user}
+              onUpdate={handleUpdateProfile}
+              onSave={handleSaveProfile}
+              saving={savingProfile}
+              saved={savedProfile}
+            />
+          </TabsContent>
 
-        <Card className="border-red-200">
-          <CardHeader><CardTitle className="text-red-600">Danger Zone</CardTitle></CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <div><p className="text-sm font-medium">Workspace Status</p><p className="text-xs text-gray-500">Current: <Badge variant={workspace?.status === "ACTIVE" ? "success" : "secondary"}>{workspace?.status}</Badge></p></div>
-              <Button variant="outline" className="text-red-600 border-red-200" onClick={async () => { await fetch("/api/workspace", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: workspace?.status === "ACTIVE" ? "INACTIVE" : "ACTIVE" }) }); fetchWorkspace(); }}>
-                {workspace?.status === "ACTIVE" ? "Deactivate" : "Activate"}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+          <TabsContent value="integrations">
+            <IntegrationsTab 
+              workspace={workspace}
+              onTestEmail={handleTestEmail}
+              onTestSms={handleTestSms}
+              onTestWhatsApp={handleTestWhatsApp}
+              onConnectCalendar={handleConnectCalendar}
+              onDisconnectCalendar={handleDisconnectCalendar}
+              testingEmail={testingEmail}
+              testingSms={testingSms}
+              testingWhatsApp={testingWhatsApp}
+              connectingCalendar={connectingCalendar}
+              disconnectingCalendar={disconnectingCalendar}
+            />
+          </TabsContent>
+
+          <TabsContent value="security">
+            <SecurityTab 
+              currentPassword={currentPassword}
+              setCurrentPassword={setCurrentPassword}
+              newPassword={newPassword}
+              setNewPassword={setNewPassword}
+              onChangePassword={handleChangePassword}
+              changingPassword={changingPassword}
+              passwordMessage={passwordMessage}
+              onDeleteAccount={handleDeleteAccount}
+              isDeleting={isDeleting}
+              deleteConfirmation={deleteConfirmation}
+              setDeleteConfirmation={setDeleteConfirmation}
+            />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

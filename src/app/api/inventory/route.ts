@@ -8,6 +8,9 @@ export async function GET() {
   if (!user || !user.workspaceId)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  if (user.role !== "OWNER" && !user.canAccessInventory)
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+
   const items = await prisma.inventoryItem.findMany({
     where: { workspaceId: user.workspaceId },
     orderBy: { name: "asc" },
@@ -20,6 +23,9 @@ export async function POST(req: Request) {
   const user = await getCurrentUser();
   if (!user || !user.workspaceId)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  if (user.role !== "OWNER" && !user.canAccessInventory)
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const {
     name,
@@ -41,8 +47,8 @@ export async function POST(req: Request) {
     data: {
       name,
       description,
-      quantity: quantity || 0,
-      threshold: threshold || 5,
+      quantity: quantity ? parseInt(String(quantity)) : 0,
+      threshold: threshold ? parseInt(String(threshold)) : 5,
       unit: unit || "units",
       vendorName,
       vendorEmail,
@@ -56,4 +62,32 @@ export async function POST(req: Request) {
   }
 
   return NextResponse.json({ item }, { status: 201 });
+}
+
+export async function PUT(req: Request) {
+  const user = await getCurrentUser();
+  if (!user || !user.workspaceId)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (user.role !== "OWNER" && !user.canAccessInventory)
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+
+  const { id, name, quantity, threshold, unit } = await req.json();
+  if (!id) return NextResponse.json({ error: "ID is required" }, { status: 400 });
+
+  const existingItem = await prisma.inventoryItem.findFirst({
+    where: { id, workspaceId: user.workspaceId },
+  });
+  if (!existingItem) return NextResponse.json({ error: "Item not found" }, { status: 404 });
+
+  const item = await prisma.inventoryItem.update({
+    where: { id },
+    data: {
+      name,
+      quantity: quantity ? parseInt(String(quantity)) : undefined,
+      threshold: threshold ? parseInt(String(threshold)) : undefined,
+      unit,
+    },
+  });
+
+  return NextResponse.json({ item });
 }

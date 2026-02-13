@@ -2,11 +2,13 @@
 
 import React, { useState, useEffect, useRef, Suspense, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Mail, Smartphone, ArrowLeft, RefreshCw, CheckCircle2 } from "lucide-react";
+import { Mail, Smartphone, ArrowLeft, RefreshCw, CheckCircle2, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+
+type VerifyMethod = "email" | "sms" | "whatsapp";
 
 function VerifyOtpContent() {
   const router = useRouter();
@@ -21,9 +23,9 @@ function VerifyOtpContent() {
   const [countdown, setCountdown] = useState(60);
   const [canResend, setCanResend] = useState(false);
   const [verified, setVerified] = useState(false);
-  const [method, setMethod] = useState<"email" | "sms">("email");
+  const [method, setMethod] = useState<VerifyMethod>("email");
   const [phone, setPhone] = useState("");
-  const [smsSent, setSmsSent] = useState(false);
+  const [codeSent, setCodeSent] = useState(false);
 
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -57,7 +59,7 @@ function VerifyOtpContent() {
       const res = await fetch("/api/auth/verify-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, otp: otpCode }),
+        body: JSON.stringify({ email, otp: otpCode, phone: phone || undefined }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Verification failed");
@@ -80,7 +82,7 @@ function VerifyOtpContent() {
     } finally {
       setLoading(false);
     }
-  }, [email, otp, router]);
+  }, [email, otp, phone, router]);
 
   const handleDigitChange = (index: number, value: string) => {
     if (!/^\d*$/.test(value)) return;
@@ -124,7 +126,7 @@ function VerifyOtpContent() {
       const res = await fetch("/api/auth/resend-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, channel: method, phone: phone || undefined }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to resend");
@@ -156,9 +158,11 @@ function VerifyOtpContent() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to send SMS");
 
-      setSmsSent(true);
+      setCodeSent(true);
       setCountdown(60);
       setCanResend(false);
+      setOtp(["", "", "", "", "", ""]);
+      setTimeout(() => inputRefs.current[0]?.focus(), 100);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Failed to send SMS";
       setError(message);
@@ -167,6 +171,67 @@ function VerifyOtpContent() {
     }
   };
 
+  const handleSendWhatsApp = async () => {
+    if (!phone) {
+      setError("Please enter your phone number");
+      return;
+    }
+    setResending(true);
+    setError("");
+
+    try {
+      const res = await fetch("/api/auth/send-whatsapp-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, phone }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to send WhatsApp message");
+
+      setCodeSent(true);
+      setCountdown(60);
+      setCanResend(false);
+      setOtp(["", "", "", "", "", ""]);
+      setTimeout(() => inputRefs.current[0]?.focus(), 100);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Failed to send WhatsApp message";
+      setError(message);
+    } finally {
+      setResending(false);
+    }
+  };
+
+  const switchMethod = (newMethod: VerifyMethod) => {
+    setMethod(newMethod);
+    setCodeSent(false);
+    setError("");
+    setOtp(["", "", "", "", "", ""]);
+  };
+
+  // Icons & colors per method
+  const methodConfig = {
+    email: {
+      icon: <Mail className="w-6 h-6 text-blue-600" />,
+      bgIcon: "bg-blue-100",
+      btnClass: "bg-blue-600 hover:bg-blue-700",
+      label: "email",
+    },
+    sms: {
+      icon: <Smartphone className="w-6 h-6 text-blue-600" />,
+      bgIcon: "bg-blue-100",
+      btnClass: "bg-blue-600 hover:bg-blue-700",
+      label: "phone",
+    },
+    whatsapp: {
+      icon: <MessageCircle className="w-6 h-6 text-green-600" />,
+      bgIcon: "bg-green-100",
+      btnClass: "bg-green-600 hover:bg-green-700",
+      label: "WhatsApp",
+    },
+  };
+
+  const config = methodConfig[method];
+
   if (verified) {
     return (
       <Card className="w-full max-w-md">
@@ -174,7 +239,7 @@ function VerifyOtpContent() {
           <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4 animate-bounce">
             <CheckCircle2 className="w-8 h-8 text-green-600" />
           </div>
-          <h2 className="text-2xl font-semibold text-gray-900 mb-2">Email Verified!</h2>
+          <h2 className="text-2xl font-semibold text-gray-900 mb-2">Verified!</h2>
           <p className="text-gray-500">Redirecting you to your workspace...</p>
         </CardContent>
       </Card>
@@ -184,21 +249,17 @@ function VerifyOtpContent() {
   return (
     <Card className="w-full max-w-md">
       <CardHeader className="text-center">
-        <div className="mx-auto w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
-          {method === "email" ? (
-            <Mail className="w-6 h-6 text-blue-600" />
-          ) : (
-            <Smartphone className="w-6 h-6 text-blue-600" />
-          )}
+        <div className={`mx-auto w-12 h-12 ${config.bgIcon} rounded-xl flex items-center justify-center mb-4`}>
+          {config.icon}
         </div>
-        <CardTitle className="text-2xl">Verify your {method === "email" ? "email" : "phone"}</CardTitle>
+        <CardTitle className="text-2xl">Verify your {config.label}</CardTitle>
         <CardDescription>
           {method === "email" ? (
             <>We sent a 6-digit code to <strong>{email || "your email"}</strong></>
-          ) : smsSent ? (
-            <>We sent a 6-digit code to <strong>{phone}</strong></>
+          ) : codeSent ? (
+            <>We sent a 6-digit code to <strong>{phone}</strong> via {method === "whatsapp" ? "WhatsApp" : "SMS"}</>
           ) : (
-            <>Enter your phone number to receive a code via SMS</>
+            <>Enter your phone number to receive a code via {method === "whatsapp" ? "WhatsApp" : "SMS"}</>
           )}
         </CardDescription>
       </CardHeader>
@@ -223,31 +284,31 @@ function VerifyOtpContent() {
           </div>
         )}
 
-        {method === "sms" && !smsSent ? (
+        {(method === "sms" || method === "whatsapp") && !codeSent ? (
           <div className="space-y-3">
             <div className="space-y-2">
               <Label htmlFor="phone">Phone Number</Label>
               <Input
                 id="phone"
                 type="tel"
-                placeholder="+1234567890"
+                placeholder="+919876543210"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 required
               />
-              <p className="text-xs text-gray-500">Use E.164 format (e.g., +1234567890)</p>
+              <p className="text-xs text-gray-500">Use E.164 format (e.g., +919876543210)</p>
             </div>
             <Button
-              onClick={handleSendSMS}
-              className="w-full bg-blue-600 hover:bg-blue-700"
+              onClick={method === "whatsapp" ? handleSendWhatsApp : handleSendSMS}
+              className={`w-full ${config.btnClass}`}
               disabled={resending || !phone}
             >
-              {resending ? "Sending..." : "Send SMS Code"}
+              {resending ? "Sending..." : `Send ${method === "whatsapp" ? "WhatsApp" : "SMS"} Code`}
             </Button>
             <Button
               variant="ghost"
               className="w-full text-sm"
-              onClick={() => setMethod("email")}
+              onClick={() => switchMethod("email")}
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to email verification
@@ -279,7 +340,7 @@ function VerifyOtpContent() {
             {/* Verify button */}
             <Button
               onClick={() => handleVerify()}
-              className="w-full bg-blue-600 hover:bg-blue-700"
+              className={`w-full ${config.btnClass}`}
               disabled={loading || otp.join("").length !== 6}
             >
               {loading ? "Verifying..." : "Verify Code"}
@@ -308,35 +369,45 @@ function VerifyOtpContent() {
               )}
             </div>
 
-            {/* Switch to SMS option */}
-            {method === "email" && (
-              <div className="text-center border-t pt-4">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setMethod("sms")}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  <Smartphone className="w-4 h-4 mr-2" />
-                  Verify via SMS instead
-                </Button>
+            {/* Channel switcher */}
+            <div className="border-t pt-4 space-y-2">
+              <p className="text-xs text-center text-gray-400 mb-2">Or verify using:</p>
+              <div className="flex gap-2 justify-center">
+                {method !== "email" && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => switchMethod("email")}
+                    className="text-gray-600 hover:text-blue-600 flex items-center gap-1.5"
+                  >
+                    <Mail className="w-3.5 h-3.5" />
+                    Email
+                  </Button>
+                )}
+                {method !== "sms" && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => switchMethod("sms")}
+                    className="text-gray-600 hover:text-blue-600 flex items-center gap-1.5"
+                  >
+                    <Smartphone className="w-3.5 h-3.5" />
+                    SMS
+                  </Button>
+                )}
+                {method !== "whatsapp" && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => switchMethod("whatsapp")}
+                    className="text-gray-600 hover:text-green-600 flex items-center gap-1.5 border-green-200 hover:border-green-400 hover:bg-green-50"
+                  >
+                    <MessageCircle className="w-3.5 h-3.5" />
+                    WhatsApp
+                  </Button>
+                )}
               </div>
-            )}
-
-            {/* Switch back to email if using SMS */}
-            {method === "sms" && smsSent && (
-              <div className="text-center border-t pt-4">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => { setMethod("email"); setSmsSent(false); }}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  <Mail className="w-4 h-4 mr-2" />
-                  Verify via email instead
-                </Button>
-              </div>
-            )}
+            </div>
           </>
         )}
       </CardContent>

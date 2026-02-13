@@ -54,6 +54,15 @@ export async function PUT(req: Request) {
       ...(data.smsConfigured !== undefined && {
         smsConfigured: data.smsConfigured,
       }),
+      ...(data.whatsappProvider !== undefined && {
+        whatsappProvider: data.whatsappProvider,
+      }),
+      ...(data.whatsappIntegratedNumber !== undefined && {
+        whatsappIntegratedNumber: data.whatsappIntegratedNumber,
+      }),
+      ...(data.whatsappConfigured !== undefined && {
+        whatsappConfigured: data.whatsappConfigured,
+      }),
       ...(data.status && { status: data.status }),
       ...(data.onboardingStep !== undefined && {
         onboardingStep: data.onboardingStep,

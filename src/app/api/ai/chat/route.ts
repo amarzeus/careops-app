@@ -7,7 +7,7 @@ export async function POST(req: Request) {
   if (!user)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { message, currentStep, businessInfo } = await req.json();
+  const { message, currentStep, businessInfo, conversationHistory } = await req.json();
   if (!message)
     return NextResponse.json(
       { error: "Message is required" },
@@ -17,7 +17,8 @@ export async function POST(req: Request) {
   const response = await aiOnboardingAssistant(
     message,
     currentStep || 1,
-    businessInfo || {}
+    businessInfo || {},
+    conversationHistory || []
   );
   return NextResponse.json(response);
 }

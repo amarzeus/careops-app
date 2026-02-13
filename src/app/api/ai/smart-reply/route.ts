@@ -29,15 +29,22 @@ export async function POST(req: Request) {
       { status: 404 }
     );
 
+  // Ownership verification: ensure the conversation belongs to the user's workspace
+  if (conversation.workspaceId !== user.workspaceId)
+    return NextResponse.json(
+      { error: "Forbidden" },
+      { status: 403 }
+    );
+
   const history = conversation.messages
     .reverse()
     .map(
-      (m: any) =>
+      (m) =>
         `${m.direction === "INBOUND" ? conversation.contact.name : "Staff"}: ${m.content}`
     )
     .join("\n");
   const lastInbound = conversation.messages
-    .filter((m: any) => m.direction === "INBOUND")
+    .filter((m) => m.direction === "INBOUND")
     .pop();
 
   const workspace = await prisma.workspace.findUnique({

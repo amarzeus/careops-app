@@ -2,12 +2,17 @@ import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { triggerAutomation } from "@/lib/automation";
+import { syncBookingToCalendar } from "@/lib/google-calendar";
 
 export async function GET() {
   const user = await getCurrentUser();
   if (!user || !user.workspaceId)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  if (user.role !== "OWNER" && !user.canAccessBookings)
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+
+  console.log(`[API] Fetching bookings for workspace: ${user.workspaceId}`);
   const bookings = await prisma.booking.findMany({
     where: { workspaceId: user.workspaceId },
     include: {
@@ -18,6 +23,7 @@ export async function GET() {
     orderBy: { date: "desc" },
   });
 
+  console.log(`[API] Found ${bookings.length} bookings`);
   return NextResponse.json({ bookings });
 }
 
@@ -25,6 +31,9 @@ export async function POST(req: Request) {
   const user = await getCurrentUser();
   if (!user || !user.workspaceId)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  if (user.role !== "OWNER" && !user.canAccessBookings)
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const { serviceId, contactId, date, notes } = await req.json();
   if (!serviceId || !contactId || !date)
@@ -62,6 +71,11 @@ export async function POST(req: Request) {
     contact,
     service,
   });
+
+  // Sync to Google Calendar (fire-and-forget, never blocks booking flow)
+  syncBookingToCalendar(booking.id, user.workspaceId).catch((err) =>
+    console.error("[Google Calendar] Background sync error:", err)
+  );
 
   return NextResponse.json({ booking }, { status: 201 });
 }

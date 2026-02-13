@@ -1,6 +1,40 @@
 import { prisma } from "./prisma";
 import { sendEmail, buildEmailTemplate } from "./email";
+import { sendSMS } from "./sms";
+import { sendWelcomeMessage, sendBookingConfirmation, isAvailable as isWhatsAppAvailable } from "./whatsapp";
 import { generateWelcomeMessage, generateBookingConfirmation } from "./gemini";
+import type { AutomationRule, Workspace, AutomationTrigger } from "@prisma/client";
+
+/** Typed shape for automation context data */
+export interface ContactData {
+  id: string;
+  name: string;
+  email?: string | null;
+  phone?: string | null;
+}
+
+export interface ServiceData {
+  id: string;
+  name: string;
+  location?: string | null;
+}
+
+export interface BookingData {
+  id: string;
+  date: string | Date;
+}
+
+export interface InventoryData {
+  name: string;
+  quantity: number;
+  threshold: number;
+  unit: string;
+  vendorEmail?: string | null;
+}
+
+export interface FormData {
+  name: string;
+}
 
 export async function triggerAutomation(
   workspaceId: string,
@@ -13,21 +47,49 @@ export async function triggerAutomation(
     });
     if (!workspace || workspace.status !== "ACTIVE") return;
 
-    const rules = await prisma.automationRule.findMany({
-      where: { workspaceId, trigger: trigger as any, isActive: true },
+    const [rules, webhooks] = await Promise.all([
+      prisma.automationRule.findMany({
+        where: { workspaceId, trigger: trigger as AutomationTrigger, isActive: true },
+      }),
+      prisma.webhook.findMany({
+        where: { workspaceId, event: trigger as AutomationTrigger, isActive: true },
+      }),
+    ]);
+
+    // Dispatch Webhooks (Fire-and-forget)
+    webhooks.forEach((hook) => {
+      fetch(hook.url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          event: trigger,
+          workspaceId,
+          timestamp: new Date().toISOString(),
+          payload: data,
+        }),
+      }).catch((err) => console.error(`Webhook failed (${hook.url}):`, err));
     });
 
     for (const rule of rules) {
-      await executeRule(rule, workspace, data);
+      // Support delayMinutes: schedule execution after delay
+      if (rule.delayMinutes > 0) {
+        setTimeout(() => {
+          executeRule(rule, workspace, data).catch((err) =>
+            console.error(`Delayed automation error (rule ${rule.id}):`, err)
+          );
+        }, rule.delayMinutes * 60 * 1000);
+      } else {
+        await executeRule(rule, workspace, data);
+      }
     }
   } catch (error) {
     console.error("Automation trigger error:", error);
   }
 }
 
-async function executeRule(
-  rule: any,
-  workspace: any,
+export async function executeRule(
+  rule: AutomationRule,
+  workspace: Workspace,
   data: Record<string, unknown>
 ) {
   switch (rule.trigger) {
@@ -43,12 +105,18 @@ async function executeRule(
     case "INVENTORY_LOW":
       await handleInventoryLow(workspace, data);
       break;
+    case "BEFORE_BOOKING":
+      await handleBeforeBooking(workspace, data);
+      break;
+    case "STAFF_REPLY":
+      await handleStaffReply(workspace, data);
+      break;
   }
 }
 
-async function handleNewContact(workspace: any, data: Record<string, unknown>) {
-  const contact = data.contact as any;
-  if (!contact?.email) return;
+async function handleNewContact(workspace: Workspace, data: Record<string, unknown>) {
+  const contact = data.contact as ContactData | undefined;
+  if (!contact?.email && !contact?.phone) return;
 
   const welcomeMsg = await generateWelcomeMessage(workspace.name, contact.name);
 
@@ -67,18 +135,24 @@ async function handleNewContact(workspace: any, data: Record<string, unknown>) {
     });
   }
 
-  await prisma.message.create({
-    data: {
-      content: welcomeMsg,
-      channel: "EMAIL",
-      direction: "OUTBOUND",
-      isAutomated: true,
-      conversationId: conversation.id,
-    },
-  });
+  // Check if automation is active for this conversation
+  if (!conversation.isActive) return;
+
+  // Determine the best channel and create the message record
+  let channel: "EMAIL" | "SMS" | "WHATSAPP" = "EMAIL";
 
   // Send actual email
-  if (workspace.emailConfigured) {
+  if (contact.email && workspace.emailConfigured) {
+    await prisma.message.create({
+      data: {
+        content: welcomeMsg,
+        channel: "EMAIL",
+        direction: "OUTBOUND",
+        isAutomated: true,
+        conversationId: conversation.id,
+      },
+    });
+
     await sendEmail({
       to: contact.email,
       subject: `Welcome to ${workspace.name}`,
@@ -88,21 +162,54 @@ async function handleNewContact(workspace: any, data: Record<string, unknown>) {
       ),
     });
   }
+
+  // Also send via WhatsApp if contact has phone and WhatsApp is configured
+  if (contact.phone && isWhatsAppAvailable()) {
+    channel = "WHATSAPP";
+    await prisma.message.create({
+      data: {
+        content: welcomeMsg,
+        channel: "WHATSAPP",
+        direction: "OUTBOUND",
+        isAutomated: true,
+        conversationId: conversation.id,
+      },
+    });
+
+    await sendWelcomeMessage(contact.phone, contact.name, workspace.name);
+  }
+
+  // Fallback to SMS if WhatsApp is not available but contact has phone
+  if (contact.phone && !isWhatsAppAvailable() && workspace.smsConfigured) {
+    channel = "SMS";
+    await prisma.message.create({
+      data: {
+        content: welcomeMsg,
+        channel: "SMS",
+        direction: "OUTBOUND",
+        isAutomated: true,
+        conversationId: conversation.id,
+      },
+    });
+
+    await sendSMS({ to: contact.phone, body: welcomeMsg });
+  }
 }
 
-async function handleBookingCreated(workspace: any, data: Record<string, unknown>) {
-  const booking = data.booking as any;
-  const contact = data.contact as any;
-  const service = data.service as any;
+async function handleBookingCreated(workspace: Workspace, data: Record<string, unknown>) {
+  const booking = data.booking as BookingData | undefined;
+  const contact = data.contact as ContactData | undefined;
+  const service = data.service as ServiceData | undefined;
 
-  if (!contact?.email) return;
+  if (!contact || !booking) return;
+  if (!contact.email && !contact.phone) return;
 
   const confirmationMsg = await generateBookingConfirmation(
     workspace.name,
     contact.name,
     service?.name || "Appointment",
     new Date(booking.date).toLocaleString(),
-    service?.location
+    service?.location ?? undefined
   );
 
   let conversation = await prisma.conversation.findUnique({
@@ -119,17 +226,21 @@ async function handleBookingCreated(workspace: any, data: Record<string, unknown
     });
   }
 
-  await prisma.message.create({
-    data: {
-      content: confirmationMsg,
-      channel: "EMAIL",
-      direction: "OUTBOUND",
-      isAutomated: true,
-      conversationId: conversation.id,
-    },
-  });
+  // Check if automation is active for this conversation
+  if (!conversation.isActive) return;
 
-  if (workspace.emailConfigured) {
+  // Send via Email
+  if (contact.email && workspace.emailConfigured) {
+    await prisma.message.create({
+      data: {
+        content: confirmationMsg,
+        channel: "EMAIL",
+        direction: "OUTBOUND",
+        isAutomated: true,
+        conversationId: conversation.id,
+      },
+    });
+
     await sendEmail({
       to: contact.email,
       subject: `Booking Confirmation - ${workspace.name}`,
@@ -138,6 +249,42 @@ async function handleBookingCreated(workspace: any, data: Record<string, unknown
         `<p>${confirmationMsg}</p>`
       ),
     });
+  }
+
+  // Send via WhatsApp (if available and contact has phone)
+  if (contact.phone && isWhatsAppAvailable()) {
+    await prisma.message.create({
+      data: {
+        content: confirmationMsg,
+        channel: "WHATSAPP",
+        direction: "OUTBOUND",
+        isAutomated: true,
+        conversationId: conversation.id,
+      },
+    });
+
+    await sendBookingConfirmation(
+      contact.phone,
+      contact.name,
+      service?.name || "Appointment",
+      new Date(booking.date).toLocaleString(),
+      workspace.name
+    );
+  }
+
+  // Fallback to SMS
+  if (contact.phone && !isWhatsAppAvailable() && workspace.smsConfigured) {
+    await prisma.message.create({
+      data: {
+        content: confirmationMsg,
+        channel: "SMS",
+        direction: "OUTBOUND",
+        isAutomated: true,
+        conversationId: conversation.id,
+      },
+    });
+
+    await sendSMS({ to: contact.phone, body: confirmationMsg });
   }
 
   // Send intake forms linked to this service
@@ -198,9 +345,9 @@ async function handleBookingCreated(workspace: any, data: Record<string, unknown
   });
 }
 
-async function handleFormPending(workspace: any, data: Record<string, unknown>) {
-  const contact = data.contact as any;
-  const form = data.form as any;
+async function handleFormPending(workspace: Workspace, data: Record<string, unknown>) {
+  const contact = data.contact as ContactData | undefined;
+  const form = data.form as FormData | undefined;
 
   if (!contact?.email) return;
 
@@ -208,7 +355,7 @@ async function handleFormPending(workspace: any, data: Record<string, unknown>) 
     where: { contactId: contact.id },
   });
 
-  if (conversation) {
+  if (conversation && conversation.isActive) {
     await prisma.message.create({
       data: {
         content: `Reminder: You have a pending form "${form?.name}" that needs to be completed.`,
@@ -221,8 +368,75 @@ async function handleFormPending(workspace: any, data: Record<string, unknown>) 
   }
 }
 
-async function handleInventoryLow(workspace: any, data: Record<string, unknown>) {
-  const item = data.item as any;
+async function handleBeforeBooking(workspace: Workspace, data: Record<string, unknown>) {
+  const booking = data.booking as BookingData | undefined;
+  const contact = data.contact as ContactData | undefined;
+  const service = data.service as ServiceData | undefined;
+  
+  if (!contact?.email || !booking) return;
+  
+  const conversation = await prisma.conversation.findUnique({
+    where: { contactId: contact.id },
+  });
+  
+  if (!conversation || !conversation.isActive) return;
+  
+  const reminderMsg = `Hi ${contact.name}, this is a reminder about your upcoming ${service?.name || "appointment"} at ${new Date(booking.date).toLocaleString()}. Please arrive on time. - ${workspace.name}`;
+  
+  await prisma.message.create({
+    data: {
+      content: reminderMsg,
+      channel: "EMAIL",
+      direction: "OUTBOUND",
+      isAutomated: true,
+      conversationId: conversation.id,
+    },
+  });
+  
+  if (workspace.emailConfigured) {
+    await sendEmail({
+      to: contact.email,
+      subject: `Reminder: Your appointment tomorrow - ${workspace.name}`,
+      html: buildEmailTemplate("Appointment Reminder", `<p>${reminderMsg}</p>`),
+    });
+  }
+  
+  await prisma.alert.create({
+    data: {
+      type: "automation",
+      title: "Booking Reminder Sent",
+      message: `Reminder sent to ${contact.name} for ${service?.name || "appointment"}`,
+      actionUrl: "/bookings",
+      workspaceId: workspace.id,
+    },
+  });
+}
+
+async function handleStaffReply(workspace: Workspace, data: Record<string, unknown>) {
+  const conversationId = data.conversationId as string;
+  if (!conversationId) return;
+
+  // Update conversation to pause automation
+  await prisma.conversation.update({
+    where: { id: conversationId },
+    data: { isActive: false },
+  });
+  
+  // Log the automation pause
+  await prisma.alert.create({
+    data: {
+      type: "automation",
+      title: "Automation Paused",
+      message: `Automated messages paused for this conversation due to staff reply`,
+      actionUrl: "/inbox",
+      workspaceId: workspace.id,
+      isRead: true, // Don't show as unread since it's informational
+    },
+  });
+}
+
+async function handleInventoryLow(workspace: Workspace, data: Record<string, unknown>) {
+  const item = data.item as InventoryData;
 
   await prisma.alert.create({
     data: {

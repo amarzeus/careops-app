@@ -7,6 +7,9 @@ export async function GET() {
   if (!user || !user.workspaceId)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  if (user.role !== "OWNER" && !user.canAccessForms)
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+
   const submissions = await prisma.formSubmission.findMany({
     where: { workspaceId: user.workspaceId },
     include: {

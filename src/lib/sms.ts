@@ -1,9 +1,10 @@
-import twilio from "twilio";
+/**
+ * SMS module — delegates to MSG91.
+ * This wrapper keeps the existing import API (`sendSMS`, `buildOTPMessage`)
+ * so that callers don't need to change, while removing the Twilio dependency.
+ */
 
-const client = twilio(
-  process.env.TWILIO_ACCOUNT_SID,
-  process.env.TWILIO_AUTH_TOKEN
-);
+import { sendSMS as msg91SendSMS, type MSG91SMSResult } from "@/lib/msg91";
 
 interface SMSOptions {
   to: string;
@@ -11,23 +12,8 @@ interface SMSOptions {
 }
 
 export async function sendSMS(options: SMSOptions): Promise<boolean> {
-  try {
-    if (!process.env.TWILIO_ACCOUNT_SID || !process.env.TWILIO_AUTH_TOKEN) {
-      console.warn("Twilio credentials not configured — skipping SMS");
-      return false;
-    }
-
-    await client.messages.create({
-      body: options.body,
-      from: process.env.TWILIO_PHONE_NUMBER,
-      to: options.to,
-    });
-
-    return true;
-  } catch (error) {
-    console.error("SMS send error:", error);
-    return false;
-  }
+  const result: MSG91SMSResult = await msg91SendSMS(options.to, options.body);
+  return result.success;
 }
 
 export function buildOTPMessage(otp: string): string {

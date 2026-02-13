@@ -1,255 +1,415 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import Link from "next/link";
 import {
-  Calendar, Users, MessageSquare, FileText, Package,
-  AlertTriangle, ArrowRight, Sparkles, Activity, TrendingUp,
-  Clock, UserPlus, CheckCircle, XCircle, Bell
+  Calendar,
+  Users,
+  FileText,
+  Package,
+  MessageSquare,
+  AlertTriangle,
+  Loader2,
+  RefreshCw,
+  Clock,
+  CheckCircle,
+  XCircle,
+  Sparkles,
+  ArrowRight,
+  Plus,
+  Send,
+  Activity,
+  Zap,
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { MetricCard } from "@/components/dashboard/metric-card";
+import { PerformanceChart } from "@/components/dashboard/performance-chart";
+import { TodaysSchedule } from "@/components/dashboard/todays-schedule";
+import { KeyAlerts } from "@/components/dashboard/key-alerts";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Header } from "@/components/layout/header";
+import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "@/hooks/use-toast";
+import Link from "next/link";
+import { HoverExpandCard } from "@/components/dashboard/hover-expand-card";
 import { cn } from "@/lib/utils";
 
+/** Dashboard data shape from /api/dashboard/metrics */
 interface DashboardData {
-  bookings: { today: number; upcoming: number; completed: number; noShow: number; total: number };
-  contacts: { total: number; new: number };
-  conversations: { total: number; unread: number };
-  forms: { pending: number; overdue: number; completed: number };
-  inventory: { lowStock: Array<{ id: string; name: string; quantity: number; threshold: number; unit: string }> };
-  alerts: Array<{ id: string; type: string; title: string; message: string; isRead: boolean; actionUrl: string; createdAt: string }>;
+  metrics: {
+    bookingsToday: number;
+    bookingsUpcoming: number;
+    bookingsCompleted: number;
+    bookingsNoShow: number;
+    bookingsUnconfirmed: number;
+    newContacts: number;
+    totalContacts: number;
+    ongoingConversations: number;
+    unansweredMessages: number;
+    pendingForms: number;
+    overdueForms: number;
+    completedForms: number;
+    totalFormSubmissions: number;
+    lowStockItems: number;
+    criticalItems: number;
+    totalInventoryItems: number;
+  };
+  todaysBookings: Array<{
+    id: string;
+    time: string;
+    service: string;
+    contact: string;
+    status: string;
+  }>;
+  chartData: Array<{
+    name: string;
+    bookings: number;
+    leads: number;
+    completed: number;
+  }>;
+  keyAlerts: Array<{
+    priority: "critical" | "high" | "medium" | "low";
+    category: string;
+    message: string;
+    action: string;
+    link: string;
+  }>;
+  aiInsights: Array<{
+    priority: "high" | "medium" | "low";
+    category: string;
+    message: string;
+    action: string;
+  }>;
+  lowStockDetails: Array<{
+    id: string;
+    name: string;
+    quantity: number;
+    threshold: number;
+    unit: string;
+  }>;
+  recentActivity: Array<{
+    id: string;
+    type: string;
+    message: string;
+    timestamp: string;
+    link?: string;
+  }>;
 }
 
 export default function DashboardPage() {
-  const [data, setData] = useState<DashboardData | null>(null);
-  const [insights, setInsights] = useState<string>("");
   const [loading, setLoading] = useState(true);
-  const [insightsLoading, setInsightsLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [data, setData] = useState<DashboardData | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+
+  const fetchMetrics = async (isRefresh = false) => {
+    if (isRefresh) setRefreshing(true);
+    try {
+      const res = await fetch("/api/dashboard/metrics");
+      if (res.ok) {
+        const json = await res.json();
+        setData(json);
+        setLastUpdated(new Date());
+      }
+    } catch (err) {
+      console.error("Dashboard fetch error:", err);
+      const message = err instanceof Error ? err.message : "Failed to load dashboard";
+      toast({ title: "Error", description: message, variant: "destructive" });
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
 
   useEffect(() => {
-    fetchDashboard();
-    fetchInsights();
+    fetchMetrics();
+    const interval = setInterval(() => fetchMetrics(), 60000);
+    return () => clearInterval(interval);
   }, []);
-
-  const fetchDashboard = async () => {
-    try {
-      const res = await fetch("/api/dashboard");
-      if (res.ok) {
-        const dashData = await res.json();
-        setData(dashData);
-      }
-    } catch (e) { console.error(e); }
-    finally { setLoading(false); }
-  };
-
-  const fetchInsights = async () => {
-    try {
-      const res = await fetch("/api/ai/insights");
-      if (res.ok) {
-        const { insights: ai } = await res.json();
-        setInsights(ai);
-      }
-    } catch (e) { console.error(e); }
-    finally { setInsightsLoading(false); }
-  };
 
   if (loading) {
     return (
-      <div className="p-8">
-        <div className="animate-pulse space-y-6">
-          <div className="h-8 bg-gray-200 rounded w-48" />
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[...Array(4)].map((_, i) => <div key={i} className="h-32 bg-gray-200 rounded-xl" />)}
+      <div className="min-h-screen bg-gray-50/50 p-4 lg:p-6 space-y-6">
+        <div className="grid lg:grid-cols-3 gap-6">
+          {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-48 rounded-xl" />)}
+        </div>
+        <div className="space-y-3">
+          <Skeleton className="h-8 w-48" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-24 rounded-xl" />)}
           </div>
+        </div>
+        <div className="grid lg:grid-cols-3 gap-6">
+          <Skeleton className="h-[300px] lg:col-span-2 rounded-xl" />
+          <Skeleton className="h-[300px] rounded-xl" />
         </div>
       </div>
     );
   }
 
-  const stats = [
-    { label: "Today's Bookings", value: data?.bookings.today || 0, icon: Calendar, color: "text-blue-600", bg: "bg-blue-50", href: "/bookings" },
-    { label: "Upcoming Bookings", value: data?.bookings.upcoming || 0, icon: Clock, color: "text-orange-600", bg: "bg-orange-50", href: "/bookings" },
-    { label: "New Contacts", value: data?.contacts.new || 0, icon: UserPlus, color: "text-green-600", bg: "bg-green-50", href: "/inbox" },
-    { label: "Unread Messages", value: data?.conversations.unread || 0, icon: MessageSquare, color: "text-purple-600", bg: "bg-purple-50", href: "/inbox" },
-  ];
+  const m = data?.metrics || {
+    bookingsToday: 0, bookingsUpcoming: 0, bookingsCompleted: 0,
+    bookingsNoShow: 0, bookingsUnconfirmed: 0, newContacts: 0,
+    totalContacts: 0, ongoingConversations: 0, unansweredMessages: 0,
+    pendingForms: 0, overdueForms: 0, completedForms: 0,
+    totalFormSubmissions: 0, lowStockItems: 0, criticalItems: 0,
+    totalInventoryItems: 0,
+  };
 
   return (
-    <div>
-      <Header title="Dashboard" subtitle="What's happening in your business right now" alertCount={data?.alerts.filter(a => !a.isRead).length || 0} />
-      
-      <div className="p-6 space-y-6 animate-fade-in">
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {stats.map((stat) => (
-            <Link key={stat.label} href={stat.href}>
-              <Card className="hover:shadow-md transition-shadow cursor-pointer">
-                <CardContent className="pt-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-gray-500">{stat.label}</p>
-                      <p className="text-3xl font-bold mt-1">{stat.value}</p>
-                    </div>
-                    <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center", stat.bg)}>
-                      <stat.icon className={cn("w-6 h-6", stat.color)} />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
+    <div className="min-h-screen bg-gray-50/50 flex flex-col">
+      {/* Header - Compact */}
+      <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-200/50 shadow-sm shrink-0">
+        <div className="flex items-center justify-between px-6 py-3">
+          <div>
+            <h1 className="text-xl font-bold text-gray-900 tracking-tight">Dashboard</h1>
+            <p className="text-xs text-muted-foreground hidden sm:block">Overview</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="text-[10px] text-muted-foreground hidden sm:block bg-gray-100 px-2 py-0.5 rounded-full">
+              Updated: {lastUpdated.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => fetchMetrics(true)}
+              disabled={refreshing}
+              className="gap-2 h-8 text-xs"
+            >
+              <RefreshCw className={`w-3 h-3 ${refreshing ? "animate-spin" : ""}`} />
+              Refresh
+            </Button>
+          </div>
         </div>
+      </header>
 
-        {/* AI Insights + Booking Summary */}
-        <div className="grid lg:grid-cols-3 gap-6">
-          {/* AI Insights */}
-          <Card className="lg:col-span-2">
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-purple-600" />
-                <CardTitle>AI Insights</CardTitle>
-              </div>
-              <CardDescription>Powered by Gemini</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {insightsLoading ? (
-                <div className="animate-pulse space-y-2">
-                  <div className="h-4 bg-gray-200 rounded w-full" />
-                  <div className="h-4 bg-gray-200 rounded w-3/4" />
-                  <div className="h-4 bg-gray-200 rounded w-5/6" />
-                </div>
-              ) : (
-                <p className="text-gray-700 leading-relaxed">{insights || "No insights available yet. Start using the platform to get AI-powered analytics."}</p>
-              )}
-            </CardContent>
-          </Card>
+      {/* Main Content */}
+      <main className="flex-1 p-4 lg:p-6 max-w-[1600px] mx-auto w-full flex flex-col gap-5 overflow-hidden">
 
-          {/* Booking Summary */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Bookings Overview</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-500">Completed</span>
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold">{data?.bookings.completed || 0}</span>
-                  <CheckCircle className="w-4 h-4 text-green-500" />
-                </div>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-500">No-shows</span>
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold">{data?.bookings.noShow || 0}</span>
-                  <XCircle className="w-4 h-4 text-red-500" />
-                </div>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-500">Total</span>
-                <span className="font-semibold">{data?.bookings.total || 0}</span>
-              </div>
-              <Link href="/bookings">
-                <Button variant="outline" className="w-full mt-2" size="sm">
-                  View All <ArrowRight className="w-3 h-3 ml-1" />
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
-        </div>
+        {/* ══════ Quick Actions Bar ══════ */}
+        <section className="flex flex-wrap gap-2">
+          <Link href="/bookings">
+            <Button size="sm" className="gap-2 h-8 text-xs bg-blue-600 hover:bg-blue-700 text-white">
+              <Plus className="w-3.5 h-3.5" /> New Booking
+            </Button>
+          </Link>
+          <Link href="/inbox">
+            <Button size="sm" variant="outline" className="gap-2 h-8 text-xs">
+              <Send className="w-3.5 h-3.5" /> Send Message
+            </Button>
+          </Link>
+          <Link href="/forms">
+            <Button size="sm" variant="outline" className="gap-2 h-8 text-xs">
+              <FileText className="w-3.5 h-3.5" /> View Forms
+            </Button>
+          </Link>
+          <Link href="/inventory">
+            <Button size="sm" variant="outline" className="gap-2 h-8 text-xs">
+              <Package className="w-3.5 h-3.5" /> Check Inventory
+            </Button>
+          </Link>
+          <Link href="/automation">
+            <Button size="sm" variant="outline" className="gap-2 h-8 text-xs">
+              <Zap className="w-3.5 h-3.5" /> Automations
+            </Button>
+          </Link>
+        </section>
 
-        {/* Forms + Inventory */}
-        <div className="grid lg:grid-cols-2 gap-6">
-          {/* Forms Status */}
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <FileText className="w-5 h-5 text-blue-600" />
-                  <CardTitle className="text-base">Forms Status</CardTitle>
-                </div>
-                <Link href="/forms"><Button variant="ghost" size="sm">View All</Button></Link>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-3 gap-4">
-                <div className="text-center p-3 bg-yellow-50 rounded-lg">
-                  <p className="text-2xl font-bold text-yellow-700">{data?.forms.pending || 0}</p>
-                  <p className="text-xs text-yellow-600 mt-1">Pending</p>
-                </div>
-                <div className="text-center p-3 bg-red-50 rounded-lg">
-                  <p className="text-2xl font-bold text-red-700">{data?.forms.overdue || 0}</p>
-                  <p className="text-xs text-red-600 mt-1">Overdue</p>
-                </div>
-                <div className="text-center p-3 bg-green-50 rounded-lg">
-                  <p className="text-2xl font-bold text-green-700">{data?.forms.completed || 0}</p>
-                  <p className="text-xs text-green-600 mt-1">Completed</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        {/* ══════ 1. Operational Metrics (Top Row) ══════ */}
+        <section className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 lg:gap-4">
+          <MetricCard
+            title="Today's Bookings"
+            value={m.bookingsToday}
+            icon={Calendar}
+            color="blue"
+            href="/bookings"
+            trend={{ value: m.bookingsToday, label: "" }}
+          />
+          <MetricCard
+            title="Inbox"
+            value={m.unansweredMessages}
+            icon={MessageSquare}
+            color={m.unansweredMessages > 0 ? "amber" : "emerald"}
+            alert={m.unansweredMessages > 0}
+            href="/inbox"
+          />
+          <MetricCard
+            title="Pending Forms"
+            value={m.pendingForms}
+            icon={FileText}
+            color={m.overdueForms > 0 ? "amber" : "violet"}
+            alert={m.overdueForms > 0}
+            href="/forms"
+          />
+          <MetricCard
+            title="New Leads"
+            value={m.newContacts}
+            icon={Users}
+            color="emerald"
+            href="/inbox"
+          />
+          <MetricCard
+            title="Completed"
+            value={m.bookingsCompleted}
+            icon={CheckCircle}
+            color="gray"
+            href="/bookings"
+          />
+        </section>
 
-          {/* Inventory Alerts */}
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Package className="w-5 h-5 text-orange-600" />
-                  <CardTitle className="text-base">Inventory Alerts</CardTitle>
-                </div>
-                <Link href="/inventory"><Button variant="ghost" size="sm">View All</Button></Link>
-              </div>
-            </CardHeader>
-            <CardContent>
-              {data?.inventory.lowStock && data.inventory.lowStock.length > 0 ? (
-                <div className="space-y-2">
-                  {data.inventory.lowStock.slice(0, 4).map((item) => (
-                    <div key={item.id} className="flex items-center justify-between p-2 bg-red-50 rounded-lg">
-                      <div>
-                        <p className="text-sm font-medium">{item.name}</p>
-                        <p className="text-xs text-gray-500">{item.quantity} {item.unit} left</p>
-                      </div>
-                      <Badge variant="destructive">Low Stock</Badge>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-sm text-gray-500 text-center py-4">All inventory levels are healthy</p>
-              )}
-            </CardContent>
-          </Card>
-        </div>
+        {/* ══════ 2. High Priority Attention Section (Middle Row) ══════ */}
+        {/* ══════ 2. High Priority Attention Section (Middle Row) ══════ */}
+        <section className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
 
-        {/* Recent Alerts */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <Bell className="w-5 h-5 text-red-500" />
-              <CardTitle className="text-base">Recent Alerts</CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {data?.alerts && data.alerts.length > 0 ? (
+          {/* A. Attention Required (Key Alerts) */}
+          <HoverExpandCard
+            title="Attention Required"
+            icon={AlertTriangle}
+            count={(data?.keyAlerts?.length || 0)}
+            countLabel={data?.keyAlerts?.length ? `${data.keyAlerts.length}` : undefined}
+            headerColorClass="text-amber-900"
+            iconColorClass="text-amber-600"
+            previewText={data?.keyAlerts?.length ? `${data.keyAlerts.length} items` : "All clear"}
+            className="h-[72px]"
+          >
+            {data?.keyAlerts && data.keyAlerts.length > 0 ? (
               <div className="space-y-2">
-                {data.alerts.slice(0, 5).map((alert) => (
-                  <Link key={alert.id} href={alert.actionUrl || "#"}>
-                    <div className={cn("flex items-start gap-3 p-3 rounded-lg border transition-colors hover:bg-gray-50", !alert.isRead && "bg-blue-50/50 border-blue-200")}>
-                      <AlertTriangle className={cn("w-4 h-4 mt-0.5 shrink-0", alert.type === "inventory" ? "text-orange-500" : alert.type === "booking" ? "text-blue-500" : "text-red-500")} />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium">{alert.title}</p>
-                        <p className="text-xs text-gray-500 truncate">{alert.message}</p>
-                      </div>
-                      {!alert.isRead && <Badge variant="default" className="text-[10px] bg-blue-600">New</Badge>}
+                {data.keyAlerts.map((alert, i) => (
+                  <button
+                    key={i}
+                    onClick={() => alert.link && (window.location.href = alert.link)}
+                    className="w-full flex items-start gap-3 p-2.5 rounded-lg border bg-white hover:bg-gray-50 transition-colors text-left group/item"
+                  >
+                    <div className={cn("w-2 h-2 rounded-full mt-1.5 shrink-0",
+                      alert.priority === 'critical' ? 'bg-red-500' :
+                        alert.priority === 'high' ? 'bg-amber-500' : 'bg-blue-500')}
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-medium text-gray-900 leading-tight group-hover/item:text-primary transition-colors">{alert.message}</p>
+                      <p className="text-[10px] text-gray-500 mt-0.5 uppercase tracking-wide">{alert.category}</p>
                     </div>
-                  </Link>
+                    <ArrowRight className="w-3.5 h-3.5 text-gray-400 mt-0.5 shrink-0 group-hover/item:text-gray-600" />
+                  </button>
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-gray-500 text-center py-4">No alerts at the moment</p>
+              <div className="text-center py-4 text-xs text-gray-500">No alerts needing attention.</div>
             )}
-          </CardContent>
-        </Card>
-      </div>
+          </HoverExpandCard>
+
+          {/* B. AI Suggestions */}
+          <HoverExpandCard
+            title="AI Suggestions"
+            icon={Sparkles}
+            count={(data?.aiInsights?.length || 0)}
+            headerColorClass="text-violet-900"
+            iconColorClass="text-violet-600"
+            previewText={data?.aiInsights?.length ? `${data.aiInsights.length} insights` : "No insights"}
+            className="h-[72px]"
+          >
+            {data?.aiInsights && data.aiInsights.length > 0 ? (
+              <div className="space-y-2">
+                {data.aiInsights.slice(0, 3).map((insight, i) => (
+                  <div key={i} className="flex gap-2.5 items-start p-2.5 rounded-md bg-white border border-violet-100 hover:border-violet-200 transition-colors">
+                    <div className="mt-1">
+                      <div className="w-1.5 h-1.5 rounded-full bg-violet-400" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs text-gray-700 leading-snug mb-1">{insight.message}</p>
+                      <Badge variant="secondary" className="text-[9px] h-4 px-1 bg-violet-50 text-violet-700 hover:bg-violet-100 border border-violet-100">
+                        {insight.action}
+                      </Badge>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-4 opacity-50">
+                <p className="text-xs text-gray-500">No suggestions right now</p>
+              </div>
+            )}
+          </HoverExpandCard>
+
+          {/* C. Critical Stock */}
+          <HoverExpandCard
+            title="Critical Stock"
+            icon={Package}
+            count={(data?.lowStockDetails?.length || 0)}
+            headerColorClass="text-red-900"
+            iconColorClass="text-red-600"
+            previewText={data?.lowStockDetails?.length ? `${data.lowStockDetails.length} items low` : "Stock OK"}
+            className="h-[72px]"
+          >
+            {data?.lowStockDetails && data.lowStockDetails.length > 0 ? (
+              <div className="space-y-2">
+                {data.lowStockDetails.slice(0, 5).map((item) => (
+                  <div key={item.id} className="flex items-center justify-between text-xs bg-white p-2.5 rounded border border-red-100">
+                    <span className="font-medium text-gray-900 truncate flex-1 pr-2" title={item.name}>{item.name}</span>
+                    <Badge variant="destructive" className="h-5 px-1.5 text-[10px]">{item.quantity} / {item.threshold}</Badge>
+                  </div>
+                ))}
+                <Link href="/inventory" className="block w-full">
+                  <Button variant="ghost" size="sm" className="w-full text-xs h-7 mt-1 text-red-600 hover:text-red-700 hover:bg-red-50">
+                    View All Inventory
+                  </Button>
+                </Link>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-4 opacity-50">
+                <CheckCircle className="w-6 h-6 text-emerald-300 mb-2" />
+                <p className="text-xs text-gray-500">Inventory levels healthy</p>
+              </div>
+            )}
+          </HoverExpandCard>
+        </section>
+
+        {/* ══════ 3. Visuals (Bottom Row) ══════ */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6 flex-1 min-h-0">
+          {/* Main Chart Column (2/3) */}
+          <div className="lg:col-span-2 flex flex-col h-full min-h-[300px]">
+            <PerformanceChart data={data?.chartData || []} />
+          </div>
+
+          {/* Schedule (1/3) */}
+          <div className="flex flex-col h-full overflow-y-auto min-h-[300px]">
+            <TodaysSchedule bookings={data?.todaysBookings || []} />
+          </div>
+        </div>
+
+        {/* ══════ 4. Activity Feed ══════ */}
+        {data?.recentActivity && data.recentActivity.length > 0 && (
+          <Card className="border-gray-200/80">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                <Activity className="w-4 h-4 text-gray-500" />
+                Recent Activity
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                {data.recentActivity.slice(0, 8).map((activity) => (
+                  <div
+                    key={activity.id}
+                    className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors text-xs"
+                    onClick={() => activity.link && (window.location.href = activity.link)}
+                  >
+                    <div className={cn("w-2 h-2 rounded-full shrink-0",
+                      activity.type === 'booking' ? 'bg-blue-500' :
+                        activity.type === 'contact' ? 'bg-emerald-500' :
+                          activity.type === 'form' ? 'bg-violet-500' :
+                            activity.type === 'inventory' ? 'bg-red-500' :
+                              activity.type === 'automation' ? 'bg-amber-500' : 'bg-gray-400'
+                    )} />
+                    <span className="flex-1 text-gray-700">{activity.message}</span>
+                    <span className="text-[10px] text-gray-400 whitespace-nowrap">
+                      {new Date(activity.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+      </main>
     </div>
   );
 }

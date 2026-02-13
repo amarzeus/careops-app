@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
@@ -32,12 +31,20 @@ enum FormStatus {
 enum MessageChannel {
   EMAIL
   SMS
+  WHATSAPP
   SYSTEM
 }
 
 enum MessageDirection {
   INBOUND
   OUTBOUND
+}
+
+enum MessageStatus {
+  SENT
+  DELIVERED
+  READ
+  FAILED
 }
 
 enum AutomationTrigger {
@@ -69,6 +76,7 @@ model User {
   // Auth fields
   otpCode       String?
   otpExpires    DateTime?
+  otpChannel    String?   // "email", "sms", "whatsapp" — which channel last OTP was sent on
   emailVerified DateTime?
   googleId      String?   @unique
   phone         String?
@@ -109,6 +117,19 @@ model Workspace {
   smsFromNumber String?
   smsConfigured Boolean @default(false)
 
+  // WhatsApp configuration
+  whatsappProvider         String?
+  whatsappIntegratedNumber String?
+  whatsappConfigured       Boolean @default(false)
+
+  // Google Calendar integration
+  googleCalendarConnected     Boolean  @default(false)
+  googleCalendarAccessToken   String?
+  googleCalendarRefreshToken  String?
+  googleCalendarTokenExpiry   DateTime?
+  googleCalendarEmail         String?
+  googleCalendarId            String?  @default("primary")
+
   // Relations
   users           User[]
   contacts        Contact[]
@@ -121,9 +142,20 @@ model Workspace {
   conversations   Conversation[]
   automationRules AutomationRule[]
   alerts          Alert[]
+  webhooks        Webhook[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Webhook {
+  id          String            @id @default(cuid())
+  url         String
+  event       AutomationTrigger
+  isActive    Boolean           @default(true)
+  workspaceId String
+  workspace   Workspace         @relation(fields: [workspaceId], references: [id])
+  createdAt   DateTime          @default(now())
 }
 
 model Contact {
@@ -151,6 +183,7 @@ model Service {
   name        String
   description String?
   duration    Int     // in minutes
+  price       Float   @default(0.0)
   location    String?
   isActive    Boolean @default(true)
   workspaceId String
@@ -180,6 +213,9 @@ model Booking {
   workspaceId String
   workspace   Workspace     @relation(fields: [workspaceId], references: [id])
 
+  // Google Calendar sync
+  googleCalendarEventId String?
+
   formSubmissions FormSubmission[]
 
   createdAt DateTime @default(now())
@@ -205,6 +241,7 @@ model IntakeForm {
   name        String
   description String?
   fields      String  @default("[]")
+  documents   String  @default("[]") // JSON: [{ name, url }]
   isActive    Boolean @default(true)
   slug        String  @unique @default(cuid())
   serviceId   String?
@@ -278,6 +315,7 @@ model Message {
   content        String
   channel        MessageChannel   @default(EMAIL)
   direction      MessageDirection @default(OUTBOUND)
+  status         MessageStatus    @default(SENT)
   isAutomated    Boolean          @default(false)
   conversationId String
   conversation   Conversation     @relation(fields: [conversationId], references: [id])
@@ -297,8 +335,22 @@ model AutomationRule {
   workspaceId     String
   workspace       Workspace         @relation(fields: [workspaceId], references: [id])
 
+  logs AutomationLog[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model AutomationLog {
+  id        String  @id @default(cuid())
+  ruleId    String
+  rule      AutomationRule @relation(fields: [ruleId], references: [id])
+  trigger   String
+  status    String  @default("SUCCESS") // SUCCESS, FAILED, SKIPPED
+  details   String? // JSON string with execution details
+  recipient String? // Email/phone of recipient
+
+  createdAt DateTime @default(now())
 }
 
 model Alert {

@@ -1,30 +1,42 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { FileText, Plus, Link2, ExternalLink, Eye, Clock, CheckCircle, AlertTriangle, Copy } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Header } from "@/components/layout/header";
-import { cn } from "@/lib/utils";
+import { toast } from "@/hooks/use-toast";
+import { FormList } from "@/components/forms/form-list";
+import { SubmissionList } from "@/components/forms/submission-list";
+import { SubmissionDetailDialog } from "@/components/forms/submission-detail-dialog";
+import { ContactFormDTO, IntakeFormDTO, FormSubmissionDTO, ServiceDTO } from "@/types/dto";
 
 export default function FormsPage() {
-  const [contactForms, setContactForms] = useState<any[]>([]);
-  const [intakeForms, setIntakeForms] = useState<any[]>([]);
-  const [submissions, setSubmissions] = useState<any[]>([]);
-  const [services, setServices] = useState<any[]>([]);
+  const [contactForms, setContactForms] = useState<ContactFormDTO[]>([]);
+  const [intakeForms, setIntakeForms] = useState<IntakeFormDTO[]>([]);
+  const [submissions, setSubmissions] = useState<FormSubmissionDTO[]>([]);
+  const [services, setServices] = useState<ServiceDTO[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  // Dialog States
   const [cfDialog, setCfDialog] = useState(false);
   const [ifDialog, setIfDialog] = useState(false);
+  const [submissionDetailOpen, setSubmissionDetailOpen] = useState(false);
+  
+  // Form Data States
   const [newCF, setNewCF] = useState({ name: "", welcomeMessage: "" });
   const [newIF, setNewIF] = useState({ name: "", description: "", serviceId: "" });
+  const [selectedSubmission, setSelectedSubmission] = useState<FormSubmissionDTO | null>(null);
+  
+  // UI States
   const [copied, setCopied] = useState("");
+  const [deleting, setDeleting] = useState("");
 
   useEffect(() => { fetchAll(); }, []);
 
@@ -40,19 +52,33 @@ export default function FormsPage() {
       setIntakeForms(inf.forms || []);
       setSubmissions(sub.submissions || []);
       setServices(svc.services || []);
-    } catch {} finally { setLoading(false); }
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to load forms", variant: "destructive" });
+    } finally { setLoading(false); }
   };
 
   const createContactForm = async () => {
     if (!newCF.name) return;
-    await fetch("/api/forms/contact-forms", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(newCF) });
-    setCfDialog(false); setNewCF({ name: "", welcomeMessage: "" }); fetchAll();
+    try {
+      const res = await fetch("/api/forms/contact-forms", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(newCF) });
+      if (!res.ok) throw new Error("Failed to create contact form");
+      toast({ title: "Success", description: "Contact form created", variant: "default" });
+      setCfDialog(false); setNewCF({ name: "", welcomeMessage: "" }); fetchAll();
+    } catch (error) {
+      toast({ title: "Error", description: "Something went wrong", variant: "destructive" });
+    }
   };
 
   const createIntakeForm = async () => {
     if (!newIF.name) return;
-    await fetch("/api/forms/intake-forms", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(newIF) });
-    setIfDialog(false); setNewIF({ name: "", description: "", serviceId: "" }); fetchAll();
+    try {
+      const res = await fetch("/api/forms/intake-forms", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(newIF) });
+      if (!res.ok) throw new Error("Failed to create intake form");
+      toast({ title: "Success", description: "Intake form created", variant: "default" });
+      setIfDialog(false); setNewIF({ name: "", description: "", serviceId: "" }); fetchAll();
+    } catch (error) {
+      toast({ title: "Error", description: "Something went wrong", variant: "destructive" });
+    }
   };
 
   const copyLink = (slug: string, type: string) => {
@@ -62,21 +88,90 @@ export default function FormsPage() {
     setTimeout(() => setCopied(""), 2000);
   };
 
-  const statusBadge = (status: string) => {
-    const config: Record<string, { label: string; variant: any }> = {
-      PENDING: { label: "Pending", variant: "warning" },
-      SENT: { label: "Sent", variant: "secondary" },
-      COMPLETED: { label: "Completed", variant: "success" },
-      OVERDUE: { label: "Overdue", variant: "destructive" },
-    };
-    const c = config[status] || config.PENDING;
-    return <Badge variant={c.variant}>{c.label}</Badge>;
+  const updateSubmissionStatus = async (id: string, status: string) => {
+    await fetch(`/api/forms/submissions/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status }),
+    });
+    fetchAll();
   };
+
+  const toggleForm = async (id: string, isActive: boolean, type: "contact" | "intake") => {
+    const endpoint = type === "contact" ? "contact-forms" : "intake-forms";
+    await fetch(`/api/forms/${endpoint}/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ isActive: !isActive }),
+    });
+    fetchAll();
+  };
+
+  const deleteForm = async (id: string, type: "contact" | "intake") => {
+    setDeleting(id);
+    const endpoint = type === "contact" ? "contact-forms" : "intake-forms";
+    try {
+      const res = await fetch(`/api/forms/${endpoint}/${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Failed to delete form");
+      toast({ title: "Success", description: `${type === "contact" ? "Contact" : "Intake"} form deleted`, variant: "default" });
+      fetchAll();
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to delete form", variant: "destructive" });
+    } finally { setDeleting(""); }
+  };
+
+  const resendForm = async (submissionId: string) => {
+    await fetch(`/api/forms/submissions/${submissionId}/resend`, { method: "POST" });
+    toast({ title: "Success", description: "Form resent to client", variant: "default" });
+    fetchAll();
+  };
+
+  const pendingCount = submissions.filter(s => s.status === "PENDING" || s.status === "SENT").length;
+  const completedCount = submissions.filter(s => s.status === "COMPLETED").length;
+  const overdueCount = submissions.filter(s => s.status === "OVERDUE").length;
 
   return (
     <div>
       <Header title="Forms" subtitle="Manage contact forms, intake forms, and submissions" />
       <div className="p-6">
+        {/* Summary Stats */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <Card>
+            <CardContent className="p-4 text-center">
+              <p className="text-2xl font-bold">{contactForms.length}</p>
+              <p className="text-xs text-gray-500">Contact Forms</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4 text-center">
+              <p className="text-2xl font-bold">{intakeForms.length}</p>
+              <p className="text-xs text-gray-500">Intake Forms</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4 text-center">
+              <p className="text-2xl font-bold text-yellow-600">{pendingCount}</p>
+              <p className="text-xs text-gray-500">Pending / Sent</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4 text-center">
+              <div className="flex items-center justify-center gap-4">
+                <div>
+                  <p className="text-2xl font-bold text-green-600">{completedCount}</p>
+                  <p className="text-xs text-gray-500">Completed</p>
+                </div>
+                {overdueCount > 0 && (
+                  <div>
+                    <p className="text-2xl font-bold text-red-600">{overdueCount}</p>
+                    <p className="text-xs text-gray-500">Overdue</p>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
         <Tabs defaultValue="contact-forms">
           <TabsList>
             <TabsTrigger value="contact-forms">Contact Forms ({contactForms.length})</TabsTrigger>
@@ -84,6 +179,7 @@ export default function FormsPage() {
             <TabsTrigger value="submissions">Submissions ({submissions.length})</TabsTrigger>
           </TabsList>
 
+          {/* Contact Forms Tab */}
           <TabsContent value="contact-forms">
             <div className="flex justify-end mb-4 mt-4">
               <Dialog open={cfDialog} onOpenChange={setCfDialog}>
@@ -98,32 +194,19 @@ export default function FormsPage() {
                 </DialogContent>
               </Dialog>
             </div>
-            <div className="space-y-3">
-              {contactForms.length === 0 ? (
-                <div className="text-center py-12"><FileText className="w-12 h-12 text-gray-300 mx-auto mb-3" /><p className="text-gray-500">No contact forms yet</p></div>
-              ) : contactForms.map(form => (
-                <Card key={form.id}>
-                  <CardContent className="flex items-center justify-between py-4">
-                    <div>
-                      <p className="font-medium">{form.name}</p>
-                      <p className="text-xs text-gray-500 mt-1">Slug: {form.slug}</p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Badge variant={form.isActive ? "success" : "secondary"}>{form.isActive ? "Active" : "Inactive"}</Badge>
-                      <Button variant="outline" size="sm" onClick={() => copyLink(form.slug, "contact")}>
-                        {copied === form.slug ? <CheckCircle className="w-3 h-3 mr-1" /> : <Copy className="w-3 h-3 mr-1" />}
-                        {copied === form.slug ? "Copied!" : "Copy Link"}
-                      </Button>
-                      <Button variant="ghost" size="sm" onClick={() => window.open(`/contact/${form.slug}`, "_blank")}>
-                        <ExternalLink className="w-3 h-3" />
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+            
+            <FormList 
+              forms={contactForms} 
+              type="contact"
+              onToggle={(id, isActive) => toggleForm(id, isActive, "contact")}
+              onDelete={(id) => deleteForm(id, "contact")}
+              copied={copied}
+              onCopy={copyLink}
+              deleting={deleting}
+            />
           </TabsContent>
 
+          {/* Intake Forms Tab */}
           <TabsContent value="intake-forms">
             <div className="flex justify-end mb-4 mt-4">
               <Dialog open={ifDialog} onOpenChange={setIfDialog}>
@@ -145,51 +228,37 @@ export default function FormsPage() {
                 </DialogContent>
               </Dialog>
             </div>
-            <div className="space-y-3">
-              {intakeForms.length === 0 ? (
-                <div className="text-center py-12"><FileText className="w-12 h-12 text-gray-300 mx-auto mb-3" /><p className="text-gray-500">No intake forms yet</p></div>
-              ) : intakeForms.map(form => (
-                <Card key={form.id}>
-                  <CardContent className="flex items-center justify-between py-4">
-                    <div>
-                      <p className="font-medium">{form.name}</p>
-                      <div className="flex items-center gap-2 mt-1">
-                        {form.service && <Badge variant="secondary">{form.service.name}</Badge>}
-                        <span className="text-xs text-gray-500">{form._count?.submissions || 0} submissions</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Badge variant={form.isActive ? "success" : "secondary"}>{form.isActive ? "Active" : "Inactive"}</Badge>
-                      <Button variant="outline" size="sm" onClick={() => copyLink(form.slug, "form")}>
-                        {copied === form.slug ? <CheckCircle className="w-3 h-3 mr-1" /> : <Copy className="w-3 h-3 mr-1" />}
-                        {copied === form.slug ? "Copied!" : "Copy Link"}
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+
+            <FormList 
+              forms={intakeForms} 
+              type="intake"
+              onToggle={(id, isActive) => toggleForm(id, isActive, "intake")}
+              onDelete={(id) => deleteForm(id, "intake")}
+              copied={copied}
+              onCopy={copyLink}
+              deleting={deleting}
+            />
           </TabsContent>
 
+          {/* Submissions Tab */}
           <TabsContent value="submissions">
-            <div className="space-y-3 mt-4">
-              {submissions.length === 0 ? (
-                <div className="text-center py-12"><FileText className="w-12 h-12 text-gray-300 mx-auto mb-3" /><p className="text-gray-500">No submissions yet</p></div>
-              ) : submissions.map(sub => (
-                <Card key={sub.id}>
-                  <CardContent className="flex items-center justify-between py-4">
-                    <div>
-                      <p className="font-medium text-sm">{sub.contact?.name || "Unknown"}</p>
-                      <p className="text-xs text-gray-500">{sub.intakeForm?.name || "Contact Form"} | {new Date(sub.createdAt).toLocaleDateString()}</p>
-                    </div>
-                    {statusBadge(sub.status)}
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+            <SubmissionList 
+              submissions={submissions}
+              onSelect={(sub) => { setSelectedSubmission(sub); setSubmissionDetailOpen(true); }}
+              onUpdateStatus={updateSubmissionStatus}
+              onResend={resendForm}
+            />
           </TabsContent>
         </Tabs>
       </div>
+
+      <SubmissionDetailDialog 
+        open={submissionDetailOpen}
+        onOpenChange={setSubmissionDetailOpen}
+        submission={selectedSubmission}
+        onUpdateStatus={updateSubmissionStatus}
+        onResend={resendForm}
+      />
     </div>
   );
 }
