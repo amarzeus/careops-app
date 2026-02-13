@@ -68,6 +68,8 @@ export async function GET(req: Request) {
                     hour: "2-digit", minute: "2-digit",
                 });
 
+                if (!booking.contact.email) continue;
+
                 const emailSent = await sendEmail({
                     to: booking.contact.email,
                     subject: `Reminder: Your appointment tomorrow — ${rule.workspace.name}`,
@@ -83,6 +85,7 @@ export async function GET(req: Request) {
              ${rule.messageTemplate || "<p>We look forward to seeing you!</p>"}
              <p style="color: #6b7280; font-size: 12px;">— ${rule.workspace.name}</p>`
                     ),
+                    workspaceId: rule.workspaceId,
                 });
 
                 await prisma.automationLog.create({
@@ -143,6 +146,8 @@ export async function GET(req: Request) {
 
                 if (alreadySent) continue;
 
+                if (!form.contact.email) continue;
+
                 const formName = form.intakeForm?.name || "your form";
                 const emailSent = await sendEmail({
                     to: form.contact.email,
@@ -154,6 +159,7 @@ export async function GET(req: Request) {
              ${rule.messageTemplate || "<p>If you have any questions, feel free to reach out to us.</p>"}
              <p style="color: #6b7280; font-size: 12px;">— ${rule.workspace.name}</p>`
                     ),
+                    workspaceId: rule.workspaceId,
                 });
 
                 await prisma.automationLog.create({

@@ -1,6 +1,7 @@
 
 import nodemailer from "nodemailer";
 import * as dotenv from "dotenv";
+import { prisma } from "./prisma";
 
 dotenv.config();
 
@@ -17,6 +18,7 @@ export interface EmailOptions {
   to: string;
   subject: string;
   html: string;
+  workspaceId?: string;
 }
 
 const MAX_RETRIES = 3;
@@ -63,7 +65,22 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
       } else {
         console.error("All delivery attempts failed.");
 
-        // Log content on final failure too
+        if (options.workspaceId) {
+          try {
+            await prisma.alert.create({
+              data: {
+                type: "automation",
+                title: "Email Delivery Failed",
+                message: `Failed to send "${options.subject}" to ${options.to} after ${MAX_RETRIES} attempts`,
+                actionUrl: "/inbox",
+                workspaceId: options.workspaceId,
+              },
+            });
+          } catch (e) {
+            console.error("Failed to create failure alert:", e);
+          }
+        }
+
         if (process.env.NODE_ENV !== "production") {
           console.log("------------------------------------------");
           console.log("EMAIL FAILED - LOGGING CONTENT");

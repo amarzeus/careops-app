@@ -160,6 +160,7 @@ async function handleNewContact(workspace: Workspace, data: Record<string, unkno
         `Welcome to ${workspace.name}`,
         `<p>${welcomeMsg}</p>`
       ),
+      workspaceId: workspace.id,
     });
   }
 
@@ -248,6 +249,7 @@ async function handleBookingCreated(workspace: Workspace, data: Record<string, u
         "Booking Confirmed",
         `<p>${confirmationMsg}</p>`
       ),
+      workspaceId: workspace.id,
     });
   }
 
@@ -318,7 +320,7 @@ async function handleBookingCreated(workspace: Workspace, data: Record<string, u
         },
       });
 
-      if (workspace.emailConfigured) {
+      if (workspace.emailConfigured && contact.email) {
         await sendEmail({
           to: contact.email,
           subject: `Action Required: ${form.name} - ${workspace.name}`,
@@ -328,6 +330,7 @@ async function handleBookingCreated(workspace: Workspace, data: Record<string, u
             "Complete Form",
             formUrl
           ),
+          workspaceId: workspace.id,
         });
       }
     }
@@ -393,11 +396,12 @@ async function handleBeforeBooking(workspace: Workspace, data: Record<string, un
     },
   });
   
-  if (workspace.emailConfigured) {
+  if (workspace.emailConfigured && contact.email) {
     await sendEmail({
       to: contact.email,
       subject: `Reminder: Your appointment tomorrow - ${workspace.name}`,
       html: buildEmailTemplate("Appointment Reminder", `<p>${reminderMsg}</p>`),
+      workspaceId: workspace.id,
     });
   }
   
@@ -457,6 +461,7 @@ async function handleInventoryLow(workspace: Workspace, data: Record<string, unk
         "Reorder Request",
         `<p>This is an automated reorder request from ${workspace.name}.</p><p>Item: ${item.name}<br>Current quantity: ${item.quantity} ${item.unit}<br>Threshold: ${item.threshold} ${item.unit}</p>`
       ),
+      workspaceId: workspace.id,
     });
   }
 }

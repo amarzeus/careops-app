@@ -631,7 +631,13 @@ export default function OnboardingPage() {
           });
           break;
         case 8:
-          // Create default automation rules
+          const validationRes = await fetch("/api/workspace/validate-activation");
+          const validation = await validationRes.json();
+          if (!validation.valid) {
+            alert(`Cannot activate: ${validation.errors.join(", ")}`);
+            setLoading(false);
+            return;
+          }
           const defaultRules = [
             { name: "Welcome New Contact", trigger: "NEW_CONTACT", messageTemplate: "Welcome! Thank you for reaching out." },
             { name: "Booking Confirmation", trigger: "BOOKING_CREATED", messageTemplate: "Your booking has been confirmed." },
