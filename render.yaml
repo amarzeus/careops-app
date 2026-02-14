@@ -1,9 +1,9 @@
 services:
   - type: web
     name: careops-app
-    env: node
+    runtime: node
     plan: free
-    buildCommand: npm install && npm run build
+    buildCommand: chmod +x render-build.sh && ./render-build.sh
     startCommand: npm start
     healthCheckPath: /
     envVars:
@@ -14,7 +14,7 @@ services:
           name: careops-db
           property: connectionString
       - key: NEXT_PUBLIC_APP_URL
-        value: https://careops-app.onrender.com # Change to your actual Render URL
+        value: https://careops-app.onrender.com
       - key: JWT_SECRET
         generateValue: true
       - key: VAPI_API_KEY
@@ -44,4 +44,5 @@ services:
 
 databases:
   - name: careops-db
-    plan: free
+    databaseName: careops_db
+    ipAllowList: []
