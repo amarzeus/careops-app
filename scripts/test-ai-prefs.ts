@@ -12,20 +12,20 @@ async function main() {
         console.log("Checking AI preferences for workspace:", workspace.id);
 
         // Test the property name
-        // @ts-ignore
-        console.log("Prisma keys:", Object.keys(prisma).filter(k => k.toLowerCase().includes('pref')));
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        console.log("Prisma keys:", Object.keys(prisma as any).filter(k => k.toLowerCase().includes('pref')));
 
-        // Try to find
-        // @ts-ignore
-        const prefs = await prisma.aIPreferences.findUnique({
+        // Try to find - use any to bypass type check for dynamic model
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const prefs = await (prisma as any).aIPreferences.findUnique({
             where: { workspaceId: workspace.id },
         });
         console.log("Prefs result:", prefs);
 
         if (!prefs) {
             console.log("Creating default prefs...");
-            // @ts-ignore
-            const newPrefs = await prisma.aIPreferences.create({
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const newPrefs = await (prisma as any).aIPreferences.create({
                 data: { workspaceId: workspace.id },
             });
             console.log("Created prefs:", newPrefs);
