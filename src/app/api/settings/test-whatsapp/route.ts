@@ -1,16 +1,16 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
-import { checkHealth, isWhatsAppConfigured } from "@/lib/msg91";
+import { isConfigured, sendWhatsApp } from "@/lib/twilio";
 
 export async function POST() {
   const user = await getCurrentUser();
   if (!user || !user.workspaceId)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  if (!isWhatsAppConfigured()) {
+  if (!isConfigured()) {
     return NextResponse.json(
       {
-        error: "WhatsApp is not configured. Set MSG91_AUTH_KEY and MSG91_WHATSAPP_INTEGRATED_NUMBER in your environment.",
+        error: "Twilio is not configured. Set TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, and TWILIO_PHONE_NUMBER in your environment.",
         configured: false,
       },
       { status: 500 }
@@ -18,19 +18,21 @@ export async function POST() {
   }
 
   try {
-    const health = await checkHealth();
+    const result = await sendWhatsApp(
+      user.phone || "+1234567890",
+      "Twilio WhatsApp connection verified!"
+    );
 
-    if (health.whatsapp.healthy) {
+    if (result.success) {
       return NextResponse.json({
         success: true,
         message: "WhatsApp connection verified",
-        balance: health.whatsapp.balance,
       });
     }
 
     return NextResponse.json(
       {
-        error: "WhatsApp API connection test failed. Check your MSG91 dashboard for WhatsApp configuration.",
+        error: `Twilio WhatsApp connection test failed: ${result.error}`,
         configured: true,
       },
       { status: 500 }

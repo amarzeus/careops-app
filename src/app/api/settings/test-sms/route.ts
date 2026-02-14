@@ -1,28 +1,25 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
+import { isConfigured, sendSMS } from "@/lib/twilio";
 
 export async function POST() {
   const user = await getCurrentUser();
   if (!user || !user.workspaceId)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const authKey = process.env.MSG91_AUTH_KEY;
-  if (!authKey) {
+  if (!isConfigured()) {
     return NextResponse.json(
-      { error: "MSG91_AUTH_KEY not configured" },
+      { error: "Twilio not configured" },
       { status: 500 }
     );
   }
 
   try {
-    // Verify MSG91 API key by checking balance/status
-    const res = await fetch("https://control.msg91.com/api/v5/balance?type=1", {
-      headers: { authkey: authKey },
-    });
+    const result = await sendSMS(user.phone || "+1234567890", "Twilio SMS connection verified!");
 
-    if (!res.ok) {
+    if (!result.success) {
       return NextResponse.json(
-        { error: "MSG91 API key validation failed" },
+        { error: `Twilio validation failed: ${result.error}` },
         { status: 500 }
       );
     }

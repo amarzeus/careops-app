@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { createToken, setAuthCookie } from "@/lib/auth";
-import { verifyOTP as msg91VerifyOTP, isMSG91Configured } from "@/lib/msg91";
 
 export async function POST(req: Request) {
   try {
@@ -38,20 +37,8 @@ export async function POST(req: Request) {
     const otpChannel = user.otpChannel || "email";
     let verified = false;
 
-    // Strategy 1: If SMS OTP was sent via MSG91, try MSG91 verification first
-    if (otpChannel === "sms" && isMSG91Configured() && (phone || user.phone)) {
-      const verifyPhone = phone || user.phone;
-      const msg91Result = await msg91VerifyOTP(verifyPhone!, otp);
-
-      if (msg91Result.success) {
-        verified = true;
-      } else {
-        // MSG91 verification failed — fall back to local check
-        console.warn("[verify-otp] MSG91 verification failed, trying local:", msg91Result.error);
-      }
-    }
-
-    // Strategy 2: Local DB verification (works for email, WhatsApp, and SMS fallback)
+    // For SMS/WhatsApp/Email, we always use local DB verification now
+    // (Twilio Verify is not used, we just send SMS/WhatsApp via Twilio and verify locally)
     if (!verified) {
       if (user.otpCode !== otp) {
         return NextResponse.json({ error: "Invalid OTP" }, { status: 400 });

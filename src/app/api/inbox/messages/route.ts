@@ -3,8 +3,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sendEmail, buildEmailTemplate } from "@/lib/email";
 import { sendSMS } from "@/lib/sms";
-import { sendWhatsAppMessage } from "@/lib/msg91";
-import { isAvailable as isWhatsAppAvailable } from "@/lib/whatsapp";
+import { sendTextMessage as sendWhatsAppMessage, isAvailable as isWhatsAppAvailable } from "@/lib/whatsapp";
 
 export async function GET(req: Request) {
     const user = await getCurrentUser();

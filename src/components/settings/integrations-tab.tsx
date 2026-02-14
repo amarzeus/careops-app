@@ -82,12 +82,12 @@ export function IntegrationsTab({
         </CardContent>
       </Card>
 
-      {/* SMS Configuration (MSG91) */}
+      {/* SMS Configuration (Twilio) */}
       <Card>
         <CardHeader>
-          <CardTitle>SMS Configuration (MSG91)</CardTitle>
+          <CardTitle>SMS Configuration (Twilio)</CardTitle>
           <CardDescription>
-            Configure MSG91 for SMS OTP and notifications
+            Configure Twilio for SMS OTP and notifications
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -95,7 +95,7 @@ export function IntegrationsTab({
             <div className="flex items-center gap-3">
               <MessageSquare className="w-5 h-5 text-blue-600" />
               <div>
-                <p className="font-medium">MSG91 SMS</p>
+                <p className="font-medium">Twilio SMS</p>
                 <p className="text-xs text-gray-500">
                   {workspace?.smsConfigured ? "Connected" : "Not configured"}
                 </p>
@@ -120,11 +120,11 @@ export function IntegrationsTab({
         </CardContent>
       </Card>
 
-      {/* WhatsApp Configuration (MSG91) */}
+      {/* WhatsApp Configuration (Twilio) */}
       <Card className="border-green-200">
         <CardHeader>
           <div className="flex items-center gap-2">
-            <CardTitle>WhatsApp Integration (MSG91)</CardTitle>
+            <CardTitle>WhatsApp Integration (Twilio)</CardTitle>
             <Badge variant="secondary" className="bg-green-100 text-green-700 text-[10px]">
               NEW
             </Badge>
@@ -140,9 +140,9 @@ export function IntegrationsTab({
                 <MessageCircle className="w-5 h-5 text-green-600" />
               </div>
               <div>
-                <p className="font-medium text-green-900">MSG91 WhatsApp</p>
+                <p className="font-medium text-green-900">Twilio WhatsApp</p>
                 <p className="text-xs text-green-600">
-                  {workspace?.whatsappConfigured ? "Connected & Active" : "Not configured — set MSG91_WHATSAPP_INTEGRATED_NUMBER"}
+                  {workspace?.whatsappConfigured ? "Connected & Active" : "Not configured — set TWILIO_PHONE_NUMBER"}
                 </p>
               </div>
             </div>

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { generateOTP, storeOTP } from "@/lib/otp";
 import { sendEmail, buildEmailTemplate } from "@/lib/email";
-import { sendOTP as msg91SendOTP, resendOTP as msg91ResendOTP, sendWhatsAppOTP, isMSG91Configured, isWhatsAppConfigured } from "@/lib/msg91";
+import { sendOTP as twilioSendOTP, sendWhatsAppOTP as twilioSendWhatsAppOTP, isConfigured as isTwilioConfigured } from "@/lib/twilio";
 import { sendSMS, buildOTPMessage } from "@/lib/sms";
 
 export async function POST(req: Request) {
@@ -66,19 +66,9 @@ export async function POST(req: Request) {
         }
 
         // Try MSG91's resend API first (if an OTP session already exists)
-        if (isMSG91Configured()) {
-          // Try native OTP API
-          const result = await msg91SendOTP(userPhone, otp);
+        if (isTwilioConfigured()) {
+          const result = await twilioSendOTP(userPhone, otp);
           if (result.success) {
-            return NextResponse.json({
-              message: "A new code has been sent via SMS.",
-              channel: "sms",
-            });
-          }
-
-          // Fallback to Flow API
-          const sent = await sendSMS({ to: userPhone, body: buildOTPMessage(otp) });
-          if (sent) {
             return NextResponse.json({
               message: "A new code has been sent via SMS.",
               channel: "sms",
@@ -101,14 +91,14 @@ export async function POST(req: Request) {
           );
         }
 
-        if (!isWhatsAppConfigured()) {
+        if (!isTwilioConfigured()) {
           return NextResponse.json(
             { error: "WhatsApp is not configured. Please use SMS or email." },
             { status: 503 }
           );
         }
 
-        const result = await sendWhatsAppOTP(userPhone, otp);
+        const result = await twilioSendWhatsAppOTP(userPhone, otp);
         if (result.success) {
           return NextResponse.json({
             message: "A new code has been sent via WhatsApp.",

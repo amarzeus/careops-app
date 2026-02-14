@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { generateOTP, storeOTP } from "@/lib/otp";
-import { sendWhatsAppOTP, isWhatsAppConfigured } from "@/lib/msg91";
+import { sendWhatsAppOTP as twilioSendWhatsAppOTP, isConfigured as isTwilioConfigured } from "@/lib/twilio";
 
 export async function POST(req: Request) {
   try {
@@ -23,10 +23,10 @@ export async function POST(req: Request) {
       );
     }
 
-    // Check if WhatsApp is configured
-    if (!isWhatsAppConfigured()) {
+    // Check if Twilio is configured
+    if (!isTwilioConfigured()) {
       return NextResponse.json(
-        { error: "WhatsApp is not configured. Please use SMS or email verification instead." },
+        { error: "Twilio is not configured for WhatsApp. Please use SMS or email verification instead." },
         { status: 503 }
       );
     }
@@ -36,7 +36,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Rate limit: don't resend if last OTP was less than 60 seconds ago
+    // Rate limit check
     if (user.otpExpires) {
       const lastSent = new Date(user.otpExpires.getTime() - 15 * 60 * 1000);
       const secondsSinceSent = (Date.now() - lastSent.getTime()) / 1000;
@@ -65,7 +65,7 @@ export async function POST(req: Request) {
     });
 
     // Send via WhatsApp
-    const result = await sendWhatsAppOTP(phone, otp);
+    const result = await twilioSendWhatsAppOTP(phone, otp);
 
     if (result.success) {
       return NextResponse.json({
@@ -75,13 +75,12 @@ export async function POST(req: Request) {
       });
     }
 
-    // WhatsApp failed — log the error but still allow local verification
+    // WhatsApp failed
     console.error("[send-whatsapp-otp] WhatsApp delivery failed:", result.error);
 
     return NextResponse.json(
       {
-        error: "Failed to send WhatsApp message. Please try SMS or email verification.",
-        details: result.error,
+        error: `Failed to send WhatsApp message: ${result.error}`,
       },
       { status: 500 }
     );

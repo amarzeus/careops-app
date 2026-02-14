@@ -1,18 +1,16 @@
 /**
  * WhatsApp messaging module for CareOps.
  * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- * High-level WhatsApp helpers built on top of MSG91.
+ * High-level WhatsApp helpers built on top of Twilio.
  * Provides business-specific templates for bookings, forms, reminders.
  */
 
 import {
-  sendWhatsAppTemplate,
-  sendWhatsAppMessage,
-  sendWhatsAppOTP as msg91SendWhatsAppOTP,
-  isWhatsAppConfigured,
-  type MSG91WhatsAppResult,
-  type MSG91OTPResult,
-} from "./msg91";
+  sendWhatsApp as twilioSendWhatsApp,
+  sendWhatsAppOTP as twilioSendWhatsAppOTP,
+  isConfigured as isWhatsAppConfigured,
+  type TwilioResult,
+} from "./twilio";
 
 // ──── Types ────────────────────────────────────────────────────────────────────
 
@@ -38,8 +36,8 @@ export interface WhatsAppTextOptions {
 export async function sendOTPViaWhatsApp(
   phone: string,
   otp: string
-): Promise<MSG91OTPResult> {
-  return msg91SendWhatsAppOTP(phone, otp);
+): Promise<TwilioResult> {
+  return twilioSendWhatsAppOTP(phone, otp);
 }
 
 // ──── Business Template Messages ───────────────────────────────────────────────
@@ -53,13 +51,9 @@ export async function sendBookingConfirmation(
   serviceName: string,
   dateTime: string,
   businessName: string
-): Promise<MSG91WhatsAppResult> {
-  return sendWhatsAppTemplate(phone, "booking_confirmation", [
-    { type: "text", text: customerName },
-    { type: "text", text: serviceName },
-    { type: "text", text: dateTime },
-    { type: "text", text: businessName },
-  ]);
+): Promise<TwilioResult> {
+  const body = `Hi ${customerName}, your booking for ${serviceName} on ${dateTime} with ${businessName} is confirmed!`;
+  return twilioSendWhatsApp(phone, body);
 }
 
 /**
@@ -70,12 +64,9 @@ export async function sendBookingReminder(
   customerName: string,
   serviceName: string,
   dateTime: string
-): Promise<MSG91WhatsAppResult> {
-  return sendWhatsAppTemplate(phone, "booking_reminder", [
-    { type: "text", text: customerName },
-    { type: "text", text: serviceName },
-    { type: "text", text: dateTime },
-  ]);
+): Promise<TwilioResult> {
+  const body = `Reminder: Hi ${customerName}, you have an appointment for ${serviceName} on ${dateTime}.`;
+  return twilioSendWhatsApp(phone, body);
 }
 
 /**
@@ -86,12 +77,9 @@ export async function sendFormRequest(
   customerName: string,
   formName: string,
   formUrl: string
-): Promise<MSG91WhatsAppResult> {
-  return sendWhatsAppTemplate(phone, "form_request", [
-    { type: "text", text: customerName },
-    { type: "text", text: formName },
-    { type: "text", text: formUrl },
-  ]);
+): Promise<TwilioResult> {
+  const body = `Hi ${customerName}, please complete the ${formName} here: ${formUrl}`;
+  return twilioSendWhatsApp(phone, body);
 }
 
 /**
@@ -101,21 +89,19 @@ export async function sendWelcomeMessage(
   phone: string,
   customerName: string,
   businessName: string
-): Promise<MSG91WhatsAppResult> {
-  return sendWhatsAppTemplate(phone, "welcome_message", [
-    { type: "text", text: customerName },
-    { type: "text", text: businessName },
-  ]);
+): Promise<TwilioResult> {
+  const body = `Welcome to ${businessName}, ${customerName}! We're glad to have you here.`;
+  return twilioSendWhatsApp(phone, body);
 }
 
 /**
- * Send a generic text message via WhatsApp (within 24hr window).
+ * Send a generic text message via WhatsApp (within 24hr session window).
  */
 export async function sendTextMessage(
   phone: string,
   message: string
-): Promise<MSG91WhatsAppResult> {
-  return sendWhatsAppMessage(phone, message);
+): Promise<TwilioResult> {
+  return twilioSendWhatsApp(phone, message);
 }
 
 // ──── Utilities ────────────────────────────────────────────────────────────────
