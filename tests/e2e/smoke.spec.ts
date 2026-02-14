@@ -29,16 +29,17 @@ test.describe('Production Smoke Tests', () => {
     await expect(loginForm).toBeVisible();
   });
 
-  test('[Smoke] Public terms page is accessible', async ({ page }) => {
-    await page.goto(`${baseURL}/terms`);
+  test('[Smoke] Public landing page is accessible', async ({ page }) => {
+    await page.goto(`${baseURL}/`);
     
-    // Check page loaded
-    await expect(page).toHaveTitle(/Terms/i);
+    // Check page loaded - landing page title
+    await expect(page).toHaveTitle(/CareOps/i);
   });
 
   test('[Smoke] API endpoints respond correctly', async ({ request }) => {
-    // Test 404 handling
+    // Test 404 handling for non-existent API route
     const notFoundResponse = await request.get(`${baseURL}/api/nonexistent`);
+    // Non-existent API routes should return 404 or 400
     expect([404, 400]).toContain(notFoundResponse.status());
   });
 
