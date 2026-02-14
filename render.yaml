@@ -3,9 +3,9 @@ services:
     name: careops-app
     env: node
     plan: free
-    buildCommand: npm install && npm run build
-    installCommand: npm install --prefer-offline
-    startCommand: npx next start
+    buildCommand: npm run build
+    installCommand: npm install
+    startCommand: npm start
     healthCheckPath: /
     envVars:
       - key: NODE_VERSION
