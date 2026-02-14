@@ -2,6 +2,30 @@ import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
+/**
+ * Check if email is configured via environment variables
+ */
+function isEmailConfigured(): boolean {
+  return !!(
+    process.env.EMAIL_HOST &&
+    process.env.EMAIL_PORT &&
+    process.env.EMAIL_USER &&
+    process.env.EMAIL_PASS &&
+    process.env.EMAIL_FROM
+  );
+}
+
+/**
+ * Check if SMS is configured via environment variables
+ */
+function isSMSConfigured(): boolean {
+  return !!(
+    process.env.TWILIO_ACCOUNT_SID &&
+    process.env.TWILIO_AUTH_TOKEN &&
+    process.env.TWILIO_PHONE_NUMBER
+  );
+}
+
 export async function GET() {
   const user = await getCurrentUser();
   if (!user || !user.workspaceId)
@@ -10,7 +34,27 @@ export async function GET() {
   const workspace = await prisma.workspace.findUnique({
     where: { id: user.workspaceId },
   });
-  return NextResponse.json({ workspace });
+
+  if (!workspace) {
+    return NextResponse.json({ error: "Workspace not found" }, { status: 404 });
+  }
+
+  // Check environment variables for email/SMS configuration
+  const emailConfiguredViaEnv = isEmailConfigured();
+  const smsConfiguredViaEnv = isSMSConfigured();
+
+  // Return workspace with configuration status based on DB flag OR env vars
+  const workspaceWithConfig = {
+    ...workspace,
+    // If DB flag is true OR env vars are configured, show as configured
+    emailConfigured: workspace.emailConfigured || emailConfiguredViaEnv,
+    smsConfigured: workspace.smsConfigured || smsConfiguredViaEnv,
+    // Include flags indicating if configuration comes from environment
+    emailConfiguredViaEnv,
+    smsConfiguredViaEnv,
+  };
+
+  return NextResponse.json({ workspace: workspaceWithConfig });
 }
 
 export async function PUT(req: Request) {
