@@ -3,6 +3,7 @@ import { sendEmail, buildEmailTemplate } from "./email";
 import { sendSMS } from "./sms";
 import { sendWelcomeMessage, sendBookingConfirmation, isAvailable as isWhatsAppAvailable } from "./whatsapp";
 import { generateWelcomeMessage, generateBookingConfirmation } from "./gemini";
+import { generateWebhookSignature, serializePayload } from "./webhook-security";
 import type { AutomationRule, Workspace, AutomationTrigger } from "@prisma/client";
 
 /** Typed shape for automation context data */
@@ -56,18 +57,64 @@ export async function triggerAutomation(
       }),
     ]);
 
-    // Dispatch Webhooks (Fire-and-forget)
-    webhooks.forEach((hook) => {
-      fetch(hook.url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          event: trigger,
-          workspaceId,
-          timestamp: new Date().toISOString(),
-          payload: data,
-        }),
-      }).catch((err) => console.error(`Webhook failed (${hook.url}):`, err));
+    // Dispatch Webhooks with HMAC signatures and delivery logging
+    webhooks.forEach(async (hook) => {
+      const payload = {
+        event: trigger,
+        workspaceId,
+        timestamp: new Date().toISOString(),
+        payload: data,
+      };
+
+      const payloadString = serializePayload(payload);
+      const signature = hook.secret
+        ? generateWebhookSignature(payloadString, hook.secret)
+        : undefined;
+
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+        "X-Webhook-Event": trigger,
+        "X-Webhook-Timestamp": payload.timestamp,
+      };
+
+      if (signature) {
+        headers["X-Webhook-Signature"] = signature;
+      }
+
+      try {
+        const response = await fetch(hook.url, {
+          method: "POST",
+          headers,
+          body: payloadString,
+        });
+
+        // Log successful delivery
+        await prisma.webhookDeliveryLog.create({
+          data: {
+            webhookId: hook.id,
+            status: response.ok ? "SUCCESS" : "FAILED",
+            statusCode: response.status,
+            responseBody: response.ok ? null : await response.text(),
+            requestBody: payloadString,
+            signature: signature || null,
+            workspaceId,
+          },
+        });
+      } catch (err) {
+        console.error(`Webhook failed (${hook.url}):`, err);
+
+        // Log failed delivery
+        await prisma.webhookDeliveryLog.create({
+          data: {
+            webhookId: hook.id,
+            status: "FAILED",
+            error: err instanceof Error ? err.message : String(err),
+            requestBody: payloadString,
+            signature: signature || null,
+            workspaceId,
+          },
+        });
+      }
     });
 
     for (const rule of rules) {

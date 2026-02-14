@@ -15,17 +15,56 @@ export async function GET() {
 
   const errors: string[] = [];
 
+  // Check 1: At least one communication channel configured
   const hasChannel =
     workspace.emailConfigured || workspace.smsConfigured;
   if (!hasChannel) {
     errors.push("At least one communication channel (Email, SMS, or WhatsApp) must be configured");
   }
 
+  // Check 2: At least one active service exists
   const serviceCount = await prisma.service.count({
     where: { workspaceId: user.workspaceId, isActive: true },
   });
   if (serviceCount === 0) {
     errors.push("At least one booking type (service) must be created");
+  }
+
+  // Check 3: CRITICAL FIX - All services must have availability defined
+  const services = await prisma.service.findMany({
+    where: { 
+      workspaceId: user.workspaceId, 
+      isActive: true
+    },
+    select: {
+      id: true,
+      name: true,
+      availableDays: true,
+      startTime: true,
+      endTime: true
+    }
+  });
+
+  const servicesWithoutAvailability = services.filter(service => 
+    !service.availableDays || 
+    service.availableDays === "" ||
+    !service.startTime || 
+    service.startTime === "" ||
+    !service.endTime || 
+    service.endTime === ""
+  );
+
+  if (servicesWithoutAvailability.length > 0) {
+    const serviceNames = servicesWithoutAvailability.map(s => s.name).join(", ");
+    errors.push(`All active services must have availability defined. Missing: ${serviceNames}`);
+  }
+
+  // Check 4: Optional - Warn if no contact form created
+  const contactFormCount = await prisma.contactForm.count({
+    where: { workspaceId: user.workspaceId, isActive: true },
+  });
+  if (contactFormCount === 0) {
+    errors.push("At least one contact form should be created (recommended)");
   }
 
   return NextResponse.json({

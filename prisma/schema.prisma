@@ -145,6 +145,7 @@ model Workspace {
   alerts          Alert[]
   webhooks        Webhook[]
   integrationLogs IntegrationLog[]
+  webhookDeliveries WebhookDeliveryLog[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -154,10 +155,29 @@ model Webhook {
   id          String            @id @default(cuid())
   url         String
   event       AutomationTrigger
+  secret      String?           // HMAC secret for signature verification
   isActive    Boolean           @default(true)
   workspaceId String
   workspace   Workspace         @relation(fields: [workspaceId], references: [id])
+  deliveries  WebhookDeliveryLog[]
   createdAt   DateTime          @default(now())
+}
+
+model WebhookDeliveryLog {
+  id           String    @id @default(cuid())
+  webhookId    String
+  webhook      Webhook   @relation(fields: [webhookId], references: [id])
+  status       String    // SUCCESS, FAILED
+  statusCode   Int?
+  responseBody String?
+  error        String?
+  requestBody  String?   // Store the payload for debugging
+  signature    String?   // Store the signature used
+  workspaceId  String
+  workspace    Workspace @relation(fields: [workspaceId], references: [id])
+  createdAt    DateTime  @default(now())
+
+  @@index([webhookId, createdAt])
 }
 
 model Contact {
