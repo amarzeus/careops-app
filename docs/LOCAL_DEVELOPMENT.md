@@ -183,6 +183,31 @@ Then run:
 npx prisma db push
 ```
 
+## ⚠️ Technical Caveats
+
+### Prisma 6 Initialization
+In Prisma 6, the `datasources` property in the `PrismaClient` constructor is deprecated when relying on environment variables. Use the standard initialization in `src/lib/prisma.ts`:
+
+```typescript
+export const prisma = new PrismaClient({
+  log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
+});
+```
+
+### Next.js 16 + useSearchParams
+Any client component using `useSearchParams` **must** be wrapped in a `<Suspense>` boundary to prevent build-time "CSR bailout" errors. 
+
+Example:
+```tsx
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ClientComponentUsingSearchParams />
+    </Suspense>
+  );
+}
+```
+
 ## Render Deployment Notes
 
 For Render deployment, use the provided PostgreSQL database:
