@@ -160,61 +160,98 @@ export function Header({ title, subtitle, children }: HeaderProps) {
 
   return (
     <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-sm border-b border-gray-200">
-      <div className="flex items-center justify-between px-6 py-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
-          {subtitle && <p className="text-sm text-gray-500 mt-0.5">{subtitle}</p>}
+      <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4">
+        <div className="flex-1 min-w-0 mr-4">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 truncate">{title}</h1>
+          {subtitle && <p className="text-xs sm:text-sm text-gray-500 mt-0.5 truncate">{subtitle}</p>}
         </div>
         <div className="flex items-center gap-3">
           {children}
 
-          {/* Global Search */}
-          <div className="relative hidden md:block" ref={searchRef}>
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <Input
-              className="pl-9 w-64 bg-gray-50"
-              placeholder="Search pages, alerts..."
-              value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
-                setSearchOpen(true);
-              }}
-              onFocus={() => setSearchOpen(true)}
-            />
-            {searchQuery && (
-              <button
-                onClick={() => { setSearchQuery(""); setSearchResults([]); }}
-                className="absolute right-3 top-1/2 -translate-y-1/2"
-              >
-                <X className="w-3 h-3 text-gray-400 hover:text-gray-600" />
-              </button>
-            )}
+          {/* Global Search - Desktop & Mobile Toggle */}
+          <div className="relative" ref={searchRef}>
+            <div className="hidden md:block">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Input
+                className="pl-9 w-64 bg-gray-50 h-9"
+                placeholder="Search..."
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setSearchOpen(true);
+                }}
+                onFocus={() => setSearchOpen(true)}
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => { setSearchQuery(""); setSearchResults([]); }}
+                  className="absolute right-3 top-1/2 -translate-y-1/2"
+                >
+                  <X className="w-3 h-3 text-gray-400 hover:text-gray-600" />
+                </button>
+              )}
+            </div>
 
-            {/* Search Results Dropdown */}
-            {searchOpen && searchResults.length > 0 && (
-              <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden z-50">
-                {searchResults.map((result, i) => (
-                  <button
-                    key={i}
-                    className="w-full text-left px-4 py-2.5 hover:bg-gray-50 flex items-center gap-3 text-sm transition-colors"
-                    onClick={() => navigateTo(result.href)}
-                  >
-                    {result.type === "alert" ? (
-                      <Bell className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                    ) : (
-                      <ExternalLink className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden"
+              onClick={() => setSearchOpen(!searchOpen)}
+            >
+              <Search className="w-5 h-5 text-gray-500" />
+            </Button>
+
+            {/* Search Results Dropdown / Mobile Search Bar */}
+            {searchOpen && (
+              <div className={cn(
+                "absolute top-full mt-2 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden z-50",
+                "right-0 md:left-0 md:right-auto w-[calc(100vw-2rem)] md:w-80 max-w-sm"
+              )}>
+                <div className="p-2 md:hidden border-b">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <Input
+                      autoFocus
+                      className="pl-9 bg-gray-50 h-10"
+                      placeholder="Search..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                    {searchQuery && (
+                      <button
+                        onClick={() => { setSearchQuery(""); setSearchResults([]); }}
+                        className="absolute right-3 top-1/2 -translate-y-1/2"
+                      >
+                        <X className="w-4 h-4 text-gray-400 hover:text-gray-600" />
+                      </button>
                     )}
-                    <span className="truncate">{result.label}</span>
-                    <Badge variant="secondary" className="ml-auto text-[9px] shrink-0">
-                      {result.type}
-                    </Badge>
-                  </button>
-                ))}
-              </div>
-            )}
-            {searchOpen && searchQuery && searchResults.length === 0 && (
-              <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg p-4 text-center text-sm text-gray-400 z-50">
-                No results for &quot;{searchQuery}&quot;
+                  </div>
+                </div>
+
+                <div className="max-h-[60vh] overflow-y-auto">
+                  {searchResults.map((result, i) => (
+                    <button
+                      key={i}
+                      className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-3 text-sm transition-colors border-b last:border-0"
+                      onClick={() => navigateTo(result.href)}
+                    >
+                      {result.type === "alert" ? (
+                        <Bell className="w-4 h-4 text-amber-500 shrink-0" />
+                      ) : (
+                        <ExternalLink className="w-4 h-4 text-gray-400 shrink-0" />
+                      )}
+                      <span className="truncate">{result.label}</span>
+                      <Badge variant="secondary" className="ml-auto text-[10px] shrink-0">
+                        {result.type}
+                      </Badge>
+                    </button>
+                  ))}
+                  {searchQuery && searchResults.length === 0 && (
+                    <div className="p-6 text-center text-sm text-gray-400">
+                      No results for &quot;{searchQuery}&quot;
+                    </div>
+                  )}
+                </div>
               </div>
             )}
           </div>
@@ -240,7 +277,7 @@ export function Header({ title, subtitle, children }: HeaderProps) {
 
             {/* Alerts Dropdown */}
             {bellOpen && (
-              <div className="absolute right-0 top-full mt-2 w-96 bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden">
+              <div className="absolute right-0 top-full mt-2 w-screen max-w-sm sm:w-96 bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden">
                 <div className="flex items-center justify-between px-4 py-3 border-b bg-gray-50/50">
                   <h3 className="font-semibold text-sm text-gray-900">Notifications</h3>
                   {unreadCount > 0 && (

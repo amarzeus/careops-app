@@ -92,7 +92,7 @@ export function Sidebar({ userName, userRole, workspaceName }: SidebarProps) {
         {navItems.map((item) => {
           const isActive = pathname === item.href || pathname?.startsWith(item.href + "/");
           const badgeCount = item.badgeKey ? badges[item.badgeKey] : 0;
-          
+
           // Role-Based Visibility
           if (userRole !== "OWNER" && (item.href === "/settings" || item.href === "/automation")) {
             return null;
@@ -157,8 +157,8 @@ export function Sidebar({ userName, userRole, workspaceName }: SidebarProps) {
 
       {/* Sidebar */}
       <aside className={cn(
-        "fixed top-0 left-0 z-40 h-screen w-64 bg-white border-r border-gray-200 transition-transform lg:translate-x-0",
-        mobileOpen ? "translate-x-0" : "-translate-x-full"
+        "fixed top-0 left-0 z-40 h-[100dvh] w-72 bg-white border-r border-gray-200 transition-transform duration-300 ease-in-out lg:translate-x-0 lg:w-64",
+        mobileOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full"
       )}>
         {sidebarContent}
       </aside>

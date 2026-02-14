@@ -124,14 +124,14 @@ export default function DashboardPage() {
   useEffect(() => {
     // Initial fetch
     fetchMetrics();
-    
+
     // Set up polling interval (30 seconds for more real-time feel)
     const interval = setInterval(() => {
       if (isVisible && !document.hidden) {
         fetchMetrics();
       }
     }, 30000);
-    
+
     // Handle visibility change (pause polling when tab not active)
     const handleVisibilityChange = () => {
       setIsVisible(!document.hidden);
@@ -140,17 +140,17 @@ export default function DashboardPage() {
         fetchMetrics();
       }
     };
-    
+
     document.addEventListener('visibilitychange', handleVisibilityChange);
-    
+
     // Handle online/offline
     const handleOnline = () => {
       toast({ title: "Back Online", description: "Refreshing dashboard..." });
       fetchMetrics();
     };
-    
+
     window.addEventListener('online', handleOnline);
-    
+
     return () => {
       clearInterval(interval);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
@@ -161,8 +161,8 @@ export default function DashboardPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50/50 p-4 lg:p-6 space-y-6">
-        <div className="grid lg:grid-cols-3 gap-6">
-          {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-48 rounded-xl" />)}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-40 sm:h-48 rounded-xl" />)}
         </div>
         <div className="space-y-3">
           <Skeleton className="h-8 w-48" />
@@ -189,47 +189,32 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gray-50/50 flex flex-col">
-      {/* Header - Compact */}
-      <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-200/50 shadow-sm shrink-0">
-        <div className="flex items-center justify-between px-6 py-3">
+      {/* Header - Compact (Hidden when using Layout Header) */}
+      <div className="lg:hidden px-4 pt-4 shrink-0">
+        <div className="flex items-center justify-between bg-white px-4 py-3 rounded-xl border border-gray-200/50 shadow-sm">
           <div>
-            <h1 className="text-xl font-bold text-gray-900 tracking-tight">Dashboard</h1>
-            <p className="text-xs text-muted-foreground hidden sm:block">Overview</p>
+            <h1 className="text-lg font-bold text-gray-900 tracking-tight">Overview</h1>
+            <p className="text-[10px] text-muted-foreground">
+              Updated: {lastUpdated.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+            </p>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2">
-              {refreshing && (
-                <span className="flex items-center gap-1.5 text-[10px] text-blue-600 animate-pulse">
-                  <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
-                  </span>
-                  Updating...
-                </span>
-              )}
-              <span className="text-[10px] text-muted-foreground hidden sm:block bg-gray-100 px-2 py-0.5 rounded-full">
-                Updated: {lastUpdated.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-              </span>
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => fetchMetrics(true)}
-              disabled={refreshing}
-              className="gap-2 h-8 text-xs"
-            >
-              <RefreshCw className={`w-3 h-3 ${refreshing ? "animate-spin" : ""}`} />
-              Refresh
-            </Button>
-          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => fetchMetrics(true)}
+            disabled={refreshing}
+            className="h-8 w-8 p-0"
+          >
+            <RefreshCw className={`w-4 h-4 ${refreshing ? "animate-spin" : ""}`} />
+          </Button>
         </div>
-      </header>
+      </div>
 
       {/* Main Content */}
-      <main className="flex-1 p-4 lg:p-6 max-w-[1600px] mx-auto w-full flex flex-col gap-5 overflow-hidden">
+      <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-[1600px] mx-auto w-full flex flex-col gap-5 sm:gap-6 overflow-hidden">
 
         {/* ══════ Quick Actions Bar ══════ */}
-        <section className="flex flex-wrap gap-2">
+        <section className="flex flex-wrap items-center gap-2 sm:gap-3 overflow-x-auto pb-1 no-scrollbar">
           <Link href="/bookings">
             <Button size="sm" className="gap-2 h-8 text-xs bg-blue-600 hover:bg-blue-700 text-white">
               <Plus className="w-3.5 h-3.5" /> New Booking
