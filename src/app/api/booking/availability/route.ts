@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { startOfDay, endOfDay, parseISO, format, addMinutes, isBefore, isAfter } from "date-fns";
+import { toUTC, fromUTC } from "@/lib/date-utils";
 
 export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
@@ -21,25 +22,23 @@ export async function GET(req: Request) {
             return NextResponse.json({ error: "Service not found" }, { status: 404 });
         }
 
-        // Parse date
-        // Note: We'll interpret dateStr as local date string "2023-10-27"
-        // Ideally we handle timezones, but for hackathon MVP assume server time or UTC is fine-ish
-        // Better: use date-fns to parse dateStr as start of day in UTC or local
-        const queryDate = parseISO(dateStr);
-        const dayStart = startOfDay(queryDate);
-        const dayEnd = endOfDay(queryDate);
+        // Get workspace timezone
+        const timezone = service.workspace?.timezone || "UTC";
 
-        // Get existing bookings for this service (and resource?)
-        // Actually need to check ALL bookings for this service's workspace if resource is shared?
-        // PRD doesn't specify resource constraint. Let's assume infinite capacity per service OR single resource.
-        // For a small biz (Doctor), usually single resource constraint.
-        // Let's assume GLOBAL overlap check in workspace or just this service?
-        // PRD says "Service based". Let's check overlap on THIS service for simplicity, 
-        // BUT typically a doctor can't do 2 services at once.
-        // So we should check ALL bookings for the Workspace (assuming single provider model for MVP).
+        // Parse date as local date in the workspace's timezone
+        const queryDate = parseISO(dateStr);
+        
+        // Create start and end of day in the workspace's timezone, then convert to UTC
+        const dayStartLocal = startOfDay(queryDate);
+        const dayEndLocal = endOfDay(queryDate);
+        
+        const dayStart = toUTC(dayStartLocal, timezone);
+        const dayEnd = toUTC(dayEndLocal, timezone);
+
+        // Get existing bookings for this workspace in the UTC time range
         const existingBookings = await prisma.booking.findMany({
             where: {
-                workspaceId: service.workspaceId, // Check workspace-wide to prevent double booking the provider
+                workspaceId: service.workspaceId,
                 date: {
                     gte: dayStart,
                     lte: dayEnd
@@ -59,42 +58,44 @@ export async function GET(req: Request) {
             return NextResponse.json({ slots: [] }); // Closed today
         }
 
-        // Business Hours from Service
+        // Business Hours from Service (in workspace's timezone)
         const [startHour, startMin] = service.startTime.split(":").map(Number);
         const [endHour, endMin] = service.endTime.split(":").map(Number);
 
-        // Create start/end Date objects for this specific day
-        let currentSlot = new Date(queryDate);
-        currentSlot.setHours(startHour, startMin, 0, 0);
+        // Create start/end Date objects for this specific day in workspace timezone
+        let currentSlotLocal = new Date(queryDate);
+        currentSlotLocal.setHours(startHour, startMin, 0, 0);
 
-        const closeTime = new Date(queryDate);
-        closeTime.setHours(endHour, endMin, 0, 0);
+        const closeTimeLocal = new Date(queryDate);
+        closeTimeLocal.setHours(endHour, endMin, 0, 0);
 
         const duration = service.duration;
         const slots = [];
 
-        while (isBefore(currentSlot, closeTime)) {
-            const slotEnd = addMinutes(currentSlot, duration);
+        while (isBefore(currentSlotLocal, closeTimeLocal)) {
+            const slotEndLocal = addMinutes(currentSlotLocal, duration);
 
-            if (isAfter(slotEnd, closeTime)) break; // Don't go past closing
+            if (isAfter(slotEndLocal, closeTimeLocal)) break; // Don't go past closing
 
-            // Check overlap
+            // Convert local slot times to UTC for comparison
+            const currentSlotUTC = toUTC(currentSlotLocal, timezone);
+            const slotEndUTC = toUTC(slotEndLocal, timezone);
+
+            // Check overlap with existing bookings (all in UTC)
             const isOverlap = existingBookings.some(booking => {
                 const bStart = new Date(booking.date);
                 const bEnd = new Date(booking.endTime);
 
                 // Overlap condition: (StartA < EndB) and (EndA > StartB)
-                return isBefore(currentSlot, bEnd) && isAfter(slotEnd, bStart);
+                return isBefore(currentSlotUTC, bEnd) && isAfter(slotEndUTC, bStart);
             });
 
             if (!isOverlap) {
-                slots.push(format(currentSlot, "HH:mm"));
+                slots.push(format(currentSlotLocal, "HH:mm"));
             }
 
-            // Interval: for now, using duration as interval
-            // Or should we use 30 min steps? 
-            // Let's use duration for packed schedule.
-            currentSlot = addMinutes(currentSlot, duration);
+            // Move to next slot
+            currentSlotLocal = addMinutes(currentSlotLocal, duration);
         }
 
         return NextResponse.json({ slots });

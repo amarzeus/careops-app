@@ -5,9 +5,10 @@ import { addHours, isBefore } from "date-fns";
 
 /** GET /api/automation/cron
  *  Scheduled automation runner — queries and executes time-based automations:
- *  1. BEFORE_BOOKING reminders (bookings happening in the next 24 hours)
- *  2. FORM_PENDING reminders (forms pending for > 48 hours)
- *  3. FORM_OVERDUE updates (forms past due date)
+ *  1. FORM_OVERDUE updates (forms past due date)
+ *  2. AUTO_RESUME automation (conversations inactive for 24+ hours)
+ *  3. BEFORE_BOOKING reminders (bookings happening in the next 24 hours)
+ *  4. FORM_PENDING reminders (forms pending for > 48 hours)
  *
  *  Should be called by an external cron service (e.g., every hour).
  *  Secured by CRON_SECRET header.
@@ -57,7 +58,44 @@ export async function GET(req: Request) {
             });
         }
 
-        // 2. BEFORE_BOOKING reminders
+        // 2. AUTO-RESUME automation for conversations
+        const conversationsToResume = await prisma.conversation.findMany({
+            where: {
+                isActive: false,
+                autoResumeAt: { lte: now }
+            },
+            include: { workspace: true, contact: true }
+        });
+
+        for (const conversation of conversationsToResume) {
+            await prisma.conversation.update({
+                where: { id: conversation.id },
+                data: { 
+                    isActive: true,
+                    autoResumeAt: null 
+                }
+            });
+
+            await prisma.alert.create({
+                data: {
+                    type: "automation",
+                    title: "Automation Resumed",
+                    message: `Automated messages resumed for conversation with ${conversation.contact.name} after 24-hour inactivity`,
+                    actionUrl: "/inbox",
+                    workspaceId: conversation.workspaceId,
+                    isRead: true,
+                },
+            });
+
+            results.push({
+                type: "AUTO_RESUME",
+                workspaceId: conversation.workspaceId,
+                status: "SUCCESS",
+                details: `Automation resumed for conversation ${conversation.id}`,
+            });
+        }
+
+        // 3. BEFORE_BOOKING reminders
         const in24Hours = addHours(now, 24);
 
         const beforeBookingRules = await prisma.automationRule.findMany({
@@ -142,7 +180,7 @@ export async function GET(req: Request) {
             }
         }
 
-        // 2. FORM_PENDING reminders (forms pending > 48h)
+        // 4. FORM_PENDING reminders (forms pending > 48h)
         const formRules = await prisma.automationRule.findMany({
             where: { trigger: "FORM_PENDING", isActive: true },
             include: { workspace: true },

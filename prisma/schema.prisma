@@ -332,11 +332,12 @@ model ServiceInventoryLink {
 }
 
 model Conversation {
-  id            String   @id @default(cuid())
+  id            String    @id @default(cuid())
   subject       String?
-  isActive      Boolean  @default(true)
-  lastMessageAt DateTime @default(now())
-  unreadCount   Int      @default(0)
+  isActive      Boolean   @default(true)
+  lastMessageAt DateTime  @default(now())
+  autoResumeAt  DateTime? // When to auto-resume automation after staff reply
+  unreadCount   Int       @default(0)
   contactId     String   @unique
   contact       Contact  @relation(fields: [contactId], references: [id])
   workspaceId   String

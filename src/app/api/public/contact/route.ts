@@ -1,9 +1,34 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { triggerAutomation } from "@/lib/automation";
+import { checkRateLimit, RATE_LIMITS, getClientIP } from "@/lib/rate-limiter";
 
 export async function POST(req: Request) {
   try {
+    // Rate limiting check
+    const clientIP = getClientIP(req);
+    const identifier = `${clientIP}:contact`;
+    const rateLimit = checkRateLimit(identifier, RATE_LIMITS.CONTACT_FORM);
+
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { 
+          error: "Rate limit exceeded",
+          message: "Too many submissions. Please try again later.",
+          retryAfter: Math.ceil((rateLimit.resetTime - Date.now()) / 1000)
+        },
+        { 
+          status: 429,
+          headers: {
+            'X-RateLimit-Limit': String(RATE_LIMITS.CONTACT_FORM.maxRequests),
+            'X-RateLimit-Remaining': String(rateLimit.remaining),
+            'X-RateLimit-Reset': String(rateLimit.resetTime),
+            'Retry-After': String(Math.ceil((rateLimit.resetTime - Date.now()) / 1000))
+          }
+        }
+      );
+    }
+
     const { formSlug, data } = await req.json();
     if (!formSlug || !data?.name)
       return NextResponse.json(

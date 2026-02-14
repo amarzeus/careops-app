@@ -100,6 +100,7 @@ export default function DashboardPage() {
   const [refreshing, setRefreshing] = useState(false);
   const [data, setData] = useState<DashboardData | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+  const [isVisible, setIsVisible] = useState(true);
 
   const fetchMetrics = async (isRefresh = false) => {
     if (isRefresh) setRefreshing(true);
@@ -121,10 +122,41 @@ export default function DashboardPage() {
   };
 
   useEffect(() => {
+    // Initial fetch
     fetchMetrics();
-    const interval = setInterval(() => fetchMetrics(), 60000);
-    return () => clearInterval(interval);
-  }, []);
+    
+    // Set up polling interval (30 seconds for more real-time feel)
+    const interval = setInterval(() => {
+      if (isVisible && !document.hidden) {
+        fetchMetrics();
+      }
+    }, 30000);
+    
+    // Handle visibility change (pause polling when tab not active)
+    const handleVisibilityChange = () => {
+      setIsVisible(!document.hidden);
+      if (!document.hidden) {
+        // Refresh immediately when coming back to tab
+        fetchMetrics();
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    // Handle online/offline
+    const handleOnline = () => {
+      toast({ title: "Back Online", description: "Refreshing dashboard..." });
+      fetchMetrics();
+    };
+    
+    window.addEventListener('online', handleOnline);
+    
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('online', handleOnline);
+    };
+  }, [isVisible]);
 
   if (loading) {
     return (
@@ -165,9 +197,20 @@ export default function DashboardPage() {
             <p className="text-xs text-muted-foreground hidden sm:block">Overview</p>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-[10px] text-muted-foreground hidden sm:block bg-gray-100 px-2 py-0.5 rounded-full">
-              Updated: {lastUpdated.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-            </span>
+            <div className="flex items-center gap-2">
+              {refreshing && (
+                <span className="flex items-center gap-1.5 text-[10px] text-blue-600 animate-pulse">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                  </span>
+                  Updating...
+                </span>
+              )}
+              <span className="text-[10px] text-muted-foreground hidden sm:block bg-gray-100 px-2 py-0.5 rounded-full">
+                Updated: {lastUpdated.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+              </span>
+            </div>
             <Button
               variant="outline"
               size="sm"

@@ -3,9 +3,35 @@ import { prisma } from "@/lib/prisma";
 import { addMinutes } from "date-fns";
 import { triggerAutomation } from "@/lib/automation";
 import { syncBookingToCalendar } from "@/lib/google-calendar";
+import { parseLocalDateTime } from "@/lib/date-utils";
+import { checkRateLimit, RATE_LIMITS, getClientIP } from "@/lib/rate-limiter";
 
 export async function POST(req: Request) {
     try {
+        // Rate limiting check
+        const clientIP = getClientIP(req);
+        const identifier = `${clientIP}:booking`;
+        const rateLimit = checkRateLimit(identifier, RATE_LIMITS.BOOKING);
+
+        if (!rateLimit.allowed) {
+            return NextResponse.json(
+                { 
+                    error: "Rate limit exceeded",
+                    message: "Too many booking attempts. Please try again later.",
+                    retryAfter: Math.ceil((rateLimit.resetTime - Date.now()) / 1000)
+                },
+                { 
+                    status: 429,
+                    headers: {
+                        'X-RateLimit-Limit': String(RATE_LIMITS.BOOKING.maxRequests),
+                        'X-RateLimit-Remaining': String(rateLimit.remaining),
+                        'X-RateLimit-Reset': String(rateLimit.resetTime),
+                        'Retry-After': String(Math.ceil((rateLimit.resetTime - Date.now()) / 1000))
+                    }
+                }
+            );
+        }
+
         const body = await req.json();
         const { serviceId, date, time, contact, notes } = body;
 
@@ -22,8 +48,16 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Service not found" }, { status: 404 });
         }
 
-        // Construct DateTime from date + time
-        const bookingStart = new Date(`${date}T${time}:00`);
+        // Fetch workspace timezone
+        const workspace = await prisma.workspace.findUnique({
+            where: { id: service.workspaceId },
+            select: { timezone: true }
+        });
+
+        const timezone = workspace?.timezone || "UTC";
+
+        // Convert local date/time to UTC for storage
+        const bookingStart = parseLocalDateTime(date, time, timezone);
         const bookingEnd = addMinutes(bookingStart, service.duration);
 
         // 2. CRITICAL FIX: Use transaction with Serializable isolation to prevent race conditions

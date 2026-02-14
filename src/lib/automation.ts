@@ -467,10 +467,16 @@ async function handleStaffReply(workspace: Workspace, data: Record<string, unkno
   const conversationId = data.conversationId as string;
   if (!conversationId) return;
 
-  // Update conversation to pause automation
+  // Calculate auto-resume time (24 hours from now)
+  const autoResumeAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+  // Update conversation to pause automation with auto-resume
   await prisma.conversation.update({
     where: { id: conversationId },
-    data: { isActive: false },
+    data: { 
+      isActive: false,
+      autoResumeAt: autoResumeAt
+    },
   });
   
   // Log the automation pause
@@ -478,7 +484,7 @@ async function handleStaffReply(workspace: Workspace, data: Record<string, unkno
     data: {
       type: "automation",
       title: "Automation Paused",
-      message: `Automated messages paused for this conversation due to staff reply`,
+      message: `Automated messages paused for this conversation due to staff reply. Will auto-resume at ${autoResumeAt.toLocaleString()}.`,
       actionUrl: "/inbox",
       workspaceId: workspace.id,
       isRead: true, // Don't show as unread since it's informational
