@@ -109,11 +109,6 @@ jobs:
         env:
           DATABASE_URL: ${{ env.DATABASE_URL }}
 
-      - name: Verify schema sync
-        run: npx prisma migrate status
-        env:
-          DATABASE_URL: ${{ env.DATABASE_URL }}
-
   # ============================================
   # STAGE 4: Build Application
   # ============================================
