@@ -9,59 +9,59 @@ datasource db {
 
 // ──── Enums (Kept as String for flexibility during migration) ────
 
-// enum UserRole {
-//   OWNER
-//   STAFF
-// }
+enum UserRole {
+  OWNER
+  STAFF
+}
 
-// enum BookingStatus {
-//   PENDING
-//   CONFIRMED
-//   COMPLETED
-//   CANCELLED
-//   NO_SHOW
-// }
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
 
-// enum FormStatus {
-//   PENDING
-//   SENT
-//   COMPLETED
-//   OVERDUE
-// }
+enum FormStatus {
+  PENDING
+  SENT
+  COMPLETED
+  OVERDUE
+}
 
-// enum MessageChannel {
-//   EMAIL
-//   SMS
-//   WHATSAPP
-//   SYSTEM
-// }
+enum MessageChannel {
+  EMAIL
+  SMS
+  WHATSAPP
+  SYSTEM
+}
 
-// enum MessageDirection {
-//   INBOUND
-//   OUTBOUND
-// }
+enum MessageDirection {
+  INBOUND
+  OUTBOUND
+}
 
-// enum MessageStatus {
-//   SENT
-//   DELIVERED
-//   READ
-//   FAILED
-// }
+enum MessageStatus {
+  SENT
+  DELIVERED
+  READ
+  FAILED
+}
 
-// enum AutomationTrigger {
-//   NEW_CONTACT
-//   BOOKING_CREATED
-//   BEFORE_BOOKING
-//   FORM_PENDING
-//   INVENTORY_LOW
-//   STAFF_REPLY
-// }
+enum AutomationTrigger {
+  NEW_CONTACT
+  BOOKING_CREATED
+  BEFORE_BOOKING
+  FORM_PENDING
+  INVENTORY_LOW
+  STAFF_REPLY
+}
 
-// enum WorkspaceStatus {
-//   ONBOARDING
-//   ACTIVE
-//   INACTIVE
-// }
+enum WorkspaceStatus {
+  ONBOARDING
+  ACTIVE
+  INACTIVE
+}
 
 // ──── Models ────
 
@@ -70,7 +70,7 @@ model User {
   email        String    @unique
   name         String
   passwordHash String
-  role         String    @default("STAFF")
+  role         UserRole @default(STAFF)
   workspaceId  String?
   workspace    Workspace? @relation(fields: [workspaceId], references: [id])
 
@@ -102,7 +102,7 @@ model Workspace {
   timezone     String          @default("UTC")
   contactEmail String?
   contactPhone String?
-  status       String          @default("ONBOARDING")
+  status       WorkspaceStatus @default(ONBOARDING)
   onboardingStep Int           @default(1)
 
   // Email configuration
@@ -236,7 +236,7 @@ model Booking {
   id          String        @id @default(cuid())
   date        DateTime
   endTime     DateTime
-  status      String        @default("PENDING")
+  status      BookingStatus @default(PENDING)
   notes       String?
   serviceId   String
   service     Service       @relation(fields: [serviceId], references: [id])
@@ -290,7 +290,7 @@ model IntakeForm {
 model FormSubmission {
   id           String     @id @default(cuid())
   data         String     @default("{}")
-  status       String     @default("PENDING")
+  status       FormStatus     @default(PENDING)
   intakeFormId String?
   intakeForm   IntakeForm? @relation(fields: [intakeFormId], references: [id])
   contactId    String
@@ -380,9 +380,9 @@ model Conversation {
 model Message {
   id             String           @id @default(cuid())
   content        String
-  channel        String           @default("EMAIL")
-  direction      String           @default("OUTBOUND")
-  status         String           @default("SENT")
+  channel        MessageChannel   @default(EMAIL)
+  direction      MessageDirection @default(OUTBOUND)
+  status         MessageStatus    @default(SENT)
   isAutomated    Boolean          @default(false)
   conversationId String
   conversation   Conversation     @relation(fields: [conversationId], references: [id])
@@ -395,7 +395,7 @@ model Message {
 model AutomationRule {
   id              String            @id @default(cuid())
   name            String
-  trigger         String
+  trigger         AutomationTrigger
   isActive        Boolean           @default(true)
   messageTemplate String?
   delayMinutes    Int               @default(0)
@@ -412,7 +412,7 @@ model AutomationLog {
   id        String  @id @default(cuid())
   ruleId    String
   rule      AutomationRule @relation(fields: [ruleId], references: [id])
-  trigger   String
+  trigger   AutomationTrigger
   status    String  @default("SUCCESS") // SUCCESS, FAILED, SKIPPED
   details   String? // JSON string with execution details
   recipient String? // Email/phone of recipient
@@ -451,7 +451,7 @@ model IntegrationLog {
 model VoiceCall {
   id              String    @id @default(cuid())
   callSid         String?   @unique  // VAPI Call SID
-  direction       String    // INBOUND | OUTBOUND
+  direction       MessageDirection // INBOUND | OUTBOUND
   status          String    // INITIATED, RINGING, IN_PROGRESS, COMPLETED, FAILED, NO_ANSWER, BUSY
   contactId       String?
   contact         Contact?  @relation(fields: [contactId], references: [id])
