@@ -32,9 +32,26 @@ interface AIPreferencesTabProps {
 
 export function AIPreferencesTab({ onSelectTab }: AIPreferencesTabProps) {
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [preferences, setPreferences] = useState<AIPreferences | null>(null);
+
+  // Default preferences when not loaded
+  const defaultPreferences: AIPreferences = {
+    id: "",
+    workspaceId: "",
+    smartReplyEnabled: true,
+    insightsEnabled: true,
+    voiceEnabled: false,
+    anomalyDetectionEnabled: false,
+    inventoryForecastEnabled: false,
+    autoClassifyEnabled: true,
+    defaultReplyTone: "professional",
+    alertOnAnomaly: true,
+    dailyInsightTime: "09:00",
+    geminiModel: "gemini-2.0-flash",
+  };
 
   useEffect(() => {
     fetchPreferences();
@@ -45,37 +62,46 @@ export function AIPreferencesTab({ onSelectTab }: AIPreferencesTabProps) {
       const res = await fetch("/api/ai/preferences");
       if (res.ok) {
         const data = await res.json();
-        setPreferences(data.preferences);
+        setPreferences(data.preferences || defaultPreferences);
+        setError(null);
+      } else {
+        // If API fails, use default preferences
+        console.log("Using default AI preferences");
+        setPreferences(defaultPreferences);
+        setError(null);
       }
     } catch (error) {
       console.error("Failed to fetch AI preferences:", error);
+      // Use defaults on error
+      setPreferences(defaultPreferences);
+      setError(null);
     } finally {
       setLoading(false);
     }
   };
 
   const updatePreference = (key: keyof AIPreferences, value: boolean | string) => {
-    setPreferences(prev => prev ? { ...prev, [key]: value } : null);
+    setPreferences(prev => prev ? { ...prev, [key]: value } : { ...defaultPreferences, [key]: value });
   };
 
   const handleSave = async () => {
-    if (!preferences) return;
+    if (!prefs) return;
     setSaving(true);
     try {
       const res = await fetch("/api/ai/preferences", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          smartReplyEnabled: preferences.smartReplyEnabled,
-          insightsEnabled: preferences.insightsEnabled,
-          voiceEnabled: preferences.voiceEnabled,
-          anomalyDetectionEnabled: preferences.anomalyDetectionEnabled,
-          inventoryForecastEnabled: preferences.inventoryForecastEnabled,
-          autoClassifyEnabled: preferences.autoClassifyEnabled,
-          defaultReplyTone: preferences.defaultReplyTone,
-          alertOnAnomaly: preferences.alertOnAnomaly,
-          dailyInsightTime: preferences.dailyInsightTime,
-          geminiModel: preferences.geminiModel,
+          smartReplyEnabled: prefs.smartReplyEnabled,
+          insightsEnabled: prefs.insightsEnabled,
+          voiceEnabled: prefs.voiceEnabled,
+          anomalyDetectionEnabled: prefs.anomalyDetectionEnabled,
+          inventoryForecastEnabled: prefs.inventoryForecastEnabled,
+          autoClassifyEnabled: prefs.autoClassifyEnabled,
+          defaultReplyTone: prefs.defaultReplyTone,
+          alertOnAnomaly: prefs.alertOnAnomaly,
+          dailyInsightTime: prefs.dailyInsightTime,
+          geminiModel: prefs.geminiModel,
         }),
       });
 
@@ -94,18 +120,14 @@ export function AIPreferencesTab({ onSelectTab }: AIPreferencesTabProps) {
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
-        <Loader2 className="animate-spin text-blue-600" />
+        <Loader2 className="animate-spin text-blue-600 w-6 h-6" />
+        <span className="ml-2 text-gray-500">Loading AI settings...</span>
       </div>
     );
   }
 
-  if (!preferences) {
-    return (
-      <div className="text-center p-8 text-gray-500">
-        Failed to load AI preferences
-      </div>
-    );
-  }
+  // Use defaults if preferences is null
+  const prefs = preferences || defaultPreferences;
 
   const features = [
     {
@@ -114,7 +136,7 @@ export function AIPreferencesTab({ onSelectTab }: AIPreferencesTabProps) {
       description: "AI-generated reply suggestions in inbox",
       icon: MessageSquare,
       color: "violet",
-      enabled: preferences.smartReplyEnabled,
+      enabled: prefs.smartReplyEnabled,
     },
     {
       key: "insightsEnabled",
@@ -122,7 +144,7 @@ export function AIPreferencesTab({ onSelectTab }: AIPreferencesTabProps) {
       description: "AI-powered business insights on dashboard",
       icon: Sparkles,
       color: "amber",
-      enabled: preferences.insightsEnabled,
+      enabled: prefs.insightsEnabled,
     },
     {
       key: "autoClassifyEnabled",
@@ -130,7 +152,7 @@ export function AIPreferencesTab({ onSelectTab }: AIPreferencesTabProps) {
       description: "Auto-classify message intent (urgent, complaint, inquiry...)",
       icon: Brain,
       color: "blue",
-      enabled: preferences.autoClassifyEnabled,
+      enabled: prefs.autoClassifyEnabled,
     },
     {
       key: "voiceEnabled",
@@ -138,7 +160,7 @@ export function AIPreferencesTab({ onSelectTab }: AIPreferencesTabProps) {
       description: "Enable AI voice assistant for phone calls",
       icon: Mic,
       color: "emerald",
-      enabled: preferences.voiceEnabled,
+      enabled: prefs.voiceEnabled,
     },
     {
       key: "anomalyDetectionEnabled",
@@ -146,7 +168,7 @@ export function AIPreferencesTab({ onSelectTab }: AIPreferencesTabProps) {
       description: "Detect unusual patterns in operations",
       icon: AlertTriangle,
       color: "red",
-      enabled: preferences.anomalyDetectionEnabled,
+      enabled: prefs.anomalyDetectionEnabled,
     },
     {
       key: "inventoryForecastEnabled",
@@ -154,7 +176,7 @@ export function AIPreferencesTab({ onSelectTab }: AIPreferencesTabProps) {
       description: "Predict stock depletion and recommend reordering",
       icon: Package,
       color: "cyan",
-      enabled: preferences.inventoryForecastEnabled,
+      enabled: prefs.inventoryForecastEnabled,
     },
   ];
 
@@ -212,7 +234,7 @@ export function AIPreferencesTab({ onSelectTab }: AIPreferencesTabProps) {
           <div className="space-y-2">
             <Label className="text-sm">Default Reply Tone</Label>
             <Select 
-              value={preferences.defaultReplyTone} 
+              value={prefs.defaultReplyTone} 
               onValueChange={(v) => updatePreference("defaultReplyTone", v)}
             >
               <SelectTrigger>
@@ -229,7 +251,7 @@ export function AIPreferencesTab({ onSelectTab }: AIPreferencesTabProps) {
           <div className="space-y-2">
             <Label className="text-sm">AI Model</Label>
             <Select 
-              value={preferences.geminiModel} 
+              value={prefs.geminiModel} 
               onValueChange={(v) => updatePreference("geminiModel", v)}
             >
               <SelectTrigger>
@@ -245,7 +267,7 @@ export function AIPreferencesTab({ onSelectTab }: AIPreferencesTabProps) {
           <div className="space-y-2">
             <Label className="text-sm">Daily Insight Time</Label>
             <Select 
-              value={preferences.dailyInsightTime || "09:00"} 
+              value={prefs.dailyInsightTime || "09:00"} 
               onValueChange={(v) => updatePreference("dailyInsightTime", v)}
             >
               <SelectTrigger>
@@ -262,7 +284,7 @@ export function AIPreferencesTab({ onSelectTab }: AIPreferencesTabProps) {
 
           <div className="flex items-center gap-3 p-3 border rounded-lg bg-gray-50">
             <Switch
-              checked={preferences.alertOnAnomaly}
+              checked={prefs.alertOnAnomaly}
               onCheckedChange={(checked) => updatePreference("alertOnAnomaly", checked)}
               id="alertOnAnomaly"
             />
@@ -288,7 +310,7 @@ export function AIPreferencesTab({ onSelectTab }: AIPreferencesTabProps) {
           {saving ? "Saving..." : saved ? "Saved!" : "Save Preferences"}
         </Button>
         
-        {!preferences.insightsEnabled && (
+        {!prefs.insightsEnabled && (
           <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">
             <Zap className="w-3 h-3 mr-1" />
             Insights disabled

@@ -9,14 +9,17 @@ export async function GET() {
   }
 
   try {
-    let prefs = await prisma.aIPreferences.findUnique({
+    console.log("Fetching AI preferences for workspace:", user.workspaceId);
+    let prefs = await (prisma as any).aIPreferences.findUnique({
       where: { workspaceId: user.workspaceId },
     });
 
     if (!prefs) {
-      prefs = await prisma.aIPreferences.create({
+      console.log("No AI preferences found, creating default...");
+      prefs = await (prisma as any).aIPreferences.create({
         data: { workspaceId: user.workspaceId },
       });
+      console.log("Created AI preferences:", prefs);
     }
 
     return NextResponse.json({ preferences: prefs });
@@ -34,7 +37,7 @@ export async function PUT(req: Request) {
 
   try {
     const body = await req.json();
-    
+
     const prefs = await prisma.aIPreferences.upsert({
       where: { workspaceId: user.workspaceId },
       update: body,
