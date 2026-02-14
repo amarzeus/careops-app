@@ -110,7 +110,8 @@ export async function sendTextMessage(
  * Check if WhatsApp channel is available.
  */
 export function isAvailable(): boolean {
-  return isWhatsAppConfigured();
+  // WhatsApp manually disabled for now per user request
+  return false;
 }
 
 /**

@@ -6,6 +6,7 @@ import {
   cancelBookingCalendarEvent,
 } from "@/lib/google-calendar";
 import { triggerAutomation } from "@/lib/automation";
+import { logInventoryChange } from "@/lib/inventory-log";
 
 async function decrementInventoryForBooking(bookingId: string, workspaceId: string) {
   const booking = await prisma.booking.findUnique({
@@ -25,11 +26,24 @@ async function decrementInventoryForBooking(bookingId: string, workspaceId: stri
 
   for (const link of booking.service.inventoryLinks) {
     const item = link.inventory;
+    const previousQuantity = item.quantity;
     const newQuantity = Math.max(0, item.quantity - link.quantity);
 
+    // Update inventory quantity
     await prisma.inventoryItem.update({
       where: { id: item.id },
       data: { quantity: newQuantity },
+    });
+
+    // Log the inventory change
+    await logInventoryChange({
+      itemId: item.id,
+      previousQty: previousQuantity,
+      newQty: newQuantity,
+      reason: "booking_completed",
+      referenceId: bookingId,
+      referenceType: "booking",
+      workspaceId,
     });
 
     if (newQuantity <= item.threshold) {

@@ -141,8 +141,8 @@ export function IntegrationsTab({
               </div>
               <div>
                 <p className="font-medium text-green-900">Twilio WhatsApp</p>
-                <p className="text-xs text-green-600">
-                  {workspace?.whatsappConfigured ? "Connected & Active" : "Not configured — set TWILIO_PHONE_NUMBER"}
+                <p className="text-xs text-red-600">
+                  Currently manually disabled.
                 </p>
               </div>
             </div>

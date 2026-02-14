@@ -140,6 +140,7 @@ model Workspace {
   intakeForms     IntakeForm[]
   formSubmissions FormSubmission[]
   inventoryItems  InventoryItem[]
+  inventoryLogs   InventoryLog[]
   conversations   Conversation[]
   automationRules AutomationRule[]
   alerts          Alert[]
@@ -167,17 +168,20 @@ model WebhookDeliveryLog {
   id           String    @id @default(cuid())
   webhookId    String
   webhook      Webhook   @relation(fields: [webhookId], references: [id])
-  status       String    // SUCCESS, FAILED
+  status       String    // SUCCESS, FAILED, PENDING_RETRY
   statusCode   Int?
   responseBody String?
   error        String?
   requestBody  String?   // Store the payload for debugging
   signature    String?   // Store the signature used
+  retryCount   Int       @default(0)
+  retryAt      DateTime? // When to retry (for failed webhooks)
   workspaceId  String
   workspace    Workspace @relation(fields: [workspaceId], references: [id])
   createdAt    DateTime  @default(now())
 
   @@index([webhookId, createdAt])
+  @@index([status, retryAt])
 }
 
 model Contact {
@@ -313,9 +317,28 @@ model InventoryItem {
   workspace   Workspace @relation(fields: [workspaceId], references: [id])
 
   serviceLinks ServiceInventoryLink[]
+  logs         InventoryLog[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model InventoryLog {
+  id            String        @id @default(cuid())
+  itemId        String
+  item          InventoryItem @relation(fields: [itemId], references: [id])
+  previousQty   Int
+  newQty        Int
+  change        Int
+  reason        String        // "booking_completed", "manual_adjustment", "restock", "initial"
+  referenceId   String?       // bookingId or manual entry id
+  referenceType String?       // "booking", "manual", "system"
+  workspaceId   String
+  workspace     Workspace     @relation(fields: [workspaceId], references: [id])
+  createdAt     DateTime      @default(now())
+
+  @@index([itemId, createdAt])
+  @@index([workspaceId, createdAt])
 }
 
 model ServiceInventoryLink {

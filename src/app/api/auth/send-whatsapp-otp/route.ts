@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { generateOTP, storeOTP } from "@/lib/otp";
 import { sendWhatsAppOTP as twilioSendWhatsAppOTP, isConfigured as isTwilioConfigured } from "@/lib/twilio";
+import { isAvailable as isWhatsAppAvailable } from "@/lib/whatsapp";
 
 export async function POST(req: Request) {
   try {
@@ -23,10 +24,10 @@ export async function POST(req: Request) {
       );
     }
 
-    // Check if Twilio is configured
-    if (!isTwilioConfigured()) {
+    // Check if WhatsApp is configured and enabled
+    if (!isWhatsAppAvailable()) {
       return NextResponse.json(
-        { error: "Twilio is not configured for WhatsApp. Please use SMS or email verification instead." },
+        { error: "WhatsApp is not available. Please use SMS or email verification instead." },
         { status: 503 }
       );
     }

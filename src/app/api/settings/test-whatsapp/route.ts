@@ -1,16 +1,17 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
-import { isConfigured, sendWhatsApp } from "@/lib/twilio";
+import { sendWhatsApp } from "@/lib/twilio";
+import { isAvailable as isWhatsAppAvailable } from "@/lib/whatsapp";
 
 export async function POST() {
   const user = await getCurrentUser();
   if (!user || !user.workspaceId)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  if (!isConfigured()) {
+  if (!isWhatsAppAvailable()) {
     return NextResponse.json(
       {
-        error: "Twilio is not configured. Set TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, and TWILIO_PHONE_NUMBER in your environment.",
+        error: "WhatsApp is currently disabled.",
         configured: false,
       },
       { status: 500 }

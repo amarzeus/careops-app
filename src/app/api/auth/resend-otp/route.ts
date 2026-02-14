@@ -4,6 +4,7 @@ import { generateOTP, storeOTP } from "@/lib/otp";
 import { sendEmail, buildEmailTemplate } from "@/lib/email";
 import { sendOTP as twilioSendOTP, sendWhatsAppOTP as twilioSendWhatsAppOTP, isConfigured as isTwilioConfigured } from "@/lib/twilio";
 import { sendSMS, buildOTPMessage } from "@/lib/sms";
+import { isAvailable as isWhatsAppAvailable } from "@/lib/whatsapp";
 
 export async function POST(req: Request) {
   try {
@@ -91,9 +92,9 @@ export async function POST(req: Request) {
           );
         }
 
-        if (!isTwilioConfigured()) {
+        if (!isWhatsAppAvailable()) {
           return NextResponse.json(
-            { error: "WhatsApp is not configured. Please use SMS or email." },
+            { error: "WhatsApp is not available. Please use SMS or email." },
             { status: 503 }
           );
         }

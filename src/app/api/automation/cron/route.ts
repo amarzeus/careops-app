@@ -1,16 +1,18 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendEmail, buildEmailTemplate } from "@/lib/email";
-import { addHours, isBefore } from "date-fns";
+import { addHours } from "date-fns";
+import { processWebhookRetries } from "@/lib/webhook-retry";
 
 /** GET /api/automation/cron
  *  Scheduled automation runner — queries and executes time-based automations:
  *  1. FORM_OVERDUE updates (forms past due date)
  *  2. AUTO_RESUME automation (conversations inactive for 24+ hours)
- *  3. BEFORE_BOOKING reminders (bookings happening in the next 24 hours)
- *  4. FORM_PENDING reminders (forms pending for > 48 hours)
+ *  3. WEBHOOK_RETRY processing (failed webhook deliveries)
+ *  4. BEFORE_BOOKING reminders (bookings happening in the next 24 hours)
+ *  5. FORM_PENDING reminders (forms pending for > 48 hours)
  *
- *  Should be called by an external cron service (e.g., every hour).
+ *  Should be called by an external cron service (e.g., every 5 minutes for webhooks, every hour for others).
  *  Secured by CRON_SECRET header.
  */
 export async function GET(req: Request) {
@@ -180,7 +182,18 @@ export async function GET(req: Request) {
             }
         }
 
-        // 4. FORM_PENDING reminders (forms pending > 48h)
+        // 4. Process webhook retries
+        const webhookRetryResult = await processWebhookRetries();
+        if (webhookRetryResult.processed > 0) {
+            results.push({
+                type: "WEBHOOK_RETRY",
+                workspaceId: "all",
+                status: "SUCCESS",
+                details: `Processed ${webhookRetryResult.processed} retries: ${webhookRetryResult.succeeded} succeeded, ${webhookRetryResult.failed} failed`,
+            });
+        }
+
+        // 5. FORM_PENDING reminders (forms pending > 48h)
         const formRules = await prisma.automationRule.findMany({
             where: { trigger: "FORM_PENDING", isActive: true },
             include: { workspace: true },
