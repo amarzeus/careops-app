@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getVapiStatus } from "@/lib/vapi";
 
 export async function GET() {
   const user = await getCurrentUser();
@@ -25,7 +26,9 @@ export async function GET() {
       orderBy: { createdAt: "desc" },
     });
 
-    return NextResponse.json({ voiceAgents, phoneNumbers });
+    const vapiStatus = getVapiStatus();
+
+    return NextResponse.json({ voiceAgents, phoneNumbers, vapiStatus });
   } catch (error) {
     console.error("Error fetching voice data:", error);
     return NextResponse.json({ error: "Failed to fetch voice data" }, { status: 500 });

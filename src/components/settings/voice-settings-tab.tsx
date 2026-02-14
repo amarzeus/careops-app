@@ -16,7 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import { getVapiStatus, VOICE_TOOLS } from "@/lib/vapi";
+import { VOICE_TOOLS } from "@/lib/vapi";
 
 interface AIPreferences {
   id: string;
@@ -86,7 +86,6 @@ export function VoiceSettingsTab() {
 
   useEffect(() => {
     fetchVoiceData();
-    setVapiStatus(getVapiStatus());
   }, []);
 
   const fetchVoiceData = async () => {
@@ -96,6 +95,9 @@ export function VoiceSettingsTab() {
         const data = await res.json();
         setVoiceAgents(data.voiceAgents || []);
         setPhoneNumbers(data.phoneNumbers || []);
+        if (data.vapiStatus) {
+          setVapiStatus(data.vapiStatus);
+        }
       }
     } catch (error) {
       console.error("Failed to fetch voice data:", error);
