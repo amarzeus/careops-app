@@ -29,11 +29,11 @@ test.describe('Production Smoke Tests', () => {
     await expect(loginForm).toBeVisible();
   });
 
-  test('[Smoke] Public contact form is accessible', async ({ page }) => {
-    await page.goto(`${baseURL}/contact`);
+  test('[Smoke] Public terms page is accessible', async ({ page }) => {
+    await page.goto(`${baseURL}/terms`);
     
     // Check page loaded
-    await expect(page).toHaveTitle(/Contact/i);
+    await expect(page).toHaveTitle(/Terms/i);
   });
 
   test('[Smoke] API endpoints respond correctly', async ({ request }) => {

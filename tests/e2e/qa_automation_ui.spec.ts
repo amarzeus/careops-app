@@ -4,6 +4,9 @@ test.describe('Feature UI Tests', () => {
   test.setTimeout(60000);
 
   test('AI Wiring: Should chat with onboarding assistant', async ({ page, request, context }) => {
+    // Skip test if no Gemini API key is configured (CI environments)
+    test.skip(!process.env.GEMINI_API_KEY, 'GEMINI_API_KEY not configured - skipping AI test');
+    
     // 1. Seed user in onboarding
     const email = `test-ai-${Date.now()}@example.com`;
     const seedRes = await request.post('/api/test/seed', {
