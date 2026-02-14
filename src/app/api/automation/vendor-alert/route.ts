@@ -73,6 +73,17 @@ export async function POST(req: Request) {
                 recipient: item.vendorEmail,
             },
         });
+
+        // Also create a dashboard alert for the staff
+        await prisma.alert.create({
+            data: {
+                type: "automation",
+                title: "Vendor Notified",
+                message: `Automated reorder sent to ${item.vendorName || item.vendorEmail} for ${item.name}`,
+                actionUrl: "/inventory",
+                workspaceId: user.workspaceId,
+            },
+        });
     }
 
     return NextResponse.json({ message: "Vendor notified successfully" });

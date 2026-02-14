@@ -258,6 +258,17 @@ export async function GET() {
     });
   }
 
+  // Surfacing database-stored alerts
+  unresolvedAlerts.forEach((alert) => {
+    keyAlerts.push({
+      priority: alert.type === "critical" ? "critical" : "high",
+      category: alert.type.charAt(0).toUpperCase() + alert.type.slice(1),
+      message: alert.message,
+      action: "View",
+      link: alert.actionUrl || "/dashboard",
+    });
+  });
+
   // ──── AI Insights (non-blocking) ────
   const metricsForAI = {
     totalBookings: bookingsTodayList.length + bookingsUpcoming,
