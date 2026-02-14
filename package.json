@@ -4,14 +4,14 @@
   "private": true,
   "scripts": {
     "dev": "next dev -H 0.0.0.0 -p 5000",
-    "build": "prisma generate && next build",
+    "build": "./node_modules/.bin/prisma generate && next build",
     "start": "next start -H 0.0.0.0 -p 5000",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
     "format": "prettier --write .",
-    "postinstall": "prisma generate",
-    "db:migrate": "prisma migrate dev",
-    "db:push": "prisma db push",
+    "postinstall": "./node_modules/.bin/prisma generate",
+    "db:migrate": "./node_modules/.bin/prisma migrate dev",
+    "db:push": "./node_modules/.bin/prisma db push",
     "db:seed": "npx tsx prisma/seed.ts",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui"
