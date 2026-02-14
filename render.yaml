@@ -3,7 +3,7 @@ services:
     name: careops-app
     env: node
     plan: free
-    buildCommand: npm install --prefer-offline && npx prisma generate && npx next build
+    buildCommand: npm install && npm run build
     installCommand: npm install --prefer-offline
     startCommand: npx next start
     healthCheckPath: /
