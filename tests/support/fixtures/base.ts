@@ -2,13 +2,13 @@ import { test as base } from '@playwright/test';
 
 type BaseFixtures = {
   // Add common fixtures here (db, auth, etc.)
-  seedData: (data: any) => Promise<any>;
+  seedData: (data: unknown) => Promise<unknown>;
 };
 
 export const test = base.extend<BaseFixtures>({
-  seedData: async ({ request }, use) => {
+  seedData: async ({ request: _request }, runFixture) => {
     // Placeholder for seeding logic
-    await use(async (data) => {
+    await runFixture(async (data) => {
       console.log('Seeding data:', data);
       return data;
     });

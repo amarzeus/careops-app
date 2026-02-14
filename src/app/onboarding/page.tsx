@@ -57,6 +57,7 @@ export default function OnboardingPage() {
   const [newService, setNewService] = useState({ name: "", duration: "30", location: "", availableDays: "1,2,3,4,5", startTime: "09:00", endTime: "17:00" });
   const [intakeForms, setIntakeForms] = useState<Array<{ id?: string; name: string; description: string; fields?: string; serviceId?: string; documents?: string }>>([]);
   const [newIntakeForm, setNewIntakeForm] = useState<{ name: string; description: string; serviceId: string; documents: Array<{ name: string; url: string }> }>({ name: "", description: "", serviceId: "", documents: [] });
+  const [editingIndex, setEditingIndex] = useState<{ type: "service" | "form" | "inventory" | "staff" | null, index: number }>({ type: null, index: -1 });
   const [inventoryItems, setInventoryItems] = useState<Array<{ id?: string; name: string; quantity: string; threshold: string; unit: string }>>([]);
   const [newItem, setNewItem] = useState({ name: "", quantity: "0", threshold: "5", unit: "units" });
   const [staffMembers, setStaffMembers] = useState<Array<{ id?: string; name: string; email: string; password: string }>>([]);
@@ -187,13 +188,14 @@ export default function OnboardingPage() {
             });
           }
 
-          if (ws.intakeForms && ws.intakeForms.length > 0) {
+          if (ws.intakeForms && ws.intakeForms.length > 0 && intakeForms.length === 0) {
             setIntakeForms(ws.intakeForms);
           }
 
-          if (ws.users && ws.users.length > 1) {
+          if (ws.users && ws.users.length > 1 && staffMembers.length === 0) {
             const staff = ws.users.filter((u: any) => u.role === "STAFF");
             setStaffMembers(staff.map((s: any) => ({
+              id: s.id,
               name: s.name,
               email: s.email,
               password: "••••••••"
@@ -515,7 +517,9 @@ export default function OnboardingPage() {
     }
   };
 
-  const saveStep = async (advanceStep = true) => {
+  const saveStep = async (advanceStep: boolean = true, isAuto: boolean = false) => {
+    if (loading) return;
+    if (isAuto && currentStep === 8) return; // Never auto-activate
     setLoading(true);
     try {
       switch (currentStep) {
@@ -548,7 +552,12 @@ export default function OnboardingPage() {
           });
           break;
         case 4:
-          for (const svc of services) {
+          const servicesToSave = [...services];
+          if (newService.name) {
+            servicesToSave.push({ ...newService });
+            setNewService({ name: "", duration: "30", location: "", availableDays: "1,2,3,4,5", startTime: "09:00", endTime: "17:00" });
+          }
+          for (const svc of servicesToSave) {
             if (svc.id) {
               await fetch(`/api/services`, {
                 method: "PUT",
@@ -571,7 +580,12 @@ export default function OnboardingPage() {
           await fetchCurrentStep(false);
           break;
         case 5:
-          for (const form of intakeForms) {
+          const formsToSave = [...intakeForms];
+          if (newIntakeForm.name) {
+            formsToSave.push({ ...newIntakeForm, documents: JSON.stringify(newIntakeForm.documents) });
+            setNewIntakeForm({ name: "", description: "", serviceId: "", documents: [] });
+          }
+          for (const form of formsToSave) {
             if (form.id) {
               await fetch("/api/forms/intake-forms", {
                 method: "PUT",
@@ -591,9 +605,15 @@ export default function OnboardingPage() {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ onboardingStep: 6 }),
           });
+          await fetchCurrentStep(false);
           break;
         case 6:
-          for (const item of inventoryItems) {
+          const itemsToSave = [...inventoryItems];
+          if (newItem.name) {
+            itemsToSave.push({ ...newItem });
+            setNewItem({ name: "", quantity: "0", threshold: "5", unit: "units" });
+          }
+          for (const item of itemsToSave) {
             if (item.id) {
               await fetch(`/api/inventory`, {
                 method: "PUT",
@@ -613,10 +633,22 @@ export default function OnboardingPage() {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ onboardingStep: 7 }),
           });
+          await fetchCurrentStep(false);
           break;
         case 7:
-          for (const staff of staffMembers) {
-            if (!staff.id) {
+          const staffToSave = [...staffMembers];
+          if (newStaff.name && newStaff.email && newStaff.password) {
+            staffToSave.push({ ...newStaff });
+            setNewStaff({ name: "", email: "", password: "" });
+          }
+          for (const staff of staffToSave) {
+            if (staff.id) {
+              await fetch("/api/staff", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(staff),
+              });
+            } else {
               await fetch("/api/staff", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -629,6 +661,7 @@ export default function OnboardingPage() {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ onboardingStep: 8 }),
           });
+          await fetchCurrentStep(false);
           break;
         case 8:
           const validationRes = await fetch("/api/workspace/validate-activation");
@@ -672,40 +705,58 @@ export default function OnboardingPage() {
   // Auto-advance logic: wait for state update to complete before saving
   useEffect(() => {
     let timeout: NodeJS.Timeout;
-    if (autoAdvance) {
+    if (autoAdvance && currentStep < 8) {
       timeout = setTimeout(() => {
-        saveStep();
+        saveStep(true, true);
         setAutoAdvance(false);
       }, 1500);
     }
     return () => clearTimeout(timeout);
-  }, [autoAdvance, workspace, emailConfig, contactForm, services, intakeForms, inventoryItems, staffMembers]);
+  }, [autoAdvance, currentStep, workspace, emailConfig, contactForm, services, intakeForms, inventoryItems, staffMembers]);
 
   const addService = () => {
     if (newService.name) {
-      setServices(prev => [...prev, { ...newService }]);
+      if (editingIndex.type === "service" && editingIndex.index >= 0) {
+        setServices(prev => prev.map((s, i) => i === editingIndex.index ? { ...newService } : s));
+        setEditingIndex({ type: null, index: -1 });
+      } else {
+        setServices(prev => [...prev, { ...newService }]);
+      }
       setNewService({ name: "", duration: "30", location: "", availableDays: "1,2,3,4,5", startTime: "09:00", endTime: "17:00" });
     }
   };
 
   const removeService = (index: number) => {
     setServices(prev => prev.filter((_, i) => i !== index));
+    if (editingIndex.type === "service" && editingIndex.index === index) {
+      setEditingIndex({ type: null, index: -1 });
+      setNewService({ name: "", duration: "30", location: "", availableDays: "1,2,3,4,5", startTime: "09:00", endTime: "17:00" });
+    }
   };
 
   const editService = (index: number) => {
     setNewService(services[index]);
-    removeService(index);
+    setEditingIndex({ type: "service", index });
   };
 
   const addIntakeForm = () => {
     if (newIntakeForm.name) {
-      setIntakeForms(prev => [...prev, { ...newIntakeForm, documents: JSON.stringify(newIntakeForm.documents) }]);
+      if (editingIndex.type === "form" && editingIndex.index >= 0) {
+        setIntakeForms(prev => prev.map((f, i) => i === editingIndex.index ? { ...newIntakeForm, documents: JSON.stringify(newIntakeForm.documents) } : f));
+        setEditingIndex({ type: null, index: -1 });
+      } else {
+        setIntakeForms(prev => [...prev, { ...newIntakeForm, documents: JSON.stringify(newIntakeForm.documents) }]);
+      }
       setNewIntakeForm({ name: "", description: "", serviceId: "", documents: [] });
     }
   };
 
   const removeIntakeForm = (index: number) => {
     setIntakeForms(prev => prev.filter((_, i) => i !== index));
+    if (editingIndex.type === "form" && editingIndex.index === index) {
+      setEditingIndex({ type: null, index: -1 });
+      setNewIntakeForm({ name: "", description: "", serviceId: "", documents: [] });
+    }
   };
 
   const editIntakeForm = (index: number) => {
@@ -713,32 +764,59 @@ export default function OnboardingPage() {
     let docs = [];
     try {
       docs = JSON.parse(form.documents || "[]");
-    } catch {}
+    } catch { }
     setNewIntakeForm({ ...form, serviceId: form.serviceId || "", documents: docs });
-    removeIntakeForm(index);
+    setEditingIndex({ type: "form", index });
   };
 
   const addInventoryItem = () => {
     if (newItem.name) {
-      setInventoryItems(prev => [...prev, { ...newItem }]);
+      if (editingIndex.type === "inventory" && editingIndex.index >= 0) {
+        setInventoryItems(prev => prev.map((item, i) => i === editingIndex.index ? { ...newItem } : item));
+        setEditingIndex({ type: null, index: -1 });
+      } else {
+        setInventoryItems(prev => [...prev, { ...newItem }]);
+      }
       setNewItem({ name: "", quantity: "0", threshold: "5", unit: "units" });
     }
   };
 
   const removeInventoryItem = (index: number) => {
     setInventoryItems(prev => prev.filter((_, i) => i !== index));
+    if (editingIndex.type === "inventory" && editingIndex.index === index) {
+      setEditingIndex({ type: null, index: -1 });
+      setNewItem({ name: "", quantity: "0", threshold: "5", unit: "units" });
+    }
   };
 
   const editInventoryItem = (index: number) => {
     setNewItem(inventoryItems[index]);
-    removeInventoryItem(index);
+    setEditingIndex({ type: "inventory", index });
   };
 
   const addStaffMember = () => {
     if (newStaff.name && newStaff.email && newStaff.password) {
-      setStaffMembers(prev => [...prev, { ...newStaff }]);
+      if (editingIndex.type === "staff" && editingIndex.index >= 0) {
+        setStaffMembers(prev => prev.map((s, i) => i === editingIndex.index ? { ...newStaff } : s));
+        setEditingIndex({ type: null, index: -1 });
+      } else {
+        setStaffMembers(prev => [...prev, { ...newStaff }]);
+      }
       setNewStaff({ name: "", email: "", password: "" });
     }
+  };
+
+  const removeStaffMember = (index: number) => {
+    setStaffMembers(prev => prev.filter((_, i) => i !== index));
+    if (editingIndex.type === "staff" && editingIndex.index === index) {
+      setEditingIndex({ type: null, index: -1 });
+      setNewStaff({ name: "", email: "", password: "" });
+    }
+  };
+
+  const editStaffMember = (index: number) => {
+    setNewStaff(staffMembers[index]);
+    setEditingIndex({ type: "staff", index });
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -883,7 +961,9 @@ export default function OnboardingPage() {
                   <Input type="time" value={newService.endTime} onChange={e => setNewService(prev => ({ ...prev, endTime: e.target.value }))} className="h-8 text-sm" />
                 </div>
               </div>
-              <Button onClick={addService} size="sm" className="w-full bg-blue-600 hover:bg-blue-700 h-8 text-xs" disabled={!newService.name}>Add Service</Button>
+              <Button onClick={addService} size="sm" className="w-full bg-blue-600 hover:bg-blue-700 h-8 text-xs" disabled={!newService.name}>
+                {editingIndex.type === "service" ? "Update Service" : "Add Service"}
+              </Button>
             </div>
             {services.length > 0 && (
               <div className="space-y-1">
@@ -948,7 +1028,9 @@ export default function OnboardingPage() {
                   </div>
                 ))}
               </div>
-              <Button onClick={addIntakeForm} size="sm" className="w-full bg-blue-600 hover:bg-blue-700 h-8 text-xs" disabled={!newIntakeForm.name}>Add Form</Button>
+              <Button onClick={addIntakeForm} size="sm" className="w-full bg-blue-600 hover:bg-blue-700 h-8 text-xs" disabled={!newIntakeForm.name}>
+                {editingIndex.type === "form" ? "Update Form" : "Add Form"}
+              </Button>
             </div>
             {intakeForms.length > 0 && (
               <div className="space-y-1">
@@ -1003,19 +1085,29 @@ export default function OnboardingPage() {
                   <Input placeholder="boxes" value={newItem.unit} onChange={e => setNewItem(prev => ({ ...prev, unit: e.target.value }))} className="h-8 text-sm" />
                 </div>
               </div>
-              <Button onClick={addInventoryItem} size="sm" className="w-full bg-blue-600 hover:bg-blue-700 h-8 text-xs" disabled={!newItem.name}>Add Item</Button>
+              <Button onClick={addInventoryItem} size="sm" className="w-full bg-blue-600 hover:bg-blue-700 h-8 text-xs" disabled={!newItem.name}>
+                {editingIndex.type === "inventory" ? "Update Item" : "Add Item"}
+              </Button>
             </div>
             {inventoryItems.length > 0 && (
               <div className="space-y-1">
                 <Label className="text-[10px] font-bold uppercase text-gray-500">Added Items ({inventoryItems.length})</Label>
                 <div className="max-h-[120px] overflow-y-auto space-y-1 pr-1">
                   {inventoryItems.map((item, i) => (
-                    <div key={i} className="flex items-center justify-between p-2 border rounded bg-white text-xs animate-fade-in">
+                    <div key={i} className="flex items-center justify-between p-2 border rounded bg-white text-xs animate-fade-in group hover:border-blue-200 transition-colors">
                       <div>
                         <p className="font-medium">{item.name}</p>
                         <p className="text-[10px] text-gray-500">{item.quantity} {item.unit} (alert: {item.threshold})</p>
                       </div>
-                      <Badge variant="outline" className="text-green-600 border-green-200 bg-green-50 text-[10px] h-5 px-1">Added</Badge>
+                      <div className="flex items-center gap-1">
+                        <Button variant="ghost" size="icon" className="h-6 w-6 text-gray-400 hover:text-blue-600" onClick={() => editInventoryItem(i)}>
+                          <Edit2 className="h-3 w-3" />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-6 w-6 text-gray-400 hover:text-red-600" onClick={() => removeInventoryItem(i)}>
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                        <Badge variant="outline" className="text-green-600 border-green-200 bg-green-50 text-[10px] h-5 px-1 ml-1">Added</Badge>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -1042,19 +1134,29 @@ export default function OnboardingPage() {
                 <Label className="text-[10px] font-bold uppercase text-gray-500">Password *</Label>
                 <Input type="password" placeholder="Temporary password" value={newStaff.password} onChange={e => setNewStaff(prev => ({ ...prev, password: e.target.value }))} className="h-8 text-sm" />
               </div>
-              <Button onClick={addStaffMember} size="sm" className="w-full bg-blue-600 hover:bg-blue-700 h-8 text-xs" disabled={!newStaff.name || !newStaff.email || !newStaff.password}>Add Staff</Button>
+              <Button onClick={addStaffMember} size="sm" className="w-full bg-blue-600 hover:bg-blue-700 h-8 text-xs" disabled={!newStaff.name || !newStaff.email || !newStaff.password}>
+                {editingIndex.type === "staff" ? "Update Staff" : "Add Staff"}
+              </Button>
             </div>
             {staffMembers.length > 0 && (
               <div className="space-y-1">
                 <Label className="text-[10px] font-bold uppercase text-gray-500">Staff Members</Label>
                 <div className="max-h-[100px] overflow-y-auto space-y-1 pr-1">
                   {staffMembers.map((s, i) => (
-                    <div key={i} className="flex items-center justify-between p-2 border rounded bg-white text-xs">
+                    <div key={i} className="flex items-center justify-between p-2 border rounded bg-white text-xs animate-fade-in group hover:border-blue-200 transition-colors">
                       <div>
                         <p className="font-medium">{s.name}</p>
                         <p className="text-[10px] text-gray-500">{s.email}</p>
                       </div>
-                      <Badge variant="outline" className="text-green-600 border-green-200 bg-green-50 text-[10px] h-5 px-1">Added</Badge>
+                      <div className="flex items-center gap-1">
+                        <Button variant="ghost" size="icon" className="h-6 w-6 text-gray-400 hover:text-blue-600" onClick={() => editStaffMember(i)}>
+                          <Edit2 className="h-3 w-3" />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-6 w-6 text-gray-400 hover:text-red-600" onClick={() => removeStaffMember(i)}>
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                        <Badge variant="outline" className="text-green-600 border-green-200 bg-green-50 text-[10px] h-5 px-1 ml-1">Added</Badge>
+                      </div>
                     </div>
                   ))}
                 </div>

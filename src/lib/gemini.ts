@@ -394,8 +394,11 @@ ${stepInfo.schema}
     const text = result.response.text();
 
     const parsed = parseJSON<Record<string, unknown>>(text, {});
+    const parsedMessage = typeof parsed.message === "string" && parsed.message.trim().length > 0
+      ? parsed.message
+      : text.trim();
     return {
-      message: String(parsed.message || "Let me help you with that."),
+      message: parsedMessage || "Let me help you with that.",
       extractedData: (parsed.extractedData as Record<string, unknown>) || null,
       shouldAdvance: Boolean(parsed.shouldAdvance),
       navigationAction: (parsed.navigationAction as { type: "jump"; targetStep: number }) || null,

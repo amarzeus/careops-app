@@ -13,7 +13,7 @@ export type CalendarProps = {
     mode?: "single"
     initialFocus?: boolean
     showOutsideDays?: boolean
-    classNames?: any
+    classNames?: Record<string, string>
 }
 
 /**

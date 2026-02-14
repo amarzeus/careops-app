@@ -48,14 +48,19 @@ export async function triggerAutomation(
     });
     if (!workspace || workspace.status !== "ACTIVE") return;
 
-    const [rules, webhooks] = await Promise.all([
-      prisma.automationRule.findMany({
-        where: { workspaceId, trigger: trigger as AutomationTrigger, isActive: true },
-      }),
-      prisma.webhook.findMany({
+    const rulesPromise = prisma.automationRule.findMany({
+      where: { workspaceId, trigger: trigger as AutomationTrigger, isActive: true },
+    });
+
+    const maybeWebhookModel = (prisma as unknown as { webhook?: { findMany?: (args: unknown) => Promise<unknown[]> } }).webhook;
+    const webhooksPromise = maybeWebhookModel?.findMany
+      ? maybeWebhookModel.findMany({
         where: { workspaceId, event: trigger as AutomationTrigger, isActive: true },
-      }),
-    ]);
+      })
+      : Promise.resolve([]);
+
+    const [rules, rawWebhooks] = await Promise.all([rulesPromise, webhooksPromise]);
+    const webhooks = rawWebhooks as Array<{ id: string; url: string; secret: string | null }>;
 
     // Dispatch Webhooks with HMAC signatures and delivery logging
     webhooks.forEach(async (hook) => {
@@ -168,22 +173,20 @@ async function handleNewContact(workspace: Workspace, data: Record<string, unkno
   const welcomeMsg = await generateWelcomeMessage(workspace.name, contact.name);
 
   // Create conversation and message
-  let conversation = await prisma.conversation.findUnique({
+  const existingConversation = await prisma.conversation.findUnique({
     where: { contactId: contact.id },
   });
 
-  if (!conversation) {
-    conversation = await prisma.conversation.create({
-      data: {
-        contactId: contact.id,
-        workspaceId: workspace.id,
-        subject: `Conversation with ${contact.name}`,
-      },
-    });
-  }
+  const conversation = existingConversation ?? await prisma.conversation.create({
+    data: {
+      contactId: contact.id,
+      workspaceId: workspace.id,
+      subject: `Conversation with ${contact.name}`,
+    },
+  });
 
   // Check if automation is active for this conversation
-  if (!conversation.isActive) return;
+  if (conversation.isActive === false) return;
 
   // Determine the best channel and create the message record
   let channel: "EMAIL" | "SMS" | "WHATSAPP" = "EMAIL";
@@ -260,19 +263,17 @@ async function handleBookingCreated(workspace: Workspace, data: Record<string, u
     service?.location ?? undefined
   );
 
-  let conversation = await prisma.conversation.findUnique({
+  const existingConversation = await prisma.conversation.findUnique({
     where: { contactId: contact.id },
   });
 
-  if (!conversation) {
-    conversation = await prisma.conversation.create({
-      data: {
-        contactId: contact.id,
-        workspaceId: workspace.id,
-        subject: `Conversation with ${contact.name}`,
-      },
-    });
-  }
+  const conversation = existingConversation ?? await prisma.conversation.create({
+    data: {
+      contactId: contact.id,
+      workspaceId: workspace.id,
+      subject: `Conversation with ${contact.name}`,
+    },
+  });
 
   // Check if automation is active for this conversation
   if (!conversation.isActive) return;
@@ -401,7 +402,7 @@ async function handleFormPending(workspace: Workspace, data: Record<string, unkn
 
   if (!contact?.email) return;
 
-  let conversation = await prisma.conversation.findUnique({
+  const conversation = await prisma.conversation.findUnique({
     where: { contactId: contact.id },
   });
 
@@ -422,17 +423,17 @@ async function handleBeforeBooking(workspace: Workspace, data: Record<string, un
   const booking = data.booking as BookingData | undefined;
   const contact = data.contact as ContactData | undefined;
   const service = data.service as ServiceData | undefined;
-  
+
   if (!contact?.email || !booking) return;
-  
+
   const conversation = await prisma.conversation.findUnique({
     where: { contactId: contact.id },
   });
-  
+
   if (!conversation || !conversation.isActive) return;
-  
+
   const reminderMsg = `Hi ${contact.name}, this is a reminder about your upcoming ${service?.name || "appointment"} at ${new Date(booking.date).toLocaleString()}. Please arrive on time. - ${workspace.name}`;
-  
+
   await prisma.message.create({
     data: {
       content: reminderMsg,
@@ -442,7 +443,7 @@ async function handleBeforeBooking(workspace: Workspace, data: Record<string, un
       conversationId: conversation.id,
     },
   });
-  
+
   if (workspace.emailConfigured && contact.email) {
     await sendEmail({
       to: contact.email,
@@ -451,7 +452,7 @@ async function handleBeforeBooking(workspace: Workspace, data: Record<string, un
       workspaceId: workspace.id,
     });
   }
-  
+
   await prisma.alert.create({
     data: {
       type: "automation",
@@ -473,12 +474,12 @@ async function handleStaffReply(workspace: Workspace, data: Record<string, unkno
   // Update conversation to pause automation with auto-resume
   await prisma.conversation.update({
     where: { id: conversationId },
-    data: { 
+    data: {
       isActive: false,
       autoResumeAt: autoResumeAt
     },
   });
-  
+
   // Log the automation pause
   await prisma.alert.create({
     data: {

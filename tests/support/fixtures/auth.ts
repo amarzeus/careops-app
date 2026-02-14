@@ -5,10 +5,10 @@ type AuthFixtures = {
 };
 
 export const test = base.extend<AuthFixtures>({
-  authenticatedUser: async ({ page }, use) => {
+  authenticatedUser: async ({ page }, runFixture) => {
     // Login logic placeholder
     await page.goto('/login');
     // Implement actual login steps here
-    await use(page);
+    await runFixture(page);
   },
 });

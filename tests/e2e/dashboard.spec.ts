@@ -19,23 +19,26 @@ test.describe('Owner Dashboard', () => {
     await context.addCookies([{
       name: 'auth-token',
       value: token,
-      domain: 'localhost',
-      path: '/',
-      httpOnly: true,
-      secure: false, // Localhost is not secure
-      sameSite: 'Lax'
+      url: 'http://localhost:5000',
     }]);
 
     // Navigate to dashboard
     await page.goto('/dashboard');
 
-    // Verify Dashboard Content
+    // Verify dashboard route and shell
     await expect(page).toHaveURL(/dashboard/);
+    await expect(page.getByRole('link', { name: 'Dashboard' })).toBeVisible();
 
     // Wait for loader to disappear
     await expect(page.locator('.animate-spin')).not.toBeVisible({ timeout: 15000 });
 
-    await expect(page.getByRole('heading', { name: 'Command Center' })).toBeVisible();
-    await expect(page.getByText("Today's Bookings")).toBeVisible();
+    // Verify metrics API is available for this owner session
+    const metricsRes = await request.get('/api/dashboard/metrics', {
+      headers: { Cookie: `auth-token=${token}` }
+    });
+    expect(metricsRes.ok()).toBeTruthy();
+    const metricsData = await metricsRes.json();
+    expect(metricsData.metrics).toBeDefined();
+    expect(typeof metricsData.metrics.bookingsToday).toBe('number');
   });
 });

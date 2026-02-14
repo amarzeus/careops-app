@@ -93,7 +93,7 @@ test.describe('Feature API Tests', () => {
     expect(listRes.ok()).toBeTruthy();
     const listData = await listRes.json();
     expect(Array.isArray(listData.webhooks)).toBeTruthy();
-    expect(listData.webhooks.some((w: any) => w.url === webhookData.url)).toBeTruthy();
+    expect(listData.webhooks.some((w: { url?: string }) => w.url === webhookData.url)).toBeTruthy();
   });
 
   test('AI Wiring: Should chat with AI assistant', async ({ request }) => {

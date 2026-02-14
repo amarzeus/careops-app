@@ -59,14 +59,6 @@ export async function GET() {
     errors.push(`All active services must have availability defined. Missing: ${serviceNames}`);
   }
 
-  // Check 4: Optional - Warn if no contact form created
-  const contactFormCount = await prisma.contactForm.count({
-    where: { workspaceId: user.workspaceId, isActive: true },
-  });
-  if (contactFormCount === 0) {
-    errors.push("At least one contact form should be created (recommended)");
-  }
-
   return NextResponse.json({
     valid: errors.length === 0,
     errors,
