@@ -13,7 +13,6 @@ import {
   CheckCircle, 
   BarChart3,
   Rocket,
-  Play,
   Star,
   Building2,
   Workflow,
@@ -362,14 +361,6 @@ export default function LandingPage() {
                   </span>
                 </GradientButton>
               </Link>
-              <Link href="#demo">
-                <GradientButton variant="secondary">
-                  <span className="flex items-center gap-2">
-                    <Play className="w-4 h-4" />
-                    Watch Demo
-                  </span>
-                </GradientButton>
-              </Link>
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto">
@@ -477,26 +468,6 @@ export default function LandingPage() {
               </GradientButton>
             </Link>
           </div>
-        </div>
-      </section>
-
-      {/* Demo */}
-      <section id="demo" className="py-28 lg:py-36">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <TiltCard>
-            <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-3xl p-1 shadow-2xl">
-              <div className="bg-gray-900 rounded-3xl aspect-video flex items-center justify-center relative overflow-hidden group cursor-pointer">
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-indigo-600/20" />
-                <div className="relative z-10 text-center">
-                  <div className="w-28 h-28 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform mx-auto border border-white/20">
-                    <Play className="w-12 h-12 text-white ml-1" />
-                  </div>
-                  <h3 className="text-3xl font-bold text-white mb-3">Watch the Demo</h3>
-                  <p className="text-gray-400 text-lg">See CareOps in action</p>
-                </div>
-              </div>
-            </div>
-          </TiltCard>
         </div>
       </section>
 
