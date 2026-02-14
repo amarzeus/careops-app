@@ -150,6 +150,7 @@ model Workspace {
   voiceCalls      VoiceCall[]
   voiceAgents     VoiceAgent[]
   phoneNumbers   PhoneNumber[]
+  aiPreferences  AIPreferences?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -539,4 +540,33 @@ model PhoneNumber {
   updatedAt       DateTime  @updatedAt
 
   @@index([workspaceId])
+}
+
+// ──── AI Preferences (Per Workspace) ────
+
+model AIPreferences {
+  id                          String    @id @default(cuid())
+  workspaceId                 String    @unique
+  workspace                   Workspace @relation(fields: [workspaceId], references: [id])
+  
+  // Feature toggles
+  smartReplyEnabled           Boolean   @default(true)
+  insightsEnabled             Boolean   @default(true)
+  voiceEnabled                Boolean   @default(false)
+  anomalyDetectionEnabled     Boolean   @default(true)
+  inventoryForecastEnabled    Boolean   @default(true)
+  autoClassifyEnabled        Boolean   @default(true)
+  
+  // Preferences
+  defaultReplyTone            String    @default("professional") // professional, friendly, casual
+  
+  // Notification preferences
+  alertOnAnomaly              Boolean   @default(true)
+  dailyInsightTime           String?   // "09:00"
+  
+  // Model preferences
+  geminiModel                String    @default("gemini-2.0-flash")
+  
+  createdAt                  DateTime  @default(now())
+  updatedAt                  DateTime  @updatedAt
 }

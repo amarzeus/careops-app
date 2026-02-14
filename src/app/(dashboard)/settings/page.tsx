@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, Suspense } from "react";
-import { Link2, Settings, Shield, User } from "lucide-react";
+import { Link2, Settings, Shield, User, Sparkles } from "lucide-react";
 import { Header } from "@/components/layout/header";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
@@ -10,6 +10,8 @@ import { WorkspaceTab } from "@/components/settings/workspace-tab";
 import { ProfileTab } from "@/components/settings/profile-tab";
 import { IntegrationsTab } from "@/components/settings/integrations-tab";
 import { SecurityTab } from "@/components/settings/security-tab";
+import { AIPreferencesTab } from "@/components/settings/ai-preferences-tab";
+import { VoiceSettingsTab } from "@/components/settings/voice-settings-tab";
 import { WorkspaceSettingsDTO, UserProfileDTO } from "@/types/dto";
 
 function SettingsContent() {
@@ -240,8 +242,10 @@ function SettingsContent() {
         <Tabs defaultValue={defaultTab} className="space-y-6">
           <TabsList>
             <TabsTrigger value="workspace" className="flex items-center gap-2"><Settings className="w-4 h-4" /> Workspace</TabsTrigger>
-            <TabsTrigger value="profile" className="flex items-center gap-2"><User className="w-4 h-4" /> Profile</TabsTrigger>
+            <TabsTrigger value="ai" className="flex items-center gap-2"><Sparkles className="w-4 h-4" /> AI</TabsTrigger>
+            <TabsTrigger value="voice" className="flex items-center gap-2"><Sparkles className="w-4 h-4" /> Voice</TabsTrigger>
             <TabsTrigger value="integrations" className="flex items-center gap-2"><Link2 className="w-4 h-4" /> Integrations</TabsTrigger>
+            <TabsTrigger value="profile" className="flex items-center gap-2"><User className="w-4 h-4" /> Profile</TabsTrigger>
             <TabsTrigger value="security" className="flex items-center gap-2"><Shield className="w-4 h-4" /> Security</TabsTrigger>
           </TabsList>
 
@@ -259,14 +263,12 @@ function SettingsContent() {
             />
           </TabsContent>
 
-          <TabsContent value="profile">
-            <ProfileTab
-              user={user}
-              onUpdate={handleUpdateProfile}
-              onSave={handleSaveProfile}
-              saving={savingProfile}
-              saved={savedProfile}
-            />
+          <TabsContent value="ai">
+            <AIPreferencesTab />
+          </TabsContent>
+
+          <TabsContent value="voice">
+            <VoiceSettingsTab />
           </TabsContent>
 
           <TabsContent value="integrations">

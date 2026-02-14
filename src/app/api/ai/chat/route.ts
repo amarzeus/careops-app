@@ -1,12 +1,7 @@
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth";
 import { aiOnboardingAssistant } from "@/lib/gemini";
 
 export async function POST(req: Request) {
-  const user = await getCurrentUser();
-  if (!user)
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
   const { message, currentStep, businessInfo, conversationHistory } = await req.json();
   if (!message)
     return NextResponse.json(

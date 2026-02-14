@@ -1,16 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { 
-  Calendar, 
-  MessageSquare, 
-  FileText, 
-  Package, 
-  Zap, 
-  Sparkles, 
-  ArrowRight, 
-  Activity, 
-  CheckCircle, 
+import {
+  Calendar,
+  MessageSquare,
+  FileText,
+  Package,
+  Zap,
+  Sparkles,
+  ArrowRight,
+  Activity,
+  CheckCircle,
   BarChart3,
   Rocket,
   Star,
@@ -29,39 +29,39 @@ import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 
 const features = [
-  { 
-    icon: Calendar, 
-    title: "Smart Bookings", 
+  {
+    icon: Calendar,
+    title: "Smart Bookings",
     description: "Automated scheduling with public pages, availability management, and instant confirmations.",
     color: "blue"
   },
-  { 
-    icon: MessageSquare, 
-    title: "Unified Inbox", 
+  {
+    icon: MessageSquare,
+    title: "Unified Inbox",
     description: "All communication channels in one place. Email, SMS, and AI-powered responses.",
     color: "indigo"
   },
-  { 
-    icon: FileText, 
-    title: "Dynamic Forms", 
+  {
+    icon: FileText,
+    title: "Dynamic Forms",
     description: "Intelligent forms that auto-send after bookings and track completion seamlessly.",
     color: "purple"
   },
-  { 
-    icon: Package, 
-    title: "Inventory Tracking", 
+  {
+    icon: Package,
+    title: "Inventory Tracking",
     description: "Real-time stock monitoring with smart alerts before items run out.",
     color: "emerald"
   },
-  { 
-    icon: Zap, 
-    title: "Automation Engine", 
+  {
+    icon: Zap,
+    title: "Automation Engine",
     description: "Event-driven workflows that handle follow-ups, reminders, and notifications.",
     color: "amber"
   },
-  { 
-    icon: BarChart3, 
-    title: "Command Dashboard", 
+  {
+    icon: BarChart3,
+    title: "Command Dashboard",
     description: "Live business overview with actionable insights and drill-down capabilities.",
     color: "rose"
   },
@@ -152,7 +152,7 @@ function TiltCard({ children, className = "" }: { children: React.ReactNode; cla
 // Gradient Orb Animation
 function GradientOrb({ className = "", delay = 0 }: { className?: string; delay?: number }) {
   return (
-    <div 
+    <div
       className={`absolute rounded-full blur-3xl opacity-30 animate-pulse ${className}`}
       style={{ animationDuration: "8s", animationDelay: `${delay}s` }}
     />
@@ -218,7 +218,7 @@ function GradientButton({ children, className = "", variant = "primary" }: { chi
 
 function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   if (!isOpen) return null;
-  
+
   return (
     <div className="fixed inset-0 z-50 bg-white/98 backdrop-blur-lg">
       <div className="flex flex-col h-full">
@@ -235,10 +235,10 @@ function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
         </div>
         <nav className="flex-1 p-6 space-y-4">
           {["Features", "How It Works", "Testimonials"].map((item) => (
-            <a 
+            <a
               key={item}
-              href={`#${item.toLowerCase().replace(" ", "-")}`} 
-              onClick={onClose} 
+              href={`#${item.toLowerCase().replace(" ", "-")}`}
+              onClick={onClose}
               className="block py-4 text-xl font-medium text-gray-700 hover:text-blue-600"
             >
               {item}
@@ -273,15 +273,15 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-white overflow-x-hidden">
       <MobileMenu isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
-      
+
       {/* Animated Background */}
       <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
         <GradientOrb className="w-[600px] h-[600px] bg-blue-300 -top-40 -left-40" delay={0} />
         <GradientOrb className="w-[500px] h-[500px] bg-indigo-300 top-1/2 right-0" delay={2} />
         <GradientOrb className="w-[400px] h-[400px] bg-purple-300 bottom-0 left-1/4" delay={4} />
-        
+
         {/* Subtle Grid */}
-        <div 
+        <div
           className="absolute inset-0 opacity-[0.015]"
           style={{
             backgroundImage: `linear-gradient(rgb(0,0,0) 1px, transparent 1px), linear-gradient(90deg, rgb(0,0,0) 1px, transparent 1px)`,
@@ -300,10 +300,10 @@ export default function LandingPage() {
               </div>
               <span className="text-2xl font-bold text-gray-900">CareOps</span>
             </div>
-            
+
             <div className="hidden lg:flex items-center gap-2">
               {["Features", "How It Works", "Testimonials"].map((item) => (
-                <a 
+                <a
                   key={item}
                   href={`#${item.toLowerCase().replace(" ", "-")}`}
                   className="px-5 py-2.5 text-sm font-medium text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
@@ -312,7 +312,7 @@ export default function LandingPage() {
                 </a>
               ))}
             </div>
-            
+
             <div className="hidden lg:flex items-center gap-4">
               <Link href="/login">
                 <Button variant="ghost" className="text-gray-600 hover:text-gray-900">Sign In</Button>
@@ -323,7 +323,7 @@ export default function LandingPage() {
                 </Button>
               </Link>
             </div>
-            
+
             <button className="lg:hidden p-3 hover:bg-gray-100 rounded-xl" onClick={() => setMobileMenuOpen(true)}>
               <Menu className="w-6 h-6" />
             </button>
@@ -339,18 +339,18 @@ export default function LandingPage() {
               <Sparkles className="w-4 h-4" />
               <span>AI-Powered Operations Platform</span>
             </div>
-            
+
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight mb-8">
               One Platform.<br />
               <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
                 Every Operation.
               </span>
             </h1>
-            
+
             <p className="text-xl sm:text-2xl text-gray-500 max-w-2xl mx-auto mb-12 leading-relaxed">
               Replace scattered tools with one intelligent system. Streamline bookings, communications, inventory, and more.
             </p>
-            
+
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
               <Link href="/register">
                 <GradientButton className="group">
@@ -374,7 +374,7 @@ export default function LandingPage() {
             </div>
           </div>
         </div>
-        
+
         {/* Floating Elements */}
         <FloatingElement className="absolute top-1/4 left-[8%] hidden lg:block" delay={0}>
           <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-3xl shadow-2xl rotate-12 opacity-80" />
@@ -417,7 +417,7 @@ export default function LandingPage() {
               Six powerful modules working as one unified system.
             </p>
           </div>
-          
+
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {features.map((feature) => (
               <TiltCard key={feature.title}>
@@ -492,7 +492,7 @@ export default function LandingPage() {
                       <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />
                     ))}
                   </div>
-                  <p className="text-gray-700 mb-8 leading-relaxed text-lg">"{testimonial.quote}"</p>
+                  <p className="text-gray-700 mb-8 leading-relaxed text-lg">&quot;{testimonial.quote}&quot;</p>
                   <div className="flex items-center gap-4">
                     <div className="w-14 h-14 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center text-white font-bold text-lg">
                       {testimonial.avatar}
@@ -513,14 +513,14 @@ export default function LandingPage() {
       <section className="py-28 lg:py-40 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700" />
         <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%23ffffff%22%20fill-opacity%3D%220.05%22%3E%3Cpath%20d%3D%22M36%2034v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6%2034v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6%204V0H4v4H0v2h4v4h2V6h4V4H6z%22%2F%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E')] opacity-30" />
-        
+
         <FloatingElement className="absolute top-20 left-[15%] hidden lg:block" delay={0}>
           <div className="w-16 h-16 bg-white/10 backdrop-blur-sm rounded-xl" />
         </FloatingElement>
         <FloatingElement className="absolute bottom-20 right-[15%] hidden lg:block" delay={1}>
           <div className="w-20 h-20 bg-white/10 backdrop-blur-sm rounded-full" />
         </FloatingElement>
-        
+
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
           <h2 className="text-5xl sm:text-6xl font-bold text-white mb-8">
             Ready to transform?
@@ -528,7 +528,7 @@ export default function LandingPage() {
           <p className="text-xl text-blue-100 mb-12 max-w-2xl mx-auto">
             Join thousands of businesses that have streamlined their operations. Start your free trial today.
           </p>
-          
+
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
             <Link href="/register">
               <button className="px-10 py-5 bg-white text-blue-600 rounded-2xl font-bold text-lg shadow-2xl hover:shadow-3xl hover:-translate-y-1 active:translate-y-0 transition-all">
@@ -544,7 +544,7 @@ export default function LandingPage() {
               </button>
             </Link>
           </div>
-          
+
           <div className="flex flex-wrap items-center justify-center gap-6 text-blue-100">
             <span className="flex items-center gap-2"><Check className="w-5 h-5" />No credit card required</span>
             <span className="flex items-center gap-2"><Check className="w-5 h-5" />8-minute setup</span>

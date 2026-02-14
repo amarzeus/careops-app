@@ -6,6 +6,12 @@ export interface ConversationDTO {
   lastMessage: string;
   lastMessageAt: string;
   unreadCount: number;
+  intent?: {
+    type: "inquiry" | "complaint" | "booking_request" | "urgent" | "general" | "follow_up" | "cancellation";
+    priority: "high" | "medium" | "low";
+    confidence: number;
+    suggestedAction: string;
+  } | null;
 }
 
 export interface MessageDTO {

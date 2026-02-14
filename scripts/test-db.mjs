@@ -1,5 +1,6 @@
-const { Client } = require('pg');
-require('dotenv').config();
+import { Client } from 'pg';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const client = new Client({
     connectionString: process.env.DATABASE_URL,
@@ -8,7 +9,7 @@ const client = new Client({
     }
 });
 
-console.log('Attempting to connect to:', process.env.DATABASE_URL.split('@')[1]);
+console.log('Attempting to connect to:', process.env.DATABASE_URL?.split('@')[1] || 'URL not found');
 
 client.connect()
     .then(() => {

@@ -326,7 +326,7 @@ export default function DashboardPage() {
 
           {/* B. AI Suggestions */}
           <HoverExpandCard
-            title="AI Suggestions"
+            title="AI Insights"
             icon={Sparkles}
             count={(data?.aiInsights?.length || 0)}
             headerColorClass="text-violet-900"
@@ -336,11 +336,13 @@ export default function DashboardPage() {
           >
             {data?.aiInsights && data.aiInsights.length > 0 ? (
               <div className="space-y-2">
-                {data.aiInsights.slice(0, 3).map((insight, i) => (
+                {data.aiInsights.slice(0, 5).map((insight, i) => (
                   <div key={i} className="flex gap-2.5 items-start p-2.5 rounded-md bg-white border border-violet-100 hover:border-violet-200 transition-colors">
-                    <div className="mt-1">
-                      <div className="w-1.5 h-1.5 rounded-full bg-violet-400" />
-                    </div>
+                    <div className={cn(
+                      "mt-1 w-2 h-2 rounded-full shrink-0",
+                      insight.priority === 'high' ? 'bg-red-500' :
+                        insight.priority === 'medium' ? 'bg-amber-500' : 'bg-green-500'
+                    )} />
                     <div className="min-w-0 flex-1">
                       <p className="text-xs text-gray-700 leading-snug mb-1">{insight.message}</p>
                       <Badge variant="secondary" className="text-[9px] h-4 px-1 bg-violet-50 text-violet-700 hover:bg-violet-100 border border-violet-100">

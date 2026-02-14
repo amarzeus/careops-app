@@ -3,6 +3,13 @@
 > eslint
 
 
+/home/amar/Documents/Hackathon/careops-app/scripts/test-db-connection.js
+  1:26  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+
+/home/amar/Documents/Hackathon/careops-app/scripts/test-db.js
+  1:20  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+  2:1   error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+
 /home/amar/Documents/Hackathon/careops-app/seed_settings_user.ts
   3:10  warning  'hashPassword' is defined but never used  @typescript-eslint/no-unused-vars
 
@@ -52,9 +59,8 @@
   118:14  warning  'error' is defined but never used             @typescript-eslint/no-unused-vars
 
 /home/amar/Documents/Hackathon/careops-app/src/app/(dashboard)/inbox/page.tsx
-   4:76  warning  'Send' is defined but never used                                                                             @typescript-eslint/no-unused-vars
-  15:16  warning  Missing JSDoc comment                                                                                        jsdoc/require-jsdoc
-  51:6   warning  React Hook useEffect has a missing dependency: 'activeId'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  14:16  warning  Missing JSDoc comment                                                                                        jsdoc/require-jsdoc
+  49:6   warning  React Hook useEffect has a missing dependency: 'activeId'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
 
 /home/amar/Documents/Hackathon/careops-app/src/app/(dashboard)/inventory/page.tsx
    13:16  warning  Missing JSDoc comment                     jsdoc/require-jsdoc
@@ -69,21 +75,16 @@
   6:16  warning  Missing JSDoc comment  jsdoc/require-jsdoc
 
 /home/amar/Documents/Hackathon/careops-app/src/app/(dashboard)/settings/page.tsx
-   10:10  warning  'ProfileTab' is defined but never used                                                                     @typescript-eslint/no-unused-vars
-   29:10  warning  'savingProfile' is assigned a value but never used                                                         @typescript-eslint/no-unused-vars
-   30:10  warning  'savedProfile' is assigned a value but never used                                                          @typescript-eslint/no-unused-vars
-   70:6   warning  React Hook useEffect has a missing dependency: 'router'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
-   76:14  warning  'error' is defined but never used                                                                          @typescript-eslint/no-unused-vars
-   85:14  warning  'error' is defined but never used                                                                          @typescript-eslint/no-unused-vars
-  101:14  warning  'error' is defined but never used                                                                          @typescript-eslint/no-unused-vars
-  106:9   warning  'handleUpdateProfile' is assigned a value but never used                                                   @typescript-eslint/no-unused-vars
-  110:9   warning  'handleSaveProfile' is assigned a value but never used                                                     @typescript-eslint/no-unused-vars
-  117:14  warning  'error' is defined but never used                                                                          @typescript-eslint/no-unused-vars
-  171:14  warning  'error' is defined but never used                                                                          @typescript-eslint/no-unused-vars
-  186:14  warning  'error' is defined but never used                                                                          @typescript-eslint/no-unused-vars
-  205:14  warning  'error' is defined but never used                                                                          @typescript-eslint/no-unused-vars
-  221:14  warning  'error' is defined but never used                                                                          @typescript-eslint/no-unused-vars
-  309:16  warning  Missing JSDoc comment                                                                                      jsdoc/require-jsdoc
+   68:6   warning  React Hook useEffect has a missing dependency: 'router'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+   74:14  warning  'error' is defined but never used                                                                          @typescript-eslint/no-unused-vars
+   83:14  warning  'error' is defined but never used                                                                          @typescript-eslint/no-unused-vars
+   99:14  warning  'error' is defined but never used                                                                          @typescript-eslint/no-unused-vars
+  115:14  warning  'error' is defined but never used                                                                          @typescript-eslint/no-unused-vars
+  169:14  warning  'error' is defined but never used                                                                          @typescript-eslint/no-unused-vars
+  184:14  warning  'error' is defined but never used                                                                          @typescript-eslint/no-unused-vars
+  203:14  warning  'error' is defined but never used                                                                          @typescript-eslint/no-unused-vars
+  219:14  warning  'error' is defined but never used                                                                          @typescript-eslint/no-unused-vars
+  307:16  warning  Missing JSDoc comment                                                                                      jsdoc/require-jsdoc
 
 /home/amar/Documents/Hackathon/careops-app/src/app/(dashboard)/staff/page.tsx
    12:16  warning  Missing JSDoc comment                     jsdoc/require-jsdoc
@@ -126,10 +127,6 @@
 /home/amar/Documents/Hackathon/careops-app/src/app/api/ai/operations-summary/route.ts
   7:8  warning  Missing JSDoc comment  jsdoc/require-jsdoc
 
-/home/amar/Documents/Hackathon/careops-app/src/app/api/ai/preferences/route.ts
-   5:8  warning  Missing JSDoc comment  jsdoc/require-jsdoc
-  29:8  warning  Missing JSDoc comment  jsdoc/require-jsdoc
-
 /home/amar/Documents/Hackathon/careops-app/src/app/api/ai/refine-message/route.ts
   5:8  warning  Missing JSDoc comment  jsdoc/require-jsdoc
 
@@ -146,10 +143,6 @@
   119:97   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
   187:21   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
   208:44   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
-
-/home/amar/Documents/Hackathon/careops-app/src/app/api/ai/voice/settings/route.ts
-   5:8  warning  Missing JSDoc comment  jsdoc/require-jsdoc
-  35:8  warning  Missing JSDoc comment  jsdoc/require-jsdoc
 
 /home/amar/Documents/Hackathon/careops-app/src/app/api/alerts/route.ts
    5:8  warning  Missing JSDoc comment  jsdoc/require-jsdoc
@@ -294,8 +287,8 @@
   68:8  warning  Missing JSDoc comment  jsdoc/require-jsdoc
 
 /home/amar/Documents/Hackathon/careops-app/src/app/api/inbox/conversations/route.ts
-  6:8   warning  Missing JSDoc comment            jsdoc/require-jsdoc
-  6:27  warning  'req' is defined but never used  @typescript-eslint/no-unused-vars
+  5:8   warning  Missing JSDoc comment            jsdoc/require-jsdoc
+  5:27  warning  'req' is defined but never used  @typescript-eslint/no-unused-vars
 
 /home/amar/Documents/Hackathon/careops-app/src/app/api/inbox/messages/route.ts
    9:1   warning  Missing JSDoc @param "workspace" declaration  jsdoc/require-param
@@ -591,7 +584,7 @@
   25:8   warning  Missing JSDoc comment                      jsdoc/require-jsdoc
 
 /home/amar/Documents/Hackathon/careops-app/src/components/inbox/conversation-list.tsx
-  31:8  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+  21:8  warning  Missing JSDoc comment  jsdoc/require-jsdoc
 
 /home/amar/Documents/Hackathon/careops-app/src/components/inbox/message-thread.tsx
   16:8  warning  Missing JSDoc comment  jsdoc/require-jsdoc
@@ -620,14 +613,6 @@
   38:67  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
   38:82  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
 
-/home/amar/Documents/Hackathon/careops-app/src/components/settings/ai-preferences-tab.tsx
-   5:29  warning  'CardDescription' is defined but never used  @typescript-eslint/no-unused-vars
-   5:46  warning  'CardHeader' is defined but never used       @typescript-eslint/no-unused-vars
-   5:58  warning  'CardTitle' is defined but never used        @typescript-eslint/no-unused-vars
-  33:8   warning  Missing JSDoc comment                        jsdoc/require-jsdoc
-  33:36  warning  'onSelectTab' is defined but never used      @typescript-eslint/no-unused-vars
-  87:14  warning  'error' is defined but never used            @typescript-eslint/no-unused-vars
-
 /home/amar/Documents/Hackathon/careops-app/src/components/settings/integrations-tab.tsx
    3:31  warning  'MessageCircle' is defined but never used  @typescript-eslint/no-unused-vars
   28:8   warning  Missing JSDoc comment                      jsdoc/require-jsdoc
@@ -637,30 +622,6 @@
 
 /home/amar/Documents/Hackathon/careops-app/src/components/settings/security-tab.tsx
   39:8  warning  Missing JSDoc comment  jsdoc/require-jsdoc
-
-/home/amar/Documents/Hackathon/careops-app/src/components/settings/voice-settings-tab.tsx
-    5:3   warning  'Sparkles' is defined but never used                             @typescript-eslint/no-unused-vars
-    5:13  warning  'Brain' is defined but never used                                @typescript-eslint/no-unused-vars
-    5:20  warning  'MessageSquare' is defined but never used                        @typescript-eslint/no-unused-vars
-    5:55  warning  'Package' is defined but never used                              @typescript-eslint/no-unused-vars
-    5:64  warning  'Settings' is defined but never used                             @typescript-eslint/no-unused-vars
-    6:12  warning  'Check' is defined but never used                                @typescript-eslint/no-unused-vars
-    6:19  warning  'Zap' is defined but never used                                  @typescript-eslint/no-unused-vars
-    6:65  warning  'Copy' is defined but never used                                 @typescript-eslint/no-unused-vars
-    7:3   warning  'ExternalLink' is defined but never used                         @typescript-eslint/no-unused-vars
-    9:29  warning  'CardDescription' is defined but never used                      @typescript-eslint/no-unused-vars
-   15:10  warning  'Select' is defined but never used                               @typescript-eslint/no-unused-vars
-   15:18  warning  'SelectContent' is defined but never used                        @typescript-eslint/no-unused-vars
-   15:33  warning  'SelectItem' is defined but never used                           @typescript-eslint/no-unused-vars
-   15:45  warning  'SelectTrigger' is defined but never used                        @typescript-eslint/no-unused-vars
-   15:60  warning  'SelectValue' is defined but never used                          @typescript-eslint/no-unused-vars
-   21:11  warning  'AIPreferences' is defined but never used                        @typescript-eslint/no-unused-vars
-   63:8   warning  Missing JSDoc comment                                            jsdoc/require-jsdoc
-  145:14  warning  'error' is defined but never used                                @typescript-eslint/no-unused-vars
-  162:14  warning  'error' is defined but never used                                @typescript-eslint/no-unused-vars
-  178:14  warning  'error' is defined but never used                                @typescript-eslint/no-unused-vars
-  449:61  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
-  449:78  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
 
 /home/amar/Documents/Hackathon/careops-app/src/components/settings/webhooks-section.tsx
   32:8   warning  Missing JSDoc comment              jsdoc/require-jsdoc
@@ -898,6 +859,6 @@
 /home/amar/Documents/Hackathon/careops-app/tests/support/fixtures/base.ts
   9:31  warning  '_request' is defined but never used  @typescript-eslint/no-unused-vars
 
-✖ 565 problems (2 errors, 563 warnings)
-  0 errors and 322 warnings potentially fixable with the `--fix` option.
+✖ 530 problems (3 errors, 527 warnings)
+  0 errors and 316 warnings potentially fixable with the `--fix` option.
 

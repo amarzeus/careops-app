@@ -19,12 +19,14 @@ interface VapiClientType {
 let vapiClient: VapiClientType | null = null;
 
 if (apiKey) {
-  try {
-    const { VapiClient } = require('@vapi-ai/server-sdk');
-    vapiClient = new VapiClient({ token: apiKey }) as VapiClientType;
-  } catch (e) {
-    console.warn('[VAPI] Failed to initialize VAPI client:', e);
-  }
+  // Use dynamic import for ESM compatibility and to satisfy linting
+  import('@vapi-ai/server-sdk')
+    .then(({ VapiClient }) => {
+      vapiClient = new VapiClient({ token: apiKey }) as unknown as VapiClientType;
+    })
+    .catch((e) => {
+      console.warn('[VAPI] Failed to initialize VAPI client:', e);
+    });
 }
 
 export const vapi = vapiClient;
