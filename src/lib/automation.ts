@@ -7,6 +7,44 @@ import { generateWebhookSignature, serializePayload } from "./webhook-security";
 import { initiateOutboundCall, isVapiConfigured } from "./vapi";
 import type { AutomationRule, Workspace, AutomationTrigger } from "@prisma/client";
 
+/**
+ * Check if email is available for sending
+ * Priority: 1) Workspace flag, 2) Environment variables
+ */
+function isEmailAvailable(workspace: Workspace): boolean {
+  // If workspace flag is explicitly set, use it
+  if (workspace.emailConfigured) return true;
+
+  // Otherwise check if environment variables are configured
+  const hasEmailEnv = !!(
+    process.env.EMAIL_HOST &&
+    process.env.EMAIL_PORT &&
+    process.env.EMAIL_USER &&
+    process.env.EMAIL_PASS &&
+    process.env.EMAIL_FROM
+  );
+
+  return hasEmailEnv;
+}
+
+/**
+ * Check if SMS is available for sending
+ * Priority: 1) Workspace flag, 2) Environment variables
+ */
+function isSMSAvailable(workspace: Workspace): boolean {
+  // If workspace flag is explicitly set, use it
+  if (workspace.smsConfigured) return true;
+
+  // Otherwise check if environment variables are configured
+  const hasSMSEnv = !!(
+    process.env.TWILIO_ACCOUNT_SID &&
+    process.env.TWILIO_AUTH_TOKEN &&
+    process.env.TWILIO_PHONE_NUMBER
+  );
+
+  return hasSMSEnv;
+}
+
 /** Typed shape for automation context data */
 export interface ContactData {
   id: string;
@@ -193,7 +231,7 @@ async function handleNewContact(workspace: Workspace, data: Record<string, unkno
   let channel: "EMAIL" | "SMS" | "WHATSAPP" = "EMAIL";
 
   // Send actual email
-  if (contact.email && workspace.emailConfigured) {
+  if (contact.email && isEmailAvailable(workspace)) {
     await prisma.message.create({
       data: {
         content: welcomeMsg,
@@ -232,7 +270,7 @@ async function handleNewContact(workspace: Workspace, data: Record<string, unkno
   }
 
   // Fallback to SMS if WhatsApp is not available but contact has phone
-  if (contact.phone && !isWhatsAppAvailable() && workspace.smsConfigured) {
+  if (contact.phone && !isWhatsAppAvailable() && isSMSAvailable(workspace)) {
     channel = "SMS";
     await prisma.message.create({
       data: {
@@ -280,7 +318,7 @@ async function handleBookingCreated(workspace: Workspace, data: Record<string, u
   if (!conversation.isActive) return;
 
   // Send via Email
-  if (contact.email && workspace.emailConfigured) {
+  if (contact.email && isEmailAvailable(workspace)) {
     await prisma.message.create({
       data: {
         content: confirmationMsg,
@@ -324,7 +362,7 @@ async function handleBookingCreated(workspace: Workspace, data: Record<string, u
   }
 
   // Fallback to SMS
-  if (contact.phone && !isWhatsAppAvailable() && workspace.smsConfigured) {
+  if (contact.phone && !isWhatsAppAvailable() && isSMSAvailable(workspace)) {
     await prisma.message.create({
       data: {
         content: confirmationMsg,
@@ -369,7 +407,7 @@ async function handleBookingCreated(workspace: Workspace, data: Record<string, u
         },
       });
 
-      if (workspace.emailConfigured && contact.email) {
+      if (isEmailAvailable(workspace) && contact.email) {
         await sendEmail({
           to: contact.email,
           subject: `Action Required: ${form.name} - ${workspace.name}`,
@@ -445,7 +483,7 @@ async function handleBeforeBooking(workspace: Workspace, data: Record<string, un
     },
   });
 
-  if (workspace.emailConfigured && contact.email) {
+  if (isEmailAvailable(workspace) && contact.email) {
     await sendEmail({
       to: contact.email,
       subject: `Reminder: Your appointment tomorrow - ${workspace.name}`,
@@ -508,7 +546,7 @@ async function handleInventoryLow(workspace: Workspace, data: Record<string, unk
   });
 
   // Email vendor if configured
-  if (item.vendorEmail && workspace.emailConfigured) {
+  if (item.vendorEmail && isEmailAvailable(workspace)) {
     await sendEmail({
       to: item.vendorEmail,
       subject: `Reorder Request: ${item.name} - ${workspace.name}`,

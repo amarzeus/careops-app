@@ -26,13 +26,19 @@ export async function getGoogleTokens(code: string) {
         grant_type: "authorization_code",
     };
 
+    console.log("[Google Tokens] Requesting tokens with redirect_uri:", values.redirect_uri);
+    
     const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: new URLSearchParams(values).toString(),
     });
 
-    if (!res.ok) throw new Error("Failed to fetch Google tokens");
+    if (!res.ok) {
+        const errorText = await res.text();
+        console.error("[Google Tokens] Failed:", res.status, errorText);
+        throw new Error(`Failed to fetch Google tokens: ${res.status} - ${errorText}`);
+    }
     return res.json();
 }
 

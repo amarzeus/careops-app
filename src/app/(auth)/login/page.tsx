@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Activity } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,10 +11,31 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // Display error from URL query params (e.g., from Google OAuth callback)
+  useEffect(() => {
+    const errorParam = searchParams.get("error");
+    const messageParam = searchParams.get("message");
+    
+    if (errorParam) {
+      let errorMessage = "Authentication failed";
+      
+      if (errorParam === "google_auth_failed") {
+        errorMessage = "Google sign-in failed. Please try again or use email/password.";
+      }
+      
+      if (messageParam) {
+        errorMessage += `: ${decodeURIComponent(messageParam)}`;
+      }
+      
+      setError(errorMessage);
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

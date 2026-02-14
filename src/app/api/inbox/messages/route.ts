@@ -4,6 +4,37 @@ import { prisma } from "@/lib/prisma";
 import { sendEmail, buildEmailTemplate } from "@/lib/email";
 import { sendSMS } from "@/lib/sms";
 import { sendTextMessage as sendWhatsAppMessage, isAvailable as isWhatsAppAvailable } from "@/lib/whatsapp";
+import type { Workspace } from "@prisma/client";
+
+/**
+ * Check if email is available for sending
+ * Priority: 1) Workspace flag, 2) Environment variables
+ */
+function isEmailAvailable(workspace: Workspace): boolean {
+  if (workspace.emailConfigured) return true;
+  const hasEmailEnv = !!(
+    process.env.EMAIL_HOST &&
+    process.env.EMAIL_PORT &&
+    process.env.EMAIL_USER &&
+    process.env.EMAIL_PASS &&
+    process.env.EMAIL_FROM
+  );
+  return hasEmailEnv;
+}
+
+/**
+ * Check if SMS is available for sending
+ * Priority: 1) Workspace flag, 2) Environment variables
+ */
+function isSMSAvailable(workspace: Workspace): boolean {
+  if (workspace.smsConfigured) return true;
+  const hasSMSEnv = !!(
+    process.env.TWILIO_ACCOUNT_SID &&
+    process.env.TWILIO_AUTH_TOKEN &&
+    process.env.TWILIO_PHONE_NUMBER
+  );
+  return hasSMSEnv;
+}
 
 export async function GET(req: Request) {
     const user = await getCurrentUser();
@@ -73,13 +104,13 @@ export async function POST(req: Request) {
 
         if (requestedChannel === "whatsapp" && contact.phone && isWhatsAppAvailable()) {
             deliveryChannel = "WHATSAPP";
-        } else if (requestedChannel === "sms" && contact.phone && workspace.smsConfigured) {
+        } else if (requestedChannel === "sms" && contact.phone && isSMSAvailable(workspace)) {
             deliveryChannel = "SMS";
-        } else if (contact.email && workspace.emailConfigured) {
+        } else if (contact.email && isEmailAvailable(workspace)) {
             deliveryChannel = "EMAIL";
         } else if (contact.phone && isWhatsAppAvailable()) {
             deliveryChannel = "WHATSAPP";
-        } else if (contact.phone && workspace.smsConfigured) {
+        } else if (contact.phone && isSMSAvailable(workspace)) {
             deliveryChannel = "SMS";
         }
 
@@ -106,7 +137,7 @@ export async function POST(req: Request) {
 
         switch (deliveryChannel) {
             case "EMAIL":
-                if (workspace.emailConfigured && contact.email) {
+                if (isEmailAvailable(workspace) && contact.email) {
                     try {
                         await sendEmail({
                             to: contact.email,

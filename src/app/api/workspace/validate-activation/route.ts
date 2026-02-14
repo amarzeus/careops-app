@@ -2,6 +2,36 @@ import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
+/**
+ * Check if email is available
+ * Priority: 1) Workspace flag, 2) Environment variables
+ */
+function isEmailAvailable(workspace: { emailConfigured: boolean }): boolean {
+  if (workspace.emailConfigured) return true;
+  const hasEmailEnv = !!(
+    process.env.EMAIL_HOST &&
+    process.env.EMAIL_PORT &&
+    process.env.EMAIL_USER &&
+    process.env.EMAIL_PASS &&
+    process.env.EMAIL_FROM
+  );
+  return hasEmailEnv;
+}
+
+/**
+ * Check if SMS is available
+ * Priority: 1) Workspace flag, 2) Environment variables
+ */
+function isSMSAvailable(workspace: { smsConfigured: boolean }): boolean {
+  if (workspace.smsConfigured) return true;
+  const hasSMSEnv = !!(
+    process.env.TWILIO_ACCOUNT_SID &&
+    process.env.TWILIO_AUTH_TOKEN &&
+    process.env.TWILIO_PHONE_NUMBER
+  );
+  return hasSMSEnv;
+}
+
 export async function GET() {
   const user = await getCurrentUser();
   if (!user || !user.workspaceId)
@@ -17,7 +47,7 @@ export async function GET() {
 
   // Check 1: At least one communication channel configured
   const hasChannel =
-    workspace.emailConfigured || workspace.smsConfigured;
+    isEmailAvailable(workspace) || isSMSAvailable(workspace);
   if (!hasChannel) {
     errors.push("At least one communication channel (Email, SMS, or WhatsApp) must be configured");
   }

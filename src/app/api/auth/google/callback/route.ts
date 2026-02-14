@@ -6,50 +6,65 @@ import { getGoogleTokens, getGoogleUser } from "@/lib/google";
 export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const code = searchParams.get("code");
+    const errorParam = searchParams.get("error");
+
+    // Handle OAuth errors from Google
+    if (errorParam) {
+        console.error(`[Google Auth Callback] OAuth error from Google: ${errorParam}`);
+        return NextResponse.redirect(new URL(`/login?error=google_auth_failed&message=${encodeURIComponent(`Google error: ${errorParam}`)}`, req.url));
+    }
 
     if (!code) {
-        return NextResponse.json({ error: "Authorization code missing" }, { status: 400 });
+        console.error("[Google Auth Callback] No authorization code received");
+        return NextResponse.redirect(new URL("/login?error=google_auth_failed&message=No authorization code", req.url));
     }
 
     try {
+        console.log("[Google Auth Callback] Exchanging code for tokens...");
         const { id_token, access_token } = await getGoogleTokens(code);
+        console.log("[Google Auth Callback] Tokens received successfully");
+        
+        console.log("[Google Auth Callback] Fetching Google user info...");
         const googleUser = await getGoogleUser(id_token, access_token);
+        console.log(`[Google Auth Callback] User info received: ${googleUser.email}`);
 
         if (!googleUser.emailVerified && !googleUser.verified_email) {
-            return NextResponse.json({ error: "Google email not verified" }, { status: 400 });
+            console.error("[Google Auth Callback] Email not verified");
+            return NextResponse.redirect(new URL("/login?error=google_auth_failed&message=Email not verified", req.url));
         }
 
         // Check if user exists
-        let user = await prisma.user.findUnique({
-            where: { email: googleUser.email },
-        });
+        console.log(`[Google Auth Callback] Looking up user: ${googleUser.email}`);
+        let user = null;
+        try {
+            user = await prisma.user.findUnique({
+                where: { email: googleUser.email },
+            });
+            console.log(`[Google Auth Callback] User lookup result: ${user ? 'found' : 'not found'}`);
+        } catch (dbError) {
+            console.error("[Google Auth Callback] Database error during user lookup:", dbError);
+            throw new Error("Database error during user lookup");
+        }
 
         if (!user) {
-            // Create new user (and workspace if needed, or ask user to create one later? 
-            // For simplicity, create a default workspace or handle onboarding logic.
-            // PRD implies Onboarding is critical. Let's create user with ONBOARDING status
-            // but they need a workspace. 
-            // Current schema requires workspaceId for User? No, workspaceId is String? (nullable).
-            // Let's check schema: workspaceId String?. Yes.
-
+            console.log("[Google Auth Callback] Creating new user...");
+            // Create new user
             user = await prisma.user.create({
                 data: {
                     email: googleUser.email,
                     name: googleUser.name,
                     googleId: googleUser.id,
                     passwordHash: "", // No password for Google users
-                    role: "OWNER", // Default to owner for new signups? Or should they be invited?
+                    role: "OWNER",
                     emailVerified: new Date(),
                 },
             });
-
-            // Need to create a placeholder workspace or redirect to onboarding to create it?
-            // Onboarding flow creates workspace.
-            // But user must exist first.
-            // Let's redirect to onboarding.
+            console.log(`[Google Auth Callback] New user created: ${user.id}`);
         } else {
+            console.log(`[Google Auth Callback] Existing user found: ${user.id}`);
             // Link Google ID if not linked
             if (!user.googleId) {
+                console.log("[Google Auth Callback] Linking Google ID to existing user...");
                 await prisma.user.update({
                     where: { id: user.id },
                     data: { googleId: googleUser.id, emailVerified: new Date() },
@@ -57,17 +72,34 @@ export async function GET(req: Request) {
             }
         }
 
+        console.log("[Google Auth Callback] Creating auth token...");
         const token = createToken(user.id, user.workspaceId, user.role);
-        await setAuthCookie(token);
-
-        if (!user.workspaceId) {
-            return NextResponse.redirect(new URL("/onboarding", req.url));
+        console.log(`[Google Auth Callback] Token created for user: ${user.id}`);
+        
+        console.log("[Google Auth Callback] Setting auth cookie...");
+        try {
+            await setAuthCookie(token);
+            console.log("[Google Auth Callback] Auth cookie set successfully");
+        } catch (cookieError) {
+            console.error("[Google Auth Callback] Failed to set auth cookie:", cookieError);
+            throw new Error("Failed to set authentication cookie");
         }
+        
+        // Determine redirect URL
+        const redirectUrl = !user.workspaceId ? "/onboarding" : "/dashboard";
+        console.log(`[Google Auth Callback] Redirecting to: ${redirectUrl}`);
 
-        return NextResponse.redirect(new URL("/dashboard", req.url));
+        // Use absolute URL to ensure proper redirect
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:5000";
+        const fullRedirectUrl = `${baseUrl}${redirectUrl}`;
+        console.log(`[Google Auth Callback] Full redirect URL: ${fullRedirectUrl}`);
+
+        return NextResponse.redirect(fullRedirectUrl);
 
     } catch (error) {
-        console.error("Google Auth Error:", error);
-        return NextResponse.redirect(new URL("/login?error=google_auth_failed", req.url));
+        console.error("[Google Auth Callback] Error:", error);
+        const errorMessage = error instanceof Error ? error.message : "Unknown error";
+        console.error("[Google Auth Callback] Error details:", errorMessage);
+        return NextResponse.redirect(new URL(`/login?error=google_auth_failed&message=${encodeURIComponent(errorMessage)}`, req.url));
     }
 }

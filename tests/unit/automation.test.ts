@@ -32,14 +32,26 @@ vi.mock('@/lib/gemini', () => ({
 describe('Automation Logic', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        // Mock environment variables for email
+        process.env.EMAIL_HOST = 'smtp.test.com';
+        process.env.EMAIL_PORT = '587';
+        process.env.EMAIL_USER = 'test';
+        process.env.EMAIL_PASS = 'test';
+        process.env.EMAIL_FROM = 'test@test.com';
     });
 
     it('should send welcome message on NEW_CONTACT', async () => {
         // Setup Mocks
-        mockPrisma.workspace.findUnique.mockResolvedValue({ id: 'ws-1', status: 'ACTIVE', name: 'Test Biz', emailConfigured: true });
+        mockPrisma.workspace.findUnique.mockResolvedValue({ 
+            id: 'ws-1', 
+            status: 'ACTIVE', 
+            name: 'Test Biz', 
+            emailConfigured: true,
+            smsConfigured: false
+        });
         mockPrisma.automationRule.findMany.mockResolvedValue([{ id: 'rule-1', trigger: 'NEW_CONTACT', isActive: true }]);
         mockPrisma.conversation.findUnique.mockResolvedValue(null); // No conversation yet
-        mockPrisma.conversation.create.mockResolvedValue({ id: 'conv-1' });
+        mockPrisma.conversation.create.mockResolvedValue({ id: 'conv-1', isActive: true });
 
         await triggerAutomation('ws-1', 'NEW_CONTACT', {
             contact: { id: 'c-1', name: 'John', email: 'john@example.com' }
