@@ -380,6 +380,50 @@ docker build -t careops-app .
 docker run -p 5000:5000 careops-app
 ```
 
+## CI/CD Pipeline
+
+This project uses **GitHub Actions** for Continuous Integration and Deployment.
+
+### Pipeline Stages
+
+1. **Code Quality** - ESLint and TypeScript type checking
+2. **Unit Tests** - Vitest unit tests with coverage
+3. **Database Check** - Prisma migration validation
+4. **Build** - Next.js production build
+5. **E2E Tests** - Playwright end-to-end tests
+6. **Security Audit** - npm audit and Snyk scans
+7. **Deployment Ready** - Confirms all checks passed
+
+### Deployment
+
+Render automatically deploys when you push to the `main` branch (free tier):
+
+1. **Connect Render to GitHub** (one-time):
+   - Go to Render Dashboard → Your Service → Settings
+   - Connect your GitHub repository
+
+2. **Push to deploy**:
+   ```bash
+   git push origin main
+   ```
+
+3. **Monitor**: Check Render dashboard for deployment status
+
+### Optional GitHub Secrets
+
+- `SNYK_TOKEN` - Security scanning
+- `CODECOV_TOKEN` - Coverage reports
+- `SLACK_WEBHOOK_URL` - Notifications
+
+See [CI/CD Documentation](docs/CI_CD.md) for detailed setup.
+
+### Status Badges
+
+```markdown
+![CI](https://github.com/yourusername/careops-app/workflows/CI%20Pipeline/badge.svg)
+![Tests](https://img.shields.io/badge/tests-passing-brightgreen)
+```
+
 ## License
 
 MIT
