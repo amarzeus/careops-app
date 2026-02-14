@@ -27,7 +27,7 @@ async function sleep(ms: number) {
 
 async function logIntegration(type: string, status: string, to: string, message: string, error?: string, workspaceId?: string) {
   if (!workspaceId) return;
-  
+
   try {
     await prisma.integrationLog.create({
       data: {
@@ -59,7 +59,7 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
       });
 
       console.log(`✅ Email sent successfully! Message ID: ${info.messageId}`);
-      
+
       await logIntegration("email", "success", options.to, options.subject, undefined, options.workspaceId);
 
       // In development, log the email content for debugging
@@ -82,9 +82,9 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
         await sleep(RETRY_DELAY * attempt);
       } else {
         console.error("All delivery attempts failed.");
-        
+
         const errorMsg = `Failed to send "${options.subject}" to ${options.to} after ${MAX_RETRIES} attempts`;
-        
+
         await logIntegration("email", "failed", options.to, options.subject, message, options.workspaceId);
 
         if (options.workspaceId) {
@@ -105,9 +105,10 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
 
         if (process.env.NODE_ENV !== "production") {
           console.log("------------------------------------------");
-          console.log("EMAIL FAILED - LOGGING CONTENT");
+          console.log("EMAIL FAILED - LOGGING CONTENT (DEV MODE)");
           console.log("Subject:", options.subject);
           console.log("To:", options.to);
+          console.log("HTML Preview:", options.html);
           console.log("------------------------------------------");
         }
         return false;

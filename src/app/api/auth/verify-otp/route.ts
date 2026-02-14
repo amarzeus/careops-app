@@ -41,7 +41,15 @@ export async function POST(req: Request) {
     // (Twilio Verify is not used, we just send SMS/WhatsApp via Twilio and verify locally)
     if (!verified) {
       if (user.otpCode !== otp) {
-        return NextResponse.json({ error: "Invalid OTP" }, { status: 400 });
+        // Development bypass for easy testing
+        if (process.env.NODE_ENV !== "production" && otp === "123456") {
+          console.log("------------------------------------------");
+          console.log(`BYPASS: Using magic OTP 123456 for ${email}`);
+          console.log("------------------------------------------");
+          verified = true;
+        } else {
+          return NextResponse.json({ error: "Invalid OTP" }, { status: 400 });
+        }
       }
 
       if (new Date() > user.otpExpires) {

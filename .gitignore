@@ -48,7 +48,6 @@ next-env.d.ts
 *.db-journal
 *.sqlite
 *.sqlite-journal
-dev.db
 
 # development scripts
 bypass_otp.ts

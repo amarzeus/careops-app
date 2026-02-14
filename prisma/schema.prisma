@@ -3,65 +3,65 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
-// ──── Enums ────
+// ──── Enums (Converted to String for SQLite) ────
 
-enum UserRole {
-  OWNER
-  STAFF
-}
+// enum UserRole {
+//   OWNER
+//   STAFF
+// }
 
-enum BookingStatus {
-  PENDING
-  CONFIRMED
-  COMPLETED
-  CANCELLED
-  NO_SHOW
-}
+// enum BookingStatus {
+//   PENDING
+//   CONFIRMED
+//   COMPLETED
+//   CANCELLED
+//   NO_SHOW
+// }
 
-enum FormStatus {
-  PENDING
-  SENT
-  COMPLETED
-  OVERDUE
-}
+// enum FormStatus {
+//   PENDING
+//   SENT
+//   COMPLETED
+//   OVERDUE
+// }
 
-enum MessageChannel {
-  EMAIL
-  SMS
-  WHATSAPP
-  SYSTEM
-}
+// enum MessageChannel {
+//   EMAIL
+//   SMS
+//   WHATSAPP
+//   SYSTEM
+// }
 
-enum MessageDirection {
-  INBOUND
-  OUTBOUND
-}
+// enum MessageDirection {
+//   INBOUND
+//   OUTBOUND
+// }
 
-enum MessageStatus {
-  SENT
-  DELIVERED
-  READ
-  FAILED
-}
+// enum MessageStatus {
+//   SENT
+//   DELIVERED
+//   READ
+//   FAILED
+// }
 
-enum AutomationTrigger {
-  NEW_CONTACT
-  BOOKING_CREATED
-  BEFORE_BOOKING
-  FORM_PENDING
-  INVENTORY_LOW
-  STAFF_REPLY
-}
+// enum AutomationTrigger {
+//   NEW_CONTACT
+//   BOOKING_CREATED
+//   BEFORE_BOOKING
+//   FORM_PENDING
+//   INVENTORY_LOW
+//   STAFF_REPLY
+// }
 
-enum WorkspaceStatus {
-  ONBOARDING
-  ACTIVE
-  INACTIVE
-}
+// enum WorkspaceStatus {
+//   ONBOARDING
+//   ACTIVE
+//   INACTIVE
+// }
 
 // ──── Models ────
 
@@ -70,7 +70,7 @@ model User {
   email        String    @unique
   name         String
   passwordHash String
-  role         UserRole  @default(STAFF)
+  role         String    @default("STAFF")
   workspaceId  String?
   workspace    Workspace? @relation(fields: [workspaceId], references: [id])
 
@@ -102,7 +102,7 @@ model Workspace {
   timezone     String          @default("UTC")
   contactEmail String?
   contactPhone String?
-  status       WorkspaceStatus @default(ONBOARDING)
+  status       String          @default("ONBOARDING")
   onboardingStep Int           @default(1)
 
   // Email configuration
@@ -159,7 +159,7 @@ model Workspace {
 model Webhook {
   id          String            @id @default(cuid())
   url         String
-  event       AutomationTrigger
+  event       String
   secret      String?           // HMAC secret for signature verification
   isActive    Boolean           @default(true)
   workspaceId String
@@ -236,7 +236,7 @@ model Booking {
   id          String        @id @default(cuid())
   date        DateTime
   endTime     DateTime
-  status      BookingStatus @default(PENDING)
+  status      String        @default("PENDING")
   notes       String?
   serviceId   String
   service     Service       @relation(fields: [serviceId], references: [id])
@@ -290,7 +290,7 @@ model IntakeForm {
 model FormSubmission {
   id           String     @id @default(cuid())
   data         String     @default("{}")
-  status       FormStatus @default(PENDING)
+  status       String     @default("PENDING")
   intakeFormId String?
   intakeForm   IntakeForm? @relation(fields: [intakeFormId], references: [id])
   contactId    String
@@ -380,9 +380,9 @@ model Conversation {
 model Message {
   id             String           @id @default(cuid())
   content        String
-  channel        MessageChannel   @default(EMAIL)
-  direction      MessageDirection @default(OUTBOUND)
-  status         MessageStatus    @default(SENT)
+  channel        String           @default("EMAIL")
+  direction      String           @default("OUTBOUND")
+  status         String           @default("SENT")
   isAutomated    Boolean          @default(false)
   conversationId String
   conversation   Conversation     @relation(fields: [conversationId], references: [id])
@@ -395,7 +395,7 @@ model Message {
 model AutomationRule {
   id              String            @id @default(cuid())
   name            String
-  trigger         AutomationTrigger
+  trigger         String
   isActive        Boolean           @default(true)
   messageTemplate String?
   delayMinutes    Int               @default(0)

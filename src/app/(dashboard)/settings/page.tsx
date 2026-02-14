@@ -20,6 +20,7 @@ function SettingsContent() {
   const [workspace, setWorkspace] = useState<WorkspaceSettingsDTO | null>(null);
   const [user, setUser] = useState<UserProfileDTO | null>(null);
   const [loading, setLoading] = useState(true);
+  const [userError, setUserError] = useState<string | null>(null);
 
   // Workspace State
   const [savingWorkspace, setSavingWorkspace] = useState(false);
@@ -48,10 +49,19 @@ function SettingsContent() {
   const [disconnectingCalendar, setDisconnectingCalendar] = useState(false);
 
   const [copied, setCopied] = useState("");
+  const defaultTab = searchParams.get("tab") || "workspace";
+  const [activeTab, setActiveTab] = useState(defaultTab);
 
   useEffect(() => {
     Promise.all([fetchWorkspace(), fetchUser()]).finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    const tab = searchParams.get("tab");
+    if (tab && tab !== activeTab) {
+      setActiveTab(tab);
+    }
+  }, [searchParams, activeTab]);
 
   // Handle Google Calendar OAuth callback results
   useEffect(() => {
@@ -81,9 +91,20 @@ function SettingsContent() {
   const fetchUser = async () => {
     try {
       const res = await fetch("/api/user");
-      if (res.ok) setUser((await res.json()).user);
+      if (res.ok) {
+        const data = await res.json();
+        setUser(data.user);
+        setUserError(null);
+      } else {
+        const data = await res.json();
+        const errorMsg = data.error || "Failed to load profile";
+        setUserError(errorMsg);
+        toast({ title: "Error", description: errorMsg, variant: "destructive" });
+      }
     } catch (error) {
-      toast({ title: "Error", description: "Failed to load profile", variant: "destructive" });
+      const errorMsg = "Failed to load profile";
+      setUserError(errorMsg);
+      toast({ title: "Error", description: errorMsg, variant: "destructive" });
     }
   };
 
@@ -233,13 +254,11 @@ function SettingsContent() {
   const bookingUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/book/${workspace?.id}`;
   const contactFormUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/contact/${workspace?.id}`;
 
-  const defaultTab = searchParams.get("tab") || "workspace";
-
   return (
     <div>
       <Header title="Settings" subtitle="Manage your workspace and account" />
       <div className="p-6 max-w-4xl">
-        <Tabs defaultValue={defaultTab} className="space-y-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList>
             <TabsTrigger value="workspace" className="flex items-center gap-2"><Settings className="w-4 h-4" /> Workspace</TabsTrigger>
             <TabsTrigger value="ai" className="flex items-center gap-2"><Sparkles className="w-4 h-4" /> AI</TabsTrigger>
@@ -282,6 +301,18 @@ function SettingsContent() {
               testingSms={testingSms}
               connectingCalendar={connectingCalendar}
               disconnectingCalendar={disconnectingCalendar}
+            />
+          </TabsContent>
+
+          <TabsContent value="profile">
+            <ProfileTab
+              user={user}
+              onUpdate={handleUpdateProfile}
+              onSave={handleSaveProfile}
+              saving={savingProfile}
+              saved={savedProfile}
+              loading={loading}
+              error={userError}
             />
           </TabsContent>
 

@@ -7,25 +7,25 @@ import { v4 as uuidv4 } from "uuid";
 export async function POST(req: Request) {
   try {
     const { email } = await req.json();
-    
+
     if (!email) {
       return NextResponse.json({ error: "Email is required" }, { status: 400 });
     }
 
     const user = await prisma.user.findUnique({ where: { email } });
-    
+
     if (!user) {
       // Return success even if user not found (security: don't reveal user existence)
-      return NextResponse.json({ 
-        message: "If an account exists with this email, a password reset link has been sent." 
+      return NextResponse.json({
+        message: "If an account exists with this email, a password reset link has been sent."
       });
     }
 
     // Rate limiting: prevent spamming resets (5 min cooldown)
     const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
     if (user.updatedAt > fiveMinutesAgo) {
-       return NextResponse.json({ 
-        message: "If an account exists with this email, a password reset link has been sent." 
+      return NextResponse.json({
+        message: "If an account exists with this email, a password reset link has been sent."
       });
     }
 
@@ -55,12 +55,18 @@ export async function POST(req: Request) {
       ),
     });
 
+    if (process.env.NODE_ENV !== "production") {
+      console.log("------------------------------------------");
+      console.log(`FORGOT PASSWORD (DEV MODE) - Temp Pass: ${tempPassword} for ${email}`);
+      console.log("------------------------------------------");
+    }
+
     if (!emailSent) {
       console.error("Failed to send password reset email to", email);
     }
 
-    return NextResponse.json({ 
-      message: "If an account exists with this email, a password reset link has been sent." 
+    return NextResponse.json({
+      message: "If an account exists with this email, a password reset link has been sent."
     });
   } catch (error) {
     console.error("Forgot password error:", error);

@@ -20,6 +20,8 @@ interface ProfileTabProps {
   onSave: () => void;
   saving: boolean;
   saved: boolean;
+  loading?: boolean;
+  error?: string | null;
 }
 
 export function ProfileTab({
@@ -28,7 +30,70 @@ export function ProfileTab({
   onSave,
   saving,
   saved,
+  loading,
+  error,
 }: ProfileTabProps) {
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Personal Information</CardTitle>
+            <CardDescription>Update your personal details</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label>Full Name</Label>
+                <Input disabled placeholder="Loading..." />
+              </div>
+              <div className="space-y-2">
+                <Label>Email Address</Label>
+                <Input disabled placeholder="Loading..." />
+              </div>
+              <div className="space-y-2">
+                <Label>Phone Number</Label>
+                <Input disabled placeholder="Loading..." />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Personal Information</CardTitle>
+            <CardDescription>Update your personal details</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-red-500">{error}</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Personal Information</CardTitle>
+            <CardDescription>Update your personal details</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-gray-500">No profile data available.</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <Card>
