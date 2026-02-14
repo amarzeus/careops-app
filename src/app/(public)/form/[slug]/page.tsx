@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, use } from "react";
+import React, { useEffect, useState, use, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { Send, CheckCircle, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -13,8 +13,7 @@ interface FormField {
   name: string; label: string; type: string; required: boolean;
 }
 
-export default function PublicIntakeFormPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = use(params);
+function FormContent({ slug }: { slug: string }) {
   const searchParams = useSearchParams();
   const submissionId = searchParams.get("submission");
   const [form, setForm] = useState<any>(null);
@@ -55,7 +54,7 @@ export default function PublicIntakeFormPage({ params }: { params: Promise<{ slu
           setFormData(initial);
         }
       }
-    } catch {} finally { setLoading(false); }
+    } catch { } finally { setLoading(false); }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -121,5 +120,15 @@ export default function PublicIntakeFormPage({ params }: { params: Promise<{ slu
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function PublicIntakeFormPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = use(params);
+
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">Loading form...</div>}>
+      <FormContent slug={slug} />
+    </Suspense>
   );
 }

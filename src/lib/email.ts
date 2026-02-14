@@ -1,9 +1,6 @@
 
 import nodemailer from "nodemailer";
-import * as dotenv from "dotenv";
 import { prisma } from "./prisma";
-
-dotenv.config();
 
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST,

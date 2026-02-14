@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Activity } from "lucide-react";
@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
@@ -21,18 +21,18 @@ export default function LoginPage() {
   useEffect(() => {
     const errorParam = searchParams.get("error");
     const messageParam = searchParams.get("message");
-    
+
     if (errorParam) {
       let errorMessage = "Authentication failed";
-      
+
       if (errorParam === "google_auth_failed") {
         errorMessage = "Google sign-in failed. Please try again or use email/password.";
       }
-      
+
       if (messageParam) {
         errorMessage += `: ${decodeURIComponent(messageParam)}`;
       }
-      
+
       setError(errorMessage);
     }
   }, [searchParams]);
@@ -101,7 +101,7 @@ export default function LoginPage() {
                     fill="#FBBC05"
                   />
                   <path
-                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                     fill="#EA4335"
                   />
                 </svg>
@@ -140,5 +140,17 @@ export default function LoginPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+        <Activity className="w-8 h-8 text-blue-600 animate-spin" />
+      </div>
+    }>
+      <LoginContent />
+    </Suspense>
   );
 }

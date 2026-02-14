@@ -3,7 +3,8 @@ services:
     name: careops-app
     runtime: node
     plan: free
-    buildCommand: chmod +x render-build.sh && ./render-build.sh
+    buildCommand: npm ci --include=dev && npm run build
+    installCommand: npm ci --include=dev
     startCommand: npm start
     healthCheckPath: /
     envVars:

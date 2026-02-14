@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import { Link2, Settings, Shield, User } from "lucide-react";
 import { Header } from "@/components/layout/header";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -12,7 +12,7 @@ import { IntegrationsTab } from "@/components/settings/integrations-tab";
 import { SecurityTab } from "@/components/settings/security-tab";
 import { WorkspaceSettingsDTO, UserProfileDTO } from "@/types/dto";
 
-export default function SettingsPage() {
+function SettingsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [workspace, setWorkspace] = useState<WorkspaceSettingsDTO | null>(null);
@@ -301,5 +301,13 @@ export default function SettingsPage() {
         </Tabs>
       </div>
     </div>
+  );
+}
+
+export default function SettingsPage() {
+  return (
+    <Suspense fallback={<div className="p-8">Loading settings...</div>}>
+      <SettingsContent />
+    </Suspense>
   );
 }
