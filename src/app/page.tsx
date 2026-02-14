@@ -127,7 +127,11 @@ export default function LandingPage() {
             </div>
             <span className="text-sm font-medium text-gray-500">CareOps</span>
           </div>
-          <p className="text-sm text-gray-400">Built for the CareOps Hackathon</p>
+          <div className="flex items-center gap-6">
+            <Link href="/privacy" className="text-sm text-gray-400 hover:text-gray-600">Privacy Policy</Link>
+            <Link href="/terms" className="text-sm text-gray-400 hover:text-gray-600">Terms of Service</Link>
+            <p className="text-sm text-gray-400">Built for the CareOps Hackathon</p>
+          </div>
         </div>
       </footer>
     </div>
