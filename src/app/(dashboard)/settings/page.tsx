@@ -40,7 +40,6 @@ export default function SettingsPage() {
   // Test connection states
   const [testingEmail, setTestingEmail] = useState(false);
   const [testingSms, setTestingSms] = useState(false);
-  const [testingWhatsApp, setTestingWhatsApp] = useState(false);
 
   // Google Calendar states
   const [connectingCalendar, setConnectingCalendar] = useState(false);
@@ -187,20 +186,6 @@ export default function SettingsPage() {
     } finally { setTestingSms(false); }
   };
 
-  const handleTestWhatsApp = async () => {
-    setTestingWhatsApp(true);
-    try {
-      const res = await fetch("/api/settings/test-whatsapp", { method: "POST" });
-      if (res.ok) {
-        toast({ title: "Success", description: "WhatsApp connection test passed", variant: "default" });
-      } else {
-        const data = await res.json();
-        toast({ title: "WhatsApp Test Failed", description: data.error || "Could not connect", variant: "destructive" });
-      }
-    } catch (error) {
-      toast({ title: "Error", description: "WhatsApp connection test failed", variant: "destructive" });
-    } finally { setTestingWhatsApp(false); }
-  };
 
   const handleConnectCalendar = async () => {
     setConnectingCalendar(true);
@@ -261,7 +246,7 @@ export default function SettingsPage() {
           </TabsList>
 
           <TabsContent value="workspace">
-            <WorkspaceTab 
+            <WorkspaceTab
               workspace={workspace}
               onUpdate={handleUpdateWorkspace}
               onSave={handleSaveWorkspace}
@@ -275,7 +260,7 @@ export default function SettingsPage() {
           </TabsContent>
 
           <TabsContent value="profile">
-            <ProfileTab 
+            <ProfileTab
               user={user}
               onUpdate={handleUpdateProfile}
               onSave={handleSaveProfile}
@@ -285,23 +270,21 @@ export default function SettingsPage() {
           </TabsContent>
 
           <TabsContent value="integrations">
-            <IntegrationsTab 
+            <IntegrationsTab
               workspace={workspace}
               onTestEmail={handleTestEmail}
               onTestSms={handleTestSms}
-              onTestWhatsApp={handleTestWhatsApp}
               onConnectCalendar={handleConnectCalendar}
               onDisconnectCalendar={handleDisconnectCalendar}
               testingEmail={testingEmail}
               testingSms={testingSms}
-              testingWhatsApp={testingWhatsApp}
               connectingCalendar={connectingCalendar}
               disconnectingCalendar={disconnectingCalendar}
             />
           </TabsContent>
 
           <TabsContent value="security">
-            <SecurityTab 
+            <SecurityTab
               currentPassword={currentPassword}
               setCurrentPassword={setCurrentPassword}
               newPassword={newPassword}

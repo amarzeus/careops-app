@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
-type VerifyMethod = "email" | "sms" | "whatsapp";
+type VerifyMethod = "email" | "sms";
 
 function VerifyOtpContent() {
   const router = useRouter();
@@ -171,36 +171,6 @@ function VerifyOtpContent() {
     }
   };
 
-  const handleSendWhatsApp = async () => {
-    if (!phone) {
-      setError("Please enter your phone number");
-      return;
-    }
-    setResending(true);
-    setError("");
-
-    try {
-      const res = await fetch("/api/auth/send-whatsapp-otp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, phone }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to send WhatsApp message");
-
-      setCodeSent(true);
-      setCountdown(60);
-      setCanResend(false);
-      setOtp(["", "", "", "", "", ""]);
-      setTimeout(() => inputRefs.current[0]?.focus(), 100);
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Failed to send WhatsApp message";
-      setError(message);
-    } finally {
-      setResending(false);
-    }
-  };
-
   const switchMethod = (newMethod: VerifyMethod) => {
     setMethod(newMethod);
     setCodeSent(false);
@@ -221,12 +191,6 @@ function VerifyOtpContent() {
       bgIcon: "bg-blue-100",
       btnClass: "bg-blue-600 hover:bg-blue-700",
       label: "phone",
-    },
-    whatsapp: {
-      icon: <MessageCircle className="w-6 h-6 text-green-600" />,
-      bgIcon: "bg-green-100",
-      btnClass: "bg-green-600 hover:bg-green-700",
-      label: "WhatsApp",
     },
   };
 
@@ -257,9 +221,9 @@ function VerifyOtpContent() {
           {method === "email" ? (
             <>We sent a 6-digit code to <strong>{email || "your email"}</strong></>
           ) : codeSent ? (
-            <>We sent a 6-digit code to <strong>{phone}</strong> via {method === "whatsapp" ? "WhatsApp" : "SMS"}</>
+            <>We sent a 6-digit code to <strong>{phone}</strong> via SMS</>
           ) : (
-            <>Enter your phone number to receive a code via {method === "whatsapp" ? "WhatsApp" : "SMS"}</>
+            <>Enter your phone number to receive a code via SMS</>
           )}
         </CardDescription>
       </CardHeader>
@@ -284,7 +248,7 @@ function VerifyOtpContent() {
           </div>
         )}
 
-        {(method === "sms" || method === "whatsapp") && !codeSent ? (
+        {(method === "sms") && !codeSent ? (
           <div className="space-y-3">
             <div className="space-y-2">
               <Label htmlFor="phone">Phone Number</Label>
@@ -299,11 +263,11 @@ function VerifyOtpContent() {
               <p className="text-xs text-gray-500">Use E.164 format (e.g., +919876543210)</p>
             </div>
             <Button
-              onClick={method === "whatsapp" ? handleSendWhatsApp : handleSendSMS}
+              onClick={handleSendSMS}
               className={`w-full ${config.btnClass}`}
               disabled={resending || !phone}
             >
-              {resending ? "Sending..." : `Send ${method === "whatsapp" ? "WhatsApp" : "SMS"} Code`}
+              {resending ? "Sending..." : `Send SMS Code`}
             </Button>
             <Button
               variant="ghost"
@@ -393,17 +357,6 @@ function VerifyOtpContent() {
                   >
                     <Smartphone className="w-3.5 h-3.5" />
                     SMS
-                  </Button>
-                )}
-                {method !== "whatsapp" && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => switchMethod("whatsapp")}
-                    className="text-gray-600 hover:text-green-600 flex items-center gap-1.5 border-green-200 hover:border-green-400 hover:bg-green-50"
-                  >
-                    <MessageCircle className="w-3.5 h-3.5" />
-                    WhatsApp
                   </Button>
                 )}
               </div>

@@ -5,7 +5,7 @@ import { Send, Loader2, Mail, Smartphone, MessageCircle, ChevronDown } from "luc
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 
-type SendChannel = "email" | "sms" | "whatsapp";
+type SendChannel = "email" | "sms";
 
 interface ChatInputProps {
   inputText: string;
@@ -20,7 +20,6 @@ interface ChatInputProps {
 const channelConfig: Record<SendChannel, { icon: typeof Mail; label: string; color: string }> = {
   email: { icon: Mail, label: "Email", color: "text-blue-600" },
   sms: { icon: Smartphone, label: "SMS", color: "text-blue-600" },
-  whatsapp: { icon: MessageCircle, label: "WhatsApp", color: "text-green-600" },
 };
 
 export function ChatInput({
@@ -41,7 +40,6 @@ export function ChatInput({
   const availableChannels = [
     ...(contactHasEmail !== false ? [{ key: "email" as SendChannel }] : []),
     ...(contactHasPhone ? [{ key: "sms" as SendChannel }] : []),
-    ...(contactHasPhone ? [{ key: "whatsapp" as SendChannel }] : []),
   ];
 
   const handleSend = () => {
@@ -65,11 +63,10 @@ export function ChatInput({
                   setChannel(key);
                   setShowChannelPicker(false);
                 }}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium transition-all ${
-                  isActive
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium transition-all ${isActive
                     ? "bg-white shadow-sm border border-gray-200"
                     : "hover:bg-gray-100 text-gray-500"
-                }`}
+                  }`}
               >
                 <Icon className={`w-3.5 h-3.5 ${isActive ? cfg.color : ""}`} />
                 {cfg.label}
@@ -107,11 +104,7 @@ export function ChatInput({
         />
         <Button
           size="icon"
-          className={`h-8 w-8 mb-1 shrink-0 ${
-            channel === "whatsapp"
-              ? "bg-green-600 hover:bg-green-700"
-              : "bg-blue-600 hover:bg-blue-700"
-          }`}
+          className="h-8 w-8 mb-1 shrink-0 bg-blue-600 hover:bg-blue-700"
           onClick={handleSend}
           disabled={!inputText.trim() || sending || disabled}
         >

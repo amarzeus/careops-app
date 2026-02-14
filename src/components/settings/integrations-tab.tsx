@@ -17,12 +17,10 @@ interface IntegrationsTabProps {
   workspace: WorkspaceSettingsDTO | null;
   onTestEmail: () => void;
   onTestSms: () => void;
-  onTestWhatsApp: () => void;
   onConnectCalendar: () => void;
   onDisconnectCalendar: () => void;
   testingEmail: boolean;
   testingSms: boolean;
-  testingWhatsApp: boolean;
   connectingCalendar: boolean;
   disconnectingCalendar: boolean;
 }
@@ -31,12 +29,10 @@ export function IntegrationsTab({
   workspace,
   onTestEmail,
   onTestSms,
-  onTestWhatsApp,
   onConnectCalendar,
   onDisconnectCalendar,
   testingEmail,
   testingSms,
-  testingWhatsApp,
   connectingCalendar,
   disconnectingCalendar,
 }: IntegrationsTabProps) {
@@ -120,71 +116,6 @@ export function IntegrationsTab({
         </CardContent>
       </Card>
 
-      {/* WhatsApp Configuration (Twilio) */}
-      <Card className="border-green-200">
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <CardTitle>WhatsApp Integration (Twilio)</CardTitle>
-            <Badge variant="secondary" className="bg-green-100 text-green-700 text-[10px]">
-              NEW
-            </Badge>
-          </div>
-          <CardDescription>
-            Send OTP, booking confirmations, and reminders via WhatsApp for higher delivery rates
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg border border-green-100">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 bg-green-100 rounded-lg flex items-center justify-center">
-                <MessageCircle className="w-5 h-5 text-green-600" />
-              </div>
-              <div>
-                <p className="font-medium text-green-900">Twilio WhatsApp</p>
-                <p className="text-xs text-red-600">
-                  Currently manually disabled.
-                </p>
-              </div>
-            </div>
-            <Badge
-              variant={workspace?.whatsappConfigured ? "default" : "secondary"}
-              className={workspace?.whatsappConfigured ? "bg-green-600" : "bg-gray-100 text-gray-600"}
-            >
-              {workspace?.whatsappConfigured ? "Active" : "Inactive"}
-            </Badge>
-          </div>
-
-          {/* WhatsApp capabilities list */}
-          <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
-            <div className="flex items-center gap-1.5 p-2 bg-gray-50 rounded">
-              <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
-              OTP Verification
-            </div>
-            <div className="flex items-center gap-1.5 p-2 bg-gray-50 rounded">
-              <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
-              Booking Confirmations
-            </div>
-            <div className="flex items-center gap-1.5 p-2 bg-gray-50 rounded">
-              <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
-              Appointment Reminders
-            </div>
-            <div className="flex items-center gap-1.5 p-2 bg-gray-50 rounded">
-              <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
-              Form Requests
-            </div>
-          </div>
-
-          <Button
-            variant="outline"
-            size="sm"
-            className="w-full border-green-200 hover:bg-green-50 hover:text-green-700"
-            onClick={onTestWhatsApp}
-            disabled={testingWhatsApp}
-          >
-            {testingWhatsApp ? "Testing..." : "Test WhatsApp Connection"}
-          </Button>
-        </CardContent>
-      </Card>
 
       {/* Google Calendar Integration */}
       <Card className="border-blue-200">
