@@ -27,7 +27,7 @@ export const VoiceActionService = {
                 // For now, redirect to bookings page with a query param to open modal
                 // In a real app, we'd use a global store to open the modal directly
                 router.push("/bookings?action=new");
-                toast.info("Opening booking creation...");
+                toast({ title: "Voice Action", description: "Opening booking creation..." });
                 break;
 
             case "check_inventory":
@@ -37,7 +37,7 @@ export const VoiceActionService = {
 
             case "send_form":
                 router.push("/forms");
-                toast.info("Navigating to forms to send...");
+                toast({ title: "Voice Action", description: "Navigating to forms to send..." });
                 break;
 
             case "general_info":

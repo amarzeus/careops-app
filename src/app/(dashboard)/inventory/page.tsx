@@ -178,8 +178,8 @@ export default function InventoryPage() {
             <InventoryDialog
                 open={dialogOpen}
                 onOpenChange={setDialogOpen}
-                onSubmit={handleCreateOrUpdate}
-                initialData={selectedItem}
+                onSave={handleCreateOrUpdate}
+                item={selectedItem ?? null}
             />
         </div>
     );

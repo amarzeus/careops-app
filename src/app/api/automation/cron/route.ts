@@ -33,7 +33,7 @@ export async function GET(req: Request) {
                 status: { in: ["PENDING", "SENT"] },
                 dueDate: { lt: now },
             },
-            include: { workspace: true, contact: true },
+            include: { workspace: true, contact: true, intakeForm: true },
         });
 
         for (const form of overdueForms) {

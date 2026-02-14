@@ -9,6 +9,7 @@ export type CalendarProps = {
     className?: string
     selected?: Date
     onSelect?: (date: Date | undefined) => void
+    disabled?: (date: Date) => boolean
     mode?: "single"
     initialFocus?: boolean
     showOutsideDays?: boolean
@@ -23,6 +24,7 @@ function Calendar({
     className,
     selected,
     onSelect,
+    disabled,
 }: CalendarProps) {
     // Prototype focused on current month/Feb 2026
     const [currentDate, setCurrentDate] = React.useState(new Date(2026, 1, 1))
@@ -85,18 +87,23 @@ function Calendar({
                 {days.monthDays.map((day) => {
                     const isSelected = selected && isSameDay(day, selected)
                     const isTod = isToday(day)
+                    const isDisabled = disabled?.(day) ?? false
 
                     return (
                         <button
                             key={day.toISOString()}
                             type="button"
-                            onClick={() => onSelect?.(day)}
+                            onClick={() => {
+                                if (!isDisabled) onSelect?.(day)
+                            }}
+                            disabled={isDisabled}
                             className={cn(
                                 "aspect-square text-[13px] flex items-center justify-center rounded-xl m-0.5 transition-all duration-200 relative group",
                                 isSelected
                                     ? "bg-primary text-white font-bold shadow-lg shadow-primary/20 scale-[1.05]"
                                     : "text-slate-600 hover:bg-slate-50 font-medium active:scale-95",
-                                isTod && !isSelected && "text-primary font-bold"
+                                isTod && !isSelected && "text-primary font-bold",
+                                isDisabled && "opacity-40 cursor-not-allowed hover:bg-transparent"
                             )}
                         >
                             {format(day, "d")}

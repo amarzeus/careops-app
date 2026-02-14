@@ -1,6 +1,10 @@
 import { test as base } from '@playwright/test';
 
-export const test = base.extend({
+type AuthFixtures = {
+  authenticatedUser: import('@playwright/test').Page;
+};
+
+export const test = base.extend<AuthFixtures>({
   authenticatedUser: async ({ page }, use) => {
     // Login logic placeholder
     await page.goto('/login');

@@ -7,7 +7,7 @@ async function main() {
         include: { conversation: true },
     });
     console.log("Contact:", contact);
-    console.log("Conversations:", contact?.conversations);
+    console.log("Conversation:", contact?.conversation);
 }
 
 main()
