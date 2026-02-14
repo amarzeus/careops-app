@@ -47,8 +47,20 @@ export async function GET(req: Request) {
         }
 
         if (!user) {
-            console.log("[Google Auth Callback] Creating new user...");
-            // Create new user
+            console.log("[Google Auth Callback] Creating new user with workspace...");
+            
+            // Create workspace first
+            const workspace = await prisma.workspace.create({
+                data: { 
+                    name: `${googleUser.name}'s Workspace`, 
+                    status: "ONBOARDING",
+                    emailConfigured: !!(process.env.EMAIL_HOST && process.env.EMAIL_FROM),
+                    smsConfigured: !!(process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_PHONE_NUMBER),
+                },
+            });
+            console.log(`[Google Auth Callback] Workspace created: ${workspace.id}`);
+            
+            // Create user linked to workspace
             user = await prisma.user.create({
                 data: {
                     email: googleUser.email,
@@ -57,11 +69,13 @@ export async function GET(req: Request) {
                     passwordHash: "", // No password for Google users
                     role: "OWNER",
                     emailVerified: new Date(),
+                    workspaceId: workspace.id,
                 },
             });
-            console.log(`[Google Auth Callback] New user created: ${user.id}`);
+            console.log(`[Google Auth Callback] New user created: ${user.id} with workspace: ${workspace.id}`);
         } else {
             console.log(`[Google Auth Callback] Existing user found: ${user.id}`);
+            
             // Link Google ID if not linked
             if (!user.googleId) {
                 console.log("[Google Auth Callback] Linking Google ID to existing user...");
@@ -69,6 +83,27 @@ export async function GET(req: Request) {
                     where: { id: user.id },
                     data: { googleId: googleUser.id, emailVerified: new Date() },
                 });
+            }
+            
+            // If user doesn't have a workspace, create one
+            if (!user.workspaceId) {
+                console.log("[Google Auth Callback] User has no workspace, creating one...");
+                const workspace = await prisma.workspace.create({
+                    data: { 
+                        name: `${user.name || googleUser.name}'s Workspace`, 
+                        status: "ONBOARDING",
+                        emailConfigured: !!(process.env.EMAIL_HOST && process.env.EMAIL_FROM),
+                        smsConfigured: !!(process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_PHONE_NUMBER),
+                    },
+                });
+                
+                await prisma.user.update({
+                    where: { id: user.id },
+                    data: { workspaceId: workspace.id },
+                });
+                
+                user.workspaceId = workspace.id;
+                console.log(`[Google Auth Callback] Workspace created and linked: ${workspace.id}`);
             }
         }
 
