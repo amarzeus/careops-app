@@ -4,6 +4,7 @@ import { sendSMS } from "./sms";
 import { sendWelcomeMessage, sendBookingConfirmation, isAvailable as isWhatsAppAvailable } from "./whatsapp";
 import { generateWelcomeMessage, generateBookingConfirmation } from "./gemini";
 import { generateWebhookSignature, serializePayload } from "./webhook-security";
+import { initiateOutboundCall, isVapiConfigured } from "./vapi";
 import type { AutomationRule, Workspace, AutomationTrigger } from "@prisma/client";
 
 /** Typed shape for automation context data */
@@ -535,4 +536,198 @@ export async function resumeAutomation(conversationId: string, workspaceId: stri
       workspaceId,
     },
   });
+}
+
+export async function sendVoiceCallReminder(
+  workspaceId: string,
+  workspaceName: string,
+  contactPhone: string,
+  contactName: string,
+  serviceName: string,
+  bookingDate: Date
+): Promise<{ success: boolean; callId?: string; error?: string }> {
+  if (!isVapiConfigured()) {
+    console.log('[VoiceReminder] VAPI not configured, skipping voice call');
+    return { success: false, error: 'VAPI not configured' };
+  }
+
+  if (!contactPhone) {
+    return { success: false, error: 'No phone number available' };
+  }
+
+  const message = `Hi ${contactName}, this is a reminder from ${workspaceName || 'our business'} about your upcoming ${serviceName} appointment on ${bookingDate.toLocaleDateString()} at ${bookingDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}. Please call us if you need to reschedule. Thank you.`;
+
+  const result = await initiateOutboundCall({
+    phoneNumber: contactPhone,
+    workspaceId,
+    contactName,
+    metadata: {
+      purpose: 'reminder',
+      serviceName,
+      bookingDate: bookingDate.toISOString(),
+    },
+  });
+
+  if (result.success) {
+    await prisma.voiceCall.create({
+      data: {
+        callSid: result.callId,
+        direction: 'OUTBOUND',
+        status: 'INITIATED',
+        workspaceId,
+        outcome: 'REMINDER_SENT',
+        metadata: JSON.stringify({ purpose: 'reminder', serviceName }),
+      },
+    });
+  }
+
+  return result;
+}
+
+export async function sendVoiceCallConfirmation(
+  workspaceId: string,
+  workspaceName: string,
+  contactPhone: string,
+  contactName: string,
+  serviceName: string,
+  bookingDate: Date
+): Promise<{ success: boolean; callId?: string; error?: string }> {
+  if (!isVapiConfigured()) {
+    console.log('[VoiceConfirmation] VAPI not configured, skipping voice call');
+    return { success: false, error: 'VAPI not configured' };
+  }
+
+  if (!contactPhone) {
+    return { success: false, error: 'No phone number available' };
+  }
+
+  const message = `Hi ${contactName}, this is a confirmation from ${workspaceName || 'our business'}. Your ${serviceName} appointment has been booked for ${bookingDate.toLocaleDateString()} at ${bookingDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}. We look forward to seeing you. Thank you.`;
+
+  const result = await initiateOutboundCall({
+    phoneNumber: contactPhone,
+    workspaceId,
+    contactName,
+    metadata: {
+      purpose: 'confirmation',
+      serviceName,
+      bookingDate: bookingDate.toISOString(),
+    },
+  });
+
+  if (result.success) {
+    await prisma.voiceCall.create({
+      data: {
+        callSid: result.callId,
+        direction: 'OUTBOUND',
+        status: 'INITIATED',
+        workspaceId,
+        outcome: 'CONFIRMATION_SENT',
+        metadata: JSON.stringify({ purpose: 'confirmation', serviceName }),
+      },
+    });
+  }
+
+  return result;
+}
+
+export async function sendVoiceCallFollowUp(
+  workspaceId: string,
+  workspaceName: string,
+  contactPhone: string,
+  contactName: string,
+  serviceName?: string
+): Promise<{ success: boolean; callId?: string; error?: string }> {
+  if (!isVapiConfigured()) {
+    return { success: false, error: 'VAPI not configured' };
+  }
+
+  if (!contactPhone) {
+    return { success: false, error: 'No phone number available' };
+  }
+
+  const servicePart = serviceName ? ` about your recent ${serviceName} visit` : '';
+  const message = `Hi ${contactName}, this is a follow-up call from ${workspaceName || 'our business'}${servicePart}. We wanted to check if everything went well and if there's anything else we can help you with. Please call us back at your convenience. Thank you.`;
+
+  const result = await initiateOutboundCall({
+    phoneNumber: contactPhone,
+    workspaceId,
+    contactName,
+    metadata: {
+      purpose: 'follow_up',
+      serviceName,
+    },
+  });
+
+  if (result.success) {
+    await prisma.voiceCall.create({
+      data: {
+        callSid: result.callId,
+        direction: 'OUTBOUND',
+        status: 'INITIATED',
+        workspaceId,
+        outcome: 'FOLLOW_UP_INITIATED',
+        metadata: JSON.stringify({ purpose: 'follow_up', serviceName }),
+      },
+    });
+  }
+
+  return result;
+}
+
+export async function triggerVoiceAutomation(
+  workspaceId: string,
+  trigger: 'VOICE_REMINDER' | 'VOICE_CONFIRMATION' | 'VOICE_FOLLOW_UP',
+  data: {
+    contactPhone?: string;
+    contactName?: string;
+    serviceName?: string;
+    bookingDate?: Date;
+    workspaceName?: string;
+  }
+): Promise<{ success: boolean; error?: string }> {
+  if (!data.contactPhone || !data.contactName) {
+    return { success: false, error: 'Missing contact information' };
+  }
+
+  const workspaceName = data.workspaceName || 'Our Business';
+
+  switch (trigger) {
+    case 'VOICE_REMINDER':
+      if (!data.bookingDate || !data.serviceName) {
+        return { success: false, error: 'Missing booking information for reminder' };
+      }
+      return sendVoiceCallReminder(
+        workspaceId,
+        workspaceName,
+        data.contactPhone,
+        data.contactName,
+        data.serviceName,
+        data.bookingDate
+      );
+
+    case 'VOICE_CONFIRMATION':
+      if (!data.bookingDate || !data.serviceName) {
+        return { success: false, error: 'Missing booking information for confirmation' };
+      }
+      return sendVoiceCallConfirmation(
+        workspaceId,
+        workspaceName,
+        data.contactPhone,
+        data.contactName,
+        data.serviceName,
+        data.bookingDate
+      );
+
+    case 'VOICE_FOLLOW_UP':
+      return sendVoiceCallFollowUp(
+        workspaceId,
+        workspaceName,
+        data.contactPhone,
+        data.contactName,
+        data.serviceName
+      );
+
+    default:
+      return { success: false, error: 'Unknown voice trigger' };
+  }
 }

@@ -252,3 +252,47 @@ Guidelines:
 Available services: {services_list}
 Business hours: {business_hours}
 `;
+
+export async function checkVapiHealth(): Promise<{
+  healthy: boolean;
+  configured: boolean;
+  error?: string;
+}> {
+  if (!vapiClient) {
+    return {
+      healthy: false,
+      configured: false,
+      error: 'VAPI API key not configured',
+    };
+  }
+
+  try {
+    const start = Date.now();
+    await vapiClient.calls.list();
+    const latency = Date.now() - start;
+
+    return {
+      healthy: true,
+      configured: true,
+      error: undefined,
+    };
+  } catch (error) {
+    return {
+      healthy: false,
+      configured: true,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    };
+  }
+}
+
+export function getVapiStatus(): {
+  configured: boolean;
+  apiKeyPresent: boolean;
+  clientInitialized: boolean;
+} {
+  return {
+    configured: isVapiConfigured(),
+    apiKeyPresent: !!apiKey,
+    clientInitialized: !!vapiClient,
+  };
+}
