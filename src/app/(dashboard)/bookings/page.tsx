@@ -213,29 +213,30 @@ export default function BookingsPage() {
     <div className="h-screen overflow-hidden flex flex-col bg-slate-50/20">
       {/* Fixed Sticky Header */}
       <Header title="Bookings" subtitle="Manage appointments and schedules">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-4">
           {/* List/Calendar Switcher */}
-          <div className="flex bg-slate-100 p-0.5 rounded-lg border border-slate-200">
+          <div className="flex bg-slate-100 p-0.5 rounded-lg border border-slate-200 hidden xs:flex">
             <Button
               variant={viewMode === "list" ? "secondary" : "ghost"}
               size="sm"
               onClick={() => setViewMode("list")}
-              className={cn("h-7 px-3 text-[10px] font-bold rounded-md", viewMode === "list" && "bg-white shadow-sm")}
+              className={cn("h-7 px-2 sm:px-3 text-[10px] sm:text-[11px] font-bold rounded-md", viewMode === "list" && "bg-white shadow-sm")}
             >
-              <List className="w-3.5 h-3.5 mr-1.5" /> List
+              <List className="w-3.5 h-3.5 sm:mr-1.5" /> <span className="hidden sm:inline">List</span>
             </Button>
             <Button
               variant={viewMode === "calendar" ? "secondary" : "ghost"}
               size="sm"
               onClick={() => setViewMode("calendar")}
-              className={cn("h-7 px-3 text-[10px] font-bold rounded-md", viewMode === "calendar" && "bg-white shadow-sm")}
+              className={cn("h-7 px-2 sm:px-3 text-[10px] sm:text-[11px] font-bold rounded-md", viewMode === "calendar" && "bg-white shadow-sm")}
             >
-              <CalendarIcon className="w-3.5 h-3.5 mr-1.5" /> Calendar
+              <CalendarIcon className="w-3.5 h-3.5 sm:mr-1.5" /> <span className="hidden sm:inline">Calendar</span>
             </Button>
           </div>
 
-          <Button onClick={() => handleNewBooking()} className="h-8 px-4 bg-primary text-[11px] font-bold rounded-lg shadow-sm">
-            <Plus className="w-3.5 h-3.5 mr-1.5" /> New Booking
+          <Button onClick={() => handleNewBooking()} className="h-8 px-3 sm:px-4 bg-primary text-[10px] sm:text-[11px] font-bold rounded-lg shadow-sm">
+            <Plus className="w-3.5 h-3.5 sm:mr-1.5" /> <span className="hidden sm:inline">New Booking</span>
+            <span className="sm:hidden">New</span>
           </Button>
         </div>
       </Header>
@@ -245,28 +246,28 @@ export default function BookingsPage() {
         <div className="max-w-[1600px] mx-auto w-full flex-1 flex flex-col gap-6 min-h-0">
 
           {/* Professional B2B Stats Cards */}
-          <div className="grid grid-cols-4 gap-4 shrink-0">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 shrink-0 px-1 overflow-x-hidden">
             {[
-              { label: "Today's Bookings", val: stats.today, icon: CalendarIcon, color: "blue" },
-              { label: "Upcoming Bookings", val: stats.upcoming, icon: Clock, color: "amber" },
-              { label: "Completed services", val: stats.completed, icon: Plus, color: "emerald", rotate: true },
-              { label: "No Show alerts", val: stats.noShow, icon: Filter, color: "rose" },
+              { label: "Today", val: stats.today, icon: CalendarIcon, color: "blue" },
+              { label: "Upcoming", val: stats.upcoming, icon: Clock, color: "amber" },
+              { label: "Completed", val: stats.completed, icon: Plus, color: "emerald", rotate: true },
+              { label: "No Show", val: stats.noShow, icon: Filter, color: "rose" },
             ].map((s) => (
               <Card key={s.label} className="border border-border/40 shadow-sm bg-white overflow-hidden group">
-                <CardContent className="p-4 relative">
+                <CardContent className="p-3 sm:p-4 relative">
                   <div className="flex justify-between items-center">
-                    <div>
-                      <p className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-1">{s.label}</p>
-                      <h3 className="text-2xl font-black text-slate-900 tracking-tight leading-none">{s.val}</h3>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-widest mb-0.5 truncate">{s.label}</p>
+                      <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-none">{s.val}</h3>
                     </div>
                     <div className={cn(
-                      "p-3 rounded-xl transition-transform group-hover:scale-110 shadow-sm border border-black/5",
+                      "p-2 sm:p-3 rounded-xl transition-transform group-hover:scale-110 shadow-sm border border-black/5 shrink-0",
                       s.color === "blue" && "bg-blue-50 text-blue-600",
                       s.color === "amber" && "bg-amber-50 text-amber-600",
                       s.color === "emerald" && "bg-emerald-50 text-emerald-600",
                       s.color === "rose" && "bg-rose-50 text-rose-600",
                     )}>
-                      <s.icon className={cn("w-5 h-5", s.rotate && "rotate-45")} />
+                      <s.icon className={cn("w-4 h-4 sm:w-5 sm:h-5", s.rotate && "rotate-45")} />
                     </div>
                   </div>
                 </CardContent>
