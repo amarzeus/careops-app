@@ -3,65 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
-
-// ──── Enums (Kept as String for flexibility during migration) ────
-
-// enum UserRole {
-//   OWNER
-//   STAFF
-// }
-
-// enum BookingStatus {
-//   PENDING
-//   CONFIRMED
-//   COMPLETED
-//   CANCELLED
-//   NO_SHOW
-// }
-
-// enum FormStatus {
-//   PENDING
-//   SENT
-//   COMPLETED
-//   OVERDUE
-// }
-
-// enum MessageChannel {
-//   EMAIL
-//   SMS
-//   WHATSAPP
-//   SYSTEM
-// }
-
-// enum MessageDirection {
-//   INBOUND
-//   OUTBOUND
-// }
-
-// enum MessageStatus {
-//   SENT
-//   DELIVERED
-//   READ
-//   FAILED
-// }
-
-// enum AutomationTrigger {
-//   NEW_CONTACT
-//   BOOKING_CREATED
-//   BEFORE_BOOKING
-//   FORM_PENDING
-//   INVENTORY_LOW
-//   STAFF_REPLY
-// }
-
-// enum WorkspaceStatus {
-//   ONBOARDING
-//   ACTIVE
-//   INACTIVE
-// }
 
 // ──── Models ────
 
