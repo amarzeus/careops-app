@@ -109,7 +109,7 @@ export function SecurityTab({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4 pt-6">
-          <div className="flex items-center justify-between p-4 border-2 border-red-200 bg-red-50 rounded-lg">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border-2 border-red-200 bg-red-50 rounded-lg gap-4">
             <div>
               <h4 className="font-medium text-red-900">Delete Account</h4>
               <p className="text-sm text-red-700">
@@ -120,7 +120,7 @@ export function SecurityTab({
             </div>
             <Dialog>
               <DialogTrigger asChild>
-                <Button variant="destructive" className="shrink-0 ml-4">
+                <Button variant="destructive" className="shrink-0 w-full sm:w-auto">
                   <Trash2 className="w-4 h-4 mr-2" />
                   Delete Account
                 </Button>

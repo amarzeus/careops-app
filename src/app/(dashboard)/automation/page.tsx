@@ -124,18 +124,18 @@ export default function AutomationPage() {
         </Button>
       </Header>
 
-      <div className="p-6">
+      <div className="p-4 sm:p-6">
         {!loading && rules.length > 0 && (
-          <div className="mb-6 flex items-center gap-4">
-            <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 border rounded-lg">
+          <div className="mb-6 flex flex-wrap items-center gap-2 sm:gap-4">
+            <div className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-gray-50 border rounded-lg">
               <Zap className="w-4 h-4 text-gray-500" />
               <span className="text-sm font-medium text-gray-700">{rules.length} rule{rules.length !== 1 ? "s" : ""}</span>
             </div>
-            <div className="flex items-center gap-2 px-4 py-2 bg-green-50 border border-green-200 rounded-lg">
+            <div className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-green-50 border border-green-200 rounded-lg">
               <div className="w-2 h-2 bg-green-500 rounded-full" />
               <span className="text-sm font-medium text-green-700">{activeCount} active</span>
             </div>
-            <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 border rounded-lg">
+            <div className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-gray-50 border rounded-lg">
               <div className="w-2 h-2 bg-gray-400 rounded-full" />
               <span className="text-sm font-medium text-gray-500">{inactiveCount} inactive</span>
             </div>

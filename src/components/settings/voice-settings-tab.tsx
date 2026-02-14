@@ -285,7 +285,7 @@ export function VoiceSettingsTab() {
         </Card>
       </div>
 
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <h3 className="font-medium">Voice Agents</h3>
         <Button
           size="sm"

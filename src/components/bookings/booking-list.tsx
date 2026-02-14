@@ -50,18 +50,19 @@ export function BookingList({ bookings, onStatusUpdate, onEdit }: BookingListPro
 
   return (
     <div className="rounded-xl border border-border/40 bg-white shadow-sm overflow-hidden">
-      <Table>
-        <TableHeader className="bg-slate-50/50">
-          <TableRow className="hover:bg-transparent border-b border-border/40">
-            <TableHead className="py-2.5 h-auto font-bold text-[10px] uppercase tracking-widest text-slate-500">Date & Time</TableHead>
-            <TableHead className="py-2.5 h-auto font-bold text-[10px] uppercase tracking-widest text-slate-500">Service</TableHead>
-            <TableHead className="py-2.5 h-auto font-bold text-[10px] uppercase tracking-widest text-slate-500">Contact</TableHead>
-            <TableHead className="py-2.5 h-auto font-bold text-[10px] uppercase tracking-widest text-slate-500">Status</TableHead>
-            <TableHead className="text-right py-2.5 h-auto font-bold text-[10px] uppercase tracking-widest text-slate-500 px-4">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {bookings.map((booking) => (
+      <div className="overflow-x-auto">
+        <Table>
+          <TableHeader className="bg-slate-50/50">
+            <TableRow className="hover:bg-transparent border-b border-border/40">
+              <TableHead className="py-2.5 h-auto font-bold text-[10px] uppercase tracking-widest text-slate-500 whitespace-nowrap">Date & Time</TableHead>
+              <TableHead className="py-2.5 h-auto font-bold text-[10px] uppercase tracking-widest text-slate-500 whitespace-nowrap">Service</TableHead>
+              <TableHead className="py-2.5 h-auto font-bold text-[10px] uppercase tracking-widest text-slate-500 whitespace-nowrap">Contact</TableHead>
+              <TableHead className="py-2.5 h-auto font-bold text-[10px] uppercase tracking-widest text-slate-500 whitespace-nowrap">Status</TableHead>
+              <TableHead className="text-right py-2.5 h-auto font-bold text-[10px] uppercase tracking-widest text-slate-500 px-4 whitespace-nowrap">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {bookings.map((booking) => (
             <TableRow key={booking.id} className="group hover:bg-slate-50/50 transition-colors border-b border-border/40 last:border-0">
               <TableCell className="py-2">
                 <div className="flex flex-col">
@@ -136,8 +137,9 @@ export function BookingList({ bookings, onStatusUpdate, onEdit }: BookingListPro
               </TableCell>
             </TableRow>
           ))}
-        </TableBody>
-      </Table>
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 }

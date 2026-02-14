@@ -41,13 +41,13 @@ export function FormList({
     <div className="space-y-3">
       {forms.map((form) => (
         <Card key={form.id}>
-          <CardContent className="flex items-center justify-between py-4">
-            <div>
-              <p className="font-medium">{form.name}</p>
+          <CardContent className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 py-4">
+            <div className="min-w-0 flex-1">
+              <p className="font-medium truncate">{form.name}</p>
               {type === "contact" ? (
                 <p className="text-xs text-gray-500 mt-1">Slug: {form.slug}</p>
               ) : (
-                <div className="flex items-center gap-2 mt-1">
+                <div className="flex items-center gap-2 mt-1 flex-wrap">
                   {(form as IntakeFormDTO).service && (
                     <Badge variant="secondary">
                       {(form as IntakeFormDTO).service?.name}
@@ -59,8 +59,8 @@ export function FormList({
                 </div>
               )}
             </div>
-            <div className="flex items-center gap-2">
-              <Badge variant={form.isActive ? "default" : "secondary"}>
+            <div className="flex items-center gap-1 sm:gap-2 flex-wrap sm:flex-nowrap">
+              <Badge variant={form.isActive ? "default" : "secondary"} className="whitespace-nowrap">
                 {form.isActive ? "Active" : "Inactive"}
               </Badge>
               <Button
@@ -79,13 +79,14 @@ export function FormList({
                 variant="outline"
                 size="sm"
                 onClick={() => onCopy(form.slug, type === "contact" ? "contact" : "form")}
+                className="whitespace-nowrap"
               >
                 {copied === form.slug ? (
                   <CheckCircle className="w-3 h-3 mr-1" />
                 ) : (
                   <Copy className="w-3 h-3 mr-1" />
                 )}
-                {copied === form.slug ? "Copied!" : "Copy Link"}
+                {copied === form.slug ? "Copied!" : "Copy"}
               </Button>
               <Button
                 variant="ghost"

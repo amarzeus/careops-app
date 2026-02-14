@@ -92,7 +92,7 @@ export function WorkspaceTab({
           <CardDescription>Manage your business information</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Business Name</Label>
               <Input
@@ -115,7 +115,7 @@ export function WorkspaceTab({
               onChange={(e) => onUpdate({ address: e.target.value })}
             />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Contact Email</Label>
               <Input

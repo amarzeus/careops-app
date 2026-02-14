@@ -173,11 +173,13 @@ export default function FormsPage() {
         </div>
 
         <Tabs defaultValue="contact-forms">
-          <TabsList>
-            <TabsTrigger value="contact-forms">Contact Forms ({contactForms.length})</TabsTrigger>
-            <TabsTrigger value="intake-forms">Intake Forms ({intakeForms.length})</TabsTrigger>
-            <TabsTrigger value="submissions">Submissions ({submissions.length})</TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto pb-2 -mb-2">
+            <TabsList className="whitespace-nowrap">
+              <TabsTrigger value="contact-forms">Contact Forms ({contactForms.length})</TabsTrigger>
+              <TabsTrigger value="intake-forms">Intake Forms ({intakeForms.length})</TabsTrigger>
+              <TabsTrigger value="submissions">Submissions ({submissions.length})</TabsTrigger>
+            </TabsList>
+          </div>
 
           {/* Contact Forms Tab */}
           <TabsContent value="contact-forms">

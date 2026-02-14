@@ -42,36 +42,36 @@ export function SubmissionList({
           className="cursor-pointer hover:shadow-sm transition-shadow"
           onClick={() => onSelect(sub)}
         >
-          <CardContent className="flex items-center justify-between py-4">
-            <div>
-              <p className="font-medium text-sm">
+          <CardContent className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 py-4">
+            <div className="min-w-0 flex-1">
+              <p className="font-medium text-sm truncate">
                 {sub.contact?.name || "Unknown"}
               </p>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-gray-500 truncate">
                 {sub.intakeForm?.name || "Contact Form"} |{" "}
                 {new Date(sub.createdAt).toLocaleDateString()}
               </p>
             </div>
             <div
-              className="flex items-center gap-2"
+              className="flex items-center gap-1 sm:gap-2 flex-wrap"
               onClick={(e) => e.stopPropagation()}
             >
               {(sub.status === "PENDING" || sub.status === "SENT") && (
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-blue-600 hover:text-blue-700"
+                  className="text-blue-600 hover:text-blue-700 h-8"
                   onClick={() => onResend(sub.id)}
                   title="Re-send form"
                 >
-                  <Send className="w-3 h-3 mr-1" /> Resend
+                  <Send className="w-3 h-3 mr-1" /> <span className="hidden sm:inline">Resend</span>
                 </Button>
               )}
               {sub.status !== "COMPLETED" && (
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-green-600 hover:text-green-700"
+                  className="text-green-600 hover:text-green-700 h-8"
                   onClick={() => onUpdateStatus(sub.id, "COMPLETED")}
                   title="Mark as completed"
                 >
@@ -82,7 +82,7 @@ export function SubmissionList({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-red-500 hover:text-red-700"
+                  className="text-red-500 hover:text-red-700 h-8"
                   onClick={() => onUpdateStatus(sub.id, "OVERDUE")}
                   title="Mark as overdue"
                 >

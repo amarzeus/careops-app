@@ -257,16 +257,18 @@ function SettingsContent() {
   return (
     <div>
       <Header title="Settings" subtitle="Manage your workspace and account" />
-      <div className="p-6 max-w-4xl">
+      <div className="p-4 sm:p-6 max-w-4xl">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList>
-            <TabsTrigger value="workspace" className="flex items-center gap-2"><Settings className="w-4 h-4" /> Workspace</TabsTrigger>
-            <TabsTrigger value="ai" className="flex items-center gap-2"><Sparkles className="w-4 h-4" /> AI</TabsTrigger>
-            <TabsTrigger value="voice" className="flex items-center gap-2"><Sparkles className="w-4 h-4" /> Voice</TabsTrigger>
-            <TabsTrigger value="integrations" className="flex items-center gap-2"><Link2 className="w-4 h-4" /> Integrations</TabsTrigger>
-            <TabsTrigger value="profile" className="flex items-center gap-2"><User className="w-4 h-4" /> Profile</TabsTrigger>
-            <TabsTrigger value="security" className="flex items-center gap-2"><Shield className="w-4 h-4" /> Security</TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto pb-2 -mb-2">
+            <TabsList className="flex-nowrap whitespace-nowrap w-full sm:w-auto">
+              <TabsTrigger value="workspace" className="flex items-center gap-2"><Settings className="w-4 h-4" /> <span className="hidden sm:inline">Workspace</span></TabsTrigger>
+              <TabsTrigger value="ai" className="flex items-center gap-2"><Sparkles className="w-4 h-4" /> <span className="hidden sm:inline">AI</span></TabsTrigger>
+              <TabsTrigger value="voice" className="flex items-center gap-2"><Sparkles className="w-4 h-4" /> <span className="hidden sm:inline">Voice</span></TabsTrigger>
+              <TabsTrigger value="integrations" className="flex items-center gap-2"><Link2 className="w-4 h-4" /> <span className="hidden sm:inline">Integrations</span></TabsTrigger>
+              <TabsTrigger value="profile" className="flex items-center gap-2"><User className="w-4 h-4" /> <span className="hidden sm:inline">Profile</span></TabsTrigger>
+              <TabsTrigger value="security" className="flex items-center gap-2"><Shield className="w-4 h-4" /> <span className="hidden sm:inline">Security</span></TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="workspace">
             <WorkspaceTab

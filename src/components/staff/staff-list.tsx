@@ -22,15 +22,15 @@ interface StaffListProps {
 
 export function StaffList({ staff, onEdit, onDelete }: StaffListProps) {
     return (
-        <div className="rounded-md border">
+        <div className="rounded-md border overflow-x-auto">
             <Table>
                 <TableHeader>
                     <TableRow>
-                        <TableHead>User</TableHead>
-                        <TableHead>Role</TableHead>
-                        <TableHead>Permissions</TableHead>
-                        <TableHead>Joined</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
+                        <TableHead className="whitespace-nowrap">User</TableHead>
+                        <TableHead className="whitespace-nowrap">Role</TableHead>
+                        <TableHead className="whitespace-nowrap">Permissions</TableHead>
+                        <TableHead className="whitespace-nowrap">Joined</TableHead>
+                        <TableHead className="text-right whitespace-nowrap">Actions</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>

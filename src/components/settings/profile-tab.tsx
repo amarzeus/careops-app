@@ -128,8 +128,8 @@ export function ProfileTab({
             />
           </div>
         </CardContent>
-        <CardFooter className="bg-gray-50 border-t flex justify-end px-6 py-4">
-          <Button onClick={onSave} disabled={saving}>
+        <CardFooter className="bg-gray-50 border-t flex flex-col sm:flex-row justify-end gap-3 px-4 sm:px-6 py-4">
+          <Button onClick={onSave} disabled={saving} className="w-full sm:w-auto">
             {saved ? (
               <>
                 <CheckCircle className="w-4 h-4 mr-2" />

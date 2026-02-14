@@ -154,7 +154,7 @@ export function IntegrationsTab({
           </div>
 
           {/* Calendar capabilities */}
-          <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-gray-600">
             <div className="flex items-center gap-1.5 p-2 bg-gray-50 rounded">
               <span className={`w-1.5 h-1.5 rounded-full ${calendarConnected ? "bg-blue-500" : "bg-gray-300"}`} />
               Auto-sync new bookings
