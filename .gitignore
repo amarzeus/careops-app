@@ -42,3 +42,30 @@ next-env.d.ts
 /test-results/
 /blob-report/
 /playwright/.cache/
+
+# local database
+*.db
+*.db-journal
+*.sqlite
+*.sqlite-journal
+
+# development scripts
+bypass_otp.ts
+check_booking.ts
+check_contact.ts
+check_dashboard_stats.ts
+check_user.ts
+debug_smtp.ts
+get_otp.ts
+reset_password.ts
+revert_bypass.ts
+seed_service.ts
+seed_settings_user.ts
+test_email_delivery.ts
+unverify_user.ts
+
+# IDEs
+.vscode/
+.idea/
+.replit
+replit.md
