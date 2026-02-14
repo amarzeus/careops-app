@@ -3,8 +3,7 @@ services:
     name: careops-app
     env: node
     plan: free
-    buildCommand: npx prisma generate && npm run build
-    installCommand: npm install
+    buildCommand: npm install && npm run build
     startCommand: npm start
     healthCheckPath: /
     envVars:

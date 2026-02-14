@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: careops-postgres
+    environment:
+      POSTGRES_USER: careops
+      POSTGRES_PASSWORD: careops
+      POSTGRES_DB: careops
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U careops"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Optional: Adminer for database management
+  adminer:
+    image: adminer
+    container_name: careops-adminer
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
