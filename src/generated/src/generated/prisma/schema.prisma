@@ -1,11 +1,11 @@
 generator client {
   provider   = "prisma-client-js"
-  output     = "../generated/prisma"
+  output     = "../src/generated/prisma"
   engineType = "library"
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -163,8 +163,8 @@ model Service {
   startTime     String @default("09:00")
   endTime       String @default("17:00")
 
-  bookings    Booking[]
-  linkedForms IntakeForm[]
+  bookings       Booking[]
+  linkedForms    IntakeForm[]
   inventoryLinks ServiceInventoryLink[]
 
   createdAt DateTime @default(now())
@@ -265,7 +265,7 @@ model InventoryItem {
 model ServiceInventoryLink {
   id          String        @id @default(cuid())
   serviceId   String
-  service     Service      @relation(fields: [serviceId], references: [id])
+  service     Service       @relation(fields: [serviceId], references: [id])
   inventoryId String
   inventory   InventoryItem @relation(fields: [inventoryId], references: [id])
   quantity    Int           @default(1) // quantity used per booking
@@ -347,8 +347,8 @@ model Webhook {
 
 model IntegrationLog {
   id          String    @id @default(cuid())
-  type        String    // "email", "sms", "webhook", "calendar"
-  status      String    // "success", "failed", "bounced"
+  type        String // "email", "sms", "webhook", "calendar"
+  status      String // "success", "failed", "bounced"
   to          String?
   message     String?
   error       String?
@@ -362,7 +362,7 @@ model AutomationLog {
   id          String            @id @default(cuid())
   ruleId      String
   trigger     AutomationTrigger
-  status      String            // "SUCCESS", "FAILED", "SKIPPED"
+  status      String // "SUCCESS", "FAILED", "SKIPPED"
   details     String?
   recipient   String?
   workspaceId String

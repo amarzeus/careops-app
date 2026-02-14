@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendEmail, buildEmailTemplate } from "@/lib/email";
-import { addHours, isWithinInterval } from "date-fns";
+import { addHours, isBefore } from "date-fns";
 
 /** GET /api/automation/cron
  *  Scheduled automation runner — queries and executes time-based automations:
  *  1. BEFORE_BOOKING reminders (bookings happening in the next 24 hours)
  *  2. FORM_PENDING reminders (forms pending for > 48 hours)
+ *  3. FORM_OVERDUE updates (forms past due date)
  *
  *  Should be called by an external cron service (e.g., every hour).
  *  Secured by CRON_SECRET header.
@@ -21,8 +22,42 @@ export async function GET(req: Request) {
     const results: { type: string; workspaceId: string; status: string; details: string }[] = [];
 
     try {
-        // 1. BEFORE_BOOKING reminders
+        // 1. Update OVERDUE forms
         const now = new Date();
+        
+        const overdueForms = await prisma.formSubmission.findMany({
+            where: {
+                status: { in: ["PENDING", "SENT"] },
+                dueDate: { lt: now },
+            },
+            include: { workspace: true, contact: true },
+        });
+
+        for (const form of overdueForms) {
+            await prisma.formSubmission.update({
+                where: { id: form.id },
+                data: { status: "OVERDUE" },
+            });
+
+            await prisma.alert.create({
+                data: {
+                    type: "form",
+                    title: "Form Overdue",
+                    message: `${form.contact.name}'s form "${form.intakeForm?.name || 'Intake Form'}" is overdue`,
+                    actionUrl: "/forms/submissions",
+                    workspaceId: form.workspaceId,
+                },
+            });
+
+            results.push({
+                type: "FORM_OVERDUE",
+                workspaceId: form.workspaceId,
+                status: "UPDATED",
+                details: `Form ${form.id} marked as overdue`,
+            });
+        }
+
+        // 2. BEFORE_BOOKING reminders
         const in24Hours = addHours(now, 24);
 
         const beforeBookingRules = await prisma.automationRule.findMany({

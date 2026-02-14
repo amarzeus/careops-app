@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -144,6 +144,7 @@ model Workspace {
   automationRules AutomationRule[]
   alerts          Alert[]
   webhooks        Webhook[]
+  integrationLogs IntegrationLog[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -196,6 +197,7 @@ model Service {
 
   bookings    Booking[]
   linkedForms IntakeForm[]
+  inventoryLinks ServiceInventoryLink[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -290,8 +292,23 @@ model InventoryItem {
   workspaceId String
   workspace   Workspace @relation(fields: [workspaceId], references: [id])
 
+  serviceLinks ServiceInventoryLink[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model ServiceInventoryLink {
+  id          String  @id @default(cuid())
+  serviceId   String
+  service     Service @relation(fields: [serviceId], references: [id])
+  inventoryId String
+  inventory   InventoryItem @relation(fields: [inventoryId], references: [id])
+  quantity    Int     @default(1)
+
+  createdAt DateTime @default(now())
+
+  @@unique([serviceId, inventoryId])
 }
 
 model Conversation {
@@ -361,6 +378,19 @@ model Alert {
   message   String
   isRead    Boolean @default(false)
   actionUrl String?
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model IntegrationLog {
+  id          String    @id @default(cuid())
+  type        String    // "email", "sms", "webhook", "calendar"
+  status      String    // "success", "failed", "bounced"
+  to          String?
+  message     String?
+  error       String?
   workspaceId String
   workspace   Workspace @relation(fields: [workspaceId], references: [id])
 

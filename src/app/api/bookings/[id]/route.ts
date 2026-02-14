@@ -5,6 +5,46 @@ import {
   updateBookingCalendarEvent,
   cancelBookingCalendarEvent,
 } from "@/lib/google-calendar";
+import { triggerAutomation } from "@/lib/automation";
+
+async function decrementInventoryForBooking(bookingId: string, workspaceId: string) {
+  const booking = await prisma.booking.findUnique({
+    where: { id: bookingId },
+    include: {
+      service: {
+        include: {
+          inventoryLinks: {
+            include: { inventory: true },
+          },
+        },
+      },
+    },
+  });
+
+  if (!booking || booking.status === "COMPLETED") return;
+
+  for (const link of booking.service.inventoryLinks) {
+    const item = link.inventory;
+    const newQuantity = Math.max(0, item.quantity - link.quantity);
+
+    await prisma.inventoryItem.update({
+      where: { id: item.id },
+      data: { quantity: newQuantity },
+    });
+
+    if (newQuantity <= item.threshold) {
+      await triggerAutomation(workspaceId, "INVENTORY_LOW", {
+        item: {
+          name: item.name,
+          quantity: newQuantity,
+          threshold: item.threshold,
+          unit: item.unit,
+          vendorEmail: item.vendorEmail,
+        },
+      });
+    }
+  }
+}
 
 export async function PUT(
   req: Request,
@@ -27,6 +67,13 @@ export async function PUT(
     },
     include: { service: true, contact: true },
   });
+
+  // Handle inventory decrement and calendar sync
+  if (data.status === "COMPLETED") {
+    decrementInventoryForBooking(id, user.workspaceId).catch((err) =>
+      console.error("[Inventory] Decrement error:", err)
+    );
+  }
 
   // Sync calendar event updates (fire-and-forget)
   if (data.status === "CANCELLED" || data.status === "NO_SHOW") {

@@ -28,6 +28,25 @@ async function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+async function logIntegration(type: string, status: string, to: string, message: string, error?: string, workspaceId?: string) {
+  if (!workspaceId) return;
+  
+  try {
+    await prisma.integrationLog.create({
+      data: {
+        type,
+        status,
+        to,
+        message,
+        error,
+        workspaceId,
+      },
+    });
+  } catch (e) {
+    console.error("Failed to log integration:", e);
+  }
+}
+
 export async function sendEmail(options: EmailOptions): Promise<boolean> {
   console.log(`Preparing to send email to: ${options.to}`);
 
@@ -43,6 +62,8 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
       });
 
       console.log(`✅ Email sent successfully! Message ID: ${info.messageId}`);
+      
+      await logIntegration("email", "success", options.to, options.subject, undefined, options.workspaceId);
 
       // In development, log the email content for debugging
       if (process.env.NODE_ENV !== "production") {
@@ -64,6 +85,10 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
         await sleep(RETRY_DELAY * attempt);
       } else {
         console.error("All delivery attempts failed.");
+        
+        const errorMsg = `Failed to send "${options.subject}" to ${options.to} after ${MAX_RETRIES} attempts`;
+        
+        await logIntegration("email", "failed", options.to, options.subject, message, options.workspaceId);
 
         if (options.workspaceId) {
           try {
@@ -71,7 +96,7 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
               data: {
                 type: "automation",
                 title: "Email Delivery Failed",
-                message: `Failed to send "${options.subject}" to ${options.to} after ${MAX_RETRIES} attempts`,
+                message: errorMsg,
                 actionUrl: "/inbox",
                 workspaceId: options.workspaceId,
               },

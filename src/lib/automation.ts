@@ -465,3 +465,20 @@ async function handleInventoryLow(workspace: Workspace, data: Record<string, unk
     });
   }
 }
+
+export async function resumeAutomation(conversationId: string, workspaceId: string) {
+  await prisma.conversation.update({
+    where: { id: conversationId },
+    data: { isActive: true },
+  });
+
+  await prisma.alert.create({
+    data: {
+      type: "automation",
+      title: "Automation Resumed",
+      message: `Automated messages have been resumed for this conversation`,
+      actionUrl: "/inbox",
+      workspaceId,
+    },
+  });
+}

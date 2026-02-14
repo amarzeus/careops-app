@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { resumeAutomation } from "@/lib/automation";
 
 export async function GET(
   req: Request,
@@ -35,6 +36,33 @@ export async function GET(
   });
 
   return NextResponse.json({ conversation });
+}
+
+export async function PUT(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const user = await getCurrentUser();
+  if (!user || !user.workspaceId)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const { id } = await params;
+  const { action } = await req.json();
+
+  if (action === "resume") {
+    await resumeAutomation(id, user.workspaceId);
+    return NextResponse.json({ success: true, message: "Automation resumed" });
+  }
+
+  if (action === "pause") {
+    await prisma.conversation.update({
+      where: { id },
+      data: { isActive: false },
+    });
+    return NextResponse.json({ success: true, message: "Automation paused" });
+  }
+
+  return NextResponse.json({ error: "Invalid action" }, { status: 400 });
 }
 
 export async function POST(
