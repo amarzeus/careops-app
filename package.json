@@ -6,7 +6,7 @@
     "dev": "next dev -H 0.0.0.0 -p ${PORT:-5000}",
     "prebuild": "npm install --include=dev",
     "build": "prisma generate && next build",
-    "start": "node .next/standalone/server.js",
+    "start": "next start -H 0.0.0.0 -p ${PORT:-10000}",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
     "format": "prettier --write .",

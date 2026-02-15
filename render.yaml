@@ -3,13 +3,11 @@ services:
     name: careops-app
     runtime: node
     plan: free
-    buildCommand: npm ci --include=dev && npm run build && cp -r public .next/standalone/ && cp -r .next/static .next/standalone/.next/
+    buildCommand: npm ci --include=dev && npm run build
     startCommand: npm run db:push && npm start
     healthCheckPath: /
     # CareOps listeners on port 5000 by default in scripts
     envVars:
-      - key: PORT
-        value: "5000"
       - key: NODE_VERSION
         value: "20"
       - key: DATABASE_URL
