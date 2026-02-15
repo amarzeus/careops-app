@@ -1,10 +1,21 @@
-# <p align="center">🚀 CareOps: The SOTA Operations Engine</p>
+# CareOps: The SOTA Operations Engine
+
+CareOps is a unified intelligence layer for service businesses, automating the full journey from first contact to final intake.
 
 <p align="center">
   <img src="https://img.shields.io/badge/Stack-Next.js%2016-blue?style=for-the-badge&logo=next.js" />
   <img src="https://img.shields.io/badge/Database-PostgreSQL-336791?style=for-the-badge&logo=postgresql" />
   <img src="https://img.shields.io/badge/AI-Gemini%202.0-orange?style=for-the-badge&logo=google-gemini" />
   <img src="https://img.shields.io/badge/Voice-Vapi.ai-purple?style=for-the-badge&logo=airtable" />
+  <a href="https://github.com/amarzeus/careops-app/actions">
+    <img src="https://img.shields.io/github/actions/workflow/status/amarzeus/careops-app/ci.yml?style=for-the-badge&label=build" alt="Build status" />
+  </a>
+  <a href="https://github.com/amarzeus/careops-app">
+    <img src="https://img.shields.io/github/package-json/v/amarzeus/careops-app?style=for-the-badge&label=version" alt="Version" />
+  </a>
+  <a href="https://github.com/amarzeus/careops-app">
+    <img src="https://img.shields.io/librariesio/github/amarzeus/careops-app?style=for-the-badge&label=dependencies" alt="Dependencies" />
+  </a>
 </p>
 
 ---
@@ -13,15 +24,11 @@
 
 CareOps is not just a dashboard; it's a **unified intelligence layer** for service businesses. By consolidating the entire operational lifecycle—from first contact to final intake—CareOps eliminates tool-chaos and replaces it with **automated clarity**.
 
-![CareOps Futuristic Dashboard](public/images/dashboard-mockup.png)
-
 ---
 
 ## 🧩 How It Works: The 8-Step Automated Engine
 
 CareOps is built on a strict, event-driven architecture that ensures no lead is ever dropped and no booking goes unconfirmed.
-
-![CareOps Onboarding Process](public/images/onboarding-process.png)
 
 ```mermaid
 sequenceDiagram
@@ -46,8 +53,6 @@ sequenceDiagram
 ## 🔌 Integrated Ecosystem
 
 CareOps leverages industrial-grade providers to power its communication and intelligence layers. Every integration is **abstracted**, **fail-safe**, and **event-driven**.
-
-![CareOps Integration Ecosystem](public/images/integration-ecosystem.png)
 
 ### 🚀 Provider Deep Dive
 
@@ -117,34 +122,173 @@ CareOps leverages industrial-grade providers to power its communication and inte
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Installation
+
+Follow these steps to run CareOps locally in development:
+
+1. Clone the repository and install dependencies.
+2. Copy `.env.example` to `.env` and configure environment variables.
+3. Provision and migrate the database.
+4. (Optional) Seed demo data for a realistic workspace.
+5. Start the development server.
 
 ```bash
-# 1. Clone & Install
-git clone https://github.com/amarzeus/careops-app.git && cd careops-app
+git clone https://github.com/amarzeus/careops-app.git
+cd careops-app
 npm install
 
-# 2. Environment Setup
 cp .env.example .env
-# Fill: GEMINI_API_KEY, VAPI_API_KEY, TWILIO_AUTH, etc.
 
-# 3. Database Setup
 npx prisma generate
 npx prisma db push
 
-# 4. (Optional) Seed Test Data
 npx tsx prisma/seed-live-business.ts
 
-# 5. Launch
 npm run dev
 ```
 
 ---
 
-## 🎖️ CareOps Hackathon 2026
+## 📦 Usage
 
-Built to set the standard for modern business operations. CareOps is a proof-of-concept for the **Founding Team** role, demonstrating elite AI leverage, UX obsessed design, and architectural discipline.
+- Access the app at `http://localhost:3000` (or the port configured via `PORT`).
+- Register a new owner account or sign in with any accounts you have seeded.
+- Explore the dashboard, inbox, bookings, forms, inventory, and automation tabs.
+
+Common development commands:
+
+```bash
+# Run unit tests (Vitest)
+npm test
+
+# Run end-to-end tests (Playwright)
+npm run test:e2e
+
+# Lint the codebase
+npm run lint
+
+# Build for production
+npm run build
+```
 
 ---
 
-**License:** MIT | **Contact:** [https://careops-app.onrender.com](https://careops-app.onrender.com)
+## ⚙️ Configuration
+
+CareOps is configured via environment variables. Copy `.env.example` to `.env` and fill in the values for your environment.
+
+### Database
+
+- `DATABASE_URL` – PostgreSQL connection string (or SQLite for local testing).
+
+### Authentication
+
+- `JWT_SECRET` – secret used to sign authentication tokens.
+
+### AI Services
+
+- `GEMINI_API_KEY` – Google Gemini API key.
+
+### Email (SMTP)
+
+- `EMAIL_HOST` – SMTP host (for example, Resend or Gmail).
+- `EMAIL_PORT` – SMTP port (typically `587`).
+- `EMAIL_USER` – SMTP username or identifier.
+- `EMAIL_PASS` – SMTP password or API key.
+- `EMAIL_FROM` – default from address for outbound emails.
+
+### App
+
+- `NEXT_PUBLIC_APP_URL` – public base URL of the app (used in links).
+
+### Google OAuth
+
+- `GOOGLE_CLIENT_ID` – OAuth client ID.
+- `GOOGLE_CLIENT_SECRET` – OAuth client secret.
+
+### SMS (Twilio)
+
+- `TWILIO_ACCOUNT_SID` – Twilio account SID.
+- `TWILIO_AUTH_TOKEN` – Twilio auth token.
+- `TWILIO_PHONE_NUMBER` – Twilio sending phone number.
+
+### Voice AI (Vapi)
+
+- `VAPI_API_KEY` – Vapi API key for voice assistants.
+
+### Testing
+
+- `BASE_URL` – base URL used by Playwright tests.
+- `TEST_ENV` – test environment label (for example, `local`).
+- `API_URL` – base URL for API requests in tests.
+
+---
+
+## 🧪 Troubleshooting
+
+- **Database connection errors**
+  - Verify `DATABASE_URL` is correct and the database is running.
+  - Run `npx prisma db push` to ensure the schema is applied.
+
+- **Emails not sending**
+  - Confirm `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_USER`, `EMAIL_PASS`, and `EMAIL_FROM` are set.
+  - Check workspace email flags under Settings → Integrations.
+
+- **SMS or voice features not working**
+  - Make sure Twilio and Vapi environment variables are configured.
+  - Verify your workspace is marked as SMS/voice enabled in settings.
+
+- **AI features disabled**
+  - Ensure `GEMINI_API_KEY` is present and valid.
+  - Restart the dev server after changing environment variables.
+
+- **Tests failing locally**
+  - Ensure the app is running on the same `BASE_URL` configured in `.env`.
+  - Reset the database with `npx prisma db push` and re-run seeds if needed.
+
+---
+
+## 🤝 Contributing
+
+CareOps is built with a focus on clean architecture and strong engineering discipline.
+
+- Use TypeScript and React with Next.js 16.
+- Prefer absolute imports via `@/` instead of deep relative paths.
+- Follow existing file naming conventions enforced by ESLint.
+- Keep UI components small and composable.
+- Add or update unit tests (Vitest) for non-trivial changes.
+- Run `npm run lint` and `npm test` before opening a pull request.
+
+To contribute:
+
+1. Fork the repository.
+2. Create a feature branch from `main`.
+3. Make your changes and add tests.
+4. Run linting and tests locally.
+5. Open a pull request with a clear description and screenshots where relevant.
+
+---
+
+## 🧾 Changelog
+
+- `0.1.0` – Initial public hackathon release of CareOps.
+
+---
+
+## 📚 Resources
+
+- Live app: <https://careops-app.onrender.com>
+- Repository: <https://github.com/amarzeus/careops-app>
+- Next.js 16: <https://nextjs.org/docs>
+- Prisma ORM: <https://www.prisma.io/docs>
+- Google Gemini: <https://ai.google.dev>
+- Twilio SMS: <https://www.twilio.com/docs/sms>
+- Vapi Voice: <https://vapi.ai>
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License. See the [LICENSE](https://github.com/amarzeus/careops-app/blob/main/LICENSE) file for details.
+
+**Contact:** <https://careops-app.onrender.com>
