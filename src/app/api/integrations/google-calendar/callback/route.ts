@@ -19,14 +19,16 @@ export async function GET(req: Request) {
   // Handle user denial
   if (error) {
     console.error("[Google Calendar] OAuth error:", error);
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:10000";
     return NextResponse.redirect(
-      new URL("/settings?tab=integrations&calendar=denied", req.url)
+      new URL("/settings?tab=integrations&calendar=denied", baseUrl)
     );
   }
 
   if (!code || !state) {
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:10000";
     return NextResponse.redirect(
-      new URL("/settings?tab=integrations&calendar=error", req.url)
+      new URL("/settings?tab=integrations&calendar=error", baseUrl)
     );
   }
 
@@ -38,8 +40,9 @@ export async function GET(req: Request) {
 
     if (!workspace) {
       console.error("[Google Calendar] Invalid workspace in state:", state);
+      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:10000";
       return NextResponse.redirect(
-        new URL("/settings?tab=integrations&calendar=error", req.url)
+        new URL("/settings?tab=integrations&calendar=error", baseUrl)
       );
     }
 
@@ -68,13 +71,15 @@ export async function GET(req: Request) {
       `[Google Calendar] Connected for workspace ${state} (${calendarEmail})`
     );
 
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:10000";
     return NextResponse.redirect(
-      new URL("/settings?tab=integrations&calendar=success", req.url)
+      new URL("/settings?tab=integrations&calendar=success", baseUrl)
     );
   } catch (err) {
     console.error("[Google Calendar] Callback error:", err);
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:10000";
     return NextResponse.redirect(
-      new URL("/settings?tab=integrations&calendar=error", req.url)
+      new URL("/settings?tab=integrations&calendar=error", baseUrl)
     );
   }
 }

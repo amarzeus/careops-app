@@ -15,26 +15,29 @@ export async function GET(req: Request) {
     // Handle OAuth errors from Google
     if (errorParam) {
         console.error(`[Google Auth Callback] OAuth error from Google: ${errorParam}`);
-        return NextResponse.redirect(new URL(`/login?error=google_auth_failed&message=${encodeURIComponent(`Google error: ${errorParam}`)}`, req.url));
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:10000";
+        return NextResponse.redirect(new URL(`/login?error=google_auth_failed&message=${encodeURIComponent(`Google error: ${errorParam}`)}`, baseUrl));
     }
 
     if (!code) {
         console.error("[Google Auth Callback] No authorization code received");
-        return NextResponse.redirect(new URL("/login?error=google_auth_failed&message=No authorization code", req.url));
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:10000";
+        return NextResponse.redirect(new URL("/login?error=google_auth_failed&message=No authorization code", baseUrl));
     }
 
     try {
         console.log("[Google Auth Callback] Exchanging code for tokens...");
         const { id_token, access_token } = await getGoogleTokens(code);
         console.log("[Google Auth Callback] Tokens received successfully");
-        
+
         console.log("[Google Auth Callback] Fetching Google user info...");
         const googleUser = await getGoogleUser(id_token, access_token);
         console.log(`[Google Auth Callback] User info received: ${googleUser.email}`);
 
         if (!googleUser.emailVerified && !googleUser.verified_email) {
             console.error("[Google Auth Callback] Email not verified");
-            return NextResponse.redirect(new URL("/login?error=google_auth_failed&message=Email not verified", req.url));
+            const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:10000";
+            return NextResponse.redirect(new URL("/login?error=google_auth_failed&message=Email not verified", baseUrl));
         }
 
         // Check if user exists
@@ -52,18 +55,18 @@ export async function GET(req: Request) {
 
         if (!user) {
             console.log("[Google Auth Callback] Creating new user with workspace...");
-            
+
             // Create workspace first
             const workspace = await prisma.workspace.create({
-                data: { 
-                    name: `${googleUser.name}'s Workspace`, 
+                data: {
+                    name: `${googleUser.name}'s Workspace`,
                     status: "ONBOARDING",
                     emailConfigured: !!(process.env.EMAIL_HOST && process.env.EMAIL_FROM),
                     smsConfigured: !!(process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_PHONE_NUMBER),
                 },
             });
             console.log(`[Google Auth Callback] Workspace created: ${workspace.id}`);
-            
+
             // Create user linked to workspace
             user = await prisma.user.create({
                 data: {
@@ -79,7 +82,7 @@ export async function GET(req: Request) {
             console.log(`[Google Auth Callback] New user created: ${user.id} with workspace: ${workspace.id}`);
         } else {
             console.log(`[Google Auth Callback] Existing user found: ${user.id}`);
-            
+
             // Link Google ID if not linked
             if (!user.googleId) {
                 console.log("[Google Auth Callback] Linking Google ID to existing user...");
@@ -88,24 +91,24 @@ export async function GET(req: Request) {
                     data: { googleId: googleUser.id, emailVerified: new Date() },
                 });
             }
-            
+
             // If user doesn't have a workspace, create one
             if (!user.workspaceId) {
                 console.log("[Google Auth Callback] User has no workspace, creating one...");
                 const workspace = await prisma.workspace.create({
-                    data: { 
-                        name: `${user.name || googleUser.name}'s Workspace`, 
+                    data: {
+                        name: `${user.name || googleUser.name}'s Workspace`,
                         status: "ONBOARDING",
                         emailConfigured: !!(process.env.EMAIL_HOST && process.env.EMAIL_FROM),
                         smsConfigured: !!(process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_PHONE_NUMBER),
                     },
                 });
-                
+
                 await prisma.user.update({
                     where: { id: user.id },
                     data: { workspaceId: workspace.id },
                 });
-                
+
                 user.workspaceId = workspace.id;
                 console.log(`[Google Auth Callback] Workspace created and linked: ${workspace.id}`);
             }
@@ -114,7 +117,7 @@ export async function GET(req: Request) {
         console.log("[Google Auth Callback] Creating auth token...");
         const token = createToken(user.id, user.workspaceId, user.role);
         console.log(`[Google Auth Callback] Token created for user: ${user.id}`);
-        
+
         console.log("[Google Auth Callback] Setting auth cookie...");
         try {
             await setAuthCookie(token);
@@ -123,7 +126,7 @@ export async function GET(req: Request) {
             console.error("[Google Auth Callback] Failed to set auth cookie:", cookieError);
             throw new Error("Failed to set authentication cookie");
         }
-        
+
         // Determine redirect URL
         const redirectUrl = !user.workspaceId ? "/onboarding" : "/dashboard";
         console.log(`[Google Auth Callback] Redirecting to: ${redirectUrl}`);
@@ -139,6 +142,7 @@ export async function GET(req: Request) {
         console.error("[Google Auth Callback] Error:", error);
         const errorMessage = error instanceof Error ? error.message : "Unknown error";
         console.error("[Google Auth Callback] Error details:", errorMessage);
-        return NextResponse.redirect(new URL(`/login?error=google_auth_failed&message=${encodeURIComponent(errorMessage)}`, req.url));
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:10000";
+        return NextResponse.redirect(new URL(`/login?error=google_auth_failed&message=${encodeURIComponent(errorMessage)}`, baseUrl));
     }
 }
