@@ -32,12 +32,16 @@ async function main() {
   // Create or update Owner (Full Access)
   const owner = await prisma.user.upsert({
     where: { email: "amar@zeuswellness.com" },
-    update: { passwordHash: "$2b$12$1Tq3aKgQ3.Nq4jcAkZYeeOFBKXvu2anpnGZCrHwMxypmKZ/.kQ9wO" },
+    update: {
+      passwordHash: "$2b$12$1Tq3aKgQ3.Nq4jcAkZYeeOFBKXvu2anpnGZCrHwMxypmKZ/.kQ9wO",
+      emailVerified: new Date(),
+    },
     create: {
       email: "amar@zeuswellness.com",
       name: "Amar Kumar",
       passwordHash: "$2b$12$1Tq3aKgQ3.Nq4jcAkZYeeOFBKXvu2anpnGZCrHwMxypmKZ/.kQ9wO", // password
       role: "OWNER",
+      emailVerified: new Date(),
       workspaceId: workspace.id,
     },
   });
@@ -46,24 +50,32 @@ async function main() {
   // Create or update Staff Users (Restricted Access)
   const staffAlpha = await prisma.user.upsert({
     where: { email: "alpha@zeuswellness.com" },
-    update: { passwordHash: "$2b$12$1Tq3aKgQ3.Nq4jcAkZYeeOFBKXvu2anpnGZCrHwMxypmKZ/.kQ9wO" },
+    update: {
+      passwordHash: "$2b$12$1Tq3aKgQ3.Nq4jcAkZYeeOFBKXvu2anpnGZCrHwMxypmKZ/.kQ9wO",
+      emailVerified: new Date(),
+    },
     create: {
       email: "alpha@zeuswellness.com",
       name: "Staff Alpha",
       passwordHash: "$2b$12$1Tq3aKgQ3.Nq4jcAkZYeeOFBKXvu2anpnGZCrHwMxypmKZ/.kQ9wO", // password
       role: "STAFF",
+      emailVerified: new Date(),
       workspaceId: workspace.id,
     },
   });
 
   const staffBeta = await prisma.user.upsert({
     where: { email: "beta@zeuswellness.com" },
-    update: { passwordHash: "$2b$12$1Tq3aKgQ3.Nq4jcAkZYeeOFBKXvu2anpnGZCrHwMxypmKZ/.kQ9wO" },
+    update: {
+      passwordHash: "$2b$12$1Tq3aKgQ3.Nq4jcAkZYeeOFBKXvu2anpnGZCrHwMxypmKZ/.kQ9wO",
+      emailVerified: new Date(),
+    },
     create: {
       email: "beta@zeuswellness.com",
       name: "Staff Beta",
       passwordHash: "$2b$12$1Tq3aKgQ3.Nq4jcAkZYeeOFBKXvu2anpnGZCrHwMxypmKZ/.kQ9wO", // password
       role: "STAFF",
+      emailVerified: new Date(),
       workspaceId: workspace.id,
     },
   });
