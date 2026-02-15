@@ -6,10 +6,8 @@ services:
     buildCommand: npm ci --include=dev && npm run build
     startCommand: npm run db:push && npm start
     healthCheckPath: /
-    # Force Render to use 10000 to avoid port loops
+    # Allow Render to automatically detect the port
     envVars:
-      - key: PORT
-        value: "10000"
       - key: NODE_VERSION
         value: "20"
       - key: DATABASE_URL
