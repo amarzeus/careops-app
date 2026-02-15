@@ -9,16 +9,18 @@ import { hashPassword } from "@/lib/auth";
 export async function POST(req: Request) {
     try {
         const { email, phone, otp, newPassword, method = "email" } = await req.json();
+        const { normalizePhoneNumber } = require("@/lib/twilio");
 
-        if (!otp || !newPassword) {
-            return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
-        }
+        const normalizedPhone = (method === "sms" && phone) ? normalizePhoneNumber(phone) : undefined;
+
+        console.log(`[ResetPassword] Request: method=${method}, email=${email}, phone=${phone}, normalizedPhone=${normalizedPhone}, otp=${otp}`);
 
         const user = await prisma.user.findFirst({
-            where: method === "email" ? { email } : { phone },
+            where: method === "email" ? { email } : { phone: normalizedPhone },
         });
 
         if (!user) {
+            console.log(`[ResetPassword] User not found for ${method === "email" ? email : normalizedPhone}`);
             return NextResponse.json({ error: "User not found" }, { status: 404 });
         }
 

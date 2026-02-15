@@ -51,6 +51,14 @@ function categorizeError(error: any, statusCode?: number): { code: TwilioErrorCo
     return { code: "UNKNOWN", retryable: false };
 }
 
+
+export function normalizePhoneNumber(phone: string): string {
+    const digits = phone.replace(/\D/g, "");
+    if (digits.length === 10) return `+91${digits}`;
+    if (digits.length === 11 && digits.startsWith("1")) return `+${digits}`;
+    return phone.startsWith("+") ? `+${digits}` : `+${digits}`;
+}
+
 function validatePhoneNumber(phone: string): { valid: boolean; formatted: string; error?: string } {
     if (!phone) {
         return { valid: false, formatted: "", error: "Phone number is required" };

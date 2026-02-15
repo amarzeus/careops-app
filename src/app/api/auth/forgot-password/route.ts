@@ -13,19 +13,18 @@ import { v4 as uuidv4 } from "uuid";
 export async function POST(req: Request) {
   try {
     const { email, phone, method = "email" } = await req.json();
+    const { normalizePhoneNumber } = require("@/lib/twilio");
 
-    if (method === "email" && !email) {
-      return NextResponse.json({ error: "Email is required" }, { status: 400 });
-    }
-    if (method === "sms" && !phone) {
-      return NextResponse.json({ error: "Phone number is required" }, { status: 400 });
-    }
+    const normalizedPhone = (method === "sms" && phone) ? normalizePhoneNumber(phone) : undefined;
+
+    console.log(`[ForgotPassword] Request: method=${method}, email=${email}, phone=${phone}, normalizedPhone=${normalizedPhone}`);
 
     const user = await prisma.user.findFirst({
-      where: method === "email" ? { email } : { phone },
+      where: method === "email" ? { email } : { phone: normalizedPhone },
     });
 
     if (!user) {
+      console.log(`[ForgotPassword] User not found for ${method === "email" ? email : normalizedPhone}`);
       // Return success even if user not found (security: don't reveal user existence)
       return NextResponse.json({
         message: method === "email"
