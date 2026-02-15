@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
-import { isConfigured, sendSMS } from "@/lib/twilio";
+import { sendSMS } from "@/lib/sms";
+import { isConfigured } from "@/lib/twilio";
 
 /**
  *
@@ -25,11 +26,15 @@ export async function POST() {
       );
     }
 
-    const result = await sendSMS(user.phone, "Twilio SMS connection verified!");
+    const success = await sendSMS({
+      to: user.phone,
+      body: "Twilio SMS connection verified! Your CareOps notification system is working.",
+      workspaceId: user.workspaceId
+    });
 
-    if (!result.success) {
+    if (!success) {
       return NextResponse.json(
-        { error: `Twilio delivery failed: ${result.error}` },
+        { error: "Twilio delivery failed. Check your Twilio dashboard for logs." },
         { status: 500 }
       );
     }

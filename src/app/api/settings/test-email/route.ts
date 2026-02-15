@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
-import nodemailer from "nodemailer";
+import { sendEmail, buildEmailTemplate } from "@/lib/email";
 
 /**
  *
@@ -11,18 +11,26 @@ export async function POST() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   try {
-    const transporter = nodemailer.createTransport({
-      host: process.env.EMAIL_HOST,
-      port: parseInt(process.env.EMAIL_PORT || "587"),
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
+    const success = await sendEmail({
+      to: user.email,
+      subject: "Email Connection Test",
+      html: buildEmailTemplate(
+        "Email Connection Test",
+        `<p>Hello ${user.name},</p><p>This is a test email to verify that your CareOps email notification system is correctly configured and working. If you can read this, the test was successful!</p>`,
+        "Go to Dashboard",
+        `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`
+      ),
+      workspaceId: user.workspaceId
     });
 
-    await transporter.verify();
+    if (!success) {
+      return NextResponse.json(
+        { error: "Email delivery failed. Checking your configuration and logs." },
+        { status: 500 }
+      );
+    }
 
-    return NextResponse.json({ success: true, message: "Email connection verified" });
+    return NextResponse.json({ success: true, message: "Test email sent successfully" });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Connection failed";
     return NextResponse.json(
