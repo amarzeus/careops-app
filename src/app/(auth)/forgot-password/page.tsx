@@ -209,7 +209,7 @@ export default function ForgotPasswordPage() {
               </div>
               <div className="flex flex-col items-center gap-2">
                 <p className="text-center text-xs text-gray-500">
-                  Didn't get the code?{" "}
+                  Didn&apos;t get the code?{" "}
                   <button
                     type="button"
                     onClick={handleRequest}
