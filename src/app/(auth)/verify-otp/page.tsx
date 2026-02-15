@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, Suspense, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Mail, Smartphone, ArrowLeft, RefreshCw, CheckCircle2, MessageCircle } from "lucide-react";
+import { Mail, Smartphone, ArrowLeft, RefreshCw, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -46,43 +46,46 @@ function VerifyOtpContent() {
     }
   }, []);
 
-  const handleVerify = useCallback(async (code?: string) => {
-    const otpCode = code || otp.join("");
-    if (otpCode.length !== 6) {
-      setError("Please enter the 6-digit code");
-      return;
-    }
-    setError("");
-    setLoading(true);
+  const handleVerify = useCallback(
+    async (code?: string) => {
+      const otpCode = code || otp.join("");
+      if (otpCode.length !== 6) {
+        setError("Please enter the 6-digit code");
+        return;
+      }
+      setError("");
+      setLoading(true);
 
-    try {
-      const res = await fetch("/api/auth/verify-otp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, otp: otpCode, phone: phone || undefined }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Verification failed");
+      try {
+        const res = await fetch("/api/auth/verify-otp", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, otp: otpCode, phone: phone || undefined }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Verification failed");
 
-      setVerified(true);
+        setVerified(true);
 
-      setTimeout(() => {
-        const workspaceStatus = data.workspace?.status;
-        if (workspaceStatus === "ONBOARDING" || !data.workspace) {
-          router.push("/onboarding");
-        } else {
-          router.push("/dashboard");
-        }
-      }, 1500);
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Verification failed";
-      setError(message);
-      setOtp(["", "", "", "", "", ""]);
-      inputRefs.current[0]?.focus();
-    } finally {
-      setLoading(false);
-    }
-  }, [email, otp, phone, router]);
+        setTimeout(() => {
+          const workspaceStatus = data.workspace?.status;
+          if (workspaceStatus === "ONBOARDING" || !data.workspace) {
+            router.push("/onboarding");
+          } else {
+            router.push("/dashboard");
+          }
+        }, 1500);
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : "Verification failed";
+        setError(message);
+        setOtp(["", "", "", "", "", ""]);
+        inputRefs.current[0]?.focus();
+      } finally {
+        setLoading(false);
+      }
+    },
+    [email, otp, phone, router]
+  );
 
   const handleDigitChange = (index: number, value: string) => {
     if (!/^\d*$/.test(value)) return;
@@ -181,13 +184,13 @@ function VerifyOtpContent() {
   // Icons & colors per method
   const methodConfig = {
     email: {
-      icon: <Mail className="w-6 h-6 text-blue-600" />,
+      icon: <Mail className="h-6 w-6 text-blue-600" />,
       bgIcon: "bg-blue-100",
       btnClass: "bg-blue-600 hover:bg-blue-700",
       label: "email",
     },
     sms: {
-      icon: <Smartphone className="w-6 h-6 text-blue-600" />,
+      icon: <Smartphone className="h-6 w-6 text-blue-600" />,
       bgIcon: "bg-blue-100",
       btnClass: "bg-blue-600 hover:bg-blue-700",
       label: "phone",
@@ -200,10 +203,10 @@ function VerifyOtpContent() {
     return (
       <Card className="w-full max-w-md">
         <CardContent className="pt-8 pb-8 text-center">
-          <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4 animate-bounce">
-            <CheckCircle2 className="w-8 h-8 text-green-600" />
+          <div className="mx-auto mb-4 flex h-16 w-16 animate-bounce items-center justify-center rounded-full bg-green-100">
+            <CheckCircle2 className="h-8 w-8 text-green-600" />
           </div>
-          <h2 className="text-2xl font-semibold text-gray-900 mb-2">Verified!</h2>
+          <h2 className="mb-2 text-2xl font-semibold text-gray-900">Verified!</h2>
           <p className="text-gray-500">Redirecting you to your workspace...</p>
         </CardContent>
       </Card>
@@ -213,15 +216,21 @@ function VerifyOtpContent() {
   return (
     <Card className="w-full max-w-md">
       <CardHeader className="text-center">
-        <div className={`mx-auto w-12 h-12 ${config.bgIcon} rounded-xl flex items-center justify-center mb-4`}>
+        <div
+          className={`mx-auto h-12 w-12 ${config.bgIcon} mb-4 flex items-center justify-center rounded-xl`}
+        >
           {config.icon}
         </div>
         <CardTitle className="text-2xl">Verify your {config.label}</CardTitle>
         <CardDescription>
           {method === "email" ? (
-            <>We sent a 6-digit code to <strong>{email || "your email"}</strong></>
+            <>
+              We sent a 6-digit code to <strong>{email || "your email"}</strong>
+            </>
           ) : codeSent ? (
-            <>We sent a 6-digit code to <strong>{phone}</strong> via SMS</>
+            <>
+              We sent a 6-digit code to <strong>{phone}</strong> via SMS
+            </>
           ) : (
             <>Enter your phone number to receive a code via SMS</>
           )}
@@ -229,7 +238,7 @@ function VerifyOtpContent() {
       </CardHeader>
       <CardContent className="space-y-6">
         {error && (
-          <div className="p-3 bg-red-50 border border-red-100 text-red-700 text-sm rounded-lg">
+          <div className="rounded-lg border border-red-100 bg-red-50 p-3 text-sm text-red-700">
             {error}
           </div>
         )}
@@ -248,7 +257,7 @@ function VerifyOtpContent() {
           </div>
         )}
 
-        {(method === "sms") && !codeSent ? (
+        {method === "sms" && !codeSent ? (
           <div className="space-y-3">
             <div className="space-y-2">
               <Label htmlFor="phone">Phone Number</Label>
@@ -274,7 +283,7 @@ function VerifyOtpContent() {
               className="w-full text-sm"
               onClick={() => switchMethod("email")}
             >
-              <ArrowLeft className="w-4 h-4 mr-2" />
+              <ArrowLeft className="mr-2 h-4 w-4" />
               Back to email verification
             </Button>
           </div>
@@ -283,18 +292,20 @@ function VerifyOtpContent() {
             {/* 6-digit OTP input */}
             <div className="space-y-2">
               <Label>Verification Code</Label>
-              <div className="flex gap-2 justify-center" onPaste={handlePaste}>
+              <div className="flex justify-center gap-2" onPaste={handlePaste}>
                 {otp.map((digit, i) => (
                   <Input
                     key={i}
-                    ref={(el) => { inputRefs.current[i] = el; }}
+                    ref={(el) => {
+                      inputRefs.current[i] = el;
+                    }}
                     type="text"
                     inputMode="numeric"
                     maxLength={1}
                     value={digit}
                     onChange={(e) => handleDigitChange(i, e.target.value)}
                     onKeyDown={(e) => handleKeyDown(i, e)}
-                    className="w-12 h-14 text-center text-xl font-semibold tracking-widest"
+                    className="h-14 w-12 text-center text-xl font-semibold tracking-widest"
                     disabled={loading}
                   />
                 ))}
@@ -311,12 +322,15 @@ function VerifyOtpContent() {
             </Button>
 
             {/* Resend section */}
-            <div className="text-center space-y-2">
+            <div className="space-y-2 text-center">
               <p className="text-sm text-gray-500">
                 {canResend ? (
                   "Didn&apos;t receive a code?"
                 ) : (
-                  <>Resend available in <span className="font-medium text-gray-700">{countdown}s</span></>
+                  <>
+                    Resend available in{" "}
+                    <span className="font-medium text-gray-700">{countdown}s</span>
+                  </>
                 )}
               </p>
               {canResend && (
@@ -327,24 +341,24 @@ function VerifyOtpContent() {
                   disabled={resending}
                   className="text-blue-600 hover:text-blue-700"
                 >
-                  <RefreshCw className={`w-4 h-4 mr-2 ${resending ? "animate-spin" : ""}`} />
+                  <RefreshCw className={`mr-2 h-4 w-4 ${resending ? "animate-spin" : ""}`} />
                   {resending ? "Sending..." : "Resend Code"}
                 </Button>
               )}
             </div>
 
             {/* Channel switcher */}
-            <div className="border-t pt-4 space-y-2">
-              <p className="text-xs text-center text-gray-400 mb-2">Or verify using:</p>
-              <div className="flex gap-2 justify-center">
+            <div className="space-y-2 border-t pt-4">
+              <p className="mb-2 text-center text-xs text-gray-400">Or verify using:</p>
+              <div className="flex justify-center gap-2">
                 {method !== "email" && (
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => switchMethod("email")}
-                    className="text-gray-600 hover:text-blue-600 flex items-center gap-1.5"
+                    className="flex items-center gap-1.5 text-gray-600 hover:text-blue-600"
                   >
-                    <Mail className="w-3.5 h-3.5" />
+                    <Mail className="h-3.5 w-3.5" />
                     Email
                   </Button>
                 )}
@@ -353,9 +367,9 @@ function VerifyOtpContent() {
                     variant="outline"
                     size="sm"
                     onClick={() => switchMethod("sms")}
-                    className="text-gray-600 hover:text-blue-600 flex items-center gap-1.5"
+                    className="flex items-center gap-1.5 text-gray-600 hover:text-blue-600"
                   >
-                    <Smartphone className="w-3.5 h-3.5" />
+                    <Smartphone className="h-3.5 w-3.5" />
                     SMS
                   </Button>
                 )}
@@ -373,7 +387,7 @@ function VerifyOtpContent() {
  */
 export default function VerifyOtpPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
       <Suspense fallback={<div>Loading...</div>}>
         <VerifyOtpContent />
       </Suspense>

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
-import { Plus, Search, Filter, Calendar as CalendarIcon, List, ChevronRight, Clock } from "lucide-react";
+import { Plus, Search, Filter, Calendar as CalendarIcon, List, Clock } from "lucide-react";
 import { Booking, Contact, Service } from "@prisma/client";
 import { format, parseISO } from "date-fns";
 
@@ -9,11 +9,7 @@ import { Header } from "@/components/layout/header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { BookingList } from "@/components/bookings/booking-list";
@@ -37,7 +33,9 @@ export default function BookingsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
-  const [externalEvents, setExternalEvents] = useState<any[]>([]);
+  const [externalEvents, setExternalEvents] = useState<
+    { id: string; title: string; start: string; end?: string }[]
+  >([]);
 
   // Google Calendar Integration Status
   const [isCalendarConnected, setIsCalendarConnected] = useState(false);
@@ -54,18 +52,20 @@ export default function BookingsPage() {
         fetch("/api/bookings"),
         fetch("/api/contacts"),
         fetch("/api/services"),
-        fetch("/api/integrations/google-calendar")
+        fetch("/api/integrations/google-calendar"),
       ]);
 
       if (bookingsRes.ok) {
         const data = await bookingsRes.json();
-        setBookings((data.bookings || []).map((b: any) => ({
-          ...b,
-          date: new Date(b.date),
-          endTime: new Date(b.endTime),
-          createdAt: new Date(b.createdAt),
-          updatedAt: new Date(b.updatedAt),
-        })));
+        setBookings(
+          (data.bookings || []).map((b: any) => ({
+            ...b,
+            date: new Date(b.date),
+            endTime: new Date(b.endTime),
+            createdAt: new Date(b.createdAt),
+            updatedAt: new Date(b.updatedAt),
+          }))
+        );
       }
 
       if (contactsRes.ok) {
@@ -165,19 +165,19 @@ export default function BookingsPage() {
 
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
-      filtered = filtered.filter(b =>
-        b.contact.name.toLowerCase().includes(term) ||
-        b.service.name.toLowerCase().includes(term)
+      filtered = filtered.filter(
+        (b) =>
+          b.contact.name.toLowerCase().includes(term) || b.service.name.toLowerCase().includes(term)
       );
     }
 
     if (dateFrom) {
-      filtered = filtered.filter(b => b.date >= new Date(dateFrom));
+      filtered = filtered.filter((b) => b.date >= new Date(dateFrom));
     }
     if (dateTo) {
       const end = new Date(dateTo);
       end.setHours(23, 59, 59);
-      filtered = filtered.filter(b => b.date <= end);
+      filtered = filtered.filter((b) => b.date <= end);
     }
 
     return filtered;
@@ -191,15 +191,17 @@ export default function BookingsPage() {
 
     switch (tab) {
       case "today":
-        return filtered.filter(b => {
+        return filtered.filter((b) => {
           const d = new Date(b.date);
           d.setHours(0, 0, 0, 0);
           return d.getTime() === today.getTime();
         });
       case "upcoming":
-        return filtered.filter(b => new Date(b.date) > new Date() && ["PENDING", "CONFIRMED"].includes(b.status));
+        return filtered.filter(
+          (b) => new Date(b.date) > new Date() && ["PENDING", "CONFIRMED"].includes(b.status)
+        );
       case "completed":
-        return filtered.filter(b => b.status === "COMPLETED");
+        return filtered.filter((b) => b.status === "COMPLETED");
       default:
         return filtered;
     }
@@ -208,69 +210,95 @@ export default function BookingsPage() {
   const stats = {
     today: getTabBookings("today").length,
     upcoming: getTabBookings("upcoming").length,
-    completed: bookings.filter(b => b.status === "COMPLETED").length,
-    noShow: bookings.filter(b => b.status === "NO_SHOW").length,
+    completed: bookings.filter((b) => b.status === "COMPLETED").length,
+    noShow: bookings.filter((b) => b.status === "NO_SHOW").length,
   };
 
   return (
-    <div className="h-screen overflow-hidden flex flex-col bg-slate-50/20">
+    <div className="flex h-screen flex-col overflow-hidden bg-slate-50/20">
       {/* Fixed Sticky Header */}
       <Header title="Bookings" subtitle="Manage appointments and schedules">
         <div className="flex items-center gap-2 sm:gap-4">
           {/* List/Calendar Switcher */}
-          <div className="flex bg-slate-100 p-0.5 rounded-lg border border-slate-200 hidden xs:flex">
+          <div className="xs:flex flex hidden rounded-lg border border-slate-200 bg-slate-100 p-0.5">
             <Button
               variant={viewMode === "list" ? "secondary" : "ghost"}
               size="sm"
               onClick={() => setViewMode("list")}
-              className={cn("h-7 px-2 sm:px-3 text-[10px] sm:text-[11px] font-bold rounded-md", viewMode === "list" && "bg-white shadow-sm")}
+              className={cn(
+                "h-7 rounded-md px-2 text-[10px] font-bold sm:px-3 sm:text-[11px]",
+                viewMode === "list" && "bg-white shadow-sm"
+              )}
             >
-              <List className="w-3.5 h-3.5 sm:mr-1.5" /> <span className="hidden sm:inline">List</span>
+              <List className="h-3.5 w-3.5 sm:mr-1.5" />{" "}
+              <span className="hidden sm:inline">List</span>
             </Button>
             <Button
               variant={viewMode === "calendar" ? "secondary" : "ghost"}
               size="sm"
               onClick={() => setViewMode("calendar")}
-              className={cn("h-7 px-2 sm:px-3 text-[10px] sm:text-[11px] font-bold rounded-md", viewMode === "calendar" && "bg-white shadow-sm")}
+              className={cn(
+                "h-7 rounded-md px-2 text-[10px] font-bold sm:px-3 sm:text-[11px]",
+                viewMode === "calendar" && "bg-white shadow-sm"
+              )}
             >
-              <CalendarIcon className="w-3.5 h-3.5 sm:mr-1.5" /> <span className="hidden sm:inline">Calendar</span>
+              <CalendarIcon className="h-3.5 w-3.5 sm:mr-1.5" />{" "}
+              <span className="hidden sm:inline">Calendar</span>
             </Button>
           </div>
 
-          <Button onClick={() => handleNewBooking()} className="h-8 px-3 sm:px-4 bg-primary text-[10px] sm:text-[11px] font-bold rounded-lg shadow-sm">
-            <Plus className="w-3.5 h-3.5 sm:mr-1.5" /> <span className="hidden sm:inline">New Booking</span>
+          <Button
+            onClick={() => handleNewBooking()}
+            className="bg-primary h-8 rounded-lg px-3 text-[10px] font-bold shadow-sm sm:px-4 sm:text-[11px]"
+          >
+            <Plus className="h-3.5 w-3.5 sm:mr-1.5" />{" "}
+            <span className="hidden sm:inline">New Booking</span>
             <span className="sm:hidden">New</span>
           </Button>
         </div>
       </Header>
 
       {/* Main Content Area - Non-Scrolling Body */}
-      <div className="flex-1 overflow-hidden p-6 flex flex-col gap-6">
-        <div className="max-w-[1600px] mx-auto w-full flex-1 flex flex-col gap-6 min-h-0">
-
+      <div className="flex flex-1 flex-col gap-6 overflow-hidden p-6">
+        <div className="mx-auto flex min-h-0 w-full max-w-[1600px] flex-1 flex-col gap-6">
           {/* Professional B2B Stats Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 shrink-0 px-1 overflow-x-hidden">
+          <div className="grid shrink-0 grid-cols-2 gap-3 overflow-x-hidden px-1 sm:gap-4 md:grid-cols-4">
             {[
               { label: "Today", val: stats.today, icon: CalendarIcon, color: "blue" },
               { label: "Upcoming", val: stats.upcoming, icon: Clock, color: "amber" },
-              { label: "Completed", val: stats.completed, icon: Plus, color: "emerald", rotate: true },
+              {
+                label: "Completed",
+                val: stats.completed,
+                icon: Plus,
+                color: "emerald",
+                rotate: true,
+              },
               { label: "No Show", val: stats.noShow, icon: Filter, color: "rose" },
             ].map((s) => (
-              <Card key={s.label} className="border border-border/40 shadow-sm bg-white overflow-hidden group">
-                <CardContent className="p-3 sm:p-4 relative">
-                  <div className="flex justify-between items-center">
+              <Card
+                key={s.label}
+                className="border-border/40 group overflow-hidden border bg-white shadow-sm"
+              >
+                <CardContent className="relative p-3 sm:p-4">
+                  <div className="flex items-center justify-between">
                     <div className="min-w-0 flex-1">
-                      <p className="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-widest mb-0.5 truncate">{s.label}</p>
-                      <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-none">{s.val}</h3>
+                      <p className="mb-0.5 truncate text-[10px] font-bold tracking-widest text-slate-500 uppercase sm:text-xs">
+                        {s.label}
+                      </p>
+                      <h3 className="text-xl leading-none font-black tracking-tight text-slate-900 sm:text-2xl">
+                        {s.val}
+                      </h3>
                     </div>
-                    <div className={cn(
-                      "p-2 sm:p-3 rounded-xl transition-transform group-hover:scale-110 shadow-sm border border-black/5 shrink-0",
-                      s.color === "blue" && "bg-blue-50 text-blue-600",
-                      s.color === "amber" && "bg-amber-50 text-amber-600",
-                      s.color === "emerald" && "bg-emerald-50 text-emerald-600",
-                      s.color === "rose" && "bg-rose-50 text-rose-600",
-                    )}>
-                      <s.icon className={cn("w-4 h-4 sm:w-5 sm:h-5", s.rotate && "rotate-45")} />
+                    <div
+                      className={cn(
+                        "shrink-0 rounded-xl border border-black/5 p-2 shadow-sm transition-transform group-hover:scale-110 sm:p-3",
+                        s.color === "blue" && "bg-blue-50 text-blue-600",
+                        s.color === "amber" && "bg-amber-50 text-amber-600",
+                        s.color === "emerald" && "bg-emerald-50 text-emerald-600",
+                        s.color === "rose" && "bg-rose-50 text-rose-600"
+                      )}
+                    >
+                      <s.icon className={cn("h-4 w-4 sm:h-5 sm:w-5", s.rotate && "rotate-45")} />
                     </div>
                   </div>
                 </CardContent>
@@ -278,24 +306,27 @@ export default function BookingsPage() {
             ))}
           </div>
 
-          <div className="flex-1 bg-white rounded-xl border border-border/40 shadow-sm overflow-hidden flex flex-col min-h-0">
+          <div className="border-border/40 flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border bg-white shadow-sm">
             {viewMode === "list" ? (
-              <div className="flex flex-col h-full">
+              <div className="flex h-full flex-col">
                 {/* Inline Filters for List View */}
-                <div className="p-3 border-b border-border/40 bg-slate-50/30 flex flex-col md:flex-row gap-2 items-center">
+                <div className="border-border/40 flex flex-col items-center gap-2 border-b bg-slate-50/30 p-3 md:flex-row">
                   <div className="relative flex-1">
-                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground/60" />
+                    <Search className="text-muted-foreground/60 absolute top-1/2 left-2.5 h-3 w-3 -translate-y-1/2" />
                     <Input
                       placeholder="Search bookings..."
-                      className="pl-8 h-8 text-[11px] bg-white border-slate-200 rounded-lg"
+                      className="h-8 rounded-lg border-slate-200 bg-white pl-8 text-[11px]"
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                     />
                   </div>
-                  <div className="flex items-center gap-1.5 bg-white p-0.5 rounded-lg border border-slate-200">
+                  <div className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white p-0.5">
                     <Popover>
                       <PopoverTrigger asChild>
-                        <Button variant="ghost" className="h-7 px-2 text-[10px] font-medium text-slate-500">
+                        <Button
+                          variant="ghost"
+                          className="h-7 px-2 text-[10px] font-medium text-slate-500"
+                        >
                           <CalendarIcon className="mr-1.5 h-3 w-3 opacity-60" />
                           {dateFrom ? format(parseISO(dateFrom), "MMM d") : "Start Date"}
                         </Button>
@@ -312,7 +343,10 @@ export default function BookingsPage() {
                     <div className="h-3 w-px bg-slate-200" />
                     <Popover>
                       <PopoverTrigger asChild>
-                        <Button variant="ghost" className="h-7 px-2 text-[10px] font-medium text-slate-500">
+                        <Button
+                          variant="ghost"
+                          className="h-7 px-2 text-[10px] font-medium text-slate-500"
+                        >
                           <CalendarIcon className="mr-1.5 h-3 w-3 opacity-60" />
                           {dateTo ? format(parseISO(dateTo), "MMM d") : "End Date"}
                         </Button>

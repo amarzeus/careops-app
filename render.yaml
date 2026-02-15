@@ -3,10 +3,9 @@ services:
     name: careops-app
     runtime: node
     plan: free
-    buildCommand: npm ci --include=dev && npm run build
-    startCommand: npm run db:push && npm start
+    buildCommand: npm ci --include=dev && npx prisma generate && npm run build
+    startCommand: npx prisma db push && npm start
     healthCheckPath: /
-    # Allow Render to automatically detect the port
     envVars:
       - key: NODE_VERSION
         value: "20"

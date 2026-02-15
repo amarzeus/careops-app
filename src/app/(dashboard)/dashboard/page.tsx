@@ -8,25 +8,21 @@ import {
   Package,
   MessageSquare,
   AlertTriangle,
-  Loader2,
-  RefreshCw,
-  Clock,
   CheckCircle,
-  XCircle,
   Sparkles,
   ArrowRight,
   Plus,
   Send,
   Activity,
   Zap,
+  Clock,
 } from "lucide-react";
 import { Header } from "@/components/layout/header";
 import { MetricCard } from "@/components/dashboard/metric-card";
 import { PerformanceChart } from "@/components/dashboard/performance-chart";
 import { TodaysSchedule } from "@/components/dashboard/todays-schedule";
-import { KeyAlerts } from "@/components/dashboard/key-alerts";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "@/hooks/use-toast";
@@ -145,7 +141,7 @@ export default function DashboardPage() {
       }
     };
 
-    document.addEventListener('visibilitychange', handleVisibilityChange);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
     // Handle online/offline
     const handleOnline = () => {
@@ -153,29 +149,33 @@ export default function DashboardPage() {
       fetchMetrics();
     };
 
-    window.addEventListener('online', handleOnline);
+    window.addEventListener("online", handleOnline);
 
     return () => {
       clearInterval(interval);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('online', handleOnline);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("online", handleOnline);
     };
   }, [isVisible]);
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50/50 p-4 lg:p-6 space-y-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-40 sm:h-48 rounded-xl" />)}
+      <div className="min-h-screen space-y-6 bg-gray-50/50 p-4 lg:p-6">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {[...Array(3)].map((_, i) => (
+            <Skeleton key={i} className="h-40 rounded-xl sm:h-48" />
+          ))}
         </div>
         <div className="space-y-3">
           <Skeleton className="h-8 w-48" />
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-24 rounded-xl" />)}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {[...Array(4)].map((_, i) => (
+              <Skeleton key={i} className="h-24 rounded-xl" />
+            ))}
           </div>
         </div>
-        <div className="grid lg:grid-cols-3 gap-6">
-          <Skeleton className="h-[300px] lg:col-span-2 rounded-xl" />
+        <div className="grid gap-6 lg:grid-cols-3">
+          <Skeleton className="h-[300px] rounded-xl lg:col-span-2" />
           <Skeleton className="h-[300px] rounded-xl" />
         </div>
       </div>
@@ -183,52 +183,73 @@ export default function DashboardPage() {
   }
 
   const m = data?.metrics || {
-    bookingsToday: 0, bookingsUpcoming: 0, bookingsCompleted: 0,
-    bookingsNoShow: 0, bookingsUnconfirmed: 0, newContacts: 0,
-    totalContacts: 0, ongoingConversations: 0, unansweredMessages: 0,
-    pendingForms: 0, overdueForms: 0, completedForms: 0,
-    totalFormSubmissions: 0, lowStockItems: 0, criticalItems: 0,
+    bookingsToday: 0,
+    bookingsUpcoming: 0,
+    bookingsCompleted: 0,
+    bookingsNoShow: 0,
+    bookingsUnconfirmed: 0,
+    newContacts: 0,
+    totalContacts: 0,
+    ongoingConversations: 0,
+    unansweredMessages: 0,
+    pendingForms: 0,
+    overdueForms: 0,
+    completedForms: 0,
+    totalFormSubmissions: 0,
+    lowStockItems: 0,
+    criticalItems: 0,
     totalInventoryItems: 0,
   };
 
   return (
-    <div className="min-h-screen bg-gray-50/50 flex flex-col">
-      <Header title="Dashboard" subtitle="Overview of your business performance" />
+    <div className="flex min-h-screen flex-col bg-gray-50/50">
+      <Header title="Dashboard" subtitle="Overview of your business performance">
+        <div className="flex items-center gap-2 text-xs text-gray-500">
+          {refreshing ? (
+            <Sparkles className="h-3.5 w-3.5 animate-pulse text-blue-500" />
+          ) : (
+            <Clock className="h-3.5 w-3.5" />
+          )}
+          <span>{lastUpdated.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
+        </div>
+      </Header>
 
       {/* Main Content */}
-      <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-[1600px] mx-auto w-full flex flex-col gap-5 sm:gap-6 overflow-hidden">
-
+      <main className="mx-auto flex w-full max-w-[1600px] flex-1 flex-col gap-5 overflow-hidden p-4 sm:gap-6 sm:p-6 lg:p-8">
         {/* ══════ Quick Actions Bar ══════ */}
-        <section className="flex flex-wrap items-center gap-2 sm:gap-3 overflow-x-auto pb-1 no-scrollbar">
+        <section className="no-scrollbar flex flex-wrap items-center gap-2 overflow-x-auto pb-1 sm:gap-3">
           <Link href="/bookings">
-            <Button size="sm" className="gap-2 h-8 text-xs bg-blue-600 hover:bg-blue-700 text-white">
-              <Plus className="w-3.5 h-3.5" /> New Booking
+            <Button
+              size="sm"
+              className="h-8 gap-2 bg-blue-600 text-xs text-white hover:bg-blue-700"
+            >
+              <Plus className="h-3.5 w-3.5" /> New Booking
             </Button>
           </Link>
           <Link href="/inbox">
-            <Button size="sm" variant="outline" className="gap-2 h-8 text-xs">
-              <Send className="w-3.5 h-3.5" /> Send Message
+            <Button size="sm" variant="outline" className="h-8 gap-2 text-xs">
+              <Send className="h-3.5 w-3.5" /> Send Message
             </Button>
           </Link>
           <Link href="/forms">
-            <Button size="sm" variant="outline" className="gap-2 h-8 text-xs">
-              <FileText className="w-3.5 h-3.5" /> View Forms
+            <Button size="sm" variant="outline" className="h-8 gap-2 text-xs">
+              <FileText className="h-3.5 w-3.5" /> View Forms
             </Button>
           </Link>
           <Link href="/inventory">
-            <Button size="sm" variant="outline" className="gap-2 h-8 text-xs">
-              <Package className="w-3.5 h-3.5" /> Check Inventory
+            <Button size="sm" variant="outline" className="h-8 gap-2 text-xs">
+              <Package className="h-3.5 w-3.5" /> Check Inventory
             </Button>
           </Link>
           <Link href="/automation">
-            <Button size="sm" variant="outline" className="gap-2 h-8 text-xs">
-              <Zap className="w-3.5 h-3.5" /> Automations
+            <Button size="sm" variant="outline" className="h-8 gap-2 text-xs">
+              <Zap className="h-3.5 w-3.5" /> Automations
             </Button>
           </Link>
         </section>
 
         {/* ══════ 1. Operational Metrics (Top Row) ══════ */}
-        <section className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 lg:gap-4">
+        <section className="grid grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-5 lg:gap-4">
           <MetricCard
             title="Today's Bookings"
             value={m.bookingsToday}
@@ -271,13 +292,12 @@ export default function DashboardPage() {
 
         {/* ══════ 2. High Priority Attention Section (Middle Row) ══════ */}
         {/* ══════ 2. High Priority Attention Section (Middle Row) ══════ */}
-        <section className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
-
+        <section className="grid grid-cols-1 gap-4 lg:grid-cols-3 lg:gap-6">
           {/* A. Attention Required (Key Alerts) */}
           <HoverExpandCard
             title="Attention Required"
             icon={AlertTriangle}
-            count={(data?.keyAlerts?.length || 0)}
+            count={data?.keyAlerts?.length || 0}
             countLabel={data?.keyAlerts?.length ? `${data.keyAlerts.length}` : undefined}
             headerColorClass="text-amber-900"
             iconColorClass="text-amber-600"
@@ -290,22 +310,34 @@ export default function DashboardPage() {
                   <button
                     key={i}
                     onClick={() => alert.link && (window.location.href = alert.link)}
-                    className="w-full flex items-start gap-3 p-2.5 rounded-lg border bg-white hover:bg-gray-50 transition-colors text-left group/item"
+                    className="group/item flex w-full items-start gap-3 rounded-lg border bg-white p-2.5 text-left transition-colors hover:bg-gray-50"
                   >
-                    <div className={cn("w-2 h-2 rounded-full mt-1.5 shrink-0",
-                      alert.priority === 'critical' ? 'bg-red-500' :
-                        alert.priority === 'high' ? 'bg-amber-500' : 'bg-blue-500')}
+                    <div
+                      className={cn(
+                        "mt-1.5 h-2 w-2 shrink-0 rounded-full",
+                        alert.priority === "critical"
+                          ? "bg-red-500"
+                          : alert.priority === "high"
+                            ? "bg-amber-500"
+                            : "bg-blue-500"
+                      )}
                     />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-medium text-gray-900 leading-tight group-hover/item:text-primary transition-colors">{alert.message}</p>
-                      <p className="text-[10px] text-gray-500 mt-0.5 uppercase tracking-wide">{alert.category}</p>
+                    <div className="min-w-0 flex-1">
+                      <p className="group-hover/item:text-primary text-xs leading-tight font-medium text-gray-900 transition-colors">
+                        {alert.message}
+                      </p>
+                      <p className="mt-0.5 text-[10px] tracking-wide text-gray-500 uppercase">
+                        {alert.category}
+                      </p>
                     </div>
-                    <ArrowRight className="w-3.5 h-3.5 text-gray-400 mt-0.5 shrink-0 group-hover/item:text-gray-600" />
+                    <ArrowRight className="mt-0.5 h-3.5 w-3.5 shrink-0 text-gray-400 group-hover/item:text-gray-600" />
                   </button>
                 ))}
               </div>
             ) : (
-              <div className="text-center py-4 text-xs text-gray-500">No alerts needing attention.</div>
+              <div className="py-4 text-center text-xs text-gray-500">
+                No alerts needing attention.
+              </div>
             )}
           </HoverExpandCard>
 
@@ -313,24 +345,37 @@ export default function DashboardPage() {
           <HoverExpandCard
             title="AI Insights"
             icon={Sparkles}
-            count={(data?.aiInsights?.length || 0)}
+            count={data?.aiInsights?.length || 0}
             headerColorClass="text-violet-900"
             iconColorClass="text-violet-600"
-            previewText={data?.aiInsights?.length ? `${data.aiInsights.length} insights` : "No insights"}
+            previewText={
+              data?.aiInsights?.length ? `${data.aiInsights.length} insights` : "No insights"
+            }
             className="h-[72px]"
           >
             {data?.aiInsights && data.aiInsights.length > 0 ? (
               <div className="space-y-2">
                 {data.aiInsights.slice(0, 5).map((insight, i) => (
-                  <div key={i} className="flex gap-2.5 items-start p-2.5 rounded-md bg-white border border-violet-100 hover:border-violet-200 transition-colors">
-                    <div className={cn(
-                      "mt-1 w-2 h-2 rounded-full shrink-0",
-                      insight.priority === 'high' ? 'bg-red-500' :
-                        insight.priority === 'medium' ? 'bg-amber-500' : 'bg-green-500'
-                    )} />
+                  <div
+                    key={i}
+                    className="flex items-start gap-2.5 rounded-md border border-violet-100 bg-white p-2.5 transition-colors hover:border-violet-200"
+                  >
+                    <div
+                      className={cn(
+                        "mt-1 h-2 w-2 shrink-0 rounded-full",
+                        insight.priority === "high"
+                          ? "bg-red-500"
+                          : insight.priority === "medium"
+                            ? "bg-amber-500"
+                            : "bg-green-500"
+                      )}
+                    />
                     <div className="min-w-0 flex-1">
-                      <p className="text-xs text-gray-700 leading-snug mb-1">{insight.message}</p>
-                      <Badge variant="secondary" className="text-[9px] h-4 px-1 bg-violet-50 text-violet-700 hover:bg-violet-100 border border-violet-100">
+                      <p className="mb-1 text-xs leading-snug text-gray-700">{insight.message}</p>
+                      <Badge
+                        variant="secondary"
+                        className="h-4 border border-violet-100 bg-violet-50 px-1 text-[9px] text-violet-700 hover:bg-violet-100"
+                      >
                         {insight.action}
                       </Badge>
                     </div>
@@ -348,29 +393,47 @@ export default function DashboardPage() {
           <HoverExpandCard
             title="Critical Stock"
             icon={Package}
-            count={(data?.lowStockDetails?.length || 0)}
+            count={data?.lowStockDetails?.length || 0}
             headerColorClass="text-red-900"
             iconColorClass="text-red-600"
-            previewText={data?.lowStockDetails?.length ? `${data.lowStockDetails.length} items low` : "Stock OK"}
+            previewText={
+              data?.lowStockDetails?.length
+                ? `${data.lowStockDetails.length} items low`
+                : "Stock OK"
+            }
             className="h-[72px]"
           >
             {data?.lowStockDetails && data.lowStockDetails.length > 0 ? (
               <div className="space-y-2">
                 {data.lowStockDetails.slice(0, 5).map((item) => (
-                  <div key={item.id} className="flex items-center justify-between text-xs bg-white p-2.5 rounded border border-red-100">
-                    <span className="font-medium text-gray-900 truncate flex-1 pr-2" title={item.name}>{item.name}</span>
-                    <Badge variant="destructive" className="h-5 px-1.5 text-[10px]">{item.quantity} / {item.threshold}</Badge>
+                  <div
+                    key={item.id}
+                    className="flex items-center justify-between rounded border border-red-100 bg-white p-2.5 text-xs"
+                  >
+                    <span
+                      className="flex-1 truncate pr-2 font-medium text-gray-900"
+                      title={item.name}
+                    >
+                      {item.name}
+                    </span>
+                    <Badge variant="destructive" className="h-5 px-1.5 text-[10px]">
+                      {item.quantity} / {item.threshold}
+                    </Badge>
                   </div>
                 ))}
                 <Link href="/inventory" className="block w-full">
-                  <Button variant="ghost" size="sm" className="w-full text-xs h-7 mt-1 text-red-600 hover:text-red-700 hover:bg-red-50">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="mt-1 h-7 w-full text-xs text-red-600 hover:bg-red-50 hover:text-red-700"
+                  >
                     View All Inventory
                   </Button>
                 </Link>
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-4 opacity-50">
-                <CheckCircle className="w-6 h-6 text-emerald-300 mb-2" />
+                <CheckCircle className="mb-2 h-6 w-6 text-emerald-300" />
                 <p className="text-xs text-gray-500">Inventory levels healthy</p>
               </div>
             )}
@@ -378,14 +441,14 @@ export default function DashboardPage() {
         </section>
 
         {/* ══════ 3. Visuals (Bottom Row) ══════ */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6 flex-1 min-h-0">
+        <div className="grid min-h-0 flex-1 grid-cols-1 gap-4 lg:grid-cols-3 lg:gap-6">
           {/* Main Chart Column (2/3) */}
-          <div className="lg:col-span-2 flex flex-col h-full min-h-[300px]">
+          <div className="flex h-full min-h-[300px] flex-col lg:col-span-2">
             <PerformanceChart data={data?.chartData || []} />
           </div>
 
           {/* Schedule (1/3) */}
-          <div className="flex flex-col h-full overflow-y-auto min-h-[300px]">
+          <div className="flex h-full min-h-[300px] flex-col overflow-y-auto">
             <TodaysSchedule bookings={data?.todaysBookings || []} />
           </div>
         </div>
@@ -394,8 +457,8 @@ export default function DashboardPage() {
         {data?.recentActivity && data.recentActivity.length > 0 && (
           <Card className="border-gray-200/80">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                <Activity className="w-4 h-4 text-gray-500" />
+              <CardTitle className="flex items-center gap-2 text-sm font-semibold">
+                <Activity className="h-4 w-4 text-gray-500" />
                 Recent Activity
               </CardTitle>
             </CardHeader>
@@ -404,19 +467,31 @@ export default function DashboardPage() {
                 {data.recentActivity.slice(0, 8).map((activity) => (
                   <div
                     key={activity.id}
-                    className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors text-xs"
+                    className="flex cursor-pointer items-center gap-3 rounded-lg p-2 text-xs transition-colors hover:bg-gray-50"
                     onClick={() => activity.link && (window.location.href = activity.link)}
                   >
-                    <div className={cn("w-2 h-2 rounded-full shrink-0",
-                      activity.type === 'booking' ? 'bg-blue-500' :
-                        activity.type === 'contact' ? 'bg-emerald-500' :
-                          activity.type === 'form' ? 'bg-violet-500' :
-                            activity.type === 'inventory' ? 'bg-red-500' :
-                              activity.type === 'automation' ? 'bg-amber-500' : 'bg-gray-400'
-                    )} />
+                    <div
+                      className={cn(
+                        "h-2 w-2 shrink-0 rounded-full",
+                        activity.type === "booking"
+                          ? "bg-blue-500"
+                          : activity.type === "contact"
+                            ? "bg-emerald-500"
+                            : activity.type === "form"
+                              ? "bg-violet-500"
+                              : activity.type === "inventory"
+                                ? "bg-red-500"
+                                : activity.type === "automation"
+                                  ? "bg-amber-500"
+                                  : "bg-gray-400"
+                      )}
+                    />
                     <span className="flex-1 text-gray-700">{activity.message}</span>
-                    <span className="text-[10px] text-gray-400 whitespace-nowrap">
-                      {new Date(activity.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    <span className="text-[10px] whitespace-nowrap text-gray-400">
+                      {new Date(activity.timestamp).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
                     </span>
                   </div>
                 ))}
