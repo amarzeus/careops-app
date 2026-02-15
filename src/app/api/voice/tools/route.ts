@@ -327,7 +327,7 @@ async function handleTransferToStaff(workspaceId: string, params: { staffName?: 
   const staff = await prisma.user.findFirst({
     where: {
       workspaceId,
-      name: { contains: staffName || '', mode: 'insensitive' },
+      name: { contains: staffName || '' },
       role: 'STAFF',
     },
   });

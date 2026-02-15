@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { executeRule } from "@/lib/automation";
-import { AutomationTrigger } from "@prisma/client";
+import { AutomationTrigger } from "@/lib/automation";
 
 export async function POST(
   req: Request,
@@ -27,9 +27,9 @@ export async function POST(
     const workspace = await prisma.workspace.findUnique({
       where: { id: user.workspaceId },
     });
-    
+
     if (!workspace) {
-        return NextResponse.json({ error: "Workspace not found" }, { status: 404 });
+      return NextResponse.json({ error: "Workspace not found" }, { status: 404 });
     }
 
     // Find a test contact or create one
@@ -66,7 +66,7 @@ export async function POST(
         where: { workspaceId: user.workspaceId },
         include: { service: true },
       });
-      
+
       if (booking) {
         data.booking = { id: booking.id, date: booking.date };
         data.service = { id: booking.serviceId, name: booking.service.name, location: booking.service.location };
@@ -76,28 +76,28 @@ export async function POST(
         data.service = { id: "test-service", name: "Test Service", location: "Main Office" };
       }
     } else if (rule.trigger === "INVENTORY_LOW") {
-        const item = await prisma.inventoryItem.findFirst({
-            where: { workspaceId: user.workspaceId }
-        });
-        if (item) {
-            data.item = {
-                name: item.name,
-                quantity: item.quantity,
-                threshold: item.threshold,
-                unit: item.unit,
-                vendorEmail: item.vendorEmail
-            };
-        } else {
-            data.item = {
-                name: "Test Item",
-                quantity: 5,
-                threshold: 10,
-                unit: "boxes",
-                vendorEmail: user.email // Send to user for test
-            };
-        }
+      const item = await prisma.inventoryItem.findFirst({
+        where: { workspaceId: user.workspaceId }
+      });
+      if (item) {
+        data.item = {
+          name: item.name,
+          quantity: item.quantity,
+          threshold: item.threshold,
+          unit: item.unit,
+          vendorEmail: item.vendorEmail
+        };
+      } else {
+        data.item = {
+          name: "Test Item",
+          quantity: 5,
+          threshold: 10,
+          unit: "boxes",
+          vendorEmail: user.email // Send to user for test
+        };
+      }
     } else if (rule.trigger === "FORM_PENDING") {
-        data.form = { name: "Intake Form" };
+      data.form = { name: "Intake Form" };
     }
 
     // Execute the rule immediately (bypassing delay for testing purposes)
@@ -106,9 +106,9 @@ export async function POST(
     // For testing, we might want to override delay.
     // However, executeRule takes the rule object directly. 
     // Let's copy the rule and set delay to 0 for the test.
-    
+
     const testRule = { ...rule, delayMinutes: 0 };
-    
+
     await executeRule(testRule, workspace, data);
 
     return NextResponse.json({ success: true });

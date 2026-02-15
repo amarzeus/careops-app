@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { AutomationTrigger } from "@prisma/client";
+import { AutomationTrigger } from "@/lib/automation";
 import { generateWebhookSecret } from "@/lib/webhook-security";
 
 export async function GET() {
@@ -58,7 +58,7 @@ export async function POST(req: Request) {
       },
     });
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       webhook,
       message: "Webhook created with security signature. Store the secret securely - it will not be shown again."
     }, { status: 201 });

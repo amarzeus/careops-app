@@ -5,7 +5,16 @@ import { sendWelcomeMessage, sendBookingConfirmation, isAvailable as isWhatsAppA
 import { generateWelcomeMessage, generateBookingConfirmation } from "./gemini";
 import { generateWebhookSignature, serializePayload } from "./webhook-security";
 import { initiateOutboundCall, isVapiConfigured } from "./vapi";
-import type { AutomationRule, Workspace, AutomationTrigger } from "@prisma/client";
+import type { AutomationRule, Workspace } from "@prisma/client";
+
+// SQLite doesn't support Enums, so we define it locally for type safety
+export type AutomationTrigger =
+  | "NEW_CONTACT"
+  | "BOOKING_CREATED"
+  | "BEFORE_BOOKING"
+  | "FORM_PENDING"
+  | "INVENTORY_LOW"
+  | "STAFF_REPLY";
 
 /**
  * Check if email is available for sending

@@ -1,6 +1,11 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+const GEMINI_KEY = process.env.GEMINI_API_KEY || "";
+if (!GEMINI_KEY && process.env.NODE_ENV !== "test") {
+  console.error("CRITICAL: GEMINI_API_KEY is missing from environment variables.");
+}
+
+const genAI = new GoogleGenerativeAI(GEMINI_KEY);
 
 // ──────────────────────────────────────────────
 // Core AI Engine
