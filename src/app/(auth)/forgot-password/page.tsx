@@ -2,22 +2,28 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { Activity, ArrowLeft, CheckCircle, Mail } from "lucide-react";
+import { Activity, ArrowLeft, CheckCircle, Mail, Phone, Lock, Eye, EyeOff, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-/**
- *
- */
+type Step = "request" | "verify" | "reset" | "success";
+
 export default function ForgotPasswordPage() {
+  const [step, setStep] = useState<Step>("request");
+  const [method, setMethod] = useState<"email" | "sms">("email");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [otp, setOtp] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleRequest = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setLoading(true);
@@ -26,13 +32,17 @@ export default function ForgotPasswordPage() {
       const res = await fetch("/api/auth/forgot-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({
+          method,
+          email: method === "email" ? email : undefined,
+          phone: method === "sms" ? phone : undefined
+        }),
       });
 
+      const data = await res.json();
       if (res.ok) {
-        setSent(true);
+        setStep("verify");
       } else {
-        const data = await res.json();
         setError(data.error || "Something went wrong");
       }
     } catch {
@@ -42,60 +52,204 @@ export default function ForgotPasswordPage() {
     }
   };
 
+  const handleReset = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+
+    if (newPassword !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    if (newPassword.length < 8) {
+      setError("Password must be at least 8 characters");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const res = await fetch("/api/auth/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          method,
+          email: method === "email" ? email : undefined,
+          phone: method === "sms" ? phone : undefined,
+          otp,
+          newPassword
+        }),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        setStep("success");
+      } else {
+        setError(data.error || "Reset failed");
+      }
+    } catch {
+      setError("Failed to reset password");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="mx-auto w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center mb-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-12">
+      <Card className="w-full max-w-md shadow-lg border-blue-100">
+        <CardHeader className="text-center pb-2">
+          <div className="mx-auto w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center mb-4 shadow-md">
             <Activity className="w-7 h-7 text-white" />
           </div>
-          <CardTitle className="text-2xl">
-            {sent ? "Check Your Email" : "Reset Password"}
+          <CardTitle className="text-2xl font-bold tracking-tight">
+            {step === "request" && "Reset Password"}
+            {step === "verify" && "Verify Identity"}
+            {step === "reset" && "Create New Password"}
+            {step === "success" && "Password Reset!"}
           </CardTitle>
-          <CardDescription>
-            {sent
-              ? "We've sent a temporary password to your email"
-              : "Enter your email and we'll send you a temporary password"}
+          <CardDescription className="text-gray-500">
+            {step === "request" && "Choose how you want to receive your reset code"}
+            {step === "verify" && `Enter the 6-digit code sent to your ${method}`}
+            {step === "reset" && "Choose a strong password for your account"}
+            {step === "success" && "Your password has been updated successfully"}
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          {sent ? (
-            <div className="text-center space-y-4">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
-                <CheckCircle className="w-8 h-8 text-green-600" />
-              </div>
-              <div className="space-y-2">
-                <p className="text-sm text-gray-600">
-                  A temporary password has been sent to <strong>{email}</strong>.
-                  Please check your inbox and log in with the temporary password.
-                </p>
-                <p className="text-xs text-gray-500">
-                  Remember to change your password after logging in from Settings &gt; Security.
-                </p>
-              </div>
-              <Link href="/login">
-                <Button className="w-full bg-blue-600 hover:bg-blue-700 mt-2">
-                  <ArrowLeft className="w-4 h-4 mr-2" /> Back to Login
-                </Button>
-              </Link>
+        <CardContent className="pt-6">
+          {error && (
+            <div className="mb-4 p-3 bg-red-50 text-red-700 text-sm rounded-lg border border-red-100 animate-in fade-in slide-in-from-top-1">
+              {error}
             </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {error && (
-                <div className="p-3 bg-red-50 text-red-700 text-sm rounded-lg">
-                  {error}
-                </div>
-              )}
+          )}
+
+          {step === "request" && (
+            <Tabs defaultValue="email" onValueChange={(v) => setMethod(v as "email" | "sms")}>
+              <TabsList className="grid w-full grid-cols-2 mb-6">
+                <TabsTrigger value="email" className="flex items-center gap-2">
+                  <Mail className="w-4 h-4" /> Email
+                </TabsTrigger>
+                <TabsTrigger value="sms" className="flex items-center gap-2">
+                  <Phone className="w-4 h-4" /> SMS
+                </TabsTrigger>
+              </TabsList>
+
+              <form onSubmit={handleRequest} className="space-y-4">
+                <TabsContent value="email" className="space-y-4 mt-0">
+                  <div className="space-y-2">
+                    <Label htmlFor="email" className="text-sm font-semibold">Email Address</Label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="name@company.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="pl-10 h-11 focus-visible:ring-blue-500"
+                        required={method === "email"}
+                      />
+                    </div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="sms" className="space-y-4 mt-0">
+                  <div className="space-y-2">
+                    <Label htmlFor="phone" className="text-sm font-semibold">Phone Number</Label>
+                    <div className="relative">
+                      <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                      <Input
+                        id="phone"
+                        type="tel"
+                        placeholder="+1 (555) 000-0000"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        className="pl-10 h-11 focus-visible:ring-blue-500"
+                        required={method === "sms"}
+                      />
+                    </div>
+                  </div>
+                </TabsContent>
+
+                <Button
+                  type="submit"
+                  className="w-full bg-blue-600 hover:bg-blue-700 h-11 transition-all shadow-sm"
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      Sending...
+                    </div>
+                  ) : (
+                    "Get Reset Code"
+                  )}
+                </Button>
+              </form>
+            </Tabs>
+          )}
+
+          {step === "verify" && (
+            <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">Email Address</Label>
+                <Label htmlFor="otp" className="text-sm font-semibold text-center block">Verification Code</Label>
+                <Input
+                  id="otp"
+                  type="text"
+                  placeholder="000000"
+                  maxLength={6}
+                  value={otp}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/\D/g, "");
+                    setOtp(val);
+                    if (val.length === 6) setStep("reset");
+                  }}
+                  className="text-center text-2xl tracking-[0.5em] font-bold h-14 border-2 focus-visible:border-blue-500 focus-visible:ring-blue-500"
+                />
+              </div>
+              <p className="text-center text-xs text-gray-500">
+                Didn't get the code? <button onClick={handleRequest} className="text-blue-600 hover:underline font-medium">Resend</button>
+              </p>
+              <Button
+                onClick={() => setStep("reset")}
+                disabled={otp.length !== 6}
+                className="w-full bg-blue-600 hover:bg-blue-700 h-11 shadow-sm"
+              >
+                Verify Code
+              </Button>
+            </div>
+          )}
+
+          {step === "reset" && (
+            <form onSubmit={handleReset} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="newPassword">New Password</Label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <Input
-                    id="email"
-                    type="email"
-                    placeholder="you@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    id="newPassword"
+                    type={showPassword ? "text" : "password"}
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    className="pl-10 pr-10"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Input
+                    id="confirmPassword"
+                    type={showPassword ? "text" : "password"}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
                     className="pl-10"
                     required
                   />
@@ -103,20 +257,41 @@ export default function ForgotPasswordPage() {
               </div>
               <Button
                 type="submit"
-                className="w-full bg-blue-600 hover:bg-blue-700"
+                className="w-full bg-blue-600 hover:bg-blue-700 h-11 shadow-sm"
                 disabled={loading}
               >
-                {loading ? "Sending..." : "Send Temporary Password"}
+                {loading ? "Resetting..." : "Reset Password"}
               </Button>
-              <p className="text-center text-sm text-gray-500">
-                <Link
-                  href="/login"
-                  className="text-blue-600 hover:underline font-medium"
-                >
-                  Back to Login
-                </Link>
-              </p>
             </form>
+          )}
+
+          {step === "success" && (
+            <div className="text-center space-y-6">
+              <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto border-2 border-green-100 shadow-sm">
+                <ShieldCheck className="w-10 h-10 text-green-600 animate-in zoom-in duration-300" />
+              </div>
+              <div className="space-y-2">
+                <p className="text-gray-600">
+                  Secure access restored! Your password has been successfully updated.
+                </p>
+              </div>
+              <Link href="/login" className="block">
+                <Button className="w-full bg-blue-600 hover:bg-blue-700 h-11 shadow-md">
+                  Sign In Now
+                </Button>
+              </Link>
+            </div>
+          )}
+
+          {step !== "success" && (
+            <div className="mt-8 pt-6 border-t border-gray-100 text-center">
+              <Link
+                href="/login"
+                className="text-sm text-gray-500 hover:text-blue-600 inline-flex items-center font-medium transition-colors"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" /> Back to Sign In
+              </Link>
+            </div>
           )}
         </CardContent>
       </Card>

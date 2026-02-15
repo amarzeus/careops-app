@@ -18,11 +18,18 @@ export async function POST() {
   }
 
   try {
-    const result = await sendSMS(user.phone || "+1234567890", "Twilio SMS connection verified!");
+    if (!user.phone) {
+      return NextResponse.json(
+        { error: "Please set your phone number in your Profile settings first." },
+        { status: 400 }
+      );
+    }
+
+    const result = await sendSMS(user.phone, "Twilio SMS connection verified!");
 
     if (!result.success) {
       return NextResponse.json(
-        { error: `Twilio validation failed: ${result.error}` },
+        { error: `Twilio delivery failed: ${result.error}` },
         { status: 500 }
       );
     }

@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { hashPassword } from "@/lib/auth";
+import { hashPassword, createToken } from "@/lib/auth";
 import { sendEmail, buildEmailTemplate } from "@/lib/email";
+import { sendSMS, buildOTPMessage } from "@/lib/sms";
+import { generateOTP, storeOTP } from "@/lib/otp";
 import { v4 as uuidv4 } from "uuid";
 
 /**
@@ -10,67 +12,80 @@ import { v4 as uuidv4 } from "uuid";
  */
 export async function POST(req: Request) {
   try {
-    const { email } = await req.json();
+    const { email, phone, method = "email" } = await req.json();
 
-    if (!email) {
+    if (method === "email" && !email) {
       return NextResponse.json({ error: "Email is required" }, { status: 400 });
     }
+    if (method === "sms" && !phone) {
+      return NextResponse.json({ error: "Phone number is required" }, { status: 400 });
+    }
 
-    const user = await prisma.user.findUnique({ where: { email } });
+    const user = await prisma.user.findFirst({
+      where: method === "email" ? { email } : { phone },
+    });
 
     if (!user) {
       // Return success even if user not found (security: don't reveal user existence)
       return NextResponse.json({
-        message: "If an account exists with this email, a password reset link has been sent."
+        message: method === "email"
+          ? "If an account exists with this email, a reset code has been sent."
+          : "If an account exists with this phone number, a reset code has been sent."
       });
     }
 
-    // Rate limiting: prevent spamming resets (5 min cooldown)
-    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
-    if (user.updatedAt > fiveMinutesAgo) {
+    // Rate limiting: prevent spamming resets (1 min cooldown for OTP)
+    const oneMinuteAgo = new Date(Date.now() - 60 * 1000);
+    if (user.updatedAt > oneMinuteAgo) {
       return NextResponse.json({
-        message: "If an account exists with this email, a password reset link has been sent."
+        message: "Please wait a moment before requesting another code."
       });
     }
 
-    // Generate a temporary password
-    const tempPassword = uuidv4().slice(0, 12);
-    const hashedPassword = await hashPassword(tempPassword);
+    // Generate and store OTP
+    const otp = generateOTP();
+    await storeOTP(user.id, otp);
 
-    // Update user's password
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { passwordHash: hashedPassword },
-    });
+    if (method === "email") {
+      // Send reset email with OTP
+      const emailSent = await sendEmail({
+        to: user.email,
+        subject: "CareOps Password Reset Code",
+        html: buildEmailTemplate(
+          "Password Reset Code",
+          `<p>Hi ${user.name},</p>
+           <p>You requested a password reset. Your verification code is:</p>
+           <div style="background: #f3f4f6; padding: 24px; border-radius: 8px; text-align: center; margin: 16px 0;">
+             <h1 style="font-size: 36px; font-weight: bold; color: #2563eb; letter-spacing: 8px; margin: 0;">${otp}</h1>
+           </div>
+           <p>This code expires in 15 minutes. If you did not request this, please ignore this email.</p>`
+        ),
+      });
 
-    // Send reset email with temporary password
-    const emailSent = await sendEmail({
-      to: email,
-      subject: "CareOps Password Reset",
-      html: buildEmailTemplate(
-        "Password Reset",
-        `<p>Hi ${user.name},</p>
-         <p>Your password has been reset. Here is your temporary password:</p>
-         <div style="background: #f3f4f6; padding: 16px; border-radius: 8px; text-align: center; margin: 16px 0;">
-           <code style="font-size: 24px; font-weight: bold; color: #1e40af; letter-spacing: 2px;">${tempPassword}</code>
-         </div>
-         <p>Please log in with this temporary password and change it immediately from Settings &gt; Security.</p>
-         <p style="color: #6b7280; font-size: 12px;">If you did not request this reset, please contact support immediately.</p>`
-      ),
-    });
+      if (!emailSent) {
+        console.error("Failed to send password reset email to", user.email);
+      }
+    } else {
+      // Send reset SMS with OTP
+      const smsSent = await sendSMS({
+        to: user.phone!,
+        body: buildOTPMessage(otp),
+        workspaceId: user.workspaceId || undefined,
+      });
 
-    if (process.env.NODE_ENV !== "production") {
-      console.log("------------------------------------------");
-      console.log(`FORGOT PASSWORD (DEV MODE) - Temp Pass: ${tempPassword} for ${email}`);
-      console.log("------------------------------------------");
-    }
-
-    if (!emailSent) {
-      console.error("Failed to send password reset email to", email);
+      if (!smsSent) {
+        console.error("Failed to send password reset SMS to", user.phone);
+        return NextResponse.json({ error: "Failed to send SMS. Please try email." }, { status: 500 });
+      }
     }
 
     return NextResponse.json({
-      message: "If an account exists with this email, a password reset link has been sent."
+      message: method === "email"
+        ? "Verification code sent to your email."
+        : "Verification code sent to your phone.",
+      requiresOTP: true,
+      email: user.email,
+      phone: user.phone,
     });
   } catch (error) {
     console.error("Forgot password error:", error);

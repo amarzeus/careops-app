@@ -4,11 +4,15 @@ import { prisma } from "./prisma";
 
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST,
-  port: parseInt(process.env.EMAIL_PORT || "587"),
+  port: parseInt(process.env.EMAIL_PORT || "465"),
+  secure: process.env.EMAIL_PORT === "465" || !process.env.EMAIL_PORT, // Default to secure if port 465 or not specified
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
+  connectionTimeout: 10000, // 10s
+  greetingTimeout: 10000,
+  socketTimeout: 15000,
 });
 
 export interface EmailOptions {
