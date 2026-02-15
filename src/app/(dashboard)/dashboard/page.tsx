@@ -20,6 +20,7 @@ import {
   Activity,
   Zap,
 } from "lucide-react";
+import { Header } from "@/components/layout/header";
 import { MetricCard } from "@/components/dashboard/metric-card";
 import { PerformanceChart } from "@/components/dashboard/performance-chart";
 import { TodaysSchedule } from "@/components/dashboard/todays-schedule";
@@ -192,26 +193,7 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gray-50/50 flex flex-col">
-      {/* Header - Compact (Hidden when using Layout Header) */}
-      <div className="lg:hidden px-4 pt-4 shrink-0">
-        <div className="flex items-center justify-between bg-white px-4 py-3 rounded-xl border border-gray-200/50 shadow-sm">
-          <div>
-            <h1 className="text-lg font-bold text-gray-900 tracking-tight">Overview</h1>
-            <p className="text-[10px] text-muted-foreground">
-              Updated: {lastUpdated.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-            </p>
-          </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => fetchMetrics(true)}
-            disabled={refreshing}
-            className="h-8 w-8 p-0"
-          >
-            <RefreshCw className={`w-4 h-4 ${refreshing ? "animate-spin" : ""}`} />
-          </Button>
-        </div>
-      </div>
+      <Header title="Dashboard" subtitle="Overview of your business performance" />
 
       {/* Main Content */}
       <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-[1600px] mx-auto w-full flex flex-col gap-5 sm:gap-6 overflow-hidden">

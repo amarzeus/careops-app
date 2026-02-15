@@ -6,8 +6,10 @@ services:
     buildCommand: npm ci --include=dev && npm run build
     startCommand: npm run db:push && npm start
     healthCheckPath: /
-    # CareOps listeners on port 5000 by default in scripts
+    # Force Render to use 10000 to avoid port loops
     envVars:
+      - key: PORT
+        value: "10000"
       - key: NODE_VERSION
         value: "20"
       - key: DATABASE_URL
