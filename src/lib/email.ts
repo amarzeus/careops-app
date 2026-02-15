@@ -1,19 +1,5 @@
 
-import nodemailer from "nodemailer";
 import { prisma } from "./prisma";
-
-const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST,
-  port: parseInt(process.env.EMAIL_PORT || "465"),
-  secure: process.env.EMAIL_PORT === "465" || !process.env.EMAIL_PORT, // Default to secure if port 465 or not specified
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-  connectionTimeout: 10000, // 10s
-  greetingTimeout: 10000,
-  socketTimeout: 15000,
-});
 
 export interface EmailOptions {
   to: string;
@@ -49,36 +35,48 @@ async function logIntegration(type: string, status: string, to: string, message:
 }
 
 /**
- *
+ * Sends an email using the Resend API via HTTPS.
+ * This is more reliable than SMTP on platforms like Render where SMTP ports might be blocked.
  * @param options
  */
 export async function sendEmail(options: EmailOptions): Promise<boolean> {
-  console.log(`Preparing to send email to: ${options.to}`);
+  console.log(`Preparing to send email to: ${options.to} via Resend API`);
+
+  const apiKey = process.env.EMAIL_PASS; // Using the existing EMAIL_PASS as the Resend API Key
+  const from = process.env.EMAIL_FROM || "CareOps <onboarding@resend.dev>";
+
+  if (!apiKey) {
+    console.error("RESEND_API_KEY (EMAIL_PASS) is missing");
+    return false;
+  }
 
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     try {
-      console.log(`Attempt ${attempt}/${MAX_RETRIES} connecting to ${process.env.EMAIL_HOST}...`);
+      console.log(`Attempt ${attempt}/${MAX_RETRIES} sending via Resend API...`);
 
-      const info = await transporter.sendMail({
-        from: process.env.EMAIL_FROM,
-        to: options.to,
-        subject: options.subject,
-        html: options.html,
+      const response = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          from: from,
+          to: options.to,
+          subject: options.subject,
+          html: options.html,
+        }),
       });
 
-      console.log(`✅ Email sent successfully! Message ID: ${info.messageId}`);
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || `Resend API error: ${response.status}`);
+      }
+
+      console.log(`✅ Email sent successfully! Message ID: ${data.id}`);
 
       await logIntegration("email", "success", options.to, options.subject, undefined, options.workspaceId);
-
-      // In development, log the email content for debugging
-      if (process.env.NODE_ENV !== "production") {
-        console.log("------------------------------------------");
-        console.log("EMAIL SENT (DEV MODE) - LOGGING CONTENT");
-        console.log("Subject:", options.subject);
-        console.log("To:", options.to);
-        console.log("HTML Preview:", options.html?.substring(0, 200) + "...");
-        console.log("------------------------------------------");
-      }
 
       return true;
     } catch (error: unknown) {
@@ -110,15 +108,6 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
             console.error("Failed to create failure alert:", e);
           }
         }
-
-        if (process.env.NODE_ENV !== "production") {
-          console.log("------------------------------------------");
-          console.log("EMAIL FAILED - LOGGING CONTENT (DEV MODE)");
-          console.log("Subject:", options.subject);
-          console.log("To:", options.to);
-          console.log("HTML Preview:", options.html);
-          console.log("------------------------------------------");
-        }
         return false;
       }
     }
@@ -127,11 +116,7 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
 }
 
 /**
- *
- * @param title
- * @param content
- * @param buttonText
- * @param buttonUrl
+ * Builds HTML template for emails.
  */
 export function buildEmailTemplate(
   title: string,
