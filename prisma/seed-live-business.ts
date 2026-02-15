@@ -11,49 +11,58 @@ async function main() {
   // ============================================
   console.log("\n📍 Creating Workspace & Users...");
 
-  // Create Workspace
-  const workspace = await prisma.workspace.create({
-    data: {
-      name: "Zeus Wellness Center",
-      address: "123 Health Avenue, Medical District",
-      timezone: "America/New_York",
-      contactEmail: "admin@zeuswellness.com",
-      contactPhone: "+1-555-0100",
-      status: "ACTIVE",
-      emailConfigured: true,
-      smsConfigured: false,
-    },
-  });
+  // Create or get existing Workspace
+  let workspace = await prisma.workspace.findFirst({ where: { name: "Zeus Wellness Center" } });
+  if (!workspace) {
+    workspace = await prisma.workspace.create({
+      data: {
+        name: "Zeus Wellness Center",
+        address: "123 Health Avenue, Medical District",
+        timezone: "America/New_York",
+        contactEmail: "admin@zeuswellness.com",
+        contactPhone: "+1-555-0100",
+        status: "ACTIVE",
+        emailConfigured: true,
+        smsConfigured: false,
+      },
+    });
+  }
   console.log(`   ✓ Workspace: ${workspace.name}`);
 
-  // Create Owner (Full Access)
-  const owner = await prisma.user.create({
-    data: {
+  // Create or update Owner (Full Access)
+  const owner = await prisma.user.upsert({
+    where: { email: "amar@zeuswellness.com" },
+    update: { passwordHash: "$2b$12$1Tq3aKgQ3.Nq4jcAkZYeeOFBKXvu2anpnGZCrHwMxypmKZ/.kQ9wO" },
+    create: {
       email: "amar@zeuswellness.com",
       name: "Amar Kumar",
-      passwordHash: "$2a$10$placeholder_hash",
+      passwordHash: "$2b$12$1Tq3aKgQ3.Nq4jcAkZYeeOFBKXvu2anpnGZCrHwMxypmKZ/.kQ9wO", // password
       role: "OWNER",
       workspaceId: workspace.id,
     },
   });
   console.log(`   ✓ Owner: ${owner.name} (${owner.email})`);
 
-  // Create Staff Users (Restricted Access)
-  const staffAlpha = await prisma.user.create({
-    data: {
+  // Create or update Staff Users (Restricted Access)
+  const staffAlpha = await prisma.user.upsert({
+    where: { email: "alpha@zeuswellness.com" },
+    update: { passwordHash: "$2b$12$1Tq3aKgQ3.Nq4jcAkZYeeOFBKXvu2anpnGZCrHwMxypmKZ/.kQ9wO" },
+    create: {
       email: "alpha@zeuswellness.com",
       name: "Staff Alpha",
-      passwordHash: "$2a$10$placeholder_hash",
+      passwordHash: "$2b$12$1Tq3aKgQ3.Nq4jcAkZYeeOFBKXvu2anpnGZCrHwMxypmKZ/.kQ9wO", // password
       role: "STAFF",
       workspaceId: workspace.id,
     },
   });
 
-  const staffBeta = await prisma.user.create({
-    data: {
+  const staffBeta = await prisma.user.upsert({
+    where: { email: "beta@zeuswellness.com" },
+    update: { passwordHash: "$2b$12$1Tq3aKgQ3.Nq4jcAkZYeeOFBKXvu2anpnGZCrHwMxypmKZ/.kQ9wO" },
+    create: {
       email: "beta@zeuswellness.com",
       name: "Staff Beta",
-      passwordHash: "$2a$10$placeholder_hash",
+      passwordHash: "$2b$12$1Tq3aKgQ3.Nq4jcAkZYeeOFBKXvu2anpnGZCrHwMxypmKZ/.kQ9wO", // password
       role: "STAFF",
       workspaceId: workspace.id,
     },
