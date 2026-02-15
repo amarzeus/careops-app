@@ -77,7 +77,7 @@ export function Sidebar({ userName, userRole, workspaceName }: SidebarProps) {
   const sidebarContent = (
     <div className="flex flex-col h-full">
       <div className="p-6 border-b border-gray-200">
-        <div className="flex items-center gap-2">
+        <Link href="/dashboard" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
           <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
             <Activity className="w-5 h-5 text-white" />
           </div>
@@ -85,7 +85,7 @@ export function Sidebar({ userName, userRole, workspaceName }: SidebarProps) {
             <h1 className="text-lg font-bold text-gray-900">CareOps</h1>
             <p className="text-xs text-gray-500 truncate max-w-[140px]">{workspaceName || "Workspace"}</p>
           </div>
-        </div>
+        </Link>
       </div>
 
       <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
@@ -142,12 +142,13 @@ export function Sidebar({ userName, userRole, workspaceName }: SidebarProps) {
 
   return (
     <>
-      {/* Mobile toggle */}
+      {/* Mobile toggle - visible on mobile only */}
       <button
-        className="fixed top-4 left-4 z-50 p-2 rounded-lg bg-white shadow-md lg:hidden"
+        className="fixed top-4 left-4 z-50 p-2 rounded-lg bg-white shadow-md border border-gray-200 hover:bg-gray-50 lg:hidden"
         onClick={() => setMobileOpen(!mobileOpen)}
+        aria-label={mobileOpen ? "Close menu" : "Open menu"}
       >
-        {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+        {mobileOpen ? <X className="w-5 h-5 text-gray-700" /> : <Menu className="w-5 h-5 text-gray-700" />}
       </button>
 
       {/* Mobile overlay */}

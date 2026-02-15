@@ -24,7 +24,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
         userRole={user.role}
         workspaceName={user.workspace?.name}
       />
-      <main className="lg:ml-64 min-h-screen">
+      <main className="lg:ml-64 ml-16 min-h-screen p-4 lg:p-8">
         {children}
       </main>
     </div>
