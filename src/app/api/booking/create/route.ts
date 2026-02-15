@@ -6,6 +6,10 @@ import { syncBookingToCalendar } from "@/lib/google-calendar";
 import { parseLocalDateTime } from "@/lib/date-utils";
 import { checkRateLimit, RATE_LIMITS, getClientIP } from "@/lib/rate-limiter";
 
+/**
+ *
+ * @param req
+ */
 export async function POST(req: Request) {
     try {
         // Rate limiting check

@@ -14,6 +14,11 @@ export const metadata: Metadata = {
   description: "One platform to manage your entire service business - bookings, leads, forms, inventory, and more.",
 };
 
+/**
+ *
+ * @param root0
+ * @param root0.children
+ */
 export default function RootLayout({
   children,
 }: Readonly<{

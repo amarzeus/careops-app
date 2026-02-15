@@ -6,6 +6,10 @@ import { sendOTP as twilioSendOTP, sendWhatsAppOTP as twilioSendWhatsAppOTP, isC
 import { sendSMS, buildOTPMessage } from "@/lib/sms";
 import { isAvailable as isWhatsAppAvailable } from "@/lib/whatsapp";
 
+/**
+ *
+ * @param req
+ */
 export async function POST(req: Request) {
   try {
     const { email, channel, phone } = await req.json();

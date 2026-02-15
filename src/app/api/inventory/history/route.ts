@@ -2,6 +2,10 @@ import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
+/**
+ *
+ * @param req
+ */
 export async function GET(req: Request) {
   const user = await getCurrentUser();
   if (!user || !user.workspaceId)

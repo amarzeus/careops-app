@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
+/**
+ *
+ * @param req
+ */
 export async function GET(req: NextRequest) {
   try {
     const user = await getCurrentUser();
@@ -38,6 +42,10 @@ export async function GET(req: NextRequest) {
   }
 }
 
+/**
+ *
+ * @param req
+ */
 export async function POST(req: NextRequest) {
   try {
     const user = await getCurrentUser();

@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { aiOnboardingAssistant } from "@/lib/gemini";
 
+/**
+ *
+ * @param req
+ */
 export async function POST(req: Request) {
   const { message, currentStep, businessInfo, conversationHistory } = await req.json();
   if (!message)

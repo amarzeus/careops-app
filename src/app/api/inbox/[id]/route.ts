@@ -3,6 +3,12 @@ import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { resumeAutomation } from "@/lib/automation";
 
+/**
+ *
+ * @param req
+ * @param root0
+ * @param root0.params
+ */
 export async function GET(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -38,6 +44,12 @@ export async function GET(
   return NextResponse.json({ conversation });
 }
 
+/**
+ *
+ * @param req
+ * @param root0
+ * @param root0.params
+ */
 export async function PUT(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -65,6 +77,12 @@ export async function PUT(
   return NextResponse.json({ error: "Invalid action" }, { status: 400 });
 }
 
+/**
+ *
+ * @param req
+ * @param root0
+ * @param root0.params
+ */
 export async function POST(
   req: Request,
   { params }: { params: Promise<{ id: string }> }

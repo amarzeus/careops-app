@@ -2,6 +2,12 @@ import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
+/**
+ *
+ * @param req
+ * @param root0
+ * @param root0.params
+ */
 export async function GET(
   req: Request,
   { params }: { params: Promise<{ id: string }> }

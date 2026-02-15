@@ -21,6 +21,9 @@ interface VoiceContextType {
 
 const VoiceContext = createContext<VoiceContextType | null>(null);
 
+/**
+ *
+ */
 export function useVoice() {
     const context = useContext(VoiceContext);
     if (!context) {
@@ -29,6 +32,11 @@ export function useVoice() {
     return context;
 }
 
+/**
+ *
+ * @param root0
+ * @param root0.children
+ */
 export function VoiceProvider({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
     const router = useRouter();

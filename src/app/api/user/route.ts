@@ -3,6 +3,9 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser, removeAuthCookie } from "@/lib/auth";
 
+/**
+ *
+ */
 export async function GET() {
     try {
         const currentUser = await getCurrentUser();
@@ -28,6 +31,10 @@ export async function GET() {
     }
 }
 
+/**
+ *
+ * @param req
+ */
 export async function PUT(req: Request) {
     try {
         const currentUser = await getCurrentUser();
@@ -56,6 +63,9 @@ export async function PUT(req: Request) {
     }
 }
 
+/**
+ *
+ */
 export async function DELETE() {
     try {
         const currentUser = await getCurrentUser();

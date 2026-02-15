@@ -5,6 +5,8 @@ import { prisma } from "@/lib/prisma";
 /**
  * Check if email is available
  * Priority: 1) Workspace flag, 2) Environment variables
+ * @param workspace
+ * @param workspace.emailConfigured
  */
 function isEmailAvailable(workspace: { emailConfigured: boolean }): boolean {
   if (workspace.emailConfigured) return true;
@@ -21,6 +23,8 @@ function isEmailAvailable(workspace: { emailConfigured: boolean }): boolean {
 /**
  * Check if SMS is available
  * Priority: 1) Workspace flag, 2) Environment variables
+ * @param workspace
+ * @param workspace.smsConfigured
  */
 function isSMSAvailable(workspace: { smsConfigured: boolean }): boolean {
   if (workspace.smsConfigured) return true;
@@ -32,6 +36,9 @@ function isSMSAvailable(workspace: { smsConfigured: boolean }): boolean {
   return hasSMSEnv;
 }
 
+/**
+ *
+ */
 export async function GET() {
   const user = await getCurrentUser();
   if (!user || !user.workspaceId)

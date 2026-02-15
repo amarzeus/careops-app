@@ -4,6 +4,9 @@ import { prisma } from "@/lib/prisma";
 import { triggerAutomation } from "@/lib/automation";
 import { syncBookingToCalendar } from "@/lib/google-calendar";
 
+/**
+ *
+ */
 export async function GET() {
   const user = await getCurrentUser();
   if (!user || !user.workspaceId)
@@ -27,6 +30,10 @@ export async function GET() {
   return NextResponse.json({ bookings });
 }
 
+/**
+ *
+ * @param req
+ */
 export async function POST(req: Request) {
   const user = await getCurrentUser();
   if (!user || !user.workspaceId)

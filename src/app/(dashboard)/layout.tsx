@@ -3,6 +3,11 @@ import { headers } from "next/headers";
 import { getCurrentUser } from "@/lib/auth";
 import { Sidebar } from "@/components/layout/sidebar";
 
+/**
+ *
+ * @param root0
+ * @param root0.children
+ */
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const user = await getCurrentUser();
   const headersList = await headers();

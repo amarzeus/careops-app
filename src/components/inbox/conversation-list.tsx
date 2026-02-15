@@ -28,6 +28,16 @@ const intentConfig = {
   general: { label: "General", color: "bg-gray-50 text-gray-500 border-gray-200", icon: MessageSquare },
 };
 
+/**
+ *
+ * @param root0
+ * @param root0.conversations
+ * @param root0.activeId
+ * @param root0.onSelect
+ * @param root0.searchQuery
+ * @param root0.setSearchQuery
+ * @param root0.totalUnread
+ */
 export function ConversationList({
   conversations,
   activeId,

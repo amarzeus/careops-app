@@ -5,6 +5,7 @@ import { listCalendarEvents } from "@/lib/google-calendar";
 /**
  * GET /api/integrations/google-calendar/events
  * Fetches events from Google Calendar for the dashboard.
+ * @param req
  */
 export async function GET(req: Request) {
     const user = await getCurrentUser();

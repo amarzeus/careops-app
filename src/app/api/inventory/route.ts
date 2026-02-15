@@ -3,6 +3,9 @@ import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { triggerAutomation } from "@/lib/automation";
 
+/**
+ *
+ */
 export async function GET() {
   const user = await getCurrentUser();
   if (!user || !user.workspaceId)
@@ -19,6 +22,10 @@ export async function GET() {
   return NextResponse.json({ items });
 }
 
+/**
+ *
+ * @param req
+ */
 export async function POST(req: Request) {
   const user = await getCurrentUser();
   if (!user || !user.workspaceId)
@@ -64,6 +71,10 @@ export async function POST(req: Request) {
   return NextResponse.json({ item }, { status: 201 });
 }
 
+/**
+ *
+ * @param req
+ */
 export async function PUT(req: Request) {
   const user = await getCurrentUser();
   if (!user || !user.workspaceId)

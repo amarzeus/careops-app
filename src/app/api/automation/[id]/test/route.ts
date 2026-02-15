@@ -4,6 +4,12 @@ import { prisma } from "@/lib/prisma";
 import { executeRule } from "@/lib/automation";
 import { AutomationTrigger } from "@/lib/automation";
 
+/**
+ *
+ * @param req
+ * @param root0
+ * @param root0.params
+ */
 export async function POST(
   req: Request,
   { params }: { params: Promise<{ id: string }> }

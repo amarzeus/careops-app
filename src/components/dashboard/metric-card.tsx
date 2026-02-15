@@ -24,6 +24,18 @@ const colorMap = {
   gray: { bg: "bg-gray-50", icon: "text-gray-600", ring: "ring-gray-200" },
 };
 
+/**
+ *
+ * @param root0
+ * @param root0.title
+ * @param root0.value
+ * @param root0.icon
+ * @param root0.description
+ * @param root0.trend
+ * @param root0.alert
+ * @param root0.href
+ * @param root0.color
+ */
 export function MetricCard({
   title,
   value,

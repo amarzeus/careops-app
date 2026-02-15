@@ -9,6 +9,7 @@ import type { Workspace } from "@prisma/client";
 /**
  * Check if email is available for sending
  * Priority: 1) Workspace flag, 2) Environment variables
+ * @param workspace
  */
 function isEmailAvailable(workspace: Workspace): boolean {
   if (workspace.emailConfigured) return true;
@@ -25,6 +26,7 @@ function isEmailAvailable(workspace: Workspace): boolean {
 /**
  * Check if SMS is available for sending
  * Priority: 1) Workspace flag, 2) Environment variables
+ * @param workspace
  */
 function isSMSAvailable(workspace: Workspace): boolean {
   if (workspace.smsConfigured) return true;
@@ -36,6 +38,10 @@ function isSMSAvailable(workspace: Workspace): boolean {
   return hasSMSEnv;
 }
 
+/**
+ *
+ * @param req
+ */
 export async function GET(req: Request) {
     const user = await getCurrentUser();
     if (!user?.workspaceId) {
@@ -78,6 +84,10 @@ export async function GET(req: Request) {
     }
 }
 
+/**
+ *
+ * @param req
+ */
 export async function POST(req: Request) {
     const user = await getCurrentUser();
     if (!user?.workspaceId) {

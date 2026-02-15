@@ -3,6 +3,10 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser, hashPassword, verifyPassword } from "@/lib/auth";
 
+/**
+ *
+ * @param req
+ */
 export async function PUT(req: Request) {
     try {
         const currentUser = await getCurrentUser();

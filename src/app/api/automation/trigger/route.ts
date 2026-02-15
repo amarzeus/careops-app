@@ -2,6 +2,10 @@ import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { triggerAutomation } from "@/lib/automation";
 
+/**
+ *
+ * @param req
+ */
 export async function POST(req: Request) {
   const user = await getCurrentUser();
   if (!user || !user.workspaceId) {

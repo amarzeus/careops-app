@@ -36,6 +36,21 @@ interface SecurityTabProps {
   setDeleteConfirmation: (v: string) => void;
 }
 
+/**
+ *
+ * @param root0
+ * @param root0.currentPassword
+ * @param root0.setCurrentPassword
+ * @param root0.newPassword
+ * @param root0.setNewPassword
+ * @param root0.onChangePassword
+ * @param root0.changingPassword
+ * @param root0.passwordMessage
+ * @param root0.onDeleteAccount
+ * @param root0.isDeleting
+ * @param root0.deleteConfirmation
+ * @param root0.setDeleteConfirmation
+ */
 export function SecurityTab({
   currentPassword,
   setCurrentPassword,

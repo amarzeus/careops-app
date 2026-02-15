@@ -17,6 +17,19 @@ interface HoverExpandCardProps {
     previewText?: string; // Text to show in collapsed state
 }
 
+/**
+ *
+ * @param root0
+ * @param root0.title
+ * @param root0.icon
+ * @param root0.count
+ * @param root0.countLabel
+ * @param root0.children
+ * @param root0.className
+ * @param root0.headerColorClass
+ * @param root0.iconColorClass
+ * @param root0.previewText
+ */
 export function HoverExpandCard({
     title,
     icon: Icon,

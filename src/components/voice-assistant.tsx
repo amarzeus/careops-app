@@ -32,6 +32,13 @@ interface DotGlobeProps {
   size?: number;
 }
 
+/**
+ *
+ * @param root0
+ * @param root0.voiceState
+ * @param root0.amplitude
+ * @param root0.size
+ */
 export function DotGlobe({ voiceState, amplitude, size = 180 }: DotGlobeProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animRef = useRef<number>(0);
@@ -200,6 +207,10 @@ export function DotGlobe({ voiceState, amplitude, size = 180 }: DotGlobeProps) {
 }
 
 // ---- Voice Engine Hook ----
+/**
+ *
+ * @param onTranscript
+ */
 export function useVoiceEngine(onTranscript: (text: string, context?: any, history?: any[]) => Promise<string>) {
   const [voiceState, setVoiceState] = useState<VoiceState>("idle");
   const [transcript, setTranscript] = useState("");
@@ -580,6 +591,15 @@ interface InlineVoiceModeProps {
   initialGreeting?: string;
 }
 
+/**
+ *
+ * @param root0
+ * @param root0.onTranscript
+ * @param root0.onClose
+ * @param root0.className
+ * @param root0.autoStart
+ * @param root0.initialGreeting
+ */
 export function InlineVoiceMode({ onTranscript, onClose, className, autoStart = true, initialGreeting }: InlineVoiceModeProps) {
   const {
     voiceState, transcript, interimTranscript, aiResponse,
@@ -782,6 +802,13 @@ export function InlineVoiceMode({ onTranscript, onClose, className, autoStart = 
 
 
 // ---- Floating Action Button ----
+/**
+ *
+ * @param root0
+ * @param root0.onClick
+ * @param root0.isOpen
+ * @param root0.pulse
+ */
 export function VoiceAssistantFAB({ 
   onClick,
   isOpen = false,
@@ -830,6 +857,22 @@ interface GlobalVoiceOverlayProps {
   isChatOpen: boolean;
 }
 
+/**
+ *
+ * @param root0
+ * @param root0.voiceState
+ * @param root0.transcript
+ * @param root0.interimTranscript
+ * @param root0.aiResponse
+ * @param root0.history
+ * @param root0.amplitude
+ * @param root0.onClose
+ * @param root0.isMuted
+ * @param root0.toggleMute
+ * @param root0.onSendMessage
+ * @param root0.onMicClick
+ * @param root0.isChatOpen
+ */
 export function GlobalVoiceOverlay({
   voiceState,
   transcript,

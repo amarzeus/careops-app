@@ -20,6 +20,13 @@ interface StaffListProps {
     onDelete: (id: string) => void;
 }
 
+/**
+ *
+ * @param root0
+ * @param root0.staff
+ * @param root0.onEdit
+ * @param root0.onDelete
+ */
 export function StaffList({ staff, onEdit, onDelete }: StaffListProps) {
     return (
         <div className="rounded-md border overflow-x-auto">

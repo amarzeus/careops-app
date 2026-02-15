@@ -15,6 +15,11 @@ interface PerformanceChartProps {
   data: ChartDataPoint[];
 }
 
+/**
+ *
+ * @param root0
+ * @param root0.data
+ */
 export function PerformanceChart({ data }: PerformanceChartProps) {
   const hasData = data.some(d => d.bookings > 0 || d.leads > 0 || d.completed > 0);
 

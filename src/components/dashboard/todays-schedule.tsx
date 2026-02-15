@@ -25,6 +25,11 @@ const statusColors: Record<string, string> = {
   NO_SHOW: "bg-red-100 text-red-700 border-red-200",
 };
 
+/**
+ *
+ * @param root0
+ * @param root0.bookings
+ */
 export function TodaysSchedule({ bookings }: TodaysScheduleProps) {
   const router = useRouter();
 

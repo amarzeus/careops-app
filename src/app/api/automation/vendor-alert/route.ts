@@ -6,6 +6,7 @@ import { sendEmail, buildEmailTemplate } from "@/lib/email";
 /** POST /api/automation/vendor-alert
  *  Sends a reorder email to the vendor of a low-stock inventory item.
  *  PRD: "When inventory is low, automatically notify vendor for restocking"
+ * @param req
  */
 export async function POST(req: Request) {
     const user = await getCurrentUser();

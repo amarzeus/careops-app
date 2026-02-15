@@ -19,6 +19,7 @@ export type AutomationTrigger =
 /**
  * Check if email is available for sending
  * Priority: 1) Workspace flag, 2) Environment variables
+ * @param workspace
  */
 function isEmailAvailable(workspace: Workspace): boolean {
   // If workspace flag is explicitly set, use it
@@ -39,6 +40,7 @@ function isEmailAvailable(workspace: Workspace): boolean {
 /**
  * Check if SMS is available for sending
  * Priority: 1) Workspace flag, 2) Environment variables
+ * @param workspace
  */
 function isSMSAvailable(workspace: Workspace): boolean {
   // If workspace flag is explicitly set, use it
@@ -85,6 +87,12 @@ export interface FormData {
   name: string;
 }
 
+/**
+ *
+ * @param workspaceId
+ * @param trigger
+ * @param data
+ */
 export async function triggerAutomation(
   workspaceId: string,
   trigger: string,
@@ -187,6 +195,12 @@ export async function triggerAutomation(
   }
 }
 
+/**
+ *
+ * @param rule
+ * @param workspace
+ * @param data
+ */
 export async function executeRule(
   rule: AutomationRule,
   workspace: Workspace,
@@ -568,6 +582,11 @@ async function handleInventoryLow(workspace: Workspace, data: Record<string, unk
   }
 }
 
+/**
+ *
+ * @param conversationId
+ * @param workspaceId
+ */
 export async function resumeAutomation(conversationId: string, workspaceId: string) {
   await prisma.conversation.update({
     where: { id: conversationId },
@@ -585,6 +604,15 @@ export async function resumeAutomation(conversationId: string, workspaceId: stri
   });
 }
 
+/**
+ *
+ * @param workspaceId
+ * @param workspaceName
+ * @param contactPhone
+ * @param contactName
+ * @param serviceName
+ * @param bookingDate
+ */
 export async function sendVoiceCallReminder(
   workspaceId: string,
   workspaceName: string,
@@ -631,6 +659,15 @@ export async function sendVoiceCallReminder(
   return result;
 }
 
+/**
+ *
+ * @param workspaceId
+ * @param workspaceName
+ * @param contactPhone
+ * @param contactName
+ * @param serviceName
+ * @param bookingDate
+ */
 export async function sendVoiceCallConfirmation(
   workspaceId: string,
   workspaceName: string,
@@ -677,6 +714,14 @@ export async function sendVoiceCallConfirmation(
   return result;
 }
 
+/**
+ *
+ * @param workspaceId
+ * @param workspaceName
+ * @param contactPhone
+ * @param contactName
+ * @param serviceName
+ */
 export async function sendVoiceCallFollowUp(
   workspaceId: string,
   workspaceName: string,
@@ -721,6 +766,17 @@ export async function sendVoiceCallFollowUp(
   return result;
 }
 
+/**
+ *
+ * @param workspaceId
+ * @param trigger
+ * @param data
+ * @param data.contactPhone
+ * @param data.contactName
+ * @param data.serviceName
+ * @param data.bookingDate
+ * @param data.workspaceName
+ */
 export async function triggerVoiceAutomation(
   workspaceId: string,
   trigger: 'VOICE_REMINDER' | 'VOICE_CONFIRMATION' | 'VOICE_FOLLOW_UP',

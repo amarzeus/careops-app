@@ -3,6 +3,9 @@ import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getVapiStatus } from "@/lib/vapi";
 
+/**
+ *
+ */
 export async function GET() {
   const user = await getCurrentUser();
   if (!user?.workspaceId) {
@@ -35,6 +38,10 @@ export async function GET() {
   }
 }
 
+/**
+ *
+ * @param req
+ */
 export async function POST(req: Request) {
   const user = await getCurrentUser();
   if (!user?.workspaceId || user.role !== "OWNER") {

@@ -16,6 +16,17 @@ interface FormListProps {
   deleting: string;
 }
 
+/**
+ *
+ * @param root0
+ * @param root0.forms
+ * @param root0.type
+ * @param root0.onToggle
+ * @param root0.onDelete
+ * @param root0.copied
+ * @param root0.onCopy
+ * @param root0.deleting
+ */
 export function FormList({
   forms,
   type,

@@ -7,7 +7,10 @@ services:
     installCommand: npm ci --include=dev
     startCommand: npm start
     healthCheckPath: /
+    # CareOps listeners on port 5000 by default in scripts
     envVars:
+      - key: PORT
+        value: "5000"
       - key: NODE_VERSION
         value: "20"
       - key: DATABASE_URL

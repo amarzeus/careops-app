@@ -12,6 +12,11 @@ interface FormField {
   name: string; label: string; type: string; required: boolean;
 }
 
+/**
+ *
+ * @param root0
+ * @param root0.params
+ */
 export default function PublicContactPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
   const [form, setForm] = useState<any>(null);

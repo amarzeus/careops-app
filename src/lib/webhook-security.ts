@@ -69,6 +69,7 @@ export interface WebhookPayload {
 
 /**
  * Serialize payload for signing (ensures consistent formatting)
+ * @param payload
  */
 export function serializePayload(payload: WebhookPayload): string {
   // Use deterministic JSON stringify (sorted keys)

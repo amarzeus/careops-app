@@ -4,6 +4,7 @@ import { classifyConversationIntent } from "@/lib/gemini";
 
 /** POST /api/ai/classify
  *  Classifies the intent of an incoming message for inbox triage
+ * @param req
  */
 export async function POST(req: Request) {
     const user = await getCurrentUser();

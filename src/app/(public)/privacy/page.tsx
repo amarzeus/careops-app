@@ -2,6 +2,9 @@ import { ArrowLeft, Activity } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
+/**
+ *
+ */
 export default function PrivacyPage() {
     return (
         <div className="min-h-screen bg-white">

@@ -2,6 +2,10 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifyPassword, createToken, setAuthCookie } from "@/lib/auth";
 
+/**
+ *
+ * @param req
+ */
 export async function POST(req: Request) {
   try {
     const { email, password } = await req.json();

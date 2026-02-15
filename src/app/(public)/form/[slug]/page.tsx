@@ -123,6 +123,11 @@ function FormContent({ slug }: { slug: string }) {
   );
 }
 
+/**
+ *
+ * @param root0
+ * @param root0.params
+ */
 export default function PublicIntakeFormPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
 

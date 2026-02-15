@@ -10,6 +10,9 @@ import { InventoryList } from "@/components/inventory/inventory-list";
 import { InventoryDialog } from "@/components/inventory/inventory-dialog";
 import { InventoryItemDTO } from "@/types/dto";
 
+/**
+ *
+ */
 export default function InventoryPage() {
     const [items, setItems] = useState<InventoryItemDTO[]>([]);
     const [loading, setLoading] = useState(true);

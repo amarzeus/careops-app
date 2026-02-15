@@ -20,6 +20,14 @@ interface InventoryDialogProps {
   onSave: (data: Partial<InventoryItemDTO>) => Promise<void>;
 }
 
+/**
+ *
+ * @param root0
+ * @param root0.open
+ * @param root0.onOpenChange
+ * @param root0.item
+ * @param root0.onSave
+ */
 export function InventoryDialog({
   open,
   onOpenChange,

@@ -52,6 +52,7 @@ const GOOGLE_CALENDAR_API = "https://www.googleapis.com/calendar/v3";
 /**
  * Generate the Google Calendar OAuth URL.
  * We use a separate redirect URI from the auth callback so they don't conflict.
+ * @param workspaceId
  */
 export function getCalendarAuthURL(workspaceId: string): string {
   const rootUrl = "https://accounts.google.com/o/oauth2/v2/auth";
@@ -72,6 +73,7 @@ export function getCalendarAuthURL(workspaceId: string): string {
 
 /**
  * Exchange an authorization code for access + refresh tokens.
+ * @param code
  */
 export async function exchangeCalendarCode(
   code: string
@@ -101,6 +103,7 @@ export async function exchangeCalendarCode(
 
 /**
  * Refresh an expired access token using the refresh token.
+ * @param refreshToken
  */
 async function refreshAccessToken(
   refreshToken: string
@@ -130,6 +133,7 @@ async function refreshAccessToken(
 /**
  * Get a valid access token for a workspace, refreshing if expired.
  * Returns null if calendar is not connected.
+ * @param workspaceId
  */
 export async function getValidAccessToken(
   workspaceId: string
@@ -200,6 +204,9 @@ export async function getValidAccessToken(
 
 /**
  * Make an authenticated request to the Google Calendar API.
+ * @param accessToken
+ * @param path
+ * @param options
  */
 async function calendarFetch(
   accessToken: string,
@@ -220,6 +227,7 @@ async function calendarFetch(
 
 /**
  * Get the authenticated user's email from the calendar API.
+ * @param accessToken
  */
 export async function getCalendarUserEmail(
   accessToken: string
@@ -232,6 +240,7 @@ export async function getCalendarUserEmail(
 
 /**
  * List the user's calendars.
+ * @param accessToken
  */
 export async function listCalendars(
   accessToken: string
@@ -244,6 +253,9 @@ export async function listCalendars(
 
 /**
  * List events from a calendar for a specific time range.
+ * @param workspaceId
+ * @param timeMin
+ * @param timeMax
  */
 export async function listCalendarEvents(
   workspaceId: string,
@@ -292,6 +304,16 @@ export async function listCalendarEvents(
 /**
  * Create a Google Calendar event for a booking.
  * Returns the created event ID or null on failure.
+ * @param workspaceId
+ * @param event
+ * @param event.summary
+ * @param event.description
+ * @param event.location
+ * @param event.startTime
+ * @param event.endTime
+ * @param event.timezone
+ * @param event.attendeeEmail
+ * @param event.attendeeName
  */
 export async function createCalendarEvent(
   workspaceId: string,
@@ -374,6 +396,16 @@ export async function createCalendarEvent(
 
 /**
  * Update an existing Google Calendar event.
+ * @param workspaceId
+ * @param eventId
+ * @param updates
+ * @param updates.summary
+ * @param updates.description
+ * @param updates.location
+ * @param updates.startTime
+ * @param updates.endTime
+ * @param updates.timezone
+ * @param updates.status
  */
 export async function updateCalendarEvent(
   workspaceId: string,
@@ -443,6 +475,8 @@ export async function updateCalendarEvent(
 
 /**
  * Cancel (delete) a Google Calendar event.
+ * @param workspaceId
+ * @param eventId
  */
 export async function cancelCalendarEvent(
   workspaceId: string,
@@ -486,6 +520,8 @@ export async function cancelCalendarEvent(
  * Sync a booking to Google Calendar.
  * Creates an event and stores the eventId on the booking.
  * Fails gracefully — never breaks the booking flow.
+ * @param bookingId
+ * @param workspaceId
  */
 export async function syncBookingToCalendar(
   bookingId: string,
@@ -543,6 +579,8 @@ export async function syncBookingToCalendar(
 
 /**
  * Update a booking's calendar event when the booking changes.
+ * @param bookingId
+ * @param workspaceId
  */
 export async function updateBookingCalendarEvent(
   bookingId: string,
@@ -585,6 +623,8 @@ export async function updateBookingCalendarEvent(
 
 /**
  * Cancel a booking's calendar event.
+ * @param bookingId
+ * @param workspaceId
  */
 export async function cancelBookingCalendarEvent(
   bookingId: string,
@@ -622,6 +662,7 @@ export async function cancelBookingCalendarEvent(
 
 /**
  * Check if Google Calendar is connected for a workspace.
+ * @param workspaceId
  */
 export async function isCalendarConnected(
   workspaceId: string

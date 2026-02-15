@@ -15,6 +15,11 @@ interface ActionListProps {
     insights: Insight[];
 }
 
+/**
+ *
+ * @param root0
+ * @param root0.insights
+ */
 export function ActionList({ insights }: ActionListProps) {
     const router = useRouter();
 

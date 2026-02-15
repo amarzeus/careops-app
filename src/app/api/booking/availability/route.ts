@@ -3,6 +3,10 @@ import { prisma } from "@/lib/prisma";
 import { startOfDay, endOfDay, parseISO, format, addMinutes, isBefore, isAfter } from "date-fns";
 import { toUTC, fromUTC } from "@/lib/date-utils";
 
+/**
+ *
+ * @param req
+ */
 export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const serviceId = searchParams.get("serviceId");

@@ -3,6 +3,10 @@ import { prisma } from '@/lib/prisma';
 import { processVapiWebhook } from '@/lib/vapi';
 import { generateWebhookSignature } from '@/lib/webhook-security';
 
+/**
+ *
+ * @param req
+ */
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -96,6 +100,10 @@ export async function POST(req: NextRequest) {
   }
 }
 
+/**
+ *
+ * @param req
+ */
 export async function GET(req: NextRequest) {
   return NextResponse.json({
     status: 'ok',

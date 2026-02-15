@@ -8,6 +8,7 @@ import {
 /**
  * GET /api/integrations/google-calendar/callback
  * Handles the Google OAuth callback after the user grants calendar access.
+ * @param req
  */
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);

@@ -35,6 +35,9 @@ export interface VapiConfig {
   isConfigured: boolean;
 }
 
+/**
+ *
+ */
 export function isVapiConfigured(): boolean {
   return !!vapiClient;
 }
@@ -48,6 +51,10 @@ export interface OutboundCallRequest {
   metadata?: Record<string, unknown>;
 }
 
+/**
+ *
+ * @param request
+ */
 export async function initiateOutboundCall(
   request: OutboundCallRequest
 ): Promise<{ callId: string; success: boolean; error?: string }> {
@@ -78,6 +85,10 @@ export async function initiateOutboundCall(
   }
 }
 
+/**
+ *
+ * @param callId
+ */
 export async function endCall(callId: string): Promise<{ success: boolean; error?: string }> {
   if (!vapiClient) {
     return { success: false, error: 'VAPI not configured' };
@@ -95,6 +106,10 @@ export async function endCall(callId: string): Promise<{ success: boolean; error
   }
 }
 
+/**
+ *
+ * @param callId
+ */
 export async function getCallDetails(callId: string): Promise<VapiCall | null> {
   if (!vapiClient) {
     return null;
@@ -129,6 +144,10 @@ export interface VapiCallEvent {
   metadata?: Record<string, unknown>;
 }
 
+/**
+ *
+ * @param event
+ */
 export function processVapiWebhook(event: VapiCallEvent): {
   callId: string;
   status: string;
@@ -255,6 +274,9 @@ Available services: {services_list}
 Business hours: {business_hours}
 `;
 
+/**
+ *
+ */
 export async function checkVapiHealth(): Promise<{
   healthy: boolean;
   configured: boolean;
@@ -287,6 +309,9 @@ export async function checkVapiHealth(): Promise<{
   }
 }
 
+/**
+ *
+ */
 export function getVapiStatus(): {
   configured: boolean;
   apiKeyPresent: boolean;

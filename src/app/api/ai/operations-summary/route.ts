@@ -4,6 +4,9 @@ import { prisma } from "@/lib/prisma";
 import { generateOperationsSummary } from "@/lib/gemini";
 import { startOfDay, endOfDay } from "date-fns";
 
+/**
+ *
+ */
 export async function GET() {
   const user = await getCurrentUser();
   if (!user || !user.workspaceId) {

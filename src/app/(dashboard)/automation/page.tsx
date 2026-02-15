@@ -17,6 +17,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
+/**
+ *
+ */
 export default function AutomationPage() {
   const [rules, setRules] = useState<AutomationRuleDTO[]>([]);
   const [loading, setLoading] = useState(true);

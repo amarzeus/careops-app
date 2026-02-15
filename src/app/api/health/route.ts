@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { isVapiConfigured } from '@/lib/vapi';
 
+/**
+ *
+ */
 export async function GET() {
   const checks = {
     status: 'healthy',

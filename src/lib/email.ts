@@ -44,6 +44,10 @@ async function logIntegration(type: string, status: string, to: string, message:
   }
 }
 
+/**
+ *
+ * @param options
+ */
 export async function sendEmail(options: EmailOptions): Promise<boolean> {
   console.log(`Preparing to send email to: ${options.to}`);
 
@@ -118,6 +122,13 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
   return false;
 }
 
+/**
+ *
+ * @param title
+ * @param content
+ * @param buttonText
+ * @param buttonUrl
+ */
 export function buildEmailTemplate(
   title: string,
   content: string,

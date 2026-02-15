@@ -33,6 +33,13 @@ interface BookingListProps {
   onEdit: (booking: BookingWithRelations) => void;
 }
 
+/**
+ *
+ * @param root0
+ * @param root0.bookings
+ * @param root0.onStatusUpdate
+ * @param root0.onEdit
+ */
 export function BookingList({ bookings, onStatusUpdate, onEdit }: BookingListProps) {
   if (bookings.length === 0) {
     return (

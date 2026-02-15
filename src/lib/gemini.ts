@@ -40,6 +40,11 @@ function parseJSON<T>(text: string, fallback: T): T {
 // 1. Welcome Message Generation
 // ──────────────────────────────────────────────
 
+/**
+ *
+ * @param businessName
+ * @param contactName
+ */
 export async function generateWelcomeMessage(businessName: string, contactName: string): Promise<string> {
   try {
     return await callGemini(
@@ -54,6 +59,14 @@ export async function generateWelcomeMessage(businessName: string, contactName: 
 // 2. Booking Confirmation
 // ──────────────────────────────────────────────
 
+/**
+ *
+ * @param businessName
+ * @param contactName
+ * @param serviceName
+ * @param dateTime
+ * @param location
+ */
 export async function generateBookingConfirmation(
   businessName: string,
   contactName: string,
@@ -74,6 +87,12 @@ export async function generateBookingConfirmation(
 // 3. Smart Reply V2 (Context-Aware)
 // ──────────────────────────────────────────────
 
+/**
+ *
+ * @param businessName
+ * @param conversationHistory
+ * @param lastMessage
+ */
 export async function generateSmartReply(
   businessName: string,
   conversationHistory: string,
@@ -112,6 +131,16 @@ RULES:
 // 4. Dashboard Insights (Enhanced)
 // ──────────────────────────────────────────────
 
+/**
+ *
+ * @param data
+ * @param data.totalBookings
+ * @param data.completedBookings
+ * @param data.newContacts
+ * @param data.pendingForms
+ * @param data.lowStockItems
+ * @param data.unreadMessages
+ */
 export async function generateDashboardInsights(data: {
   totalBookings: number;
   completedBookings: number;
@@ -163,6 +192,11 @@ Return ONLY a JSON array of objects with: "priority" ("high"/"medium"/"low"), "c
 // 5. Message Refinement
 // ──────────────────────────────────────────────
 
+/**
+ *
+ * @param content
+ * @param tone
+ */
 export async function refineMessage(content: string, tone: string = "professional"): Promise<string> {
   try {
     return await callGemini(
@@ -177,6 +211,10 @@ export async function refineMessage(content: string, tone: string = "professiona
 // 6. Inventory Forecast
 // ──────────────────────────────────────────────
 
+/**
+ *
+ * @param items
+ */
 export async function generateInventoryForecast(
   items: Array<{ name: string; quantity: number; threshold: number; unit: string }>
 ): Promise<Array<{ name: string; daysRemaining: number | string; confidence: string }>> {
@@ -206,6 +244,18 @@ Return ONLY a JSON array of objects with: "name" (string), "daysRemaining" (numb
 // 7. Operations Summary (NEW - SOTA Feature)
 // ──────────────────────────────────────────────
 
+/**
+ *
+ * @param data
+ * @param data.bookingsToday
+ * @param data.bookingsCompleted
+ * @param data.bookingsNoShow
+ * @param data.newContacts
+ * @param data.unansweredMessages
+ * @param data.pendingForms
+ * @param data.lowStockItems
+ * @param data.businessName
+ */
 export async function generateOperationsSummary(data: {
   bookingsToday: number;
   bookingsCompleted: number;
@@ -240,6 +290,15 @@ Return only the summary text.`
 // 8. AI Message Composer (NEW - SOTA Feature)
 // ──────────────────────────────────────────────
 
+/**
+ *
+ * @param intent
+ * @param context
+ * @param context.businessName
+ * @param context.contactName
+ * @param context.serviceName
+ * @param context.dateTime
+ */
 export async function composeMessage(
   intent: string,
   context: {
@@ -333,6 +392,13 @@ function sanitizeGeminiHistory(
   }));
 }
 
+/**
+ *
+ * @param userMessage
+ * @param currentStep
+ * @param businessInfo
+ * @param conversationHistory
+ */
 export async function aiOnboardingAssistant(
   userMessage: string,
   currentStep: number,
@@ -438,6 +504,11 @@ export interface ConversationIntent {
   priority: "high" | "medium" | "low";
 }
 
+/**
+ *
+ * @param messageContent
+ * @param conversationHistory
+ */
 export async function classifyConversationIntent(
   messageContent: string,
   conversationHistory?: string[]
@@ -482,6 +553,22 @@ export interface OperationsAnomaly {
   actualValue: string;
 }
 
+/**
+ *
+ * @param metrics
+ * @param metrics.bookingsThisWeek
+ * @param metrics.bookingsLastWeek
+ * @param metrics.noShowRate
+ * @param metrics.averageNoShowRate
+ * @param metrics.newContactsThisWeek
+ * @param metrics.newContactsLastWeek
+ * @param metrics.pendingForms
+ * @param metrics.overdueForms
+ * @param metrics.lowStockItems
+ * @param metrics.totalItems
+ * @param metrics.unansweredMessages
+ * @param metrics.avgResponseTimeHours
+ */
 export async function analyzeOperationsAnomalies(metrics: {
   bookingsThisWeek: number;
   bookingsLastWeek: number;
@@ -536,6 +623,20 @@ export interface ContactScore {
   nextBestAction: string;
 }
 
+/**
+ *
+ * @param contactData
+ * @param contactData.name
+ * @param contactData.totalBookings
+ * @param contactData.completedBookings
+ * @param contactData.noShows
+ * @param contactData.cancelledBookings
+ * @param contactData.totalMessages
+ * @param contactData.formsCompleted
+ * @param contactData.formsPending
+ * @param contactData.daysSinceLastBooking
+ * @param contactData.daysSinceFirstContact
+ */
 export async function scoreContact(contactData: {
   name: string;
   totalBookings: number;

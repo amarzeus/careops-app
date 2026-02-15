@@ -339,6 +339,9 @@ function SettingsContent() {
   );
 }
 
+/**
+ *
+ */
 export default function SettingsPage() {
   return (
     <Suspense fallback={<div className="p-8">Loading settings...</div>}>

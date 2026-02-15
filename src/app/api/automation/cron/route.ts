@@ -14,6 +14,7 @@ import { processWebhookRetries } from "@/lib/webhook-retry";
  *
  *  Should be called by an external cron service (e.g., every 5 minutes for webhooks, every hour for others).
  *  Secured by CRON_SECRET header.
+ * @param req
  */
 export async function GET(req: Request) {
     // Simple security: verify cron secret

@@ -2,6 +2,12 @@ import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
+/**
+ *
+ * @param req
+ * @param root0
+ * @param root0.params
+ */
 export async function PUT(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -32,6 +38,12 @@ export async function PUT(
   return NextResponse.json({ rule });
 }
 
+/**
+ *
+ * @param req
+ * @param root0
+ * @param root0.params
+ */
 export async function DELETE(
   req: Request,
   { params }: { params: Promise<{ id: string }> }

@@ -95,6 +95,9 @@ interface DashboardData {
   }>;
 }
 
+/**
+ *
+ */
 export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);

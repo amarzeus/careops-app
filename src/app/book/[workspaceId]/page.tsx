@@ -29,6 +29,9 @@ interface Workspace {
     services: Service[];
 }
 
+/**
+ *
+ */
 export default function BookingPage() {
     const params = useParams();
     const workspaceId = params.workspaceId as string;

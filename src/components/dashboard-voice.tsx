@@ -11,6 +11,9 @@ interface ChatMsg {
   content: string;
 }
 
+/**
+ *
+ */
 export function DashboardVoice() {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);

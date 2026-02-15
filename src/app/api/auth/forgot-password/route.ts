@@ -4,6 +4,10 @@ import { hashPassword } from "@/lib/auth";
 import { sendEmail, buildEmailTemplate } from "@/lib/email";
 import { v4 as uuidv4 } from "uuid";
 
+/**
+ *
+ * @param req
+ */
 export async function POST(req: Request) {
   try {
     const { email } = await req.json();

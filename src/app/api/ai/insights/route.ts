@@ -3,6 +3,9 @@ import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { generateDashboardInsights } from "@/lib/gemini";
 
+/**
+ *
+ */
 export async function GET() {
   const user = await getCurrentUser();
   if (!user || !user.workspaceId)

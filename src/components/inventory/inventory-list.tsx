@@ -29,6 +29,17 @@ interface InventoryListProps {
   deletingId: string | null;
 }
 
+/**
+ *
+ * @param root0
+ * @param root0.items
+ * @param root0.forecast
+ * @param root0.onUpdateQuantity
+ * @param root0.onDelete
+ * @param root0.onEdit
+ * @param root0.onNotifyVendor
+ * @param root0.deletingId
+ */
 export function InventoryList({
   items,
   forecast,

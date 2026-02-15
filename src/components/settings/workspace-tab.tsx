@@ -47,6 +47,19 @@ const workspaceStatusConfig: Record<
   },
 };
 
+/**
+ *
+ * @param root0
+ * @param root0.workspace
+ * @param root0.onUpdate
+ * @param root0.onSave
+ * @param root0.saving
+ * @param root0.saved
+ * @param root0.copyToClipboard
+ * @param root0.copied
+ * @param root0.bookingUrl
+ * @param root0.contactFormUrl
+ */
 export function WorkspaceTab({
   workspace,
   onUpdate,

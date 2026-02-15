@@ -7,6 +7,12 @@ interface RouteParams {
   params: Promise<{ id: string }>;
 }
 
+/**
+ *
+ * @param req
+ * @param root0
+ * @param root0.params
+ */
 export async function GET(req: NextRequest, { params }: RouteParams) {
   try {
     const user = await getCurrentUser();
@@ -48,6 +54,12 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
   }
 }
 
+/**
+ *
+ * @param req
+ * @param root0
+ * @param root0.params
+ */
 export async function POST(req: NextRequest, { params }: RouteParams) {
   try {
     const user = await getCurrentUser();

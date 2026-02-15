@@ -53,6 +53,14 @@ const triggerDescriptions: Record<string, string> = {
   STAFF_REPLY: "Fires when a staff member manually replies, pausing automation",
 };
 
+/**
+ *
+ * @param root0
+ * @param root0.open
+ * @param root0.onOpenChange
+ * @param root0.rule
+ * @param root0.onSave
+ */
 export function RuleDialog({
   open,
   onOpenChange,

@@ -24,6 +24,17 @@ interface ProfileTabProps {
   error?: string | null;
 }
 
+/**
+ *
+ * @param root0
+ * @param root0.user
+ * @param root0.onUpdate
+ * @param root0.onSave
+ * @param root0.saving
+ * @param root0.saved
+ * @param root0.loading
+ * @param root0.error
+ */
 export function ProfileTab({
   user,
   onUpdate,

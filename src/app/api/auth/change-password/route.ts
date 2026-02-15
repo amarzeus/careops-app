@@ -2,6 +2,10 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser, hashPassword, verifyPassword } from "@/lib/auth";
 
+/**
+ *
+ * @param req
+ */
 export async function POST(req: Request) {
     try {
         const user = await getCurrentUser();

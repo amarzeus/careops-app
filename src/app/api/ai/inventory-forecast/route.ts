@@ -3,6 +3,10 @@ import { getCurrentUser } from "@/lib/auth";
 import { generateInventoryForecast } from "@/lib/gemini";
 import { prisma } from "@/lib/prisma";
 
+/**
+ *
+ * @param req
+ */
 export async function POST(req: Request) {
     const user = await getCurrentUser();
     if (!user || !user.workspaceId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

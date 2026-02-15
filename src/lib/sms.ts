@@ -18,6 +18,10 @@ interface SMSOptions {
   workspaceId?: string;
 }
 
+/**
+ *
+ * @param options
+ */
 export async function sendSMS(options: SMSOptions): Promise<boolean> {
   const result: TwilioResult = await twilioSendSMS(options.to, options.body);
 
@@ -75,6 +79,10 @@ export async function sendSMS(options: SMSOptions): Promise<boolean> {
   return result.success;
 }
 
+/**
+ *
+ * @param otp
+ */
 export function buildOTPMessage(otp: string): string {
   return `Your CareOps verification code is: ${otp}. It expires in 15 minutes. Do not share this code.`;
 }

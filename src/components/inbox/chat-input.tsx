@@ -22,6 +22,17 @@ const channelConfig: Record<SendChannel, { icon: typeof Mail; label: string; col
   sms: { icon: Smartphone, label: "SMS", color: "text-blue-600" },
 };
 
+/**
+ *
+ * @param root0
+ * @param root0.inputText
+ * @param root0.setInputText
+ * @param root0.onSend
+ * @param root0.sending
+ * @param root0.disabled
+ * @param root0.contactHasPhone
+ * @param root0.contactHasEmail
+ */
 export function ChatInput({
   inputText,
   setInputText,

@@ -45,6 +45,14 @@ interface InviteStaffDialogProps {
     initialData?: StaffMemberDTO; // For editing in future
 }
 
+/**
+ *
+ * @param root0
+ * @param root0.open
+ * @param root0.onOpenChange
+ * @param root0.onSubmit
+ * @param root0.initialData
+ */
 export function InviteStaffDialog({
     open,
     onOpenChange,

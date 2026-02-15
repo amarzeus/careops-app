@@ -25,6 +25,19 @@ interface IntegrationsTabProps {
   disconnectingCalendar: boolean;
 }
 
+/**
+ *
+ * @param root0
+ * @param root0.workspace
+ * @param root0.onTestEmail
+ * @param root0.onTestSms
+ * @param root0.onConnectCalendar
+ * @param root0.onDisconnectCalendar
+ * @param root0.testingEmail
+ * @param root0.testingSms
+ * @param root0.connectingCalendar
+ * @param root0.disconnectingCalendar
+ */
 export function IntegrationsTab({
   workspace,
   onTestEmail,

@@ -3,6 +3,10 @@ import { prisma } from "@/lib/prisma";
 import { triggerAutomation } from "@/lib/automation";
 import { checkRateLimit, RATE_LIMITS, getClientIP } from "@/lib/rate-limiter";
 
+/**
+ *
+ * @param req
+ */
 export async function POST(req: Request) {
   try {
     // Rate limiting check

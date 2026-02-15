@@ -29,6 +29,9 @@ interface Webhook {
   createdAt: string;
 }
 
+/**
+ *
+ */
 export function WebhooksSection() {
   const [webhooks, setWebhooks] = useState<Webhook[]>([]);
   const [loading, setLoading] = useState(true);

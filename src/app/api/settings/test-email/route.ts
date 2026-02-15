@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import nodemailer from "nodemailer";
 
+/**
+ *
+ */
 export async function POST() {
   const user = await getCurrentUser();
   if (!user || !user.workspaceId)

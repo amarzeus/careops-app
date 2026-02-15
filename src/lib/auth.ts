@@ -14,6 +14,7 @@ const SECRET = JWT_SECRET || "dev-only-careops-secret-change-me";
 /**
  * Cryptographically-secure token encoding using HMAC-SHA256.
  * Format: base64url(payload).hmac_signature
+ * @param payload
  */
 function encodeToken(payload: Record<string, unknown>): string {
   const data = JSON.stringify({ ...payload, exp: Date.now() + 7 * 24 * 60 * 60 * 1000 });
@@ -45,18 +46,37 @@ function decodeToken(token: string): Record<string, unknown> | null {
   }
 }
 
+/**
+ *
+ * @param password
+ */
 export async function hashPassword(password: string): Promise<string> {
   return bcrypt.hash(password, 12);
 }
 
+/**
+ *
+ * @param password
+ * @param hash
+ */
 export async function verifyPassword(password: string, hash: string): Promise<boolean> {
   return bcrypt.compare(password, hash);
 }
 
+/**
+ *
+ * @param userId
+ * @param workspaceId
+ * @param role
+ */
 export function createToken(userId: string, workspaceId: string | null, role: string): string {
   return encodeToken({ userId, workspaceId, role });
 }
 
+/**
+ *
+ * @param token
+ */
 export async function setAuthCookie(token: string) {
   const cookieStore = await cookies();
   cookieStore.set("auth-token", token, {
@@ -68,16 +88,25 @@ export async function setAuthCookie(token: string) {
   });
 }
 
+/**
+ *
+ */
 export async function getAuthCookie(): Promise<string | null> {
   const cookieStore = await cookies();
   return cookieStore.get("auth-token")?.value || null;
 }
 
+/**
+ *
+ */
 export async function removeAuthCookie() {
   const cookieStore = await cookies();
   cookieStore.delete("auth-token");
 }
 
+/**
+ *
+ */
 export async function getCurrentUser() {
   const token = await getAuthCookie();
   if (!token) return null;
@@ -93,6 +122,10 @@ export async function getCurrentUser() {
   return user;
 }
 
+/**
+ *
+ * @param token
+ */
 export function verifyToken(token: string) {
   return decodeToken(token);
 }

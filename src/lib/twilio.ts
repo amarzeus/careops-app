@@ -77,6 +77,11 @@ function validatePhoneNumber(phone: string): { valid: boolean; formatted: string
     return { valid: true, formatted: phone.startsWith("+") ? phone : `+${digits}` };
 }
 
+/**
+ *
+ * @param to
+ * @param body
+ */
 export async function sendSMS(to: string, body: string): Promise<TwilioResult> {
     if (!client || !fromNumber) {
         console.warn("[Twilio:sendSMS] Twilio not configured");
@@ -139,6 +144,11 @@ export async function sendSMS(to: string, body: string): Promise<TwilioResult> {
     };
 }
 
+/**
+ *
+ * @param to
+ * @param body
+ */
 export async function sendWhatsApp(to: string, body: string): Promise<TwilioResult> {
     if (!client || !fromNumber) {
         console.warn("[Twilio:sendWhatsApp] Twilio not configured");
@@ -204,20 +214,36 @@ export async function sendWhatsApp(to: string, body: string): Promise<TwilioResu
     };
 }
 
+/**
+ *
+ * @param phone
+ * @param otp
+ */
 export async function sendOTP(phone: string, otp: string): Promise<TwilioResult> {
     const body = `Your CareOps verification code is: ${otp}. It expires in 15 minutes.`;
     return sendSMS(phone, body);
 }
 
+/**
+ *
+ * @param phone
+ * @param otp
+ */
 export async function sendWhatsAppOTP(phone: string, otp: string): Promise<TwilioResult> {
     const body = `Your CareOps verification code is: *${otp}*\n\nThis code expires in 15 minutes.`;
     return sendWhatsApp(phone, body);
 }
 
+/**
+ *
+ */
 export function isConfigured(): boolean {
     return !!(accountSid && authToken && fromNumber);
 }
 
+/**
+ *
+ */
 export async function checkTwilioHealth(): Promise<{ healthy: boolean; balance?: any; error?: string }> {
     if (!isConfigured()) {
         return { healthy: false, error: "Twilio not configured" };

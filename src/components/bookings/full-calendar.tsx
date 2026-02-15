@@ -60,6 +60,14 @@ const STATUS_STYLES: Record<string, string> = {
 const HOUR_HEIGHT = 48; // Compact B2B scale (h-12 equivalent)
 const CALENDAR_LEFT_PADDING = 48; // Width of the time gutter
 
+/**
+ *
+ * @param root0
+ * @param root0.bookings
+ * @param root0.externalEvents
+ * @param root0.onEdit
+ * @param root0.onNewBooking
+ */
 export function FullCalendar({ bookings, externalEvents = [], onEdit, onNewBooking }: FullCalendarProps) {
   const [view, setView] = useState<ViewMode>("week");
   const [currentDate, setCurrentDate] = useState(new Date());

@@ -30,6 +30,11 @@ interface AIPreferencesTabProps {
   onSelectTab?: (tab: string) => void;
 }
 
+/**
+ *
+ * @param root0
+ * @param root0.onSelectTab
+ */
 export function AIPreferencesTab({ onSelectTab }: AIPreferencesTabProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

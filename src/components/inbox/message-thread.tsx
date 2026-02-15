@@ -13,6 +13,13 @@ interface MessageThreadProps {
   contactName: string;
 }
 
+/**
+ *
+ * @param root0
+ * @param root0.messages
+ * @param root0.loading
+ * @param root0.contactName
+ */
 export function MessageThread({ messages, loading, contactName }: MessageThreadProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
 

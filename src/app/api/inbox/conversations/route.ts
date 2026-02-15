@@ -3,6 +3,10 @@ import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { classifyConversationIntent } from "@/lib/gemini";
 
+/**
+ *
+ * @param req
+ */
 export async function GET(req: Request) {
     const user = await getCurrentUser();
     if (!user?.workspaceId) {

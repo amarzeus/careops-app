@@ -20,6 +20,15 @@ interface SubmissionDetailDialogProps {
   onResend: (id: string) => void;
 }
 
+/**
+ *
+ * @param root0
+ * @param root0.open
+ * @param root0.onOpenChange
+ * @param root0.submission
+ * @param root0.onUpdateStatus
+ * @param root0.onResend
+ */
 export function SubmissionDetailDialog({
   open,
   onOpenChange,

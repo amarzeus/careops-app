@@ -2,6 +2,10 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { hashPassword, createToken, setAuthCookie } from "@/lib/auth";
 
+/**
+ *
+ * @param req
+ */
 export async function POST(req: Request) {
   try {
     const { email, password, name } = await req.json();
@@ -57,10 +61,16 @@ export async function POST(req: Request) {
       message: "Registration successful. Please check your email for the verification code.",
       userId: user.id
     });
-  } catch (error) {
-    console.error("Register error:", error);
+  } catch (error: any) {
+    console.error("[Register API] Critical failure:", error);
+
+    // Check for Prisma/Database connection errors
+    if (error.code?.startsWith('P') || error.message?.includes('prisma') || error.message?.includes('database')) {
+      return NextResponse.json({ error: "Database connection error. Please verify your DATABASE_URL." }, { status: 500 });
+    }
+
     return NextResponse.json(
-      { error: "Registration failed" },
+      { error: "Registration failed: " + (error.message || "Unknown error") },
       { status: 500 }
     );
   }

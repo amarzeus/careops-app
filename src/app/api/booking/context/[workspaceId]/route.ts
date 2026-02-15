@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+/**
+ *
+ * @param req
+ * @param root0
+ * @param root0.params
+ */
 export async function GET(req: Request, { params }: { params: Promise<{ workspaceId: string }> }) {
     const { workspaceId } = await params;
     try {

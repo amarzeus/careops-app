@@ -11,6 +11,7 @@ import { addHours, startOfDay, endOfDay, addDays } from "date-fns";
  * 
  * Should be called periodically (e.g., every hour via cron).
  * Verifiable via: GET /api/automation/scheduler
+ * @param req
  */
 export async function GET(req: Request) {
   try {

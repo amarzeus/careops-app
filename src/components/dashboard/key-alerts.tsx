@@ -25,6 +25,11 @@ const priorityConfig = {
   low: { bg: "bg-gray-50 border-gray-200", dot: "bg-gray-400", text: "text-gray-600" },
 };
 
+/**
+ *
+ * @param root0
+ * @param root0.alerts
+ */
 export function KeyAlerts({ alerts }: KeyAlertsProps) {
   const router = useRouter();
 

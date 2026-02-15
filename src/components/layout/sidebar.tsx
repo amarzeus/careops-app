@@ -33,6 +33,13 @@ interface SidebarProps {
   workspaceName?: string;
 }
 
+/**
+ *
+ * @param root0
+ * @param root0.userName
+ * @param root0.userRole
+ * @param root0.workspaceName
+ */
 export function Sidebar({ userName, userRole, workspaceName }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();

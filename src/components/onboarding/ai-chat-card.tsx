@@ -30,6 +30,18 @@ interface AIChatCardProps {
   onVoiceTranscript: (text: string) => Promise<string>;
 }
 
+/**
+ *
+ * @param root0
+ * @param root0.chatMessages
+ * @param root0.chatLoading
+ * @param root0.chatInput
+ * @param root0.setChatInput
+ * @param root0.onSendMessage
+ * @param root0.voiceMode
+ * @param root0.setVoiceMode
+ * @param root0.onVoiceTranscript
+ */
 export function AIChatCard({
   chatMessages,
   chatLoading,

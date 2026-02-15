@@ -44,6 +44,11 @@ export async function sendOTPViaWhatsApp(
 
 /**
  * Send a booking confirmation via WhatsApp.
+ * @param phone
+ * @param customerName
+ * @param serviceName
+ * @param dateTime
+ * @param businessName
  */
 export async function sendBookingConfirmation(
   phone: string,
@@ -58,6 +63,10 @@ export async function sendBookingConfirmation(
 
 /**
  * Send a booking reminder via WhatsApp.
+ * @param phone
+ * @param customerName
+ * @param serviceName
+ * @param dateTime
  */
 export async function sendBookingReminder(
   phone: string,
@@ -71,6 +80,10 @@ export async function sendBookingReminder(
 
 /**
  * Send a form completion request via WhatsApp.
+ * @param phone
+ * @param customerName
+ * @param formName
+ * @param formUrl
  */
 export async function sendFormRequest(
   phone: string,
@@ -84,6 +97,9 @@ export async function sendFormRequest(
 
 /**
  * Send a welcome message via WhatsApp.
+ * @param phone
+ * @param customerName
+ * @param businessName
  */
 export async function sendWelcomeMessage(
   phone: string,
@@ -96,6 +112,8 @@ export async function sendWelcomeMessage(
 
 /**
  * Send a generic text message via WhatsApp (within 24hr session window).
+ * @param phone
+ * @param message
  */
 export async function sendTextMessage(
   phone: string,
@@ -116,6 +134,7 @@ export function isAvailable(): boolean {
 
 /**
  * Build a WhatsApp OTP message for fallback/logging purposes.
+ * @param otp
  */
 export function buildOTPMessage(otp: string): string {
   return `Your CareOps verification code is: *${otp}*\n\nThis code expires in 15 minutes. Do not share this code with anyone.`;

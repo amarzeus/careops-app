@@ -19,6 +19,11 @@ export type CalendarProps = {
 /**
  * Optimized Calendar component for CareOps.
  * Fixes misalignment by using a unified 7-column grid for both headers and days.
+ * @param root0
+ * @param root0.className
+ * @param root0.selected
+ * @param root0.onSelect
+ * @param root0.disabled
  */
 function Calendar({
     className,

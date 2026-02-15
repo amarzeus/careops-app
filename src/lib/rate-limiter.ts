@@ -97,6 +97,7 @@ export const RATE_LIMITS = {
 /**
  * Get client IP from request
  * Note: In production, handle X-Forwarded-For headers properly
+ * @param req
  */
 export function getClientIP(req: Request): string {
   // Try to get IP from various headers

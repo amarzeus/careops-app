@@ -48,6 +48,13 @@ function getRelativeTime(dateStr: string): string {
   return date.toLocaleDateString();
 }
 
+/**
+ *
+ * @param root0
+ * @param root0.title
+ * @param root0.subtitle
+ * @param root0.children
+ */
 export function Header({ title, subtitle, children }: HeaderProps) {
   const router = useRouter();
   const [searchOpen, setSearchOpen] = useState(false);

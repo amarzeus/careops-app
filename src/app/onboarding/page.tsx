@@ -35,6 +35,9 @@ const steps = [
   { id: 8, title: "Activation", description: "Review and go live", icon: Rocket },
 ];
 
+/**
+ *
+ */
 export default function OnboardingPage() {
   const router = useRouter();
 

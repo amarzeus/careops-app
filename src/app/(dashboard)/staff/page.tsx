@@ -9,6 +9,9 @@ import { StaffList } from "@/components/staff/staff-list";
 import { InviteStaffDialog } from "@/components/staff/invite-staff-dialog";
 import { StaffMemberDTO } from "@/types/dto";
 
+/**
+ *
+ */
 export default function StaffPage() {
     const [staff, setStaff] = useState<StaffMemberDTO[]>([]);
     const [loading, setLoading] = useState(true);

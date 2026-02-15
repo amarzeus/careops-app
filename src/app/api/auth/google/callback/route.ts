@@ -3,6 +3,10 @@ import { prisma } from "@/lib/prisma";
 import { createToken, setAuthCookie } from "@/lib/auth";
 import { getGoogleTokens, getGoogleUser } from "@/lib/google";
 
+/**
+ *
+ * @param req
+ */
 export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const code = searchParams.get("code");

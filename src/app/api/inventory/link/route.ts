@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
+/**
+ *
+ */
 export async function GET() {
   const user = await getCurrentUser();
   if (!user || !user.workspaceId)
@@ -20,6 +23,10 @@ export async function GET() {
   return NextResponse.json({ links });
 }
 
+/**
+ *
+ * @param req
+ */
 export async function POST(req: Request) {
   const user = await getCurrentUser();
   if (!user || !user.workspaceId)
@@ -63,6 +70,10 @@ export async function POST(req: Request) {
   return NextResponse.json({ link }, { status: 201 });
 }
 
+/**
+ *
+ * @param req
+ */
 export async function DELETE(req: Request) {
   const user = await getCurrentUser();
   if (!user || !user.workspaceId)

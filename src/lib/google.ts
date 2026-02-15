@@ -1,3 +1,6 @@
+/**
+ *
+ */
 export function getGoogleAuthURL(): string {
     const rootUrl = "https://accounts.google.com/o/oauth2/v2/auth";
     const options = {
@@ -16,6 +19,10 @@ export function getGoogleAuthURL(): string {
     return `${rootUrl}?${qs.toString()}`;
 }
 
+/**
+ *
+ * @param code
+ */
 export async function getGoogleTokens(code: string) {
     const url = "https://oauth2.googleapis.com/token";
     const values = {
@@ -27,7 +34,7 @@ export async function getGoogleTokens(code: string) {
     };
 
     console.log("[Google Tokens] Requesting tokens with redirect_uri:", values.redirect_uri);
-    
+
     const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -42,14 +49,23 @@ export async function getGoogleTokens(code: string) {
     return res.json();
 }
 
+/**
+ *
+ * @param id_token
+ * @param access_token
+ */
 export async function getGoogleUser(id_token: string, access_token: string) {
     const res = await fetch(
-        `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${access_token}`,
+        `https://www.googleapis.com/oauth2/v1/userinfo?alt=json`,
         {
-            headers: { Authorization: `Bearer ${id_token}` },
+            headers: { Authorization: `Bearer ${access_token}` },
         }
     );
 
-    if (!res.ok) throw new Error("Failed to fetch Google user");
+    if (!res.ok) {
+        const errorText = await res.text();
+        console.error("[Google User Info] Failed:", res.status, errorText);
+        throw new Error(`Failed to fetch Google user: ${res.status} - ${errorText}`);
+    }
     return res.json();
 }

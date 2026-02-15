@@ -4,6 +4,10 @@ import { generateOTP, storeOTP } from "@/lib/otp";
 import { isConfigured as isTwilioConfigured, sendOTP as twilioSendOTP } from "@/lib/twilio";
 import { sendSMS, buildOTPMessage } from "@/lib/sms";
 
+/**
+ *
+ * @param req
+ */
 export async function POST(req: Request) {
   try {
     const { email, phone } = await req.json();

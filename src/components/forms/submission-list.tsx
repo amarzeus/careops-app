@@ -13,6 +13,14 @@ interface SubmissionListProps {
   onResend: (id: string) => void;
 }
 
+/**
+ *
+ * @param root0
+ * @param root0.submissions
+ * @param root0.onSelect
+ * @param root0.onUpdateStatus
+ * @param root0.onResend
+ */
 export function SubmissionList({
   submissions,
   onSelect,

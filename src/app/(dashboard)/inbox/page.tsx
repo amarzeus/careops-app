@@ -12,6 +12,9 @@ import { MessageThread } from "@/components/inbox/message-thread";
 import { ChatInput } from "@/components/inbox/chat-input";
 import { toast } from "@/hooks/use-toast";
 
+/**
+ *
+ */
 export default function InboxPage() {
   const [conversations, setConversations] = useState<ConversationDTO[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);

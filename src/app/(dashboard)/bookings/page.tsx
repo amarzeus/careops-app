@@ -25,6 +25,9 @@ interface BookingWithRelations extends Booking {
   service: Service;
 }
 
+/**
+ *
+ */
 export default function BookingsPage() {
   const [bookings, setBookings] = useState<BookingWithRelations[]>([]);
   const [contacts, setContacts] = useState<Contact[]>([]);

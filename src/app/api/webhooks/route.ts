@@ -4,6 +4,9 @@ import { prisma } from "@/lib/prisma";
 import { AutomationTrigger } from "@/lib/automation";
 import { generateWebhookSecret } from "@/lib/webhook-security";
 
+/**
+ *
+ */
 export async function GET() {
   const user = await getCurrentUser();
   if (!user || user.role !== "OWNER" || !user.workspaceId) {
@@ -24,6 +27,10 @@ export async function GET() {
   return NextResponse.json({ webhooks });
 }
 
+/**
+ *
+ * @param req
+ */
 export async function POST(req: Request) {
   const user = await getCurrentUser();
   if (!user || user.role !== "OWNER" || !user.workspaceId) {

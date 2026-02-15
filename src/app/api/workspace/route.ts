@@ -26,6 +26,9 @@ function isSMSConfigured(): boolean {
   );
 }
 
+/**
+ *
+ */
 export async function GET() {
   const user = await getCurrentUser();
   if (!user || !user.workspaceId)
@@ -57,6 +60,10 @@ export async function GET() {
   return NextResponse.json({ workspace: workspaceWithConfig });
 }
 
+/**
+ *
+ * @param req
+ */
 export async function PUT(req: Request) {
   const user = await getCurrentUser();
   if (!user || !user.workspaceId)

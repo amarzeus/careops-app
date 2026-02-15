@@ -3,6 +3,9 @@ import { getCurrentUser } from "@/lib/auth";
 import { sendWhatsApp } from "@/lib/twilio";
 import { isAvailable as isWhatsAppAvailable } from "@/lib/whatsapp";
 
+/**
+ *
+ */
 export async function POST() {
   const user = await getCurrentUser();
   if (!user || !user.workspaceId)

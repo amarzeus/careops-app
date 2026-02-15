@@ -105,6 +105,17 @@ function getRelativeTime(dateStr: string): string {
   return date.toLocaleDateString();
 }
 
+/**
+ *
+ * @param root0
+ * @param root0.rules
+ * @param root0.onToggle
+ * @param root0.onDelete
+ * @param root0.onEdit
+ * @param root0.onTest
+ * @param root0.deletingId
+ * @param root0.testingId
+ */
 export function RuleList({
   rules,
   onToggle,
