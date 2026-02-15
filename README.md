@@ -13,7 +13,7 @@
 
 CareOps is not just a dashboard; it's a **unified intelligence layer** for service businesses. By consolidating the entire operational lifecycle—from first contact to final intake—CareOps eliminates tool-chaos and replaces it with **automated clarity**.
 
-![CareOps Futuristic Dashboard](file:///home/amar/.gemini/antigravity/brain/e6c1cd03-e4c2-436d-b674-3b2bfe6e8ca2/careops_3d_mockup_dashboard_1771137955921.png)
+![CareOps Futuristic Dashboard](public/images/dashboard-mockup.png)
 
 ---
 
@@ -21,7 +21,7 @@ CareOps is not just a dashboard; it's a **unified intelligence layer** for servi
 
 CareOps is built on a strict, event-driven architecture that ensures no lead is ever dropped and no booking goes unconfirmed.
 
-![CareOps Onboarding Process](file:///home/amar/.gemini/antigravity/brain/e6c1cd03-e4c2-436d-b674-3b2bfe6e8ca2/careops_3d_onboarding_process_1771137971496.png)
+![CareOps Onboarding Process](public/images/onboarding-process.png)
 
 ```mermaid
 sequenceDiagram
@@ -47,7 +47,7 @@ sequenceDiagram
 
 CareOps leverages industrial-grade providers to power its communication and intelligence layers. Every integration is **abstracted**, **fail-safe**, and **event-driven**.
 
-![CareOps Integration Ecosystem](file:///home/amar/.gemini/antigravity/brain/e6c1cd03-e4c2-436d-b674-3b2bfe6e8ca2/careops_3d_integration_ecosystem_1771137987361.png)
+![CareOps Integration Ecosystem](public/images/integration-ecosystem.png)
 
 ### 🚀 Provider Deep Dive
 
