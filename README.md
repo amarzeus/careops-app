@@ -51,58 +51,122 @@ CareOps leverages industrial-grade providers to power its communication and inte
 
 ### 🚀 Provider Deep Dive
 
-| Provider | Role in CareOps | Integration Logic |
-| :--- | :--- | :--- |
-| **Google Gemini 2.0** | **The SOTA Brain** | Powers the `AI Onboarding Assistant`, `Smart Reply Engine`, `Inventory Forecasting`, and `Operational Anomaly Detection`. |
-| **Vapi.ai** | **Voice AI Receptionist** | Handles automated outbound reminders and voice-based booking confirmations via high-fidelity AI agents. |
-| **Twilio** | **Messaging Hub** | Drives all SMS, WhatsApp, and OTP authentication flows with enterprise-grade deliverability. |
-| **Google Calendar** | **Availability Sync** | Real-time two-way synchronization for all bookings, ensuring zero double-bookings. |
-| **Nodemailer** | **Enterprise Email** | Managed SMTP layer for automated intake forms, agreements, and vendor reorder alerts. |
+| Provider              | Role in CareOps           | Integration Logic                                                                                                         |
+| :-------------------- | :------------------------ | :------------------------------------------------------------------------------------------------------------------------ |
+| **Google Gemini 2.0** | **The SOTA Brain**        | Powers the `AI Onboarding Assistant`, `Smart Reply Engine`, `Inventory Forecasting`, and `Operational Anomaly Detection`. |
+| **Vapi.ai**           | **Voice AI Receptionist** | Handles automated outbound reminders and voice-based booking confirmations via high-fidelity AI agents.                   |
+| **Twilio**            | **Messaging Hub**         | Drives all SMS, WhatsApp, and OTP authentication flows with enterprise-grade deliverability.                              |
+| **Google Calendar**   | **Availability Sync**     | Real-time two-way synchronization for all bookings, ensuring zero double-bookings.                                        |
+| **Nodemailer**        | **Enterprise Email**      | Managed SMTP layer for automated intake forms, agreements, and vendor reorder alerts.                                     |
 
 ---
 
 ## 🛠️ Feature Spotlight
 
 ### 🧠 SOTA AI Brain
+
 - **Intent Classification**: Automatically categorizes incoming messages (Inquiry vs. Urgent vs. Complaint).
 - **Inventory Forecasting**: Predicts stock depletion based on booking volume and historical usage.
 - **Micro-Onboarding**: An AI concierge guides business owners through the 8-step setup.
 
 ### 🎙️ Voice-First Engagement
+
 - **Outbound Automation**: Automatically calls customers to remind them of upcoming appointments.
 - **Hand-off Logic**: Seamlessly transfers AI voice calls to human staff when complexity arises.
 
 ### 📦 Precision Inventory
+
 - **Usage Tracking**: Inventory is automatically deducted based on specific service types.
 - **Vendor Alerts**: Automated emails sent to vendors when items hit critical thresholds.
 
 ---
 
-## 🚀 Rapid Deployment
+## 🧪 Test Users (Pre-Seeded)
+
+For testing purposes, the database is pre-seeded with a live business environment. Use these credentials to explore all features:
+
+### Owner Account (Full Access)
+
+| Field    | Value                                                                                    |
+| -------- | ---------------------------------------------------------------------------------------- |
+| Email    | `amar@zeuswellness.com`                                                                  |
+| Password | `password`                                                                               |
+| Role     | OWNER                                                                                    |
+| Access   | All features (Dashboard, Inbox, Bookings, Forms, Inventory, Automation, Settings, Staff) |
+
+### Staff Accounts (Restricted Access)
+
+| Field    | Staff Alpha              | Staff Beta              |
+| -------- | ------------------------ | ----------------------- |
+| Email    | `alpha@zeuswellness.com` | `beta@zeuswellness.com` |
+| Password | `password`               | `password`              |
+| Role     | STAFF                    | STAFF                   |
+| Access   | Inbox, Bookings, Forms   | Inbox, Bookings, Forms  |
+
+### Pre-Seeded Data
+
+#### Business: Zeus Wellness Center
+
+- **Address:** 123 Health Avenue, Medical District
+- **Timezone:** America/New_York
+
+#### Services
+
+| Service              | Duration | Price |
+| -------------------- | -------- | ----- |
+| General Consultation | 60 min   | $150  |
+| Therapy Session      | 45 min   | $120  |
+| Emergency Follow-up  | 30 min   | $75   |
+
+#### Bookings (Dashboard Metrics)
+
+- **Today:** 3 bookings (2 Confirmed, 1 Pending)
+- **Yesterday:** 2 Completed, 1 No-Show
+
+#### Forms Status
+
+- Pending: 2
+- Overdue: 1
+
+#### Inventory Alerts
+
+- **Medical Kits:** 6 units (Threshold: 5) - **Critical**
+
+#### Integrations
+
+- **Google Calendar:** Test OAuth flow at Settings → Integrations
+- **Email/SMS:** Configured with Resend & Twilio
+
+---
+
+## 🚀 Quick Start
 
 ```bash
 # 1. Clone & Install
-```bash
 git clone https://github.com/amarzeus/careops-app.git && cd careops-app
-```
 npm install
 
-# 2. Environment (SOTA Keys Required)
+# 2. Environment Setup
 cp .env.example .env
 # Fill: GEMINI_API_KEY, VAPI_API_KEY, TWILIO_AUTH, etc.
 
-# 3. Intelligent Database Sync
+# 3. Database Setup
 npx prisma generate
 npx prisma db push
 
-# 4. Launch the Engine
+# 4. (Optional) Seed Test Data
+npx tsx prisma/seed-live-business.ts
+
+# 5. Launch
 npm run dev
 ```
 
 ---
 
 ## 🎖️ CareOps Hackathon 2026
+
 Built to set the standard for modern business operations. CareOps is a proof-of-concept for the **Founding Team** role, demonstrating elite AI leverage, UX obsessed design, and architectural discipline.
 
 ---
+
 **License:** MIT | **Contact:** [https://careops-app.onrender.com](https://careops-app.onrender.com)
