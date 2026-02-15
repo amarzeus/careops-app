@@ -81,28 +81,6 @@ CareOps leverages industrial-grade providers to power its communication and inte
 
 ---
 
-## 🧪 Test Users (Pre-Seeded)
-
-For testing purposes, the database is pre-seeded with a live business environment. Use these credentials to explore all features:
-
-### Owner Account (Full Access)
-
-| Field    | Value                                                                                    |
-| -------- | ---------------------------------------------------------------------------------------- |
-| Email    | `amar@zeuswellness.com`                                                                  |
-| Password | `password`                                                                               |
-| Role     | OWNER                                                                                    |
-| Access   | All features (Dashboard, Inbox, Bookings, Forms, Inventory, Automation, Settings, Staff) |
-
-### Staff Accounts (Restricted Access)
-
-| Field    | Staff Alpha              | Staff Beta              |
-| -------- | ------------------------ | ----------------------- |
-| Email    | `alpha@zeuswellness.com` | `beta@zeuswellness.com` |
-| Password | `password`               | `password`              |
-| Role     | STAFF                    | STAFF                   |
-| Access   | Inbox, Bookings, Forms   | Inbox, Bookings, Forms  |
-
 ### Pre-Seeded Data
 
 #### Business: Zeus Wellness Center
