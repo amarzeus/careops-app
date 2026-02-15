@@ -22,6 +22,7 @@ export default function ForgotPasswordPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
 
   const handleRequest = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,6 +42,7 @@ export default function ForgotPasswordPage() {
 
       const data = await res.json();
       if (res.ok) {
+        setMessage(data.message || "Verification code sent!");
         setStep("verify");
       } else {
         setError(data.error || "Something went wrong");
@@ -205,9 +207,24 @@ export default function ForgotPasswordPage() {
                   className="text-center text-2xl tracking-[0.5em] font-bold h-14 border-2 focus-visible:border-blue-500 focus-visible:ring-blue-500"
                 />
               </div>
-              <p className="text-center text-xs text-gray-500">
-                Didn't get the code? <button onClick={handleRequest} className="text-blue-600 hover:underline font-medium">Resend</button>
-              </p>
+              <div className="flex flex-col items-center gap-2">
+                <p className="text-center text-xs text-gray-500">
+                  Didn't get the code?{" "}
+                  <button
+                    type="button"
+                    onClick={handleRequest}
+                    disabled={loading}
+                    className="text-blue-600 hover:underline font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {loading ? "Sending..." : "Resend"}
+                  </button>
+                </p>
+                {message && (
+                  <p className="text-[10px] text-green-600 font-medium animate-in fade-in">
+                    {message}
+                  </p>
+                )}
+              </div>
               <Button
                 onClick={() => setStep("reset")}
                 disabled={otp.length !== 6}

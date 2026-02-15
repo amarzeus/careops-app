@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { normalizePhoneNumber } from "@/lib/twilio";
 import { hashPassword } from "@/lib/auth";
 
 /**
@@ -9,7 +10,6 @@ import { hashPassword } from "@/lib/auth";
 export async function POST(req: Request) {
     try {
         const { email, phone, otp, newPassword, method = "email" } = await req.json();
-        const { normalizePhoneNumber } = require("@/lib/twilio");
 
         const normalizedPhone = (method === "sms" && phone) ? normalizePhoneNumber(phone) : undefined;
 

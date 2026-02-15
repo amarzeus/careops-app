@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { normalizePhoneNumber } from "@/lib/twilio";
 import { hashPassword, createToken } from "@/lib/auth";
 import { sendEmail, buildEmailTemplate } from "@/lib/email";
 import { sendSMS, buildOTPMessage } from "@/lib/sms";
@@ -13,7 +14,6 @@ import { v4 as uuidv4 } from "uuid";
 export async function POST(req: Request) {
   try {
     const { email, phone, method = "email" } = await req.json();
-    const { normalizePhoneNumber } = require("@/lib/twilio");
 
     const normalizedPhone = (method === "sms" && phone) ? normalizePhoneNumber(phone) : undefined;
 
@@ -33,12 +33,12 @@ export async function POST(req: Request) {
       });
     }
 
-    // Rate limiting: prevent spamming resets (1 min cooldown for OTP)
     const oneMinuteAgo = new Date(Date.now() - 60 * 1000);
     if (user.updatedAt > oneMinuteAgo) {
+      console.log(`[ForgotPassword] Rate limited for user ${user.id}`);
       return NextResponse.json({
-        message: "Please wait a moment before requesting another code."
-      });
+        error: "Please wait a moment before requesting another code."
+      }, { status: 429 });
     }
 
     // Generate and store OTP
