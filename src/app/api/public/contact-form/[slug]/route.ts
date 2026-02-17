@@ -29,7 +29,31 @@ export async function GET(
     },
   });
 
-  if (!form || !form.isActive)
+  if (!form) {
+    // Check if workspace exists
+    const workspace = await prisma.workspace.findUnique({
+      where: { id: slug },
+      select: { id: true, name: true, isActive: true }
+    });
+
+    if (workspace) {
+      // Return a default form structure
+      return NextResponse.json({
+        form: {
+          id: "default",
+          name: "Contact Us",
+          fields: "[]", // Default fields handled by frontend
+          isActive: true,
+          workspace: workspace
+        }
+      });
+    }
+
     return NextResponse.json({ error: "Form not found" }, { status: 404 });
+  }
+
+  if (!form.isActive)
+    return NextResponse.json({ error: "Form not found" }, { status: 404 });
+
   return NextResponse.json({ form });
 }
