@@ -334,8 +334,8 @@ export function getVapiStatus(): {
 
 /**
  * Create a new Vapi assistant
+ * @param params
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function createVapiAssistant(params: any): Promise<any> {
   if (!vapiClient) {
     throw new Error('VAPI client not initialized');
@@ -351,8 +351,9 @@ export async function createVapiAssistant(params: any): Promise<any> {
 
 /**
  * Update an existing Vapi assistant
+ * @param id
+ * @param params
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function updateVapiAssistant(id: string, params: any): Promise<any> {
   if (!vapiClient) {
     throw new Error('VAPI client not initialized');

@@ -20,6 +20,9 @@ interface Workspace {
     }[];
 }
 
+/**
+ *
+ */
 export default function SearchPage() {
     const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
     const [loading, setLoading] = useState(true);

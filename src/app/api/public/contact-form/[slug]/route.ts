@@ -33,7 +33,7 @@ export async function GET(
     // Check if workspace exists
     const workspace = await prisma.workspace.findUnique({
       where: { id: slug },
-      select: { id: true, name: true, isActive: true }
+      select: { id: true, name: true }
     });
 
     if (workspace) {
