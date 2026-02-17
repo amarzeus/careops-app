@@ -5,9 +5,7 @@ import { prisma } from "@/lib/prisma";
 export async function GET() {
     try {
         const workspaces = await prisma.workspace.findMany({
-            where: {
-                isActive: true,
-            },
+            where: {},
             select: {
                 id: true,
                 name: true,
