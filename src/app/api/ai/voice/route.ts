@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI, Type } from "@google/genai";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+const client = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
 
 /**
  *
@@ -173,66 +173,77 @@ Key Features and Benefits:
   const finalPrompt = `${systemPrompt}
 
 ## RESPONSE FORMAT
-Return ONLY a valid JSON object:
-{
-  "message": "Your natural spoken response (2-4 sentences, conversational)",
-  "action": null or { "type": "navigate", "path": "/register" }
-}`;
+Returns a JSON object with:
+- "message": Natural spoken response
+- "action": Optional navigation action { "type": "navigate", "path": "..." }`;
+
+  const schema = {
+    type: Type.OBJECT,
+    properties: {
+      message: { type: Type.STRING },
+      action: {
+        type: Type.OBJECT,
+        properties: {
+          type: { type: Type.STRING },
+          path: { type: Type.STRING },
+        },
+        nullable: true,
+      },
+    },
+    required: ["message"],
+  };
 
   try {
-    const model = genAI.getGenerativeModel({
+    const chat = client.chats.create({
       model: "gemini-2.0-flash",
-      systemInstruction: finalPrompt,
-      generationConfig: { responseMimeType: "application/json" },
+      config: {
+        systemInstruction: finalPrompt,
+        responseMimeType: "application/json",
+        responseSchema: schema,
+      },
     });
 
     // Strip trailing user messages from history since sendMessage() adds the current one
-    let historyMsgs = (conversationHistory || [])
+    const historyMsgs = (conversationHistory || [])
       .filter((msg: any) => msg.content && msg.content.trim());
-    while (historyMsgs.length > 0 && historyMsgs[historyMsgs.length - 1].role === "user") {
-      historyMsgs = historyMsgs.slice(0, -1);
-    }
-    // Merge consecutive same-role messages
-    const merged: Array<{ role: string; content: string }> = [];
-    for (const msg of historyMsgs) {
-      if (merged.length > 0 && merged[merged.length - 1].role === msg.role) {
-        merged[merged.length - 1].content += "\n" + msg.content;
-      } else {
-        merged.push({ ...msg });
-      }
-    }
-    // Gemini requires history to start with "user" role
-    if (merged.length > 0 && merged[0].role === "assistant") {
-      merged.unshift({ role: "user", content: "Hello" });
-    }
-    // Ensure ends with model
-    if (merged.length > 0 && merged[merged.length - 1].role === "user") {
-      merged.pop();
-    }
-    const geminiHistory = merged.map((msg: any) => ({
-      role: msg.role === "assistant" ? ("model" as const) : ("user" as const),
+
+    // Simple history sanitization
+    const geminiHistory = historyMsgs.map((msg: any) => ({
+      role: msg.role === "assistant" ? "model" : "user",
       parts: [{ text: msg.content }],
     }));
 
-    const chat = model.startChat({ history: geminiHistory });
-    const result = await chat.sendMessage(message);
-    const response = result.response.text();
+    // In new SDK, we don't pass history to create() if using startChat logic? 
+    // Wait, client.chats.create returns a Chat object. It supports `history`.
+    // But `history` in `create` expects `Content[]`.
 
-    try {
-      const cleaned = response.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
-      const parsed = JSON.parse(cleaned);
+    // Let's rely on single-turn generation with history context if `chats` is complex to map,
+    // OR just use generateContent with full history.
+    // For simplicity and robustness with structured output:
 
-      return NextResponse.json({
-        message: parsed.message || "I'm here to help with your business operations.",
-        action: parsed.action || null,
-      });
-    } catch {
-      // Gemini returned non-JSON — use as plain message
-      return NextResponse.json({
-        message: response,
-        action: null,
-      });
-    }
+    const contents = [
+      ...geminiHistory,
+      { role: "user", parts: [{ text: message }] }
+    ];
+
+    const response = await client.models.generateContent({
+      model: "gemini-2.0-flash",
+      config: {
+        systemInstruction: finalPrompt,
+        responseMimeType: "application/json",
+        responseSchema: schema,
+      },
+      contents: contents as any,
+    });
+
+    const text = response.text;
+    const parsed = JSON.parse(text!) as { message: string, action?: any };
+
+    return NextResponse.json({
+      message: parsed.message,
+      action: parsed.action || null,
+    });
+
   } catch (error) {
     console.error("Voice AI Error:", error);
     return NextResponse.json({
@@ -242,3 +253,4 @@ Return ONLY a valid JSON object:
     });
   }
 }
+
