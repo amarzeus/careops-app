@@ -246,6 +246,9 @@ function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
           ))}
         </nav>
         <div className="p-6 border-t space-y-4">
+          <Link href="/search" onClick={onClose} className="block">
+            <Button variant="secondary" className="w-full h-14 text-lg bg-gray-100 text-gray-900 hover:bg-gray-200">Find a Business</Button>
+          </Link>
           <Link href="/login" onClick={onClose} className="block">
             <Button variant="outline" className="w-full h-14 text-lg">Sign In</Button>
           </Link>
@@ -317,6 +320,9 @@ export default function LandingPage() {
             </div>
 
             <div className="hidden lg:flex items-center gap-4">
+              <Link href="/search">
+                <Button variant="ghost" className="text-gray-600 hover:text-blue-600 font-medium">Find a Business</Button>
+              </Link>
               <Link href="/login">
                 <Button variant="ghost" className="text-gray-600 hover:text-gray-900">Sign In</Button>
               </Link>
@@ -363,6 +369,11 @@ export default function LandingPage() {
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </span>
                 </GradientButton>
+              </Link>
+              <Link href="/search">
+                <Button variant="outline" className="px-8 py-4 h-auto rounded-2xl text-lg border-gray-200 text-gray-600 hover:bg-gray-50">
+                  Try Demo Booking
+                </Button>
               </Link>
             </div>
 
