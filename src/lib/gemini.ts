@@ -557,10 +557,10 @@ BEHAVIOR RULES:
     });
 
     const text = response.text || ""; // Text might be empty if only a tool call is made, but usually Gemini explains itself.
-    
+
     // Extract function calls from the candidates
-    const functionCalls = response.functionCalls; 
-    
+    const functionCalls = response.functionCalls;
+
     // Map function calls to the legacy `extractedData` structure
     let extractedData: Record<string, unknown> | null = null;
     let navigationAction: { type: "jump"; targetStep: number } | null = null;
@@ -575,7 +575,7 @@ BEHAVIOR RULES:
       } else {
         // For data update tools, the args map directly to extractedData
         extractedData = args as Record<string, unknown>;
-        
+
         // Auto-advance logic: if a data update tool was called successfully, we can likely advance
         // But let's be conservative: only advance if the model didn't explicitly ask a follow-up in text.
         // For this implementation, we'll assume yes if data was extracted, matching previous behavior.
@@ -760,5 +760,78 @@ Data: ${JSON.stringify(contactData, null, 2)}`,
       summary: "Insufficient data for scoring",
       nextBestAction: "Engage with this contact to learn more",
     };
+  }
+}
+
+// ──────────────────────────────────────────────
+// 10. Multimodal Inventory Scanner
+// ──────────────────────────────────────────────
+
+export interface ScannedInvoice {
+  invoiceNumber: string;
+  vendor: string;
+  date: string;
+  items: Array<{ name: string; quantity: number; unitPrice: number; total: number }>;
+}
+
+export async function extractInventoryItemsFromImage(
+  imageBase64: string,
+  mimeType: string = "image/jpeg"
+): Promise<ScannedInvoice | null> {
+  const schema = {
+    type: Type.OBJECT,
+    properties: {
+      invoiceNumber: { type: Type.STRING },
+      vendor: { type: Type.STRING },
+      date: { type: Type.STRING },
+      items: {
+        type: Type.ARRAY,
+        items: {
+          type: Type.OBJECT,
+          properties: {
+            name: { type: Type.STRING },
+            quantity: { type: Type.NUMBER },
+            unitPrice: { type: Type.NUMBER },
+            total: { type: Type.NUMBER },
+          },
+          required: ["name", "quantity", "unitPrice", "total"],
+        },
+      },
+    },
+    required: ["invoiceNumber", "vendor", "date", "items"],
+  };
+
+  try {
+    const response = await client.models.generateContent({
+      model: "gemini-2.0-flash",
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: schema,
+        systemInstruction: "You are an expert data extraction AI. Extract inventory items from the invoice image.",
+      },
+      contents: [
+        {
+          role: "user",
+          parts: [
+            {
+              inlineData: {
+                data: imageBase64,
+                mimeType: mimeType,
+              },
+            },
+            {
+              text: "Extract inventory items from this invoice image. Return JSON data including invoice number, vendor, date, and a list of items with quantity and price.",
+            },
+          ],
+        },
+      ] as any,
+    });
+
+    const text = response.text;
+    if (!text) return null;
+    return JSON.parse(text) as ScannedInvoice;
+  } catch (err) {
+    console.error("Multimodal Scan Error:", err);
+    return null;
   }
 }
