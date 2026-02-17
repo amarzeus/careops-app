@@ -1,71 +1,104 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { aiOnboardingAssistant } from '@/lib/gemini';
 
-const { mockSendMessage, mockStartChat, mockGenerateContent } = vi.hoisted(() => {
+const { mockGenerateContent } = vi.hoisted(() => {
     return {
-        mockSendMessage: vi.fn(),
-        mockStartChat: vi.fn(),
         mockGenerateContent: vi.fn(),
     };
 });
 
-vi.mock('@google/generative-ai', () => {
+vi.mock('@google/genai', () => {
     return {
-        GoogleGenerativeAI: class {
-            getGenerativeModel() {
+        GoogleGenAI: class {
+            constructor() { }
+            get models() {
                 return {
-                    startChat: mockStartChat,
                     generateContent: mockGenerateContent,
                 };
             }
+        },
+        Type: {
+            STRING: 'STRING',
+            NUMBER: 'NUMBER',
+            INTEGER: 'INTEGER',
+            BOOLEAN: 'BOOLEAN',
+            ARRAY: 'ARRAY',
+            OBJECT: 'OBJECT',
         }
     };
 });
 
 
-describe('aiOnboardingAssistant', () => {
+describe('aiOnboardingAssistant (Function Calling)', () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        mockStartChat.mockReturnValue({
-            sendMessage: mockSendMessage,
-        });
     });
 
-    it('should handle proactive greeting for Step 6 correctly', async () => {
-        // Mock AI response
-        const mockResponse = {
-            message: "Since you run a dental clinic, let's add gloves.",
-            extractedData: { addInventoryItems: [{ name: "Gloves", quantity: "100" }] },
-            shouldAdvance: false
-        };
+    it('should handle tool call for data update correctly', async () => {
+        // Mock Tool Call response
+        const mockArgs = { addInventoryItems: [{ name: "Gloves", quantity: "100" }] };
 
-        mockSendMessage.mockResolvedValue({
-            response: {
-                text: () => JSON.stringify(mockResponse)
-            }
+        mockGenerateContent.mockResolvedValue({
+            text: "I've added those items for you.",
+            functionCalls: [{
+                name: "updateInventory",
+                args: mockArgs
+            }]
         });
 
         const result = await aiOnboardingAssistant(
-            "__GREETING__",
+            "Add 100 gloves",
             6,
             { workspace: { name: "My Dental Clinic" }, inventoryItems: [] },
             []
         );
 
-        expect(mockStartChat).toHaveBeenCalled();
-        expect(mockSendMessage).toHaveBeenCalledWith(
-            expect.stringContaining("I just arrived on this step")
-        );
-        expect(result.message).toBe(mockResponse.message);
-        expect(result.extractedData).toEqual(mockResponse.extractedData);
+        expect(mockGenerateContent).toHaveBeenCalled();
+        expect(result.message).toBe("I've added those items for you.");
+        expect(result.extractedData).toEqual(mockArgs);
+        expect(result.shouldAdvance).toBe(true);
     });
 
-    it('should handle JSON parsing errors gracefully', async () => {
-        mockSendMessage.mockResolvedValue({
-            response: {
-                text: () => "I'm sorry, I broke." // Not JSON
-            }
+    it('should handle navigation tool call correctly', async () => {
+        mockGenerateContent.mockResolvedValue({
+            text: "Sure, let's go back.",
+            functionCalls: [{
+                name: "jumpToStep",
+                args: { targetStep: 3, reason: "User request" }
+            }]
         });
+
+        const result = await aiOnboardingAssistant(
+            "Go back to contact form",
+            6,
+            {},
+            []
+        );
+
+        expect(result.navigationAction).toEqual({ type: "jump", targetStep: 3 });
+        expect(result.extractedData).toBeNull();
+    });
+
+    it('should handle text-only response (no tool call)', async () => {
+        mockGenerateContent.mockResolvedValue({
+            text: "What services do you offer?",
+            functionCalls: undefined
+        });
+
+        const result = await aiOnboardingAssistant(
+            "Hello",
+            4,
+            {},
+            []
+        );
+
+        expect(result.message).toBe("What services do you offer?");
+        expect(result.extractedData).toBeNull();
+        expect(result.shouldAdvance).toBe(false);
+    });
+
+    it('should handle error gracefully', async () => {
+        mockGenerateContent.mockRejectedValue(new Error("API Error"));
 
         const result = await aiOnboardingAssistant(
             "Hello",
@@ -74,7 +107,7 @@ describe('aiOnboardingAssistant', () => {
             []
         );
 
-        expect(result.message).toBe("I'm sorry, I broke.");
+        expect(result.message).toContain("hiccup");
         expect(result.extractedData).toBeNull();
     });
 });
