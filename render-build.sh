@@ -5,6 +5,13 @@ set -e
 
 echo "🚀 Starting robust build process..."
 
+# 0. Patch Prisma Schema for Production (PostgreSQL)
+if [[ "$DATABASE_URL" == postgres* ]]; then
+  echo "🔧 Detected PostgreSQL environment. Patching schema.prisma..."
+  sed -i 's/provider = "sqlite"/provider = "postgresql"/g' prisma/schema.prisma
+fi
+
+
 # 1. Install dependencies using the lock file
 echo "📦 Installing dependencies from package-lock.json..."
 npm ci

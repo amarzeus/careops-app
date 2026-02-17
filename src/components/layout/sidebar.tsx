@@ -14,6 +14,7 @@ const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, badgeKey: null },
   { href: "/inbox", label: "Inbox", icon: MessageSquare, badgeKey: "inbox" as const },
   { href: "/bookings", label: "Bookings", icon: Calendar, badgeKey: "bookings" as const },
+  { href: "/contacts", label: "Contacts", icon: Users, badgeKey: null },
   { href: "/forms", label: "Forms", icon: FileText, badgeKey: null },
   { href: "/inventory", label: "Inventory", icon: Package, badgeKey: "lowStock" as const },
   { href: "/staff", label: "Staff", icon: Users, badgeKey: null },

@@ -3,7 +3,7 @@ services:
     name: careops-app
     runtime: node
     plan: free
-    buildCommand: npm ci --include=dev && npx prisma generate && npm run build
+    buildCommand: ./render-build.sh
     startCommand: npx prisma db push && npm start
     healthCheckPath: /
     envVars:
@@ -42,7 +42,3 @@ services:
       - key: EMAIL_FROM
         sync: false
 
-databases:
-  - name: careops-db
-    databaseName: careops_db
-    ipAllowList: []

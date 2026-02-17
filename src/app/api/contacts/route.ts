@@ -38,6 +38,33 @@ export async function POST(req: Request) {
   if (!name)
     return NextResponse.json({ error: "Name is required" }, { status: 400 });
 
+  // Check for existing contact
+  const existingContact = await prisma.contact.findFirst({
+    where: {
+      workspaceId: user.workspaceId,
+      OR: [
+        { email: email || undefined },
+        { phone: phone || undefined }
+      ]
+    }
+  });
+
+  if (existingContact) {
+    // If contact exists, you might want to update it or just return it.
+    // For now, we'll return it to avoid duplicate errors.
+    // Optionally we could update the name/notes if provided.
+    const updatedContact = await prisma.contact.update({
+      where: { id: existingContact.id },
+      data: {
+        name: name, // User might be correcting the name
+        notes: notes ? (existingContact.notes ? `${existingContact.notes}\n${notes}` : notes) : undefined
+      }
+    });
+    return NextResponse.json({ contact: updatedContact }, { status: 200 });
+  }
+
+
+
   const contact = await prisma.contact.create({
     data: {
       name,
