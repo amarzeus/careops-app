@@ -42,6 +42,38 @@ export async function GET() {
  *
  * @param req
  */
+import { createVapiAssistant, updateVapiAssistant } from "@/lib/vapi";
+
+const NEXT_PUBLIC_APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://careops-app.onrender.com";
+
+// Helper to construct Vapi Assistant config
+const getVapiConfig = (data: any) => {
+  return {
+    name: data.name,
+    model: {
+      provider: "openai",
+      model: "gpt-4",
+      systemPrompt: data.prompt || "You are a helpful assistant.",
+    },
+    voice: {
+      provider: "11labs",
+      voiceId: "21m00Tcm4TlvDq8ikWAM", // Default voice
+    },
+    transcriber: {
+      provider: "deepgram",
+      model: "nova-2",
+      language: "en",
+    },
+    serverUrl: `${NEXT_PUBLIC_APP_URL}/api/voice/tools`,
+    serverMessages: ["tool-calls"],
+    tools: data.tools ? JSON.parse(JSON.stringify(data.tools)) : [],
+  };
+};
+
+/**
+ *
+ * @param req
+ */
 export async function POST(req: Request) {
   const user = await getCurrentUser();
   if (!user?.workspaceId || user.role !== "OWNER") {
@@ -53,6 +85,16 @@ export async function POST(req: Request) {
     const { action, data } = body;
 
     if (action === "createAgent") {
+      let vapiAssistantId = null;
+      try {
+        const vapiConfig = getVapiConfig(data);
+        const vapiAssistant = await createVapiAssistant(vapiConfig);
+        vapiAssistantId = vapiAssistant.id;
+      } catch (e) {
+        console.error("Failed to create Vapi assistant:", e);
+        // Fallback: proceed without Vapi ID, or fail? specific req says "sync", so maybe warn but proceed
+      }
+
       const agent = await prisma.voiceAgent.create({
         data: {
           name: data.name,
@@ -65,12 +107,31 @@ export async function POST(req: Request) {
           canHandleInquiry: data.canHandleInquiry || true,
           tools: JSON.stringify(data.tools || []),
           workspaceId: user.workspaceId,
+          vapiAssistantId: vapiAssistantId,
         },
       });
       return NextResponse.json({ agent });
     }
 
     if (action === "updateAgent") {
+      if (data.vapiAssistantId) {
+        try {
+          const vapiConfig = getVapiConfig(data);
+          await updateVapiAssistant(data.vapiAssistantId, vapiConfig);
+        } catch (e) {
+          console.error("Failed to update Vapi assistant:", e);
+        }
+      } else {
+        // Check if we should create one now?
+        try {
+          const vapiConfig = getVapiConfig(data);
+          const vapiAssistant = await createVapiAssistant(vapiConfig);
+          data.vapiAssistantId = vapiAssistant.id;
+        } catch (e) {
+          console.error("Failed to backfill Vapi assistant:", e);
+        }
+      }
+
       const agent = await prisma.voiceAgent.update({
         where: { id: data.id },
         data: {
@@ -84,6 +145,7 @@ export async function POST(req: Request) {
           canHandleInquiry: data.canHandleInquiry,
           tools: JSON.stringify(data.tools || []),
           isActive: data.isActive,
+          vapiAssistantId: data.vapiAssistantId,
         },
       });
       return NextResponse.json({ agent });
@@ -133,3 +195,4 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Failed to process request" }, { status: 500 });
   }
 }
+

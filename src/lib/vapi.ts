@@ -12,8 +12,16 @@ interface VapiCallsClient {
   list(): Promise<{ data: VapiCall[] }>;
 }
 
+interface VapiAssistantsClient {
+  create(params: unknown): Promise<any>;
+  update(id: string, params: unknown): Promise<any>;
+  list(): Promise<any>;
+  get(id: string): Promise<any>;
+}
+
 interface VapiClientType {
   calls: VapiCallsClient;
+  assistants: VapiAssistantsClient;
 }
 
 let vapiClient: VapiClientType | null = null;
@@ -320,6 +328,30 @@ export function getVapiStatus(): {
   return {
     configured: isVapiConfigured(),
     apiKeyPresent: !!apiKey,
-    clientInitialized: !!vapiClient,
-  };
+    throw new Error('VAPI client not initialized');
+  }
+  try {
+    const assistant = await vapiClient.assistants.create(params);
+    return assistant;
+  } catch (error) {
+    console.error('[VAPI] Failed to create assistant:', error);
+    throw error;
+  }
+}
+
+/**
+ * Update an existing Vapi assistant
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function updateVapiAssistant(id: string, params: any): Promise<any> {
+  if (!vapiClient) {
+    throw new Error('VAPI client not initialized');
+  }
+  try {
+    const assistant = await vapiClient.assistants.update(id, params);
+    return assistant;
+  } catch (error) {
+    console.error('[VAPI] Failed to update assistant:', error);
+    throw error;
+  }
 }
