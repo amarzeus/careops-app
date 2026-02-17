@@ -328,6 +328,16 @@ export function getVapiStatus(): {
   return {
     configured: isVapiConfigured(),
     apiKeyPresent: !!apiKey,
+    clientInitialized: !!vapiClient,
+  };
+}
+
+/**
+ * Create a new Vapi assistant
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function createVapiAssistant(params: any): Promise<any> {
+  if (!vapiClient) {
     throw new Error('VAPI client not initialized');
   }
   try {
