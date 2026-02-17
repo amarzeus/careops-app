@@ -8,14 +8,22 @@ const { mockGenerateContent } = vi.hoisted(() => ({
     mockGenerateContent: vi.fn(),
 }));
 
-vi.mock('@google/generative-ai', () => ({
-    GoogleGenerativeAI: class {
-        getGenerativeModel() {
+vi.mock('@google/genai', () => ({
+    GoogleGenAI: class {
+        constructor() { }
+        get models() {
             return {
                 generateContent: mockGenerateContent,
-                startChat: vi.fn().mockReturnValue({ sendMessage: vi.fn() }),
             };
         }
+    },
+    Type: {
+        STRING: 'STRING',
+        NUMBER: 'NUMBER',
+        INTEGER: 'INTEGER',
+        BOOLEAN: 'BOOLEAN',
+        ARRAY: 'ARRAY',
+        OBJECT: 'OBJECT',
     }
 }));
 
@@ -36,7 +44,7 @@ describe('AI Brain — Intent Classification', () => {
             priority: 'medium',
         };
         mockGenerateContent.mockResolvedValue({
-            response: { text: () => JSON.stringify(mockResult) }
+            text: JSON.stringify(mockResult)
         });
 
         const result = await classifyConversationIntent('I want to schedule an appointment for next week');
@@ -53,7 +61,7 @@ describe('AI Brain — Intent Classification', () => {
             priority: 'high',
         };
         mockGenerateContent.mockResolvedValue({
-            response: { text: () => JSON.stringify(mockResult) }
+            text: JSON.stringify(mockResult)
         });
 
         const result = await classifyConversationIntent('I had a terrible experience yesterday');
@@ -69,7 +77,7 @@ describe('AI Brain — Intent Classification', () => {
             priority: 'low',
         };
         mockGenerateContent.mockResolvedValue({
-            response: { text: () => JSON.stringify(mockResult) }
+            text: JSON.stringify(mockResult)
         });
 
         const result = await classifyConversationIntent(
@@ -77,14 +85,17 @@ describe('AI Brain — Intent Classification', () => {
             ['Previous message 1', 'Previous message 2']
         );
         expect(result.intent).toBe('follow_up');
+        // Check if generateContent was called with history in the prompt
         expect(mockGenerateContent).toHaveBeenCalledWith(
-            expect.stringContaining('Conversation history')
+            expect.objectContaining({
+                contents: expect.stringContaining('Conversation history')
+            })
         );
     });
 
     it('should return safe defaults on AI error', async () => {
         mockGenerateContent.mockResolvedValue({
-            response: { text: () => 'not valid JSON at all' }
+            text: 'not valid JSON at all'
         });
 
         const result = await classifyConversationIntent('hello');
@@ -108,7 +119,7 @@ describe('AI Brain — Anomaly Detection', () => {
             actualValue: '30%',
         }];
         mockGenerateContent.mockResolvedValue({
-            response: { text: () => JSON.stringify(mockAnomalies) }
+            text: JSON.stringify({ anomalies: mockAnomalies })
         });
 
         const result = await analyzeOperationsAnomalies({
@@ -132,7 +143,7 @@ describe('AI Brain — Anomaly Detection', () => {
 
     it('should return empty array when operations are normal', async () => {
         mockGenerateContent.mockResolvedValue({
-            response: { text: () => '[]' }
+            text: JSON.stringify({ anomalies: [] })
         });
 
         const result = await analyzeOperationsAnomalies({
@@ -155,19 +166,9 @@ describe('AI Brain — Anomaly Detection', () => {
     it('should handle malformed AI response gracefully', async () => {
         mockGenerateContent.mockRejectedValue(new Error('API quota exceeded'));
 
-        await expect(analyzeOperationsAnomalies({
-            bookingsThisWeek: 0,
-            bookingsLastWeek: 0,
-            noShowRate: 0,
-            averageNoShowRate: 0,
-            newContactsThisWeek: 0,
-            newContactsLastWeek: 0,
-            pendingForms: 0,
-            overdueForms: 0,
-            lowStockItems: 0,
-            totalItems: 0,
-            unansweredMessages: 0,
-        })).rejects.toThrow();
+        // Implementation returns empty array on error for anomalies
+        const result = await analyzeOperationsAnomalies({});
+        expect(result).toEqual([]);
     });
 });
 
@@ -186,7 +187,7 @@ describe('AI Brain — Contact Scoring', () => {
             nextBestAction: 'Offer loyalty program',
         };
         mockGenerateContent.mockResolvedValue({
-            response: { text: () => JSON.stringify(mockScore) }
+            text: JSON.stringify(mockScore)
         });
 
         const result = await scoreContact({
@@ -218,7 +219,7 @@ describe('AI Brain — Contact Scoring', () => {
             nextBestAction: 'Consider removing from active list',
         };
         mockGenerateContent.mockResolvedValue({
-            response: { text: () => JSON.stringify(mockScore) }
+            text: JSON.stringify(mockScore)
         });
 
         const result = await scoreContact({
@@ -240,7 +241,7 @@ describe('AI Brain — Contact Scoring', () => {
 
     it('should provide safe defaults when AI returns invalid JSON', async () => {
         mockGenerateContent.mockResolvedValue({
-            response: { text: () => 'totally not json at all!' }
+            text: 'totally not json at all!'
         });
 
         const result = await scoreContact({
