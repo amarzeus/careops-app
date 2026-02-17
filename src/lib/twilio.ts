@@ -52,6 +52,10 @@ function categorizeError(error: any, statusCode?: number): { code: TwilioErrorCo
 }
 
 
+/**
+ *
+ * @param phone
+ */
 export function normalizePhoneNumber(phone: string): string {
     const digits = phone.replace(/\D/g, "");
     if (digits.length === 10) return `+91${digits}`;

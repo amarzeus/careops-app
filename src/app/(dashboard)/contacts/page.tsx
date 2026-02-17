@@ -147,6 +147,9 @@ function UserIcon({ className }: { className?: string }) {
   );
 }
 
+/**
+ *
+ */
 export default function ContactsPage() {
   return (
     <div className="space-y-6">

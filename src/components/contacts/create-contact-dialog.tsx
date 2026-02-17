@@ -45,6 +45,15 @@ interface CreateContactDialogProps {
   initialData?: Contact | null; // For editing
 }
 
+/**
+ *
+ * @param root0
+ * @param root0.open
+ * @param root0.onOpenChange
+ * @param root0.onContactCreated
+ * @param root0.trigger
+ * @param root0.initialData
+ */
 export function CreateContactDialog({
   open: controlledOpen,
   onOpenChange: setControlledOpen,

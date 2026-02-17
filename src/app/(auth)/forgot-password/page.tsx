@@ -11,6 +11,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 type Step = "request" | "verify" | "reset" | "success";
 
+/**
+ *
+ */
 export default function ForgotPasswordPage() {
   const [step, setStep] = useState<Step>("request");
   const [method, setMethod] = useState<"email" | "sms">("email");

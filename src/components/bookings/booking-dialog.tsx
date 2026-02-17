@@ -61,6 +61,17 @@ interface BookingDialogProps {
   initialDate?: Date;
 }
 
+/**
+ *
+ * @param root0
+ * @param root0.open
+ * @param root0.onOpenChange
+ * @param root0.onSubmit
+ * @param root0.contacts
+ * @param root0.services
+ * @param root0.initialData
+ * @param root0.initialDate
+ */
 export function BookingDialog({
   open,
   onOpenChange,

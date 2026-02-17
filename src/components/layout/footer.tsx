@@ -8,6 +8,11 @@ interface FooterProps {
   children?: React.ReactNode;
 }
 
+/**
+ *
+ * @param root0
+ * @param root0.children
+ */
 export function Footer({ children }: FooterProps) {
   return (
     <footer className="border-t border-gray-200 bg-white px-6 py-4">

@@ -117,6 +117,10 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
 
 /**
  * Builds HTML template for emails.
+ * @param title
+ * @param content
+ * @param buttonText
+ * @param buttonUrl
  */
 export function buildEmailTemplate(
   title: string,
