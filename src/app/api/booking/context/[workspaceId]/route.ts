@@ -9,6 +9,7 @@ import { prisma } from "@/lib/prisma";
  */
 export async function GET(req: Request, { params }: { params: Promise<{ workspaceId: string }> }) {
     const { workspaceId } = await params;
+    console.log("Fetching booking context for workspaceId:", workspaceId);
     try {
         const workspace = await prisma.workspace.findUnique({
             where: { id: workspaceId },

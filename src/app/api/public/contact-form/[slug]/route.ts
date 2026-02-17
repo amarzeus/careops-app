@@ -13,8 +13,13 @@ export async function GET(
 ) {
   const { slug } = await params;
 
-  const form = await prisma.contactForm.findUnique({
-    where: { slug },
+  const form = await prisma.contactForm.findFirst({
+    where: {
+      OR: [
+        { slug: slug },
+        { workspaceId: slug, isActive: true }
+      ]
+    },
     select: {
       id: true,
       name: true,
