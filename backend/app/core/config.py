@@ -11,6 +11,9 @@ class Settings(BaseSettings):
     app_name: str = "CareOps API"
     app_version: str = "0.1.0"
     allowed_origins: list[str] = ["http://localhost:3000"]
+    clerk_jwks_url: str | None = None
+    clerk_issuer: str | None = None
+    clerk_audience: str | None = None
 
 
 @lru_cache

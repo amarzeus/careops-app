@@ -12,3 +12,15 @@ uvicorn app.main:app --reload --port 8000
 ```
 
 Open `http://localhost:8000/health` for the health check.
+
+## Clerk Auth (Backend)
+
+Set these environment variables before testing protected routes:
+
+- `CLERK_JWKS_URL`
+- `CLERK_ISSUER`
+- `CLERK_AUDIENCE` (optional)
+
+Protected endpoint:
+
+- `GET /api/v1/protected/me` with `Authorization: Bearer <token>`
