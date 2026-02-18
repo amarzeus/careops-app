@@ -124,6 +124,26 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
       return NextResponse.json(updated);
     }
 
+    if (action === 'resolve-escalation') {
+      const { note } = body;
+
+      const updated = await prisma.voiceCall.update({
+        where: { id },
+        data: {
+          escalated: false,
+          escalationReason: null,
+          outcome: 'ESCALATION_REVIEWED',
+          ...(note
+            ? {
+                summary: note,
+              }
+            : {}),
+        },
+      });
+
+      return NextResponse.json({ success: true, call: updated });
+    }
+
     return NextResponse.json(
       { error: 'Invalid action' },
       { status: 400 }

@@ -153,6 +153,8 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const contactId = searchParams.get('contactId');
     const status = searchParams.get('status');
+    const escalated = searchParams.get('escalated');
+    const outcome = searchParams.get('outcome');
     const limit = parseInt(searchParams.get('limit') || '50');
     const offset = parseInt(searchParams.get('offset') || '0');
 
@@ -168,11 +170,24 @@ export async function GET(req: NextRequest) {
       where.status = status;
     }
 
+    if (escalated === 'true') {
+      where.escalated = true;
+    }
+
+    if (escalated === 'false') {
+      where.escalated = false;
+    }
+
+    if (outcome) {
+      where.outcome = outcome;
+    }
+
     const [calls, total] = await Promise.all([
       prisma.voiceCall.findMany({
         where,
         include: {
           contact: true,
+          consent: true,
         },
         orderBy: { createdAt: 'desc' },
         take: limit,
