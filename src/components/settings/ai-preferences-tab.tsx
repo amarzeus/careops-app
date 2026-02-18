@@ -2,7 +2,7 @@
 
 import React, { useCallback, useState, useEffect } from "react";
 import { Sparkles, Brain, MessageSquare, Mic, AlertTriangle, Package, Settings, Loader2, Check, Zap } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -26,10 +26,6 @@ interface AIPreferences {
   geminiModel: string;
 }
 
-interface AIPreferencesTabProps {
-  onSelectTab?: (tab: string) => void;
-}
-
 const DEFAULT_AI_PREFERENCES: AIPreferences = {
   id: "",
   workspaceId: "",
@@ -48,11 +44,11 @@ const DEFAULT_AI_PREFERENCES: AIPreferences = {
 /**
  *
  * @param root0
- * @param root0.onSelectTab
+ * @param root0._onSelectTab
  */
-export function AIPreferencesTab({ onSelectTab }: AIPreferencesTabProps) {
+export function AIPreferencesTab({ _onSelectTab }: { _onSelectTab?: (tab: string) => void }) {
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [_error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [preferences, setPreferences] = useState<AIPreferences | null>(null);
@@ -65,14 +61,12 @@ export function AIPreferencesTab({ onSelectTab }: AIPreferencesTabProps) {
         setPreferences(data.preferences || DEFAULT_AI_PREFERENCES);
         setError(null);
       } else {
-        // If API fails, use default preferences
         console.log("Using default AI preferences");
         setPreferences(DEFAULT_AI_PREFERENCES);
         setError(null);
       }
-    } catch (error) {
-      console.error("Failed to fetch AI preferences:", error);
-      // Use defaults on error
+    } catch (err) {
+      console.error("Failed to fetch AI preferences:", err);
       setPreferences(DEFAULT_AI_PREFERENCES);
       setError(null);
     } finally {
@@ -89,23 +83,23 @@ export function AIPreferencesTab({ onSelectTab }: AIPreferencesTabProps) {
   };
 
   const handleSave = async () => {
-    if (!prefs) return;
+    if (!preferences) return;
     setSaving(true);
     try {
       const res = await fetch("/api/ai/preferences", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          smartReplyEnabled: prefs.smartReplyEnabled,
-          insightsEnabled: prefs.insightsEnabled,
-          voiceEnabled: prefs.voiceEnabled,
-          anomalyDetectionEnabled: prefs.anomalyDetectionEnabled,
-          inventoryForecastEnabled: prefs.inventoryForecastEnabled,
-          autoClassifyEnabled: prefs.autoClassifyEnabled,
-          defaultReplyTone: prefs.defaultReplyTone,
-          alertOnAnomaly: prefs.alertOnAnomaly,
-          dailyInsightTime: prefs.dailyInsightTime,
-          geminiModel: prefs.geminiModel,
+          smartReplyEnabled: preferences.smartReplyEnabled,
+          insightsEnabled: preferences.insightsEnabled,
+          voiceEnabled: preferences.voiceEnabled,
+          anomalyDetectionEnabled: preferences.anomalyDetectionEnabled,
+          inventoryForecastEnabled: preferences.inventoryForecastEnabled,
+          autoClassifyEnabled: preferences.autoClassifyEnabled,
+          defaultReplyTone: preferences.defaultReplyTone,
+          alertOnAnomaly: preferences.alertOnAnomaly,
+          dailyInsightTime: preferences.dailyInsightTime,
+          geminiModel: preferences.geminiModel,
         }),
       });
 
@@ -114,7 +108,7 @@ export function AIPreferencesTab({ onSelectTab }: AIPreferencesTabProps) {
       toast({ title: "Success", description: "AI preferences saved", variant: "default" });
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
-    } catch (error) {
+    } catch (_err) {
       toast({ title: "Error", description: "Failed to save preferences", variant: "destructive" });
     } finally {
       setSaving(false);
@@ -130,7 +124,6 @@ export function AIPreferencesTab({ onSelectTab }: AIPreferencesTabProps) {
     );
   }
 
-  // Use defaults if preferences is null
   const prefs = preferences || DEFAULT_AI_PREFERENCES;
 
   const features = [
@@ -207,8 +200,8 @@ export function AIPreferencesTab({ onSelectTab }: AIPreferencesTabProps) {
                 <div className="flex items-center gap-3">
                   <div className={cn(
                     "w-10 h-10 rounded-lg flex items-center justify-center",
-                    feature.enabled 
-                      ? `bg-${feature.color}-100 text-${feature.color}-600` 
+                    feature.enabled
+                      ? `bg-${feature.color}-100 text-${feature.color}-600`
                       : "bg-gray-100 text-gray-400"
                   )}>
                     <feature.icon className="w-5 h-5" />
@@ -233,12 +226,12 @@ export function AIPreferencesTab({ onSelectTab }: AIPreferencesTabProps) {
           <Settings className="w-4 h-4" />
           Advanced Settings
         </h3>
-        
+
         <div className="grid sm:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label className="text-sm">Default Reply Tone</Label>
-            <Select 
-              value={prefs.defaultReplyTone} 
+            <Select
+              value={prefs.defaultReplyTone}
               onValueChange={(v) => updatePreference("defaultReplyTone", v)}
             >
               <SelectTrigger>
@@ -254,8 +247,8 @@ export function AIPreferencesTab({ onSelectTab }: AIPreferencesTabProps) {
 
           <div className="space-y-2">
             <Label className="text-sm">AI Model</Label>
-            <Select 
-              value={prefs.geminiModel} 
+            <Select
+              value={prefs.geminiModel}
               onValueChange={(v) => updatePreference("geminiModel", v)}
             >
               <SelectTrigger>
@@ -270,8 +263,8 @@ export function AIPreferencesTab({ onSelectTab }: AIPreferencesTabProps) {
 
           <div className="space-y-2">
             <Label className="text-sm">Daily Insight Time</Label>
-            <Select 
-              value={prefs.dailyInsightTime || "09:00"} 
+            <Select
+              value={prefs.dailyInsightTime || "09:00"}
               onValueChange={(v) => updatePreference("dailyInsightTime", v)}
             >
               <SelectTrigger>
@@ -301,8 +294,8 @@ export function AIPreferencesTab({ onSelectTab }: AIPreferencesTabProps) {
       </div>
 
       <div className="flex items-center gap-3 pt-4 border-t">
-        <Button 
-          onClick={handleSave} 
+        <Button
+          onClick={handleSave}
           disabled={saving}
           className="bg-violet-600 hover:bg-violet-700"
         >
@@ -313,7 +306,7 @@ export function AIPreferencesTab({ onSelectTab }: AIPreferencesTabProps) {
           ) : null}
           {saving ? "Saving..." : saved ? "Saved!" : "Save Preferences"}
         </Button>
-        
+
         {!prefs.insightsEnabled && (
           <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">
             <Zap className="w-3 h-3 mr-1" />

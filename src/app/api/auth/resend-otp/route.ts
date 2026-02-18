@@ -3,7 +3,6 @@ import { prisma } from "@/lib/prisma";
 import { generateOTP, storeOTP } from "@/lib/otp";
 import { sendEmail, buildEmailTemplate } from "@/lib/email";
 import { sendOTP as twilioSendOTP, sendWhatsAppOTP as twilioSendWhatsAppOTP, isConfigured as isTwilioConfigured } from "@/lib/twilio";
-import { sendSMS, buildOTPMessage } from "@/lib/sms";
 import { isAvailable as isWhatsAppAvailable } from "@/lib/whatsapp";
 
 /**

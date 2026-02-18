@@ -28,7 +28,6 @@ export default function BookingsPage() {
   const [bookings, setBookings] = useState<BookingWithRelations[]>([]);
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [services, setServices] = useState<Service[]>([]);
-  const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<"list" | "calendar">("calendar");
   const [searchTerm, setSearchTerm] = useState("");
   const [dateFrom, setDateFrom] = useState("");
@@ -37,16 +36,12 @@ export default function BookingsPage() {
     { id: string; title: string; start: string; end?: string }[]
   >([]);
 
-  // Google Calendar Integration Status
-  const [isCalendarConnected, setIsCalendarConnected] = useState(false);
-
   // Dialog state
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState<BookingWithRelations | null>(null);
   const [initialDialogDate, setInitialDialogDate] = useState<Date | undefined>();
 
   const fetchData = useCallback(async () => {
-    setLoading(true);
     try {
       const [bookingsRes, contactsRes, servicesRes, calendarStatusRes] = await Promise.all([
         fetch("/api/bookings"),
@@ -80,7 +75,6 @@ export default function BookingsPage() {
 
       if (calendarStatusRes.ok) {
         const status = await calendarStatusRes.json();
-        setIsCalendarConnected(status.connected);
 
         // If connected, fetch events for the next 30 days and previous 7 days
         if (status.connected) {
@@ -98,10 +92,8 @@ export default function BookingsPage() {
           }
         }
       }
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    } finally {
-      setLoading(false);
+    } catch (_error) {
+      console.error("Error fetching data:", _error);
     }
   }, []);
 
@@ -120,8 +112,8 @@ export default function BookingsPage() {
       if (response.ok) {
         fetchData();
       }
-    } catch (error) {
-      console.error("Error updating status:", error);
+    } catch (_error) {
+      console.error("Error updating status:", _error);
     }
   };
 
@@ -141,9 +133,9 @@ export default function BookingsPage() {
       } else {
         throw new Error("Failed to save booking");
       }
-    } catch (error) {
-      console.error("Error saving booking:", error);
-      throw error;
+    } catch (_error) {
+      console.error("Error saving booking:", _error);
+      throw _error;
     }
   };
 

@@ -1,15 +1,9 @@
 "use client";
 
-import React, { useState, useCallback, useRef } from "react";
+import React, { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { X } from "lucide-react";
 import { InlineVoiceMode, VoiceAssistantFAB } from "@/components/voice-assistant";
-import { cn } from "@/lib/utils";
-
-interface ChatMsg {
-  role: "user" | "assistant";
-  content: string;
-}
 
 /**
  *

@@ -316,7 +316,7 @@ export async function checkVapiHealth(): Promise<{
   try {
     const start = Date.now();
     await vapiClient.calls.list();
-    const latency = Date.now() - start;
+    const _latency = Date.now() - start;
 
     return {
       healthy: true,

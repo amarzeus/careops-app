@@ -23,13 +23,14 @@ import {
 export default function AutomationPage() {
   const [rules, setRules] = useState<AutomationRuleDTO[]>([]);
   const [loading, setLoading] = useState(true);
-  
+
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedRule, setSelectedRule] = useState<AutomationRuleDTO | null>(null);
-  
+
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [testingId, setTestingId] = useState<string | null>(null);
+
 
   useEffect(() => {
     fetchRules();
@@ -39,7 +40,7 @@ export default function AutomationPage() {
     try {
       const res = await fetch("/api/automation");
       if (res.ok) setRules((await res.json()).rules);
-    } catch (error) {
+    } catch (_error) {
       toast({ title: "Error", description: "Failed to load rules", variant: "destructive" });
     } finally {
       setLoading(false);
@@ -50,7 +51,7 @@ export default function AutomationPage() {
     try {
       let res;
       if (selectedRule) {
-        res = await fetch(`/api/automation/${selectedRule.id}`, {
+        res = await fetch(`/ api / automation / ${selectedRule.id} `, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(data),
@@ -74,13 +75,13 @@ export default function AutomationPage() {
 
   const handleToggle = async (id: string, isActive: boolean) => {
     try {
-      await fetch(`/api/automation/${id}`, {
+      await fetch(`/ api / automation / ${id} `, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ isActive }),
       });
       fetchRules();
-    } catch (error) {
+    } catch (_error) {
       toast({ title: "Error", description: "Failed to toggle rule", variant: "destructive" });
     }
   };
@@ -88,14 +89,16 @@ export default function AutomationPage() {
   const handleDelete = async (id: string) => {
     setDeleting(true);
     try {
-      const res = await fetch(`/api/automation/${id}`, { method: "DELETE" });
+      const res = await fetch(`/ api / automation / ${id} `, { method: "DELETE" });
       if (!res.ok) throw new Error("Failed to delete rule");
       toast({ title: "Success", description: "Rule deleted", variant: "default" });
       fetchRules();
       setDeleteConfirmId(null);
     } catch (error) {
+      console.error("Delete rule error:", error);
       toast({ title: "Error", description: "Failed to delete rule", variant: "destructive" });
-    } finally {
+    }
+    finally {
       setDeleting(false);
     }
   };
@@ -103,10 +106,10 @@ export default function AutomationPage() {
   const handleTest = async (id: string) => {
     setTestingId(id);
     try {
-      const res = await fetch(`/api/automation/${id}/test`, { method: "POST" });
+      const res = await fetch(`/ api / automation / ${id}/test`, { method: "POST" });
       if (!res.ok) throw new Error("Test failed");
       toast({ title: "Success", description: "Rule tested", variant: "default" });
-    } catch (error) {
+    } catch (_error) {
       toast({ title: "Error", description: "Test failed", variant: "destructive" });
     } finally {
       setTimeout(() => setTestingId(null), 2000);
@@ -119,7 +122,7 @@ export default function AutomationPage() {
   return (
     <div>
       <Header title="Automation" subtitle="Event-based rules that work for you">
-        <Button 
+        <Button
           className="bg-blue-600 hover:bg-blue-700"
           onClick={() => { setSelectedRule(null); setDialogOpen(true); }}
         >
@@ -148,7 +151,7 @@ export default function AutomationPage() {
         {loading ? (
           <div className="space-y-3">{[...Array(4)].map((_, i) => <div key={i} className="h-20 bg-gray-100 rounded-lg animate-pulse" />)}</div>
         ) : (
-          <RuleList 
+          <RuleList
             rules={rules}
             onToggle={handleToggle}
             onDelete={(id) => setDeleteConfirmId(id)}
@@ -160,7 +163,7 @@ export default function AutomationPage() {
         )}
       </div>
 
-      <RuleDialog 
+      <RuleDialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         rule={selectedRule}
@@ -175,8 +178,8 @@ export default function AutomationPage() {
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeleteConfirmId(null)}>Cancel</Button>
-            <Button 
-              variant="destructive" 
+            <Button
+              variant="destructive"
               onClick={() => deleteConfirmId && handleDelete(deleteConfirmId)}
               disabled={deleting}
             >

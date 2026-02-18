@@ -1,0 +1,328 @@
+
+> careops-app@0.1.0 lint
+> eslint
+
+
+/home/amar/Documents/Hackathon/careops-app/check_booking.ts
+  4:1  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+
+/home/amar/Documents/Hackathon/careops-app/check_contact.ts
+  4:1  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+
+/home/amar/Documents/Hackathon/careops-app/check_dashboard_stats.ts
+  4:1  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+
+/home/amar/Documents/Hackathon/careops-app/check_twilio.ts
+  7:1  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+
+/home/amar/Documents/Hackathon/careops-app/debug_smtp.ts
+  8:1  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+
+/home/amar/Documents/Hackathon/careops-app/get_otp.ts
+  4:1  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+
+/home/amar/Documents/Hackathon/careops-app/prisma/seed-live-business.ts
+  6:1  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+
+/home/amar/Documents/Hackathon/careops-app/reset_password.ts
+  5:1  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+
+/home/amar/Documents/Hackathon/careops-app/revert_bypass.ts
+  4:1  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+
+/home/amar/Documents/Hackathon/careops-app/seed_service.ts
+  4:1  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+
+/home/amar/Documents/Hackathon/careops-app/seed_settings_user.ts
+  7:1  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+
+/home/amar/Documents/Hackathon/careops-app/src/app/(auth)/login/page.tsx
+  12:1  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+
+/home/amar/Documents/Hackathon/careops-app/src/app/(auth)/verify-otp/page.tsx
+  13:1  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+
+/home/amar/Documents/Hackathon/careops-app/src/app/(dashboard)/bookings/page.tsx
+   56:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  120:44  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Documents/Hackathon/careops-app/src/app/(dashboard)/contacts/page.tsx
+   20:1  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+  131:1  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+
+/home/amar/Documents/Hackathon/careops-app/src/app/(dashboard)/inventory/page.tsx
+  46:48  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  61:47  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Documents/Hackathon/careops-app/src/app/(dashboard)/settings/page.tsx
+  17:1  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+
+/home/amar/Documents/Hackathon/careops-app/src/app/(dashboard)/staff/page.tsx
+  37:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  55:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Documents/Hackathon/careops-app/src/app/(dashboard)/voice/calls/page.tsx
+  69:1   warning  Missing JSDoc comment  jsdoc/require-jsdoc
+  79:1   warning  Missing JSDoc comment  jsdoc/require-jsdoc
+  88:1   warning  Missing JSDoc comment  jsdoc/require-jsdoc
+  95:16  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+
+/home/amar/Documents/Hackathon/careops-app/src/app/(public)/contact/[slug]/page.tsx
+  22:36  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Documents/Hackathon/careops-app/src/app/(public)/form/[slug]/page.tsx
+  16:1   warning  Missing JSDoc comment                     jsdoc/require-jsdoc
+  19:36  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Documents/Hackathon/careops-app/src/app/api/ai/insights/route.ts
+  43:12  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Documents/Hackathon/careops-app/src/app/api/ai/preferences/route.ts
+  16:34  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  22:32  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Documents/Hackathon/careops-app/src/app/api/ai/voice/route.ts
+   20:23   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   75:14   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   85:39   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   91:42   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  122:101  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  123:97   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  201:21   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  204:49   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  222:29   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  226:69   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Documents/Hackathon/careops-app/src/app/api/ai/voice/settings/route.ts
+  50:30  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Documents/Hackathon/careops-app/src/app/api/auth/register/route.ts
+  64:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Documents/Hackathon/careops-app/src/app/api/automation/[id]/test/route.ts
+  59:32  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Documents/Hackathon/careops-app/src/app/api/booking/create/route.ts
+  162:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Documents/Hackathon/careops-app/src/app/api/bookings/[id]/route.ts
+  11:1  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+
+/home/amar/Documents/Hackathon/careops-app/src/app/api/dashboard/route.ts
+  81:12  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Documents/Hackathon/careops-app/src/app/api/staff/route.ts
+  118:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Documents/Hackathon/careops-app/src/app/api/voice/dnc/route.ts
+   6:8  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+  32:8  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+
+/home/amar/Documents/Hackathon/careops-app/src/app/api/voice/tools/route.ts
+   10:1  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+   14:1  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+   31:1  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+  312:8  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+
+/home/amar/Documents/Hackathon/careops-app/src/app/api/voice/webhook/route.ts
+   28:1  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+   44:1  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+   69:8  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+  326:8  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+
+/home/amar/Documents/Hackathon/careops-app/src/app/layout.tsx
+  18:16  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+
+/home/amar/Documents/Hackathon/careops-app/src/app/onboarding/page.tsx
+   54:62  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   91:63  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  109:56  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  113:62  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  116:68  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  119:60  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  119:96  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  175:45  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  182:57  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  202:47  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  203:43  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  287:52  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  320:23  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  321:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  337:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  380:23  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  381:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  394:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  436:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  437:23  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  451:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Documents/Hackathon/careops-app/src/app/page.tsx
+  112:1  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+  149:1  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+  159:1  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+  183:1  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+  215:1  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+
+/home/amar/Documents/Hackathon/careops-app/src/components/automation/rule-list.tsx
+  94:1  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+
+/home/amar/Documents/Hackathon/careops-app/src/components/bookings/full-calendar.tsx
+  42:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Documents/Hackathon/careops-app/src/components/dashboard-voice.tsx
+  15:71  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  15:86  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Documents/Hackathon/careops-app/src/components/dashboard/todays-schedule.tsx
+  3:17  error  'User' is defined but never used. Allowed unused vars must match /^_/u         @typescript-eslint/no-unused-vars
+  3:23  error  'CheckCircle' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  3:36  error  'AlertCircle' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+/home/amar/Documents/Hackathon/careops-app/src/components/inbox/chat-input.tsx
+  4:43  error  'MessageCircle' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+/home/amar/Documents/Hackathon/careops-app/src/components/layout/header.tsx
+  37:1  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+
+/home/amar/Documents/Hackathon/careops-app/src/components/providers/theme-provider.tsx
+  6:8  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+
+/home/amar/Documents/Hackathon/careops-app/src/components/providers/voice-provider.tsx
+  46:67  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  46:82  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Documents/Hackathon/careops-app/src/components/settings/integrations-tab.tsx
+  3:31  error  'MessageCircle' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+/home/amar/Documents/Hackathon/careops-app/src/components/settings/voice-settings-tab.tsx
+  198:14  error  'error' is defined but never used. Allowed unused caught errors must match /^_/u  @typescript-eslint/no-unused-vars
+  215:14  error  'error' is defined but never used. Allowed unused caught errors must match /^_/u  @typescript-eslint/no-unused-vars
+  231:14  error  'error' is defined but never used. Allowed unused caught errors must match /^_/u  @typescript-eslint/no-unused-vars
+
+/home/amar/Documents/Hackathon/careops-app/src/components/settings/webhooks-section.tsx
+  80:14  error  'error' is defined but never used. Allowed unused caught errors must match /^_/u  @typescript-eslint/no-unused-vars
+  96:14  error  'error' is defined but never used. Allowed unused caught errors must match /^_/u  @typescript-eslint/no-unused-vars
+
+/home/amar/Documents/Hackathon/careops-app/src/components/staff/invite-staff-dialog.tsx
+  83:18  error  'error' is defined but never used. Allowed unused caught errors must match /^_/u  @typescript-eslint/no-unused-vars
+
+/home/amar/Documents/Hackathon/careops-app/src/components/ui/theme-toggle.tsx
+  9:8  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+
+/home/amar/Documents/Hackathon/careops-app/src/components/voice-assistant.tsx
+   10:1   warning  Missing JSDoc comment                     jsdoc/require-jsdoc
+  212:71  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  212:86  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  232:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  441:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  441:79  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  474:36  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  497:35  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Documents/Hackathon/careops-app/src/hooks/use-toast.ts
+   26:1  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+  130:1  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+
+/home/amar/Documents/Hackathon/careops-app/src/lib/auth.ts
+  26:1  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+
+/home/amar/Documents/Hackathon/careops-app/src/lib/automation.ts
+   60:1  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+  247:1  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+  328:1  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+  477:1  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+  500:1  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+  558:1  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+  587:1  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+
+/home/amar/Documents/Hackathon/careops-app/src/lib/check-user.ts
+  8:1  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+
+/home/amar/Documents/Hackathon/careops-app/src/lib/email.ts
+  14:1  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+  18:1  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+
+/home/amar/Documents/Hackathon/careops-app/src/lib/gemini.ts
+    8:1   warning  Missing JSDoc comment                     jsdoc/require-jsdoc
+   23:1   warning  Missing JSDoc comment                     jsdoc/require-jsdoc
+   25:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   29:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   61:8   warning  Missing JSDoc comment                     jsdoc/require-jsdoc
+   87:8   warning  Missing JSDoc comment                     jsdoc/require-jsdoc
+  117:8   warning  Missing JSDoc comment                     jsdoc/require-jsdoc
+  163:8   warning  Missing JSDoc comment                     jsdoc/require-jsdoc
+  229:8   warning  Missing JSDoc comment                     jsdoc/require-jsdoc
+  254:8   warning  Missing JSDoc comment                     jsdoc/require-jsdoc
+  298:8   warning  Missing JSDoc comment                     jsdoc/require-jsdoc
+  339:8   warning  Missing JSDoc comment                     jsdoc/require-jsdoc
+  490:1   warning  Missing JSDoc comment                     jsdoc/require-jsdoc
+  520:1   warning  Missing JSDoc comment                     jsdoc/require-jsdoc
+  530:8   warning  Missing JSDoc comment                     jsdoc/require-jsdoc
+  565:35  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  567:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  634:8   warning  Missing JSDoc comment                     jsdoc/require-jsdoc
+  685:8   warning  Missing JSDoc comment                     jsdoc/require-jsdoc
+  685:59  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  735:8   warning  Missing JSDoc comment                     jsdoc/require-jsdoc
+  735:49  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  788:8   warning  Missing JSDoc comment                     jsdoc/require-jsdoc
+  839:12  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Documents/Hackathon/careops-app/src/lib/google-calendar.ts
+  264:12  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Documents/Hackathon/careops-app/src/lib/recover-user.ts
+  8:1  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+
+/home/amar/Documents/Hackathon/careops-app/src/lib/twilio.ts
+   29:1   warning  Missing JSDoc comment                     jsdoc/require-jsdoc
+   33:1   warning  Missing JSDoc comment                     jsdoc/require-jsdoc
+   33:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   66:1   warning  Missing JSDoc comment                     jsdoc/require-jsdoc
+  129:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  147:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  196:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  217:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  278:82  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  289:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Documents/Hackathon/careops-app/src/lib/update-workspace-config.ts
+  11:1   warning  Missing JSDoc comment                     jsdoc/require-jsdoc
+  30:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Documents/Hackathon/careops-app/src/lib/vapi.ts
+   16:36  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   17:48  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   18:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   19:28  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  354:51  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  354:65  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  372:63  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  372:77  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Documents/Hackathon/careops-app/src/lib/voice-actions.ts
+  12:15  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  16:44  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Documents/Hackathon/careops-app/src/lib/voice-compliance.ts
+   21:8  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+   35:8  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+   59:8  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+   63:8  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+   71:8  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+   79:8  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+  138:8  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+
+/home/amar/Documents/Hackathon/careops-app/tests/unit/email.test.ts
+  39:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  67:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  89:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Documents/Hackathon/careops-app/tests/unit/sms.test.ts
+  31:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  53:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  77:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+✖ 188 problems (11 errors, 177 warnings)
+  0 errors and 85 warnings potentially fixable with the `--fix` option.
+

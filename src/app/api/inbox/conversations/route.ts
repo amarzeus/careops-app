@@ -7,7 +7,7 @@ import { classifyConversationIntent } from "@/lib/gemini";
  *
  * @param req
  */
-export async function GET(req: Request) {
+export async function GET(_req: Request) {
     const user = await getCurrentUser();
     if (!user?.workspaceId) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -52,7 +52,7 @@ export async function GET(req: Request) {
         const formatted = await Promise.all(conversations.map(async (c) => {
             // Find the last inbound message for classification
             const lastInboundMessage = c.messages.find(m => !m.isAutomated && m.direction === "INBOUND");
-            
+
             let intent = null;
             if (lastInboundMessage?.content && c.unreadCount > 0) {
                 try {
@@ -60,12 +60,12 @@ export async function GET(req: Request) {
                         .filter(m => m.direction === "INBOUND" && !m.isAutomated)
                         .slice(0, 3)
                         .map(m => m.content);
-                    
+
                     const classification = await classifyConversationIntent(
                         lastInboundMessage.content,
                         history.length > 0 ? history : undefined
                     );
-                    
+
                     if (classification.confidence > 0.5) {
                         intent = {
                             type: classification.intent,
@@ -101,8 +101,8 @@ export async function GET(req: Request) {
         });
 
         return NextResponse.json(formatted);
-    } catch (error) {
-        console.error("Inbox Error:", error);
+    } catch (_error) {
+        console.error("Inbox Error:", _error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }

@@ -6,6 +6,8 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 
+import { useToast } from "@/hooks/use-toast";
+
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -60,6 +62,7 @@ export function InviteStaffDialog({
     initialData: _initialData,
 }: InviteStaffDialogProps) {
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const { toast } = useToast();
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -80,8 +83,12 @@ export function InviteStaffDialog({
             await onSubmit(values);
             form.reset();
             onOpenChange(false);
-        } catch (error) {
-            // Error handled by parent
+        } catch (_error) {
+            toast({
+                title: "Error",
+                description: "Something went wrong. Please try again.",
+                variant: "destructive",
+            });
         } finally {
             setIsSubmitting(false);
         }

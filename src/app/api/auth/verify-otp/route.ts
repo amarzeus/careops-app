@@ -8,17 +8,17 @@ import { createToken, setAuthCookie } from "@/lib/auth";
  */
 export async function POST(req: Request) {
   try {
-    const { email, otp, phone } = await req.json();
+    const { identifier, otp, method = "email" } = await req.json();
 
-    if (!email || !otp) {
+    if (!identifier || !otp) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
       );
     }
 
-    const user = await prisma.user.findUnique({
-      where: { email },
+    const user = await prisma.user.findFirst({
+      where: method === "email" ? { email: identifier } : { phone: identifier },
       include: { workspace: true },
     });
 
@@ -48,7 +48,7 @@ export async function POST(req: Request) {
         // Development bypass for easy testing
         if (process.env.NODE_ENV !== "production" && otp === "123456") {
           console.log("------------------------------------------");
-          console.log(`BYPASS: Using magic OTP 123456 for ${email}`);
+          console.log(`BYPASS: Using magic OTP 123456 for ${identifier}`);
           console.log("------------------------------------------");
           verified = true;
         } else {

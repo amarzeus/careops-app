@@ -21,7 +21,7 @@ export async function GET() {
     // Check database connection
     await prisma.$queryRaw`SELECT 1`;
     checks.checks.database = true;
-  } catch (error) {
+  } catch (_error) {
     checks.checks.database = false;
     checks.status = 'degraded';
   }

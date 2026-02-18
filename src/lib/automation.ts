@@ -267,7 +267,7 @@ async function handleNewContact(workspace: Workspace, data: Record<string, unkno
   if (conversation.isActive === false) return;
 
   // Determine the best channel and create the message record
-  let channel: "EMAIL" | "SMS" | "WHATSAPP" = "EMAIL";
+  let _channel: "EMAIL" | "SMS" | "WHATSAPP" = "EMAIL";
 
   // Send actual email
   if (contact.email && isEmailAvailable(workspace)) {
@@ -294,7 +294,7 @@ async function handleNewContact(workspace: Workspace, data: Record<string, unkno
 
   // Also send via WhatsApp if contact has phone and WhatsApp is configured
   if (contact.phone && isWhatsAppAvailable()) {
-    channel = "WHATSAPP";
+    _channel = "WHATSAPP";
     await prisma.message.create({
       data: {
         content: welcomeMsg,
@@ -310,7 +310,7 @@ async function handleNewContact(workspace: Workspace, data: Record<string, unkno
 
   // Fallback to SMS if WhatsApp is not available but contact has phone
   if (contact.phone && !isWhatsAppAvailable() && isSMSAvailable(workspace)) {
-    channel = "SMS";
+    _channel = "SMS";
     await prisma.message.create({
       data: {
         content: welcomeMsg,
@@ -675,22 +675,22 @@ export async function sendVoiceCallReminder(
     return { success: false, error: 'Number is in Do Not Call registry' };
   }
 
-  const message = `Hi ${contactName}, this is a reminder from ${workspaceName || 'our business'} about your upcoming ${serviceName} appointment on ${bookingDate.toLocaleDateString()} at ${bookingDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}. Please call us if you need to reschedule. Thank you.`;
+  const _message = `Hi ${contactName}, this is a reminder from ${workspaceName || 'our business'} about your upcoming ${serviceName} appointment on ${bookingDate.toLocaleDateString()} at ${bookingDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}. Please call us if you need to reschedule. Thank you.`;
 
   const result = await initiateOutboundCall({
     phoneNumber: contactPhone,
     workspaceId,
     contactName,
-      metadata: {
-        purpose: 'reminder',
-        serviceName,
-        bookingDate: bookingDate.toISOString(),
-        bookingId,
-        contactId,
-        contactPhone,
-        retryCount: 0,
-      },
-    });
+    metadata: {
+      purpose: 'reminder',
+      serviceName,
+      bookingDate: bookingDate.toISOString(),
+      bookingId,
+      contactId,
+      contactPhone,
+      retryCount: 0,
+    },
+  });
 
   if (result.success) {
     await prisma.voiceCall.create({
@@ -751,22 +751,22 @@ export async function sendVoiceCallConfirmation(
     return { success: false, error: 'Number is in Do Not Call registry' };
   }
 
-  const message = `Hi ${contactName}, this is a confirmation from ${workspaceName || 'our business'}. Your ${serviceName} appointment has been booked for ${bookingDate.toLocaleDateString()} at ${bookingDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}. We look forward to seeing you. Thank you.`;
+  const _message = `Hi ${contactName}, this is a confirmation from ${workspaceName || 'our business'}. Your ${serviceName} appointment has been booked for ${bookingDate.toLocaleDateString()} at ${bookingDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}. We look forward to seeing you. Thank you.`;
 
   const result = await initiateOutboundCall({
     phoneNumber: contactPhone,
     workspaceId,
     contactName,
-      metadata: {
-        purpose: 'confirmation',
-        serviceName,
-        bookingDate: bookingDate.toISOString(),
-        bookingId,
-        contactId,
-        contactPhone,
-        retryCount: 0,
-      },
-    });
+    metadata: {
+      purpose: 'confirmation',
+      serviceName,
+      bookingDate: bookingDate.toISOString(),
+      bookingId,
+      contactId,
+      contactPhone,
+      retryCount: 0,
+    },
+  });
 
   if (result.success) {
     await prisma.voiceCall.create({
@@ -824,20 +824,20 @@ export async function sendVoiceCallFollowUp(
   }
 
   const servicePart = serviceName ? ` about your recent ${serviceName} visit` : '';
-  const message = `Hi ${contactName}, this is a follow-up call from ${workspaceName || 'our business'}${servicePart}. We wanted to check if everything went well and if there's anything else we can help you with. Please call us back at your convenience. Thank you.`;
+  const _message = `Hi ${contactName}, this is a follow-up call from ${workspaceName || 'our business'}${servicePart}. We wanted to check if everything went well and if there's anything else we can help you with. Please call us back at your convenience. Thank you.`;
 
   const result = await initiateOutboundCall({
     phoneNumber: contactPhone,
     workspaceId,
     contactName,
-      metadata: {
-        purpose: 'follow_up',
-        serviceName,
-        contactId,
-        contactPhone,
-        retryCount: 0,
-      },
-    });
+    metadata: {
+      purpose: 'follow_up',
+      serviceName,
+      contactId,
+      contactPhone,
+      retryCount: 0,
+    },
+  });
 
   if (result.success) {
     await prisma.voiceCall.create({

@@ -7,7 +7,7 @@ import { checkVapiHealth, getVapiStatus, isVapiConfigured } from '@/lib/vapi';
  *
  * @param req
  */
-export async function GET(req: NextRequest) {
+export async function GET(_req: Request) {
   try {
     const user = await getCurrentUser();
     if (!user?.workspaceId) {
@@ -92,14 +92,14 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { voiceAgentId, phoneNumberId, action } = body;
+    const { voiceAgentId, _phoneNumberId, action } = body;
 
     if (action === 'test') {
       const vapiHealth = await checkVapiHealth();
       return NextResponse.json({
         success: vapiHealth.healthy,
-        message: vapiHealth.healthy 
-          ? 'VAPI connection successful' 
+        message: vapiHealth.healthy
+          ? 'VAPI connection successful'
           : `VAPI connection failed: ${vapiHealth.error}`,
         health: vapiHealth,
       });
@@ -107,7 +107,7 @@ export async function POST(req: NextRequest) {
 
     if (action === 'activate_voice' || action === 'deactivate_voice') {
       const isActive = action === 'activate_voice';
-      
+
       if (voiceAgentId) {
         await prisma.voiceAgent.update({
           where: { id: voiceAgentId },
@@ -117,8 +117,8 @@ export async function POST(req: NextRequest) {
 
       return NextResponse.json({
         success: true,
-        message: isActive 
-          ? 'Voice agent activated' 
+        message: isActive
+          ? 'Voice agent activated'
           : 'Voice agent deactivated',
       });
     }

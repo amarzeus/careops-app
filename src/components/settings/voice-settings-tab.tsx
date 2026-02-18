@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+
 import {
-  Sparkles, Brain, MessageSquare, Mic, AlertTriangle, Package, Settings,
-  Loader2, Check, Zap, Phone, Plus, Trash2, Edit2, Play, Pause, Copy,
-  ExternalLink, PhoneCall, Volume2, CheckCircle2, XCircle
+  Loader2, Check, Phone, Plus, Trash2, Edit2, Play, Pause,
+  Volume2, CheckCircle2, XCircle, Mic, AlertTriangle, PhoneCall
 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,22 +19,7 @@ import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { VOICE_TOOLS } from "@/lib/vapi";
 
-interface AIPreferences {
-  id: string;
-  workspaceId: string;
-  smartReplyEnabled: boolean;
-  insightsEnabled: boolean;
-  voiceEnabled: boolean;
-  anomalyDetectionEnabled: boolean;
-  inventoryForecastEnabled: boolean;
-  autoClassifyEnabled: boolean;
-  defaultReplyTone: string;
-  alertOnAnomaly: boolean;
-  dailyInsightTime: string | null;
-  geminiModel: string;
-}
-
-interface VoiceAgent {
+interface VoiceAgentLocal {
   id: string;
   name: string;
   description: string | null;
@@ -46,17 +31,17 @@ interface VoiceAgent {
   canTransfer: boolean;
   canHandleInquiry: boolean;
   tools: string | null;
-  phoneNumbers: PhoneNumber[];
+  phoneNumbers: PhoneNumberLocal[];
   createdAt: string;
 }
 
-interface PhoneNumber {
+interface PhoneNumberLocal {
   id: string;
   phoneNumber: string;
   label: string | null;
   isActive: boolean;
   voiceAgentId: string | null;
-  voiceAgent: VoiceAgent | null;
+  voiceAgent: VoiceAgentLocal | null;
   forwardToStaff: boolean;
   forwardNumber: string | null;
 }
@@ -104,8 +89,8 @@ interface EscalationCallDetail extends EscalationCall {
 export function VoiceSettingsTab() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [voiceAgents, setVoiceAgents] = useState<VoiceAgent[]>([]);
-  const [phoneNumbers, setPhoneNumbers] = useState<PhoneNumber[]>([]);
+  const [voiceAgents, setVoiceAgentLocals] = useState<VoiceAgentLocal[]>([]);
+  const [phoneNumbers, setPhoneNumberLocals] = useState<PhoneNumberLocal[]>([]);
   const [vapiStatus, setVapiStatus] = useState<{ configured: boolean; apiKeyPresent: boolean }>({
     configured: false,
     apiKeyPresent: false,
@@ -123,7 +108,7 @@ export function VoiceSettingsTab() {
 
   // Agent form state
   const [showAgentForm, setShowAgentForm] = useState(false);
-  const [editingAgent, setEditingAgent] = useState<VoiceAgent | null>(null);
+  const [editingAgent, setEditingAgent] = useState<VoiceAgentLocal | null>(null);
   const [agentForm, setAgentForm] = useState({
     name: "",
     description: "",
@@ -149,8 +134,8 @@ export function VoiceSettingsTab() {
 
       if (settingsRes.ok) {
         const data = await settingsRes.json();
-        setVoiceAgents(data.voiceAgents || []);
-        setPhoneNumbers(data.phoneNumbers || []);
+        setVoiceAgentLocals(data.voiceAgents || []);
+        setPhoneNumberLocals(data.phoneNumbers || []);
         if (data.vapiStatus) {
           setVapiStatus(data.vapiStatus);
         }
@@ -165,8 +150,8 @@ export function VoiceSettingsTab() {
         const escalationsData = await escalationsRes.json();
         setEscalationCalls(escalationsData.calls || []);
       }
-    } catch (error) {
-      console.error("Failed to fetch voice data:", error);
+    } catch (_error) {
+      console.error("Failed to fetch voice data:", _error);
     } finally {
       setLoading(false);
     }
@@ -196,7 +181,7 @@ export function VoiceSettingsTab() {
 
       if (!res.ok) throw new Error("Failed to save agent");
 
-      toast({ title: "Success", description: `Voice agent ${editingAgent ? "updated" : "created"}` });
+      toast({ title: "Success", description: `Voice agent ${editingAgent ? "updated" : "created"} ` });
       setShowAgentForm(false);
       setEditingAgent(null);
       setAgentForm({
@@ -210,7 +195,7 @@ export function VoiceSettingsTab() {
         canHandleInquiry: true,
       });
       fetchVoiceData();
-    } catch (error) {
+    } catch (_error) {
       toast({ title: "Error", description: "Failed to save agent", variant: "destructive" });
     } finally {
       setSaving(false);
@@ -227,12 +212,12 @@ export function VoiceSettingsTab() {
       });
       toast({ title: "Deleted", description: "Voice agent deleted" });
       fetchVoiceData();
-    } catch (error) {
+    } catch (_error) {
       toast({ title: "Error", description: "Failed to delete agent", variant: "destructive" });
     }
   };
 
-  const handleToggleAgent = async (agent: VoiceAgent) => {
+  const handleToggleAgent = async (agent: VoiceAgentLocal) => {
     try {
       await fetch("/api/ai/voice/settings", {
         method: "POST",
@@ -243,12 +228,12 @@ export function VoiceSettingsTab() {
         }),
       });
       fetchVoiceData();
-    } catch (error) {
+    } catch (_error) {
       toast({ title: "Error", description: "Failed to update agent", variant: "destructive" });
     }
   };
 
-  const editAgent = (agent: VoiceAgent) => {
+  const editAgent = (agent: VoiceAgentLocal) => {
     setEditingAgent(agent);
     setAgentForm({
       name: agent.name,
@@ -741,7 +726,7 @@ export function VoiceSettingsTab() {
             <DialogTitle>Escalated Call Details</DialogTitle>
             <DialogDescription>
               {selectedEscalationDetail
-                ? `${selectedEscalationDetail.contact?.name || "Unknown caller"} · ${new Date(selectedEscalationDetail.createdAt).toLocaleString()}`
+                ? `${selectedEscalationDetail.contact?.name || "Unknown caller"} · ${new Date(selectedEscalationDetail.createdAt).toLocaleString()} `
                 : "Review transcript, consent, and retry metadata"}
             </DialogDescription>
           </DialogHeader>
@@ -762,7 +747,7 @@ export function VoiceSettingsTab() {
                   <p>
                     <span className="text-gray-500">Duration:</span>{" "}
                     {selectedEscalationDetail.duration != null
-                      ? `${Math.floor(selectedEscalationDetail.duration / 60)}:${String(selectedEscalationDetail.duration % 60).padStart(2, "0")}`
+                      ? `${Math.floor(selectedEscalationDetail.duration / 60)}:${String(selectedEscalationDetail.duration % 60).padStart(2, "0")} `
                       : "-"}
                   </p>
                   <p><span className="text-gray-500">Escalation reason:</span> {selectedEscalationDetail.escalationReason || "Flagged"}</p>

@@ -1,11 +1,9 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { normalizePhoneNumber } from "@/lib/twilio";
-import { hashPassword, createToken } from "@/lib/auth";
 import { sendEmail, buildEmailTemplate } from "@/lib/email";
 import { sendSMS, buildOTPMessage } from "@/lib/sms";
 import { generateOTP, storeOTP } from "@/lib/otp";
-import { v4 as uuidv4 } from "uuid";
 
 /**
  *

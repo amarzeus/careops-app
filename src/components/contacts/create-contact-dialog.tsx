@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Loader2, Plus, UserPlus } from "lucide-react";
+import { Loader2 } from "lucide-react"; // Loader2 is used for the loading spinner
 import { Contact } from "@prisma/client";
 import { useRouter } from "next/navigation";
 
@@ -91,10 +91,10 @@ export function CreateContactDialog({
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      const url = initialData 
-        ? `/api/contacts/${initialData.id}` // We'll need to make sure this route exists for PATCH
+      const url = initialData
+        ? `/ api / contacts / ${initialData.id} ` // We'll need to make sure this route exists for PATCH
         : "/api/contacts";
-      
+
       const method = initialData ? "PATCH" : "POST";
 
       const res = await fetch(url, {
@@ -110,7 +110,7 @@ export function CreateContactDialog({
       }
 
       toast.success(initialData ? "Contact updated" : "Contact created");
-      
+
       if (onContactCreated) {
         onContactCreated(data.contact);
       } else {

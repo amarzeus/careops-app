@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { triggerAutomation } from "@/lib/automation";
-import { addHours, startOfDay, endOfDay, addDays } from "date-fns";
+import { startOfDay, endOfDay, addDays } from "date-fns";
 
 /**
  * BEFORE_BOOKING Scheduler

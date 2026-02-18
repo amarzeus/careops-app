@@ -4,8 +4,8 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import {
   Building2, Mail, FileText, Calendar, ClipboardList,
-  Package, Users, Rocket, Sparkles, Send, Check,
-  ArrowRight, ArrowLeft, Mic, Activity, MessageSquare, Edit2, Trash2
+  Package, Users, Rocket, Check,
+  ArrowRight, ArrowLeft, Activity, Edit2, Trash2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -140,7 +140,7 @@ export default function OnboardingPage() {
       /* if (data.extractedData) {
         applyExtractedData(data.extractedData);
       } */
-    } catch (e) {
+    } catch (_e) {
       setChatMessages([{ role: "assistant", content: "Hi! I'm here to help you set up this step. Tell me about your business or say 'set it up' and I'll suggest everything." }]);
     } finally {
       setChatLoading(false);
@@ -1024,7 +1024,7 @@ export default function OnboardingPage() {
                   <SelectTrigger className="h-8 text-sm"><SelectValue placeholder="Select a service..." /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">None (General Form)</SelectItem>
-                    {services.map((s, i) => (
+                    {services.map((s, _i) => (
                       s.id ? <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem> : null
                     ))}
                   </SelectContent>

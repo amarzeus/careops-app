@@ -8,22 +8,11 @@
 import {
   sendWhatsApp as twilioSendWhatsApp,
   sendWhatsAppOTP as twilioSendWhatsAppOTP,
-  isConfigured as isWhatsAppConfigured,
   type TwilioResult,
 } from "./twilio";
 
 // ──── Types ────────────────────────────────────────────────────────────────────
 
-export interface WhatsAppSendOptions {
-  to: string;
-  templateName: string;
-  parameters: Array<{ type: string; text: string }>;
-}
-
-export interface WhatsAppTextOptions {
-  to: string;
-  body: string;
-}
 
 // ──── OTP via WhatsApp ─────────────────────────────────────────────────────────
 

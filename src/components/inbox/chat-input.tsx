@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Send, Loader2, Mail, Smartphone, MessageCircle, ChevronDown } from "lucide-react";
+import { Send, Loader2, Mail, Smartphone, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -75,8 +75,8 @@ export function ChatInput({
                   setShowChannelPicker(false);
                 }}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium transition-all ${isActive
-                    ? "bg-white shadow-sm border border-gray-200"
-                    : "hover:bg-gray-100 text-gray-500"
+                  ? "bg-white shadow-sm border border-gray-200"
+                  : "hover:bg-gray-100 text-gray-500"
                   }`}
               >
                 <Icon className={`w-3.5 h-3.5 ${isActive ? cfg.color : ""}`} />

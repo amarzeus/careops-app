@@ -1,8 +1,7 @@
 "use client";
 
-import { AlertTriangle, ArrowRight, CheckCircle2, AlertCircle, XCircle } from "lucide-react";
+import { ArrowRight, CheckCircle2, AlertCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 

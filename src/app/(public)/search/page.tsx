@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { Search, Loader2, MapPin, Clock, ArrowRight, Building2 } from "lucide-react";
+import { Search, MapPin, Building2, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -39,8 +39,8 @@ export default function SearchPage() {
                 const data = await res.json();
                 setWorkspaces(data.workspaces || []);
             }
-        } catch (error) {
-            console.error("Error fetching workspaces:", error);
+        } catch (_error) {
+            console.error("Error fetching workspaces:", _error);
         } finally {
             setLoading(false);
         }
@@ -137,12 +137,12 @@ export default function SearchPage() {
                                     </div>
 
                                     <div className="flex gap-2 mt-auto pt-4 border-t">
-                                        <Link href={`/book/${workspace.id}`} className="flex-1">
+                                        <Link href={`/ book / ${workspace.id} `} className="flex-1">
                                             <Button className="w-full bg-blue-600 hover:bg-blue-700">
                                                 Book Now
                                             </Button>
                                         </Link>
-                                        <Link href={`/contact/${workspace.id}`} className="flex-1">
+                                        <Link href={`/ contact / ${workspace.id} `} className="flex-1">
                                             <Button variant="outline" className="w-full">
                                                 Contact
                                             </Button>

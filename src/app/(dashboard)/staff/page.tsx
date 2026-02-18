@@ -27,7 +27,7 @@ export default function StaffPage() {
             if (!res.ok) throw new Error("Failed to fetch staff");
             const data = await res.json();
             setStaff(data.staff);
-        } catch (error) {
+        } catch (_error) {
             toast({ title: "Error", description: "Could not load staff list", variant: "destructive" });
         } finally {
             setLoading(false);
@@ -84,7 +84,7 @@ export default function StaffPage() {
 
             toast({ title: "Success", description: "Staff member removed" });
             fetchStaff();
-        } catch (error) {
+        } catch (_error) {
             toast({ title: "Error", description: "Could not remove staff member", variant: "destructive" });
         }
     };
@@ -103,7 +103,7 @@ export default function StaffPage() {
                 ) : (
                     <StaffList
                         staff={staff}
-                        onEdit={(member) => {
+                        onEdit={(_member) => {
                             // Edit not fully implemented in this quick fix, but could be added
                             toast({ title: "Info", description: "Edit functionality coming soon" });
                         }}

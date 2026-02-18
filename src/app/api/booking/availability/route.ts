@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { startOfDay, endOfDay, parseISO, format, addMinutes, isBefore, isAfter } from "date-fns";
-import { toUTC, fromUTC } from "@/lib/date-utils";
+import { startOfDay, endOfDay, parseISO, addMinutes, isBefore, isAfter } from "date-fns";
+import { format } from "date-fns-tz";
+import { toUTC } from "@/lib/date-utils";
 
 /**
  *
@@ -31,11 +32,11 @@ export async function GET(req: Request) {
 
         // Parse date as local date in the workspace's timezone
         const queryDate = parseISO(dateStr);
-        
+
         // Create start and end of day in the workspace's timezone, then convert to UTC
         const dayStartLocal = startOfDay(queryDate);
         const dayEndLocal = endOfDay(queryDate);
-        
+
         const dayStart = toUTC(dayStartLocal, timezone);
         const dayEnd = toUTC(dayEndLocal, timezone);
 
