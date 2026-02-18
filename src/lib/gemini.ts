@@ -1,11 +1,20 @@
 import { GoogleGenAI, Type } from "@google/genai";
 
 const GEMINI_KEY = process.env.GEMINI_API_KEY || "";
-if (!GEMINI_KEY && process.env.NODE_ENV !== "test") {
-  console.error("CRITICAL: GEMINI_API_KEY is missing from environment variables.");
-}
 
-const client = new GoogleGenAI({ apiKey: GEMINI_KEY });
+// Lazy initialization to prevent build-time errors if env vars are missing
+let clientInstance: GoogleGenAI | null = null;
+
+function getClient(): GoogleGenAI {
+  if (!clientInstance) {
+    if (!GEMINI_KEY && process.env.NODE_ENV !== "test") {
+      console.error("CRITICAL: GEMINI_API_KEY is missing from environment variables.");
+      // We don't throw here to avoid crashing the build if this is just a side-effect import
+    }
+    clientInstance = new GoogleGenAI({ apiKey: GEMINI_KEY });
+  }
+  return clientInstance;
+}
 
 // ──────────────────────────────────────────────
 // Core AI Engine
@@ -25,6 +34,7 @@ async function callGemini<T>(
       config.responseSchema = responseSchema;
     }
 
+    const client = getClient();
     const response = await client.models.generateContent({
       model: "gemini-2.0-flash",
       contents: prompt,
@@ -545,6 +555,7 @@ BEHAVIOR RULES:
       { role: "user", parts: [{ text: userMessage }] }
     ];
 
+    const client = getClient();
     // We do NOT use responseSchema when using tools, as the model needs flexibility to call tools or just talk.
     // Instead, we inspect the response for function calls.
     const response = await client.models.generateContent({
@@ -802,6 +813,7 @@ export async function extractInventoryItemsFromImage(
   };
 
   try {
+    const client = getClient();
     const response = await client.models.generateContent({
       model: "gemini-2.0-flash",
       config: {
@@ -829,9 +841,10 @@ export async function extractInventoryItemsFromImage(
 
     const text = response.text;
     if (!text) return null;
+
     return JSON.parse(text) as ScannedInvoice;
-  } catch (err) {
-    console.error("Multimodal Scan Error:", err);
+  } catch (error) {
+    console.error("Multimodal Inventory Scan Error:", error);
     return null;
   }
 }

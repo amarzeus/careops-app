@@ -3,7 +3,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { GoogleGenAI, Type } from "@google/genai";
 
-const client = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
+const GEMINI_KEY = process.env.GEMINI_API_KEY || "";
 
 /**
  *
@@ -194,6 +194,7 @@ Returns a JSON object with:
   };
 
   try {
+    const client = new GoogleGenAI({ apiKey: GEMINI_KEY });
     const chat = client.chats.create({
       model: "gemini-2.0-flash",
       config: {
