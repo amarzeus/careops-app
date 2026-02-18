@@ -46,8 +46,8 @@ export default function InboxPage() {
         if (res.ok) {
           const data = await res.json();
           setConversations(data);
-          if (data.length > 0 && !activeId) {
-            setActiveId(data[0].id);
+          if (data.length > 0) {
+            setActiveId((prev) => prev || data[0].id);
           }
         }
       } catch (error) {

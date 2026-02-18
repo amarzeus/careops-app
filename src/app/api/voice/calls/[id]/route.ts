@@ -29,6 +29,7 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
       },
       include: {
         contact: true,
+        consent: true,
       },
     });
 
@@ -122,6 +123,33 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
       });
 
       return NextResponse.json(updated);
+    }
+
+    if (action === 'resolve-escalation') {
+      if (user.role !== 'OWNER') {
+        return NextResponse.json(
+          { error: 'Only workspace owners can resolve escalations' },
+          { status: 403 }
+        );
+      }
+
+      const { note } = body;
+
+      const updated = await prisma.voiceCall.update({
+        where: { id },
+        data: {
+          escalated: false,
+          escalationReason: null,
+          outcome: 'ESCALATION_REVIEWED',
+          ...(note
+            ? {
+                summary: note,
+              }
+            : {}),
+        },
+      });
+
+      return NextResponse.json({ success: true, call: updated });
     }
 
     return NextResponse.json(

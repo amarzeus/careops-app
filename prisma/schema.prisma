@@ -93,8 +93,9 @@ model Workspace {
   webhookDeliveries WebhookDeliveryLog[]
   voiceCalls      VoiceCall[]
   voiceAgents     VoiceAgent[]
-  phoneNumbers   PhoneNumber[]
-  aiPreferences  AIPreferences?
+  phoneNumbers    PhoneNumber[]
+  doNotCallEntries DoNotCallEntry[]
+  aiPreferences   AIPreferences?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -418,6 +419,14 @@ model VoiceCall {
   // Metadata
   metadata        String?   // JSON string with additional data
   
+  // Escalation tracking
+  escalated       Boolean   @default(false)
+  escalationReason String?  // frustration, request, complexity
+  transferredTo   String?   // Staff user ID if transferred
+  
+  // Consent
+  consent         CallConsent?
+  
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
@@ -484,6 +493,50 @@ model PhoneNumber {
   updatedAt       DateTime  @updatedAt
 
   @@index([workspaceId])
+}
+
+// ──── Voice Compliance Models ────
+
+model CallConsent {
+  id              String    @id @default(cuid())
+  voiceCallId     String    @unique
+  voiceCall       VoiceCall @relation(fields: [voiceCallId], references: [id])
+  
+  // Consent details
+  consentText     String    // What was asked
+  consentResponse Boolean   // true = granted, false = denied
+  capturedAt      DateTime  @default(now())
+  
+  // Metadata
+  channel         String    @default("voice") // voice, sms, email
+  notes           String?
+  
+  createdAt       DateTime  @default(now())
+  
+  @@index([voiceCallId])
+  @@index([capturedAt])
+}
+
+model DoNotCallEntry {
+  id              String    @id @default(cuid())
+  phoneNumber     String
+  workspaceId     String
+  workspace       Workspace @relation(fields: [workspaceId], references: [id])
+  
+  // DNC details
+  source          String    @default("customer_request") // customer_request, legal, admin
+  reason          String?
+  
+  // Metadata
+  addedBy         String?   // User ID who added
+  isActive        Boolean   @default(true)
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  @@unique([workspaceId, phoneNumber])
+  @@index([phoneNumber])
+  @@index([workspaceId, isActive])
 }
 
 // ──── AI Preferences (Per Workspace) ────

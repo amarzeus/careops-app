@@ -136,6 +136,7 @@ export function Header({ title, subtitle, children }: HeaderProps) {
       { type: "page", label: "Bookings", href: "/bookings", keywords: ["bookings", "appointments", "schedule", "calendar"] },
       { type: "page", label: "Forms", href: "/forms", keywords: ["forms", "intake", "contact", "submissions"] },
       { type: "page", label: "Inventory", href: "/inventory", keywords: ["inventory", "stock", "supplies", "items"] },
+      { type: "page", label: "Voice Calls", href: "/voice/calls", keywords: ["voice", "calls", "vapi", "escalation", "transcript"] },
       { type: "page", label: "Staff", href: "/staff", keywords: ["staff", "team", "members", "permissions"] },
       { type: "page", label: "Automation", href: "/automation", keywords: ["automation", "rules", "triggers", "workflows"] },
       { type: "page", label: "Settings", href: "/settings", keywords: ["settings", "workspace", "profile", "security", "export"] },

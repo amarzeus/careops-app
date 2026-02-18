@@ -77,7 +77,7 @@ function SettingsContent() {
       toast({ title: "Access Denied", description: "Calendar access was denied. Please grant permission to connect.", variant: "destructive" });
       router.replace("/settings?tab=integrations");
     }
-  }, [searchParams]);
+  }, [searchParams, router]);
 
   const fetchWorkspace = async () => {
     try {

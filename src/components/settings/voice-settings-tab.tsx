@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { VOICE_TOOLS } from "@/lib/vapi";
@@ -60,6 +61,43 @@ interface PhoneNumber {
   forwardNumber: string | null;
 }
 
+interface DoNotCallEntry {
+  id: string;
+  phoneNumber: string;
+  source: string;
+  reason: string | null;
+  isActive: boolean;
+  createdAt: string;
+}
+
+interface EscalationCall {
+  id: string;
+  callSid: string | null;
+  status: string;
+  escalated: boolean;
+  escalationReason: string | null;
+  summary: string | null;
+  transcript: string | null;
+  createdAt: string;
+  contact: {
+    id: string;
+    name: string;
+    phone: string | null;
+  } | null;
+}
+
+interface EscalationCallDetail extends EscalationCall {
+  outcome: string | null;
+  duration: number | null;
+  metadata: string | null;
+  consent: {
+    id: string;
+    consentResponse: boolean;
+    consentText: string;
+    capturedAt: string;
+  } | null;
+}
+
 /**
  *
  */
@@ -72,6 +110,16 @@ export function VoiceSettingsTab() {
     configured: false,
     apiKeyPresent: false,
   });
+  const [dncEntries, setDncEntries] = useState<DoNotCallEntry[]>([]);
+  const [escalationCalls, setEscalationCalls] = useState<EscalationCall[]>([]);
+  const [savingDnc, setSavingDnc] = useState(false);
+  const [resolvingCallId, setResolvingCallId] = useState<string | null>(null);
+  const [selectedEscalationId, setSelectedEscalationId] = useState<string | null>(null);
+  const [selectedEscalationDetail, setSelectedEscalationDetail] = useState<EscalationCallDetail | null>(null);
+  const [loadingEscalationDetail, setLoadingEscalationDetail] = useState(false);
+  const [newDncPhone, setNewDncPhone] = useState("");
+  const [newDncSource, setNewDncSource] = useState("customer_request");
+  const [newDncReason, setNewDncReason] = useState("");
 
   // Agent form state
   const [showAgentForm, setShowAgentForm] = useState(false);
@@ -93,14 +141,29 @@ export function VoiceSettingsTab() {
 
   const fetchVoiceData = async () => {
     try {
-      const res = await fetch("/api/ai/voice/settings");
-      if (res.ok) {
-        const data = await res.json();
+      const [settingsRes, dncRes, escalationsRes] = await Promise.all([
+        fetch("/api/ai/voice/settings"),
+        fetch("/api/voice/dnc"),
+        fetch("/api/voice/calls?escalated=true&limit=20"),
+      ]);
+
+      if (settingsRes.ok) {
+        const data = await settingsRes.json();
         setVoiceAgents(data.voiceAgents || []);
         setPhoneNumbers(data.phoneNumbers || []);
         if (data.vapiStatus) {
           setVapiStatus(data.vapiStatus);
         }
+      }
+
+      if (dncRes.ok) {
+        const dncData = await dncRes.json();
+        setDncEntries(dncData.entries || []);
+      }
+
+      if (escalationsRes.ok) {
+        const escalationsData = await escalationsRes.json();
+        setEscalationCalls(escalationsData.calls || []);
       }
     } catch (error) {
       console.error("Failed to fetch voice data:", error);
@@ -198,6 +261,153 @@ export function VoiceSettingsTab() {
       canHandleInquiry: agent.canHandleInquiry,
     });
     setShowAgentForm(true);
+  };
+
+  const handleAddDnc = async () => {
+    if (!newDncPhone.trim()) {
+      toast({ title: "Phone required", description: "Enter a phone number to block", variant: "destructive" });
+      return;
+    }
+
+    setSavingDnc(true);
+    try {
+      const res = await fetch("/api/voice/dnc", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          phoneNumber: newDncPhone,
+          source: newDncSource,
+          reason: newDncReason || null,
+          isActive: true,
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Failed to add DNC entry");
+      }
+
+      toast({ title: "Saved", description: "Number added to Do Not Call registry" });
+      setNewDncPhone("");
+      setNewDncReason("");
+      await fetchVoiceData();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to add DNC entry",
+        variant: "destructive",
+      });
+    } finally {
+      setSavingDnc(false);
+    }
+  };
+
+  const handleToggleDnc = async (entry: DoNotCallEntry) => {
+    setSavingDnc(true);
+    try {
+      const res = await fetch("/api/voice/dnc", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          phoneNumber: entry.phoneNumber,
+          source: entry.source,
+          reason: entry.reason,
+          isActive: !entry.isActive,
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Failed to update DNC entry");
+      }
+
+      toast({
+        title: entry.isActive ? "Unblocked" : "Blocked",
+        description: entry.isActive
+          ? "Number removed from active DNC block"
+          : "Number re-added to active DNC block",
+      });
+      await fetchVoiceData();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to update DNC entry",
+        variant: "destructive",
+      });
+    } finally {
+      setSavingDnc(false);
+    }
+  };
+
+  const handleResolveEscalation = async (callId: string) => {
+    setResolvingCallId(callId);
+    try {
+      const res = await fetch(`/api/voice/calls/${callId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "resolve-escalation",
+          note: "Escalation reviewed by workspace owner",
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Failed to resolve escalation");
+      }
+
+      toast({ title: "Escalation resolved", description: "Call marked as reviewed" });
+      await fetchVoiceData();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to resolve escalation",
+        variant: "destructive",
+      });
+    } finally {
+      setResolvingCallId(null);
+    }
+  };
+
+  const openEscalationDetails = async (callId: string) => {
+    setSelectedEscalationId(callId);
+    setLoadingEscalationDetail(true);
+    try {
+      const res = await fetch(`/api/voice/calls/${callId}`);
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Failed to load call details");
+      }
+
+      const data = (await res.json()) as EscalationCallDetail;
+      setSelectedEscalationDetail(data);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to load call details",
+        variant: "destructive",
+      });
+      setSelectedEscalationId(null);
+      setSelectedEscalationDetail(null);
+    } finally {
+      setLoadingEscalationDetail(false);
+    }
+  };
+
+  const closeEscalationDetails = () => {
+    setSelectedEscalationId(null);
+    setSelectedEscalationDetail(null);
+    setLoadingEscalationDetail(false);
+  };
+
+  const parseCallMetadata = (raw: string | null): Record<string, unknown> => {
+    if (!raw) return {};
+    try {
+      const parsed = JSON.parse(raw) as unknown;
+      return parsed && typeof parsed === "object" ? (parsed as Record<string, unknown>) : {};
+    } catch {
+      return {};
+    }
   };
 
   if (loading) {
@@ -458,6 +668,245 @@ export function VoiceSettingsTab() {
           </Card>
         ))}
       </div>
+
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-amber-600" />
+            Voice Escalation Inbox
+          </CardTitle>
+          <CardDescription>
+            Calls flagged for frustration/escalation. Resolve once reviewed.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {escalationCalls.length === 0 ? (
+            <p className="text-sm text-gray-500">No escalated calls right now.</p>
+          ) : (
+            escalationCalls.map((call) => (
+              <div
+                key={call.id}
+                className="flex flex-col gap-2 rounded-lg border border-amber-200 bg-amber-50/40 p-3 sm:flex-row sm:items-start sm:justify-between"
+              >
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-gray-900">
+                    {call.contact?.name || "Unknown Caller"}
+                    {call.contact?.phone ? ` (${call.contact.phone})` : ""}
+                  </p>
+                  <p className="text-xs text-gray-600">
+                    {call.escalationReason || "Escalation flagged"} · {new Date(call.createdAt).toLocaleString()}
+                  </p>
+                  {call.summary && <p className="text-xs text-gray-700">Summary: {call.summary}</p>}
+                  {!call.summary && call.transcript && (
+                    <p className="text-xs text-gray-700">
+                      Transcript: {call.transcript.slice(0, 180)}{call.transcript.length > 180 ? "..." : ""}
+                    </p>
+                  )}
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => openEscalationDetails(call.id)}
+                    disabled={loadingEscalationDetail && selectedEscalationId === call.id}
+                  >
+                    {loadingEscalationDetail && selectedEscalationId === call.id ? (
+                      <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                    ) : null}
+                    Details
+                  </Button>
+                  <Button
+                    size="sm"
+                    className="bg-emerald-600 hover:bg-emerald-700"
+                    disabled={resolvingCallId === call.id}
+                    onClick={() => handleResolveEscalation(call.id)}
+                  >
+                    {resolvingCallId === call.id ? (
+                      <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                    ) : (
+                      <Check className="w-4 h-4 mr-1" />
+                    )}
+                    Mark Reviewed
+                  </Button>
+                </div>
+              </div>
+            ))
+          )}
+        </CardContent>
+      </Card>
+
+      <Dialog open={!!selectedEscalationId} onOpenChange={(open) => !open && closeEscalationDetails()}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>Escalated Call Details</DialogTitle>
+            <DialogDescription>
+              {selectedEscalationDetail
+                ? `${selectedEscalationDetail.contact?.name || "Unknown caller"} · ${new Date(selectedEscalationDetail.createdAt).toLocaleString()}`
+                : "Review transcript, consent, and retry metadata"}
+            </DialogDescription>
+          </DialogHeader>
+
+          {loadingEscalationDetail ? (
+            <div className="flex items-center justify-center py-10">
+              <Loader2 className="w-5 h-5 animate-spin text-emerald-600" />
+            </div>
+          ) : selectedEscalationDetail ? (
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm">Summary</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2 text-sm">
+                  <p><span className="text-gray-500">Status:</span> {selectedEscalationDetail.status}</p>
+                  <p><span className="text-gray-500">Outcome:</span> {selectedEscalationDetail.outcome || "-"}</p>
+                  <p>
+                    <span className="text-gray-500">Duration:</span>{" "}
+                    {selectedEscalationDetail.duration != null
+                      ? `${Math.floor(selectedEscalationDetail.duration / 60)}:${String(selectedEscalationDetail.duration % 60).padStart(2, "0")}`
+                      : "-"}
+                  </p>
+                  <p><span className="text-gray-500">Escalation reason:</span> {selectedEscalationDetail.escalationReason || "Flagged"}</p>
+                  {selectedEscalationDetail.summary ? (
+                    <p className="rounded-md bg-gray-50 p-2 text-xs text-gray-700">{selectedEscalationDetail.summary}</p>
+                  ) : null}
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm">Compliance</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2 text-sm">
+                  {selectedEscalationDetail.consent ? (
+                    <>
+                      <p>
+                        <span className="text-gray-500">Consent:</span>{" "}
+                        {selectedEscalationDetail.consent.consentResponse ? "Granted" : "Denied"}
+                      </p>
+                      <p><span className="text-gray-500">Prompt:</span> {selectedEscalationDetail.consent.consentText}</p>
+                      <p className="text-xs text-gray-500">
+                        Captured at {new Date(selectedEscalationDetail.consent.capturedAt).toLocaleString()}
+                      </p>
+                    </>
+                  ) : (
+                    <p className="text-gray-500">No consent record attached.</p>
+                  )}
+
+                  {(() => {
+                    const metadata = parseCallMetadata(selectedEscalationDetail.metadata);
+                    const retryCount = metadata.retryCount as number | undefined;
+                    const nextRetryAt = metadata.nextRetryAt as string | undefined;
+                    const smsFallbackRequired = metadata.smsFallbackRequired as boolean | undefined;
+
+                    return (
+                      <div className="rounded-md bg-gray-50 p-2 text-xs text-gray-600">
+                        <p>Retry count: {typeof retryCount === "number" ? retryCount : 0}</p>
+                        <p>Next retry: {nextRetryAt ? new Date(nextRetryAt).toLocaleString() : "-"}</p>
+                        <p>SMS fallback required: {smsFallbackRequired ? "Yes" : "No"}</p>
+                      </div>
+                    );
+                  })()}
+                </CardContent>
+              </Card>
+
+              <Card className="sm:col-span-2">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm">Transcript</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="max-h-64 overflow-auto rounded-md bg-gray-50 p-3 text-sm text-gray-700 whitespace-pre-wrap">
+                    {selectedEscalationDetail.transcript || "No transcript available."}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          ) : (
+            <p className="text-sm text-gray-500">No escalation details available.</p>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">Do Not Call Registry</CardTitle>
+          <CardDescription>
+            Outbound calls to active DNC numbers are blocked automatically.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-3 sm:grid-cols-4">
+            <Input
+              className="sm:col-span-2"
+              placeholder="+1 555 123 4567"
+              value={newDncPhone}
+              onChange={(e) => setNewDncPhone(e.target.value)}
+            />
+            <Select value={newDncSource} onValueChange={setNewDncSource}>
+              <SelectTrigger>
+                <SelectValue placeholder="Source" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="customer_request">Customer Request</SelectItem>
+                <SelectItem value="legal">Legal</SelectItem>
+                <SelectItem value="admin">Admin</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button
+              onClick={handleAddDnc}
+              disabled={savingDnc || !newDncPhone.trim()}
+              className="bg-emerald-600 hover:bg-emerald-700"
+            >
+              {savingDnc ? <Loader2 className="w-4 h-4 animate-spin" /> : "Add"}
+            </Button>
+          </div>
+
+          <Textarea
+            value={newDncReason}
+            onChange={(e) => setNewDncReason(e.target.value)}
+            placeholder="Reason (optional)"
+            rows={2}
+          />
+
+          {dncEntries.length === 0 ? (
+            <p className="text-sm text-gray-500">No DNC entries yet.</p>
+          ) : (
+            <div className="space-y-2">
+              {dncEntries.map((entry) => (
+                <div
+                  key={entry.id}
+                  className="flex flex-col gap-2 rounded-md border p-3 sm:flex-row sm:items-center sm:justify-between"
+                >
+                  <div>
+                    <p className="text-sm font-medium">{entry.phoneNumber}</p>
+                    <p className="text-xs text-gray-500">
+                      {entry.source} · {entry.reason || "No reason"} · {new Date(entry.createdAt).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Badge
+                      variant="outline"
+                      className={cn(
+                        "bg-white",
+                        entry.isActive ? "text-red-700 border-red-200" : "text-gray-500 border-gray-200"
+                      )}
+                    >
+                      {entry.isActive ? "Blocked" : "Inactive"}
+                    </Badge>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      disabled={savingDnc}
+                      onClick={() => handleToggleDnc(entry)}
+                    >
+                      {entry.isActive ? "Unblock" : "Re-block"}
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

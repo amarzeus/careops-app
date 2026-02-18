@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendEmail, buildEmailTemplate } from "@/lib/email";
+import { sendSMS } from "@/lib/sms";
 import { addHours } from "date-fns";
+import { initiateOutboundCall, isVapiConfigured } from "@/lib/vapi";
+import { parseVoiceMetadata, serializeVoiceMetadata } from "@/lib/voice-compliance";
 import { processWebhookRetries } from "@/lib/webhook-retry";
 
 /** GET /api/automation/cron
@@ -266,6 +269,172 @@ export async function GET(req: Request) {
                     details: `Form reminder to ${form.contact.name}`,
                 });
             }
+        }
+
+        // 6. Voice no-answer retry handling
+        if (isVapiConfigured()) {
+            const retryCandidates = await prisma.voiceCall.findMany({
+                where: {
+                    direction: "OUTBOUND",
+                    status: { in: ["NO_ANSWER", "BUSY"] },
+                    endedAt: { lte: addHours(now, -4) },
+                },
+                include: {
+                    contact: true,
+                    workspace: { select: { name: true } },
+                },
+                orderBy: { endedAt: "asc" },
+                take: 100,
+            });
+
+            for (const call of retryCandidates) {
+                const metadata = parseVoiceMetadata(call.metadata);
+                const retryHandled = metadata.retryHandled === true;
+                const retryCount =
+                    typeof metadata.retryCount === "number"
+                        ? Math.max(0, Math.floor(metadata.retryCount))
+                        : 0;
+
+                const nextRetryAtRaw = metadata.nextRetryAt;
+                const nextRetryAt =
+                    typeof nextRetryAtRaw === "string" && nextRetryAtRaw
+                        ? new Date(nextRetryAtRaw)
+                        : null;
+
+                if (retryHandled) continue;
+                if (nextRetryAt && nextRetryAt > now) continue;
+
+                const contactPhone =
+                    (typeof metadata.contactPhone === "string" ? metadata.contactPhone : null) ||
+                    call.contact?.phone ||
+                    null;
+
+                if (!contactPhone) {
+                    metadata.retryHandled = true;
+                    metadata.retrySkippedReason = "missing_contact_phone";
+
+                    await prisma.voiceCall.update({
+                        where: { id: call.id },
+                        data: {
+                            metadata: serializeVoiceMetadata(metadata),
+                            outcome: "RETRY_SKIPPED",
+                        },
+                    });
+                    continue;
+                }
+
+                if (retryCount >= 2) {
+                    const smsSent = await sendSMS({
+                        to: contactPhone,
+                        body: "We tried calling about your appointment. Please call us back when convenient.",
+                        workspaceId: call.workspaceId,
+                    });
+
+                    metadata.retryHandled = true;
+                    metadata.smsFallbackSent = smsSent;
+                    metadata.smsFallbackAt = now.toISOString();
+
+                    await prisma.voiceCall.update({
+                        where: { id: call.id },
+                        data: {
+                            metadata: serializeVoiceMetadata(metadata),
+                            outcome: smsSent ? "SMS_FALLBACK_SENT" : "SMS_FALLBACK_FAILED",
+                        },
+                    });
+
+                    results.push({
+                        type: "VOICE_RETRY",
+                        workspaceId: call.workspaceId,
+                        status: smsSent ? "SUCCESS" : "FAILED",
+                        details: `SMS fallback ${smsSent ? "sent" : "failed"} for call ${call.id}`,
+                    });
+                    continue;
+                }
+
+                const retryResult = await initiateOutboundCall({
+                    phoneNumber: contactPhone,
+                    workspaceId: call.workspaceId,
+                    contactId: call.contactId || undefined,
+                    contactName:
+                        call.contact?.name ||
+                        (typeof metadata.contactName === "string" ? metadata.contactName : undefined),
+                    assistantId: call.assistantId || undefined,
+                    metadata: {
+                        ...metadata,
+                        retryCount: retryCount + 1,
+                        retryOfCallId: call.id,
+                        retryAttempt: retryCount + 1,
+                        nextRetryAt: null,
+                    },
+                });
+
+                metadata.retryHandled = true;
+                metadata.retryAttemptedAt = now.toISOString();
+
+                await prisma.voiceCall.update({
+                    where: { id: call.id },
+                    data: {
+                        metadata: serializeVoiceMetadata(metadata),
+                        outcome: retryResult.success ? "RETRY_TRIGGERED" : "RETRY_FAILED",
+                    },
+                });
+
+                if (retryResult.success && retryResult.callId) {
+                    await prisma.voiceCall.create({
+                        data: {
+                            callSid: retryResult.callId,
+                            direction: "OUTBOUND",
+                            status: "INITIATED",
+                            contactId: call.contactId || undefined,
+                            workspaceId: call.workspaceId,
+                            assistantId: call.assistantId,
+                            outcome: "RETRY_INITIATED",
+                            metadata: serializeVoiceMetadata({
+                                ...metadata,
+                                retryCount: retryCount + 1,
+                                retryOfCallId: call.id,
+                            }),
+                        },
+                    });
+                }
+
+                results.push({
+                    type: "VOICE_RETRY",
+                    workspaceId: call.workspaceId,
+                    status: retryResult.success ? "SUCCESS" : "FAILED",
+                    details: `Retry ${retryResult.success ? "triggered" : "failed"} for call ${call.id}`,
+                });
+            }
+        }
+
+        // 7. Voice recording retention cleanup (default 90 days)
+        const retentionDays = Number.parseInt(process.env.VOICE_RECORDING_RETENTION_DAYS || "90", 10);
+        const cutoff = addHours(now, -24 * retentionDays);
+
+        const expiredCount = await prisma.voiceCall.count({
+            where: {
+                recordingUrl: { not: null },
+                endedAt: { lte: cutoff },
+            },
+        });
+
+        if (expiredCount > 0) {
+            await prisma.voiceCall.updateMany({
+                where: {
+                    recordingUrl: { not: null },
+                    endedAt: { lte: cutoff },
+                },
+                data: {
+                    recordingUrl: null,
+                },
+            });
+
+            results.push({
+                type: "VOICE_RETENTION",
+                workspaceId: "all",
+                status: "SUCCESS",
+                details: `Cleared recording URLs for ${expiredCount} calls older than ${retentionDays} days`,
+            });
         }
 
         return NextResponse.json({

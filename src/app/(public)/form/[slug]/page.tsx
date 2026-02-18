@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, use, Suspense } from "react";
+import React, { useCallback, useEffect, useState, use, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { Send, CheckCircle, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -24,9 +24,7 @@ function FormContent({ slug }: { slug: string }) {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
 
-  useEffect(() => { fetchForm(); }, [slug]);
-
-  const fetchForm = async () => {
+  const fetchForm = useCallback(async () => {
     try {
       const res = await fetch(`/api/public/form/${slug}`);
       if (res.ok) {
@@ -55,7 +53,11 @@ function FormContent({ slug }: { slug: string }) {
         }
       }
     } catch { } finally { setLoading(false); }
-  };
+  }, [slug]);
+
+  useEffect(() => {
+    void fetchForm();
+  }, [fetchForm]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard, MessageSquare, Calendar, FileText,
-  Package, Users, Zap, Settings, LogOut, Menu, X, Activity
+  Package, Users, Zap, Settings, LogOut, Menu, X, Activity, PhoneCall
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,7 @@ const navItems = [
   { href: "/contacts", label: "Contacts", icon: Users, badgeKey: null },
   { href: "/forms", label: "Forms", icon: FileText, badgeKey: null },
   { href: "/inventory", label: "Inventory", icon: Package, badgeKey: "lowStock" as const },
+  { href: "/voice/calls", label: "Voice", icon: PhoneCall, badgeKey: null },
   { href: "/staff", label: "Staff", icon: Users, badgeKey: null },
   { href: "/automation", label: "Automation", icon: Zap, badgeKey: null },
   { href: "/settings", label: "Settings", icon: Settings, badgeKey: null },

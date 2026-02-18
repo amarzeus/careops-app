@@ -27,7 +27,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   }
 
   // Pages that use full-screen layouts (no footer needed)
-  const fullScreenPages = ["/inbox", "/bookings"];
+  const fullScreenPages = ["/inbox", "/bookings", "/voice/calls"];
   const showFooter = !fullScreenPages.some((page) => pathname.startsWith(page));
 
   return (

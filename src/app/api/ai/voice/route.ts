@@ -195,14 +195,6 @@ Returns a JSON object with:
 
   try {
     const client = new GoogleGenAI({ apiKey: GEMINI_KEY });
-    const chat = client.chats.create({
-      model: "gemini-2.0-flash",
-      config: {
-        systemInstruction: finalPrompt,
-        responseMimeType: "application/json",
-        responseSchema: schema,
-      },
-    });
 
     // Strip trailing user messages from history since sendMessage() adds the current one
     const historyMsgs = (conversationHistory || [])
@@ -214,14 +206,7 @@ Returns a JSON object with:
       parts: [{ text: msg.content }],
     }));
 
-    // In new SDK, we don't pass history to create() if using startChat logic? 
-    // Wait, client.chats.create returns a Chat object. It supports `history`.
-    // But `history` in `create` expects `Content[]`.
-
-    // Let's rely on single-turn generation with history context if `chats` is complex to map,
-    // OR just use generateContent with full history.
-    // For simplicity and robustness with structured output:
-
+    // Build contents with history context
     const contents = [
       ...geminiHistory,
       { role: "user", parts: [{ text: message }] }
@@ -254,4 +239,3 @@ Returns a JSON object with:
     });
   }
 }
-

@@ -240,19 +240,6 @@ export function useVoiceEngine(onTranscript: (text: string, context?: any, histo
   const streamRef = useRef<MediaStream | null>(null);
   const ampFrameRef = useRef<number>(0);
 
-  useEffect(() => {
-    synthRef.current = window.speechSynthesis;
-    // Load voices early
-    if (window.speechSynthesis.onvoiceschanged !== undefined) {
-      window.speechSynthesis.onvoiceschanged = () => {
-        // Just trigger a re-render or ensure voices are loaded
-      };
-    }
-    return () => {
-      cleanup();
-    };
-  }, []);
-
   const cleanup = useCallback(() => {
     if (recognitionRef.current) {
       try { recognitionRef.current.stop(); } catch { }
@@ -273,6 +260,19 @@ export function useVoiceEngine(onTranscript: (text: string, context?: any, histo
     cancelAnimationFrame(ampFrameRef.current);
     analyserRef.current = null;
   }, []);
+
+  useEffect(() => {
+    synthRef.current = window.speechSynthesis;
+    // Load voices early
+    if (window.speechSynthesis.onvoiceschanged !== undefined) {
+      window.speechSynthesis.onvoiceschanged = () => {
+        // Just trigger a re-render or ensure voices are loaded
+      };
+    }
+    return () => {
+      cleanup();
+    };
+  }, [cleanup]);
 
   const stopListening = useCallback(() => {
     if (recognitionRef.current) {
@@ -390,7 +390,7 @@ export function useVoiceEngine(onTranscript: (text: string, context?: any, histo
     utteranceRef.current = utterance;
     synthRef.current.speak(utterance);
     animateSpeakAmp();
-  }, [isMuted, continuousMode]);
+  }, [isMuted]);
 
   const processTranscript = useCallback(async (text: string) => {
     if (!text.trim()) return;
@@ -437,7 +437,7 @@ export function useVoiceEngine(onTranscript: (text: string, context?: any, histo
       setError("Failed to get AI response.");
       setVoiceState("idle");
     }
-  }, [onTranscript, speak, stopSpeaking]);
+  }, [onTranscript, speak, stopSpeaking, history, setContinuousMode]);
 
   const startListening = useCallback(async () => {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
@@ -515,7 +515,7 @@ export function useVoiceEngine(onTranscript: (text: string, context?: any, histo
 
     recognitionRef.current = recognition;
     recognition.start();
-  }, [stopSpeaking, stopListening, processTranscript, startAmplitudeMonitoring]);
+  }, [stopSpeaking, stopListening, processTranscript, startAmplitudeMonitoring, setContinuousMode]);
 
   // Assign to ref for use in speak callback
   useEffect(() => {
@@ -541,7 +541,7 @@ export function useVoiceEngine(onTranscript: (text: string, context?: any, histo
       startListening();
       setContinuousMode(true); // Explicit start enables continuous mode
     }
-  }, [voiceState, transcript, interimTranscript, stopListening, stopSpeaking, startListening, processTranscript]);
+  }, [voiceState, transcript, interimTranscript, stopListening, stopSpeaking, startListening, processTranscript, setContinuousMode]);
 
   const stop = useCallback(() => {
     stopListening();
@@ -554,7 +554,7 @@ export function useVoiceEngine(onTranscript: (text: string, context?: any, histo
     setAiResponse("");
     setAmplitude(0);
     setError(null);
-  }, [stopListening, stopSpeaking, cleanup]);
+  }, [stopListening, stopSpeaking, cleanup, setContinuousMode]);
 
   return {
     voiceState,
@@ -1048,5 +1048,3 @@ export function GlobalVoiceOverlay({
     </AnimatePresence>
   );
 }
-
-
