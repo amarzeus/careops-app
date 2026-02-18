@@ -1,7 +1,8 @@
+import asyncio
 from logging.config import fileConfig
 
-from sqlalchemy import engine_from_config
 from sqlalchemy import pool
+from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
 from app.core.config import settings
@@ -58,7 +59,14 @@ def run_migrations_offline() -> None:
         context.run_migrations()
 
 
-def run_migrations_online() -> None:
+def do_run_migrations(connection) -> None:
+    context.configure(connection=connection, target_metadata=target_metadata)
+
+    with context.begin_transaction():
+        context.run_migrations()
+
+
+async def run_migrations_online() -> None:
     """Run migrations in 'online' mode.
 
     In this scenario we need to create an Engine
@@ -69,22 +77,19 @@ def run_migrations_online() -> None:
     if not url or url.startswith("driver://"):
         raise RuntimeError("DATABASE_URL is not configured for Alembic")
 
-    connectable = engine_from_config(
+    connectable = async_engine_from_config(
         config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )
 
-    with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
+    async with connectable.connect() as connection:
+        await connection.run_sync(do_run_migrations)
 
-        with context.begin_transaction():
-            context.run_migrations()
+    await connectable.dispose()
 
 
 if context.is_offline_mode():
     run_migrations_offline()
 else:
-    run_migrations_online()
+    asyncio.run(run_migrations_online())
