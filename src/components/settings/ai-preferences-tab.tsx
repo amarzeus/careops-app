@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import { Sparkles, Brain, MessageSquare, Mic, AlertTriangle, Package, Settings, Loader2, Check, Zap } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -30,6 +30,21 @@ interface AIPreferencesTabProps {
   onSelectTab?: (tab: string) => void;
 }
 
+const DEFAULT_AI_PREFERENCES: AIPreferences = {
+  id: "",
+  workspaceId: "",
+  smartReplyEnabled: true,
+  insightsEnabled: true,
+  voiceEnabled: false,
+  anomalyDetectionEnabled: false,
+  inventoryForecastEnabled: false,
+  autoClassifyEnabled: true,
+  defaultReplyTone: "professional",
+  alertOnAnomaly: true,
+  dailyInsightTime: "09:00",
+  geminiModel: "gemini-2.0-flash",
+};
+
 /**
  *
  * @param root0
@@ -42,51 +57,35 @@ export function AIPreferencesTab({ onSelectTab }: AIPreferencesTabProps) {
   const [saved, setSaved] = useState(false);
   const [preferences, setPreferences] = useState<AIPreferences | null>(null);
 
-  // Default preferences when not loaded
-  const defaultPreferences: AIPreferences = {
-    id: "",
-    workspaceId: "",
-    smartReplyEnabled: true,
-    insightsEnabled: true,
-    voiceEnabled: false,
-    anomalyDetectionEnabled: false,
-    inventoryForecastEnabled: false,
-    autoClassifyEnabled: true,
-    defaultReplyTone: "professional",
-    alertOnAnomaly: true,
-    dailyInsightTime: "09:00",
-    geminiModel: "gemini-2.0-flash",
-  };
-
-  useEffect(() => {
-    fetchPreferences();
-  }, []);
-
-  const fetchPreferences = async () => {
+  const fetchPreferences = useCallback(async () => {
     try {
       const res = await fetch("/api/ai/preferences");
       if (res.ok) {
         const data = await res.json();
-        setPreferences(data.preferences || defaultPreferences);
+        setPreferences(data.preferences || DEFAULT_AI_PREFERENCES);
         setError(null);
       } else {
         // If API fails, use default preferences
         console.log("Using default AI preferences");
-        setPreferences(defaultPreferences);
+        setPreferences(DEFAULT_AI_PREFERENCES);
         setError(null);
       }
     } catch (error) {
       console.error("Failed to fetch AI preferences:", error);
       // Use defaults on error
-      setPreferences(defaultPreferences);
+      setPreferences(DEFAULT_AI_PREFERENCES);
       setError(null);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    void fetchPreferences();
+  }, [fetchPreferences]);
 
   const updatePreference = (key: keyof AIPreferences, value: boolean | string) => {
-    setPreferences(prev => prev ? { ...prev, [key]: value } : { ...defaultPreferences, [key]: value });
+    setPreferences((prev) => prev ? { ...prev, [key]: value } : { ...DEFAULT_AI_PREFERENCES, [key]: value });
   };
 
   const handleSave = async () => {
@@ -132,7 +131,7 @@ export function AIPreferencesTab({ onSelectTab }: AIPreferencesTabProps) {
   }
 
   // Use defaults if preferences is null
-  const prefs = preferences || defaultPreferences;
+  const prefs = preferences || DEFAULT_AI_PREFERENCES;
 
   const features = [
     {

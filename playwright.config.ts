@@ -5,6 +5,9 @@ import dotenv from 'dotenv';
 // Read from .env file
 dotenv.config({ path: path.resolve(__dirname, '.env') });
 
+const baseURL = process.env.BASE_URL || 'http://localhost:5000';
+const shouldUseLocalWebServer = !process.env.BASE_URL || process.env.BASE_URL.includes('localhost');
+
 export default defineConfig({
   testDir: './tests/e2e',
   fullyParallel: true,
@@ -13,7 +16,7 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: 'html',
   use: {
-    baseURL: process.env.BASE_URL || 'http://localhost:5000',
+    baseURL,
     trace: 'on-first-retry',
     actionTimeout: 15000,
     navigationTimeout: 30000,
@@ -24,14 +27,16 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'] },
     },
   ],
-  // Run your local dev server before starting the tests
-  webServer: {
-    command: 'npm run dev',
-    url: 'http://localhost:5000',
-    reuseExistingServer: !process.env.CI,
-    timeout: 120 * 1000,
-    env: {
-      PORT: '5000',
-    },
-  },
+  // Run local server only when tests target localhost.
+  webServer: shouldUseLocalWebServer
+    ? {
+        command: 'npm run dev',
+        url: 'http://localhost:5000',
+        reuseExistingServer: !process.env.CI,
+        timeout: 120 * 1000,
+        env: {
+          PORT: '5000',
+        },
+      }
+    : undefined,
 });

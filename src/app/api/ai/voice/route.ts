@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
 
 /**
  *
@@ -180,12 +180,6 @@ Return ONLY a valid JSON object:
 }`;
 
   try {
-    const model = genAI.getGenerativeModel({
-      model: "gemini-2.0-flash",
-      systemInstruction: finalPrompt,
-      generationConfig: { responseMimeType: "application/json" },
-    });
-
     // Strip trailing user messages from history since sendMessage() adds the current one
     let historyMsgs = (conversationHistory || [])
       .filter((msg: any) => msg.content && msg.content.trim());
@@ -214,9 +208,21 @@ Return ONLY a valid JSON object:
       parts: [{ text: msg.content }],
     }));
 
-    const chat = model.startChat({ history: geminiHistory });
-    const result = await chat.sendMessage(message);
-    const response = result.response.text();
+    const result = await genAI.models.generateContent({
+      model: "gemini-2.0-flash",
+      config: {
+        systemInstruction: finalPrompt,
+        responseMimeType: "application/json",
+      },
+      contents: [
+        ...geminiHistory,
+        {
+          role: "user",
+          parts: [{ text: message }],
+        },
+      ] as any,
+    });
+    const response = result.text || "";
 
     try {
       const cleaned = response.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();

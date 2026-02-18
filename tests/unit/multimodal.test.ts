@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { extractInventoryItemsFromImage } from '../../src/lib/gemini';
+import { extractInventoryItemsFromImage } from '@/lib/gemini';
 import { GoogleGenAI } from '@google/genai';
 
 // Mock the GoogleGenAI client

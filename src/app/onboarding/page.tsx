@@ -49,6 +49,9 @@ export default function OnboardingPage() {
   const [chatInput, setChatInput] = useState("");
   const [chatLoading, setChatLoading] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const fetchCurrentStepRef = useRef<(shouldUpdateStep?: boolean) => Promise<void>>(async () => { });
+  const saveStepRef = useRef<(advanceStep?: boolean, isAuto?: boolean) => Promise<void>>(async () => { });
+  const applyExtractedDataRef = useRef<(data: Record<string, any>) => void>(() => { });
   const [voiceMode, setVoiceMode] = useState(false);
   const [autoAdvance, setAutoAdvance] = useState(false);
 
@@ -67,7 +70,7 @@ export default function OnboardingPage() {
   const [newStaff, setNewStaff] = useState({ name: "", email: "", password: "" });
 
   useEffect(() => {
-    fetchCurrentStep(true);
+    void fetchCurrentStepRef.current(true);
   }, []);
 
   // Scroll chat on new messages
@@ -80,7 +83,7 @@ export default function OnboardingPage() {
   useEffect(() => {
     if (prevStepRef.current !== 0 && prevStepRef.current !== currentStep) {
       // Step changed — fetch fresh context and trigger greeting
-      fetchCurrentStep(false);
+      void fetchCurrentStepRef.current(false);
     }
     prevStepRef.current = currentStep;
   }, [currentStep]);
@@ -222,7 +225,9 @@ export default function OnboardingPage() {
     }
   };
 
-  const sendChatMessage = async (messageOverride?: string) => {
+  fetchCurrentStepRef.current = fetchCurrentStep;
+
+  const sendChatMessage = useCallback(async (messageOverride?: string) => {
     const userMsg = messageOverride || chatInput.trim();
     if (!userMsg) return;
     if (!messageOverride) setChatInput("");
@@ -254,7 +259,7 @@ export default function OnboardingPage() {
       setChatMessages(prev => [...prev, { role: "assistant", content: aiMessage }]);
 
       if (data.extractedData) {
-        applyExtractedData(data.extractedData);
+        applyExtractedDataRef.current(data.extractedData);
       }
 
       if (data.navigationAction && data.navigationAction.type === "jump") {
@@ -271,13 +276,13 @@ export default function OnboardingPage() {
     } finally {
       setChatLoading(false);
     }
-  };
+  }, [chatInput, chatMessages, currentStep, workspace, emailConfig, contactForm, services, intakeForms, inventoryItems, staffMembers]);
 
   // Voice transcript handler — sends to AI and returns response for TTS
   const handleVoiceTranscript = useCallback(async (text: string): Promise<string> => {
     const response = await sendChatMessage(text);
     return response || "I understand. Let me help you with that.";
-  }, [currentStep, workspace, emailConfig, contactForm, services, intakeForms, inventoryItems, staffMembers, chatMessages]);
+  }, [sendChatMessage]);
 
   const applyExtractedData = (data: Record<string, any>) => {
     if (currentStep === 1) {
@@ -520,6 +525,8 @@ export default function OnboardingPage() {
     }
   };
 
+  applyExtractedDataRef.current = applyExtractedData;
+
   const saveStep = async (advanceStep: boolean = true, isAuto: boolean = false) => {
     if (loading) return;
     if (isAuto && currentStep === 8) return; // Never auto-activate
@@ -705,12 +712,14 @@ export default function OnboardingPage() {
     }
   };
 
+  saveStepRef.current = saveStep;
+
   // Auto-advance logic: wait for state update to complete before saving
   useEffect(() => {
     let timeout: NodeJS.Timeout;
     if (autoAdvance && currentStep < 8) {
       timeout = setTimeout(() => {
-        saveStep(true, true);
+        void saveStepRef.current(true, true);
         setAutoAdvance(false);
       }, 1500);
     }

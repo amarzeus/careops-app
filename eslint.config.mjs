@@ -74,6 +74,7 @@ const eslintConfig = defineConfig([
     "prisma/seed.ts",
     "playwright-report/**",
     "test-results/**",
+    "coverage/**",
     "scripts/**",
   ]),
 ]);

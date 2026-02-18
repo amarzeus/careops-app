@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, use } from "react";
+import React, { useCallback, useEffect, useState, use } from "react";
 import { Send, CheckCircle, Activity } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,9 +28,7 @@ export default function PublicContactPage({ params }: { params: Promise<{ slug: 
   const [successMessage, setSuccessMessage] = useState("");
   const [error, setError] = useState("");
 
-  useEffect(() => { fetchForm(); }, [slug]);
-
-  const fetchForm = async () => {
+  const fetchForm = useCallback(async () => {
     try {
       const res = await fetch(`/api/public/contact-form/${slug}`);
       if (res.ok) {
@@ -43,7 +41,11 @@ export default function PublicContactPage({ params }: { params: Promise<{ slug: 
         setFormData(initial);
       }
     } catch {} finally { setLoading(false); }
-  };
+  }, [slug]);
+
+  useEffect(() => {
+    void fetchForm();
+  }, [fetchForm]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
