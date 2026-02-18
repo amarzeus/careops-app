@@ -26,6 +26,8 @@ export default function InventoryPage() {
     // Mock forecast for now until we have an AI endpoint
     const [forecast, setForecast] = useState<Record<string, { daysRemaining: number; confidence: string }>>({});
 
+    const [scanning, setScanning] = useState(false);
+
     useEffect(() => {
         fetchItems();
     }, []);
@@ -58,6 +60,62 @@ export default function InventoryPage() {
         }
     };
 
+    const handleScan = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setScanning(true);
+        try {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = async () => {
+                const base64 = (reader.result as string).split(",")[1];
+                const mimeType = file.type;
+
+                const res = await fetch("/api/ai/inventory/scan", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ imageBase64: base64, mimeType }),
+                });
+
+                if (!res.ok) throw new Error("Scan failed");
+
+                const { data } = await res.json();
+                if (data && data.items && data.items.length > 0) {
+                    const firstItem = data.items[0];
+                    const newItem: InventoryItemDTO = {
+                        id: "", // New item
+                        name: firstItem.name,
+                        description: `Imported from invoice ${data.invoiceNumber || ""}`,
+                        quantity: firstItem.quantity,
+                        threshold: 5, // Default
+                        unit: "units", // Default or inferred
+                        vendorName: data.vendor || "",
+                        vendorEmail: "",
+                        vendorPhone: "",
+                    };
+
+                    setSelectedItem(newItem);
+                    setDialogOpen(true);
+
+                    toast({
+                        title: "Scan Complete",
+                        description: `Found ${data.items.length} items. Opening the first one for review.`,
+                    });
+                } else {
+                    toast({ title: "No Items Found", description: "Could not identify inventory items in the image." });
+                }
+            };
+        } catch (error) {
+            console.error(error);
+            toast({ title: "Scan Error", description: "Failed to process invoice image.", variant: "destructive" });
+        } finally {
+            setScanning(false);
+            // Reset input
+            e.target.value = "";
+        }
+    };
+
     const handleCreateOrUpdate = async (data: any) => {
         try {
             const payload = {
@@ -67,7 +125,7 @@ export default function InventoryPage() {
             };
 
             let res;
-            if (selectedItem) {
+            if (selectedItem && selectedItem.id) {
                 res = await fetch("/api/inventory", {
                     method: "PUT",
                     headers: { "Content-Type": "application/json" },
@@ -85,7 +143,7 @@ export default function InventoryPage() {
 
             toast({
                 title: "Success",
-                description: `Item ${selectedItem ? "updated" : "created"} successfully`
+                description: `Item ${selectedItem && selectedItem.id ? "updated" : "created"} successfully`
             });
             setDialogOpen(false);
             fetchItems();
@@ -97,21 +155,12 @@ export default function InventoryPage() {
     const handleDelete = async (id: string) => {
         setDeletingId(id);
         try {
-            // We need a DELETE endpoint. Assuming it exists or I need to create it.
-            // Checking route.ts previously, I didn't see DELETE. 
-            // I will assume for now I cannot delete or I need to add DELETE to route.ts.
-            // But the UI has a delete button.
-            // Let's implement DELETE in route.ts if missing.
-            // For now, I'll try to call DELETE.
             const res = await fetch(`/api/inventory/${id}`, { method: "DELETE" });
             if (!res.ok) throw new Error("Failed to delete");
 
             toast({ title: "Deleted", description: "Item removed from inventory" });
             setItems(items.filter(i => i.id !== id));
         } catch (error) {
-            // If DELETE is missing, this will fail. Reference logic check needed.
-            // The route.ts I read had GET, POST, PUT. No DELETE.
-            // I should probably add DELETE to route.ts as well.
             toast({ title: "Error", description: "Failed to delete item", variant: "destructive" });
         } finally {
             setDeletingId(null);
@@ -147,9 +196,24 @@ export default function InventoryPage() {
     return (
         <div className="flex flex-col h-full">
             <Header title="Inventory" subtitle="Track supplies and automate reordering">
-                <Button onClick={() => { setSelectedItem(undefined); setDialogOpen(true); }}>
-                    <Plus className="w-4 h-4 mr-2" /> Add Item
-                </Button>
+                <div className="flex gap-2">
+                    <div className="relative">
+                        <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            id="invoice-upload"
+                            onChange={handleScan}
+                            disabled={scanning}
+                        />
+                        <Button variant="outline" onClick={() => document.getElementById("invoice-upload")?.click()} disabled={scanning}>
+                            {scanning ? "Scanning..." : "Scan Invoice"}
+                        </Button>
+                    </div>
+                    <Button onClick={() => { setSelectedItem(undefined); setDialogOpen(true); }}>
+                        <Plus className="w-4 h-4 mr-2" /> Add Item
+                    </Button>
+                </div>
             </Header>
 
             <div className="flex-1 p-6 space-y-6">
