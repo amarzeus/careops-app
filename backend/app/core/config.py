@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     app_version: str = "0.1.0"
     allowed_origins: str = "http://localhost:3000"
     database_url: str | None = None
+    redis_url: str | None = None
     clerk_jwks_url: str | None = None
     clerk_issuer: str | None = None
     clerk_audience: str | None = None

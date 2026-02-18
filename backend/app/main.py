@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.router import api_router
 from app.core.config import settings
 from app.core.database import check_database_connection
+from app.core.redis import check_redis_connection
 
 
 def create_app() -> FastAPI:
@@ -28,10 +29,13 @@ def create_app() -> FastAPI:
     @app.get("/health", tags=["system"])
     async def health() -> dict[str, object]:
         db_status = await check_database_connection()
+        redis_status = await check_redis_connection()
+        overall_ok = db_status["status"] == "ok" and redis_status["status"] == "ok"
         return {
-            "status": "ok" if db_status["status"] == "ok" else "degraded",
+            "status": "ok" if overall_ok else "degraded",
             "service": "careops-backend",
             "database": db_status,
+            "redis": redis_status,
         }
 
     return app
