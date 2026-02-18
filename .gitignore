@@ -3,14 +3,6 @@
 /.pnp
 .pnp.js
 
-# python virtualenvs
-.venv/
-backend/.venv/
-
-# python caches
-__pycache__/
-*.pyc
-
 # testing
 /coverage
 
