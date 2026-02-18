@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   AlertTriangle,
   Check,
@@ -102,8 +102,9 @@ export default function VoiceCallsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCall, setSelectedCall] = useState<VoiceCallItem | null>(null);
   const [resolving, setResolving] = useState<string | null>(null);
+  const [canResolveEscalations, setCanResolveEscalations] = useState(false);
 
-  const fetchCalls = async () => {
+  const fetchCalls = useCallback(async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams({ limit: "100" });
@@ -129,11 +130,30 @@ export default function VoiceCallsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [status, outcome, escalationFilter]);
 
   useEffect(() => {
-    fetchCalls();
-  }, [status, outcome, escalationFilter]);
+    const fetchCurrentUser = async () => {
+      try {
+        const res = await fetch("/api/auth/me");
+        if (!res.ok) {
+          setCanResolveEscalations(false);
+          return;
+        }
+
+        const data = (await res.json()) as { user?: { role?: string } };
+        setCanResolveEscalations(data.user?.role === "OWNER");
+      } catch {
+        setCanResolveEscalations(false);
+      }
+    };
+
+    void fetchCurrentUser();
+  }, []);
+
+  useEffect(() => {
+    void fetchCalls();
+  }, [fetchCalls]);
 
   const filteredCalls = useMemo(() => {
     if (!searchTerm.trim()) return calls;
@@ -165,6 +185,15 @@ export default function VoiceCallsPage() {
   }, [calls]);
 
   const resolveEscalation = async (call: VoiceCallItem) => {
+    if (!canResolveEscalations) {
+      toast({
+        title: "Owner access required",
+        description: "Only workspace owners can resolve escalations.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setResolving(call.id);
     try {
       const res = await fetch(`/api/voice/calls/${call.id}`, {
@@ -236,6 +265,11 @@ export default function VoiceCallsPage() {
           <Card className="flex min-h-0 flex-1 flex-col overflow-hidden">
             <CardHeader className="border-b bg-white/70">
               <CardTitle className="text-base">Call Log</CardTitle>
+              {!canResolveEscalations ? (
+                <p className="mt-1 text-xs text-amber-700">
+                  Only workspace owners can resolve escalations.
+                </p>
+              ) : null}
               <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-6">
                 <div className="relative lg:col-span-2">
                   <Search className="absolute top-1/2 left-2.5 h-3.5 w-3.5 -translate-y-1/2 text-gray-400" />
@@ -358,7 +392,7 @@ export default function VoiceCallsPage() {
                             <Button size="sm" variant="outline" onClick={() => setSelectedCall(call)}>
                               Details
                             </Button>
-                            {call.escalated && (
+                            {call.escalated && canResolveEscalations && (
                               <Button
                                 size="sm"
                                 className="bg-emerald-600 hover:bg-emerald-700"
