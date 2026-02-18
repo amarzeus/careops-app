@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { GoogleGenAI, Type } from "@google/genai";
+import { getClient } from "@/lib/gemini";
 
 const GEMINI_KEY = process.env.GEMINI_API_KEY || "";
 
@@ -10,96 +11,99 @@ const GEMINI_KEY = process.env.GEMINI_API_KEY || "";
  * @param req
  */
 export async function POST(req: Request) {
-  const user = await getCurrentUser();
-  const { message, conversationHistory, clientContext } = await req.json();
+  try {
+    const user = await getCurrentUser();
+    const { message, conversationHistory, clientContext } = await req.json();
 
-  if (!message)
-    return NextResponse.json({ error: "Message is required" }, { status: 400 });
+    if (!message) {
+      console.error("Voice AI Error: Message is required");
+      return NextResponse.json({ error: "Message is required" }, { status: 400 });
+    }
 
-  let systemPrompt = "";
-  let contextSummary: any = {};
+    let systemPrompt = "";
+    let contextSummary: any = {};
 
-  if (user && user.workspaceId) {
-    const wid = user.workspaceId;
+    if (user && user.workspaceId) {
+      const wid = user.workspaceId;
 
-    // Gather workspace context for the AI
-    const [
-      workspace,
-      bookingsToday,
-      bookingsUpcoming,
-      contactsCount,
-      unreadConversations,
-      pendingForms,
-      lowStockItems,
-      recentAlerts,
-      servicesCount,
-      staffCount,
-    ] = await Promise.all([
-      prisma.workspace.findUnique({ where: { id: wid } }),
-      prisma.booking.count({
-        where: {
-          workspaceId: wid,
-          date: {
-            gte: new Date(new Date().setHours(0, 0, 0, 0)),
-            lt: new Date(new Date().setHours(23, 59, 59, 999)),
+      // Gather workspace context for the AI
+      const [
+        workspace,
+        bookingsToday,
+        bookingsUpcoming,
+        contactsCount,
+        unreadConversations,
+        pendingForms,
+        lowStockItems,
+        recentAlerts,
+        servicesCount,
+        staffCount,
+      ] = await Promise.all([
+        prisma.workspace.findUnique({ where: { id: wid } }),
+        prisma.booking.count({
+          where: {
+            workspaceId: wid,
+            date: {
+              gte: new Date(new Date().setHours(0, 0, 0, 0)),
+              lt: new Date(new Date().setHours(23, 59, 59, 999)),
+            },
           },
-        },
-      }),
-      prisma.booking.count({
-        where: {
-          workspaceId: wid,
-          date: { gt: new Date() },
-          status: { in: ["PENDING", "CONFIRMED"] },
-        },
-      }),
-      prisma.contact.count({ where: { workspaceId: wid } }),
-      prisma.conversation.count({
-        where: { workspaceId: wid, unreadCount: { gt: 0 } },
-      }),
-      prisma.formSubmission.count({
-        where: { workspaceId: wid, status: { in: ["PENDING", "SENT"] } },
-      }),
-      prisma.inventoryItem.findMany({
-        where: { workspaceId: wid },
-      }),
-      prisma.alert.findMany({
-        where: { workspaceId: wid, isRead: false },
-        orderBy: { createdAt: "desc" },
-        take: 5,
-      }),
-      prisma.service.count({ where: { workspaceId: wid } }),
-      prisma.user.count({ where: { workspaceId: wid, role: "STAFF" } }),
-    ]);
+        }),
+        prisma.booking.count({
+          where: {
+            workspaceId: wid,
+            date: { gt: new Date() },
+            status: { in: ["PENDING", "CONFIRMED"] },
+          },
+        }),
+        prisma.contact.count({ where: { workspaceId: wid } }),
+        prisma.conversation.count({
+          where: { workspaceId: wid, unreadCount: { gt: 0 } },
+        }),
+        prisma.formSubmission.count({
+          where: { workspaceId: wid, status: { in: ["PENDING", "SENT"] } },
+        }),
+        prisma.inventoryItem.findMany({
+          where: { workspaceId: wid },
+        }),
+        prisma.alert.findMany({
+          where: { workspaceId: wid, isRead: false },
+          orderBy: { createdAt: "desc" },
+          take: 5,
+        }),
+        prisma.service.count({ where: { workspaceId: wid } }),
+        prisma.user.count({ where: { workspaceId: wid, role: "STAFF" } }),
+      ]);
 
-    const lowStock = lowStockItems.filter(
-      (item: any) => item.quantity <= item.threshold
-    );
+      const lowStock = lowStockItems.filter(
+        (item: any) => item.quantity <= item.threshold
+      );
 
-    contextSummary = {
-      workspaceName: workspace?.name || "Unknown",
-      todaysBookings: bookingsToday,
-      upcomingBookings: bookingsUpcoming,
-      totalContacts: contactsCount,
-      unreadMessages: unreadConversations,
-      pendingForms: pendingForms,
-      lowStockItems: lowStock.map((i: any) => ({
-        name: i.name,
-        qty: i.quantity,
-        threshold: i.threshold,
-        unit: i.unit,
-      })),
-      unreadAlerts: recentAlerts.map((a: any) => ({
-        type: a.type,
-        title: a.title,
-        message: a.message,
-      })),
-      totalServices: servicesCount,
-      totalStaff: staffCount,
-      userName: user.name,
-      userRole: user.role,
-    };
+      contextSummary = {
+        workspaceName: workspace?.name || "Unknown",
+        todaysBookings: bookingsToday,
+        upcomingBookings: bookingsUpcoming,
+        totalContacts: contactsCount,
+        unreadMessages: unreadConversations,
+        pendingForms: pendingForms,
+        lowStockItems: lowStock.map((i: any) => ({
+          name: i.name,
+          qty: i.quantity,
+          threshold: i.threshold,
+          unit: i.unit,
+        })),
+        unreadAlerts: recentAlerts.map((a: any) => ({
+          type: a.type,
+          title: a.title,
+          message: a.message,
+        })),
+        totalServices: servicesCount,
+        totalStaff: staffCount,
+        userName: user.name,
+        userRole: user.role,
+      };
 
-    systemPrompt = `You are CareOps AI — a voice-first operations assistant for "${contextSummary.workspaceName}".
+      systemPrompt = `You are CareOps AI — a voice-first operations assistant for "${contextSummary.workspaceName}".
 You are speaking to ${contextSummary.userName} (${contextSummary.userRole}).
 
 ## YOUR PERSONALITY
@@ -144,9 +148,9 @@ When relevant, suggest where to go:
 - Staff: /staff (team management)
 - Automation: /automation (rules)
 - Settings: /settings (configuration)`;
-  } else {
-    // PUBLIC / VISITOR MODE
-    systemPrompt = `You are CareOps AI — a friendly and knowledgeable voice assistant for the CareOps platform.
+    } else {
+      // PUBLIC / VISITOR MODE
+      systemPrompt = `You are CareOps AI — a friendly and knowledgeable voice assistant for the CareOps platform.
 You are speaking to a visitor on our landing page who is exploring the platform.
 
 ## ABOUT CAREOPS
@@ -168,33 +172,32 @@ Key Features and Benefits:
 ## CONTEXT
 - **User Status**: Guest Visitor (Stranger)
 - **Location**: Landing Page`;
-  }
+    }
 
-  const finalPrompt = `${systemPrompt}
+    const finalPrompt = `${systemPrompt}
 
 ## RESPONSE FORMAT
 Returns a JSON object with:
 - "message": Natural spoken response
 - "action": Optional navigation action { "type": "navigate", "path": "..." }`;
 
-  const schema = {
-    type: Type.OBJECT,
-    properties: {
-      message: { type: Type.STRING },
-      action: {
-        type: Type.OBJECT,
-        properties: {
-          type: { type: Type.STRING },
-          path: { type: Type.STRING },
+    const schema = {
+      type: Type.OBJECT,
+      properties: {
+        message: { type: Type.STRING },
+        action: {
+          type: Type.OBJECT,
+          properties: {
+            type: { type: Type.STRING },
+            path: { type: Type.STRING },
+          },
+          nullable: true,
         },
-        nullable: true,
       },
-    },
-    required: ["message"],
-  };
+      required: ["message"],
+    };
 
-  try {
-    const client = new GoogleGenAI({ apiKey: GEMINI_KEY });
+    const client = getClient();
 
     // Strip trailing user messages from history since sendMessage() adds the current one
     const historyMsgs = (conversationHistory || [])
@@ -212,6 +215,8 @@ Returns a JSON object with:
       { role: "user", parts: [{ text: message }] }
     ];
 
+    console.log("Calling Gemini for Voice AI...");
+
     const response = await client.models.generateContent({
       model: "gemini-2.0-flash",
       config: {
@@ -223,6 +228,11 @@ Returns a JSON object with:
     });
 
     const text = response.text;
+    if (!text) {
+      console.error("Gemini returned empty text response");
+      throw new Error("Empty response from Gemini");
+    }
+
     const parsed = JSON.parse(text!) as { message: string, action?: any };
 
     return NextResponse.json({
@@ -236,6 +246,6 @@ Returns a JSON object with:
       message:
         "Sorry, I had trouble processing that. Could you try rephrasing your question?",
       action: null,
-    });
+    }, { status: 500 });
   }
 }

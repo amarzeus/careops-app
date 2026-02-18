@@ -5,7 +5,7 @@ const GEMINI_KEY = process.env.GEMINI_API_KEY || "";
 // Lazy initialization to prevent build-time errors if env vars are missing
 let clientInstance: GoogleGenAI | null = null;
 
-function getClient(): GoogleGenAI {
+export function getClient(): GoogleGenAI {
   if (!clientInstance) {
     if (!GEMINI_KEY && process.env.NODE_ENV !== "test") {
       console.error("CRITICAL: GEMINI_API_KEY is missing from environment variables.");
