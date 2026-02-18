@@ -226,9 +226,24 @@ export const VOICE_TOOLS = [
     parameters: {
       type: 'object',
       properties: {
-        bookingId: { type: 'string', description: 'The booking ID or customer phone' },
+        bookingId: { type: 'string', description: 'The booking ID (preferred)' },
+        customerPhone: { type: 'string', description: 'Customer phone number (fallback lookup)' },
+        workspaceId: { type: 'string', description: 'Workspace ID for fallback lookup' },
       },
-      required: ['bookingId'],
+      required: [],
+    },
+  },
+  {
+    name: 'reschedule_booking',
+    description: 'Reschedule an existing booking to a new date/time',
+    parameters: {
+      type: 'object',
+      properties: {
+        bookingId: { type: 'string', description: 'The booking ID' },
+        date: { type: 'string', description: 'New date in YYYY-MM-DD format' },
+        time: { type: 'string', description: 'New time in HH:MM format' },
+      },
+      required: ['bookingId', 'date', 'time'],
     },
   },
   {

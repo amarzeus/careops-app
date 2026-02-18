@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { normalizeVoicePhoneNumber } from '@/lib/voice-compliance';
 import { initiateOutboundCall, isVapiConfigured } from '@/lib/vapi';
 
 /**
@@ -32,6 +33,34 @@ export async function POST(req: NextRequest) {
     }
 
     const workspaceId = user.workspaceId;
+    const normalizedPhone = normalizeVoicePhoneNumber(phoneNumber);
+
+    const dncEntry = await prisma.doNotCallEntry.findFirst({
+      where: {
+        workspaceId,
+        isActive: true,
+        OR: [{ phoneNumber }, { phoneNumber: normalizedPhone }],
+      },
+      select: { id: true },
+    });
+
+    if (dncEntry) {
+      await prisma.voiceCall.create({
+        data: {
+          direction: 'OUTBOUND',
+          status: 'SKIPPED',
+          workspaceId,
+          outcome: 'DNC_SKIP',
+          metadata: JSON.stringify({ purpose, notes, phoneNumber: normalizedPhone, reason: 'dnc' }),
+        },
+      });
+
+      return NextResponse.json(
+        { error: 'Outbound calls to this number are blocked by Do Not Call policy' },
+        { status: 403 }
+      );
+    }
+
     let contact = null;
 
     if (contactId) {
@@ -72,6 +101,8 @@ export async function POST(req: NextRequest) {
         purpose,
         notes,
         initiatedBy: user.email,
+        contactPhone: normalizedPhone,
+        retryCount: 0,
       },
     });
 
@@ -90,7 +121,7 @@ export async function POST(req: NextRequest) {
         contactId: contact?.id,
         workspaceId,
         assistantId,
-        metadata: JSON.stringify({ purpose, notes }),
+        metadata: JSON.stringify({ purpose, notes, contactPhone: normalizedPhone, retryCount: 0 }),
       },
     });
 
