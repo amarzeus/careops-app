@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limiter';
+import { describe, it, expect, beforeEach } from 'vitest';
+import { checkRateLimit } from '@/lib/rate-limiter';
 
 describe('Rate Limiter Utility (Strict Mode)', () => {
     const mockConfig = {

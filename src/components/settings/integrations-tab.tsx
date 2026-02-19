@@ -1,6 +1,6 @@
 "use client";
 
-import { Mail, MessageSquare, MessageCircle, Calendar, ExternalLink, Unplug } from "lucide-react";
+import { Mail, MessageSquare, Calendar, ExternalLink, Unplug } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {

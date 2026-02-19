@@ -2,11 +2,10 @@ import { Suspense } from "react";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { Plus, Search, Mail, Phone, Calendar } from "lucide-react";
+import { Plus, Mail, Phone } from "lucide-react";
 import { format } from "date-fns";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -16,7 +15,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { CreateContactDialog } from "@/components/contacts/create-contact-dialog";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 async function ContactsTable() {
   const user = await getCurrentUser();
@@ -40,13 +39,13 @@ async function ContactsTable() {
         <p className="max-w-sm mt-2 text-sm text-gray-500 mb-6">
           Contacts will appear here when they book a service or fill out a form. You can also add them manually.
         </p>
-        <CreateContactDialog 
+        <CreateContactDialog
           trigger={
             <Button>
               <Plus className="w-4 h-4 mr-2" />
               Add First Contact
             </Button>
-          } 
+          }
         />
       </div>
     );
@@ -112,7 +111,7 @@ async function ContactsTable() {
                 {format(new Date(contact.createdAt), "MMM d, yyyy")}
               </TableCell>
               <TableCell className="text-right">
-                <CreateContactDialog 
+                <CreateContactDialog
                   initialData={contact}
                   trigger={
                     <Button variant="ghost" size="sm">
@@ -131,14 +130,14 @@ async function ContactsTable() {
 
 function UserIcon({ className }: { className?: string }) {
   return (
-    <svg 
-      className={className} 
-      xmlns="http://www.w3.org/2000/svg" 
-      viewBox="0 0 24 24" 
-      fill="none" 
-      stroke="currentColor" 
-      strokeWidth="2" 
-      strokeLinecap="round" 
+    <svg
+      className={className}
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
       strokeLinejoin="round"
     >
       <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
@@ -160,13 +159,13 @@ export default function ContactsPage() {
             Manage your customer database and view their history.
           </p>
         </div>
-        <CreateContactDialog 
+        <CreateContactDialog
           trigger={
             <Button>
               <Plus className="w-4 h-4 mr-2" />
               Add Contact
             </Button>
-          } 
+          }
         />
       </div>
 

@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { generateOTP, storeOTP } from "@/lib/otp";
 import { isConfigured as isTwilioConfigured, sendOTP as twilioSendOTP } from "@/lib/twilio";
-import { sendSMS, buildOTPMessage } from "@/lib/sms";
 
 /**
  *

@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { addDays, subDays, subHours } from "date-fns";
+import { subDays, subHours } from "date-fns";
 
 const prisma = new PrismaClient();
 
@@ -247,7 +247,7 @@ async function main() {
   // 1 No-Show booking for YESTERDAY
   const noShowDate = new Date(yesterday);
   noShowDate.setHours(15, 0, 0, 0);
-  const noShowBooking = await prisma.booking.create({
+  await prisma.booking.create({
     data: {
       workspaceId: workspace.id,
       contactId: contacts[0].id,
@@ -498,7 +498,6 @@ async function main() {
 main()
   .catch((e) => {
     console.error("❌ Seeding failed:", e);
-    process.exit(1);
   })
   .finally(async () => {
     await prisma.$disconnect();

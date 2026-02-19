@@ -25,18 +25,17 @@ export default function FormsPage() {
   const [intakeForms, setIntakeForms] = useState<IntakeFormDTO[]>([]);
   const [submissions, setSubmissions] = useState<FormSubmissionDTO[]>([]);
   const [services, setServices] = useState<ServiceDTO[]>([]);
-  const [loading, setLoading] = useState(true);
-  
+
   // Dialog States
   const [cfDialog, setCfDialog] = useState(false);
   const [ifDialog, setIfDialog] = useState(false);
   const [submissionDetailOpen, setSubmissionDetailOpen] = useState(false);
-  
+
   // Form Data States
   const [newCF, setNewCF] = useState({ name: "", welcomeMessage: "" });
   const [newIF, setNewIF] = useState({ name: "", description: "", serviceId: "" });
   const [selectedSubmission, setSelectedSubmission] = useState<FormSubmissionDTO | null>(null);
-  
+
   // UI States
   const [copied, setCopied] = useState("");
   const [deleting, setDeleting] = useState("");
@@ -55,9 +54,9 @@ export default function FormsPage() {
       setIntakeForms(inf.forms || []);
       setSubmissions(sub.submissions || []);
       setServices(svc.services || []);
-    } catch (error) {
+    } catch (_error) {
       toast({ title: "Error", description: "Failed to load forms", variant: "destructive" });
-    } finally { setLoading(false); }
+    }
   };
 
   const createContactForm = async () => {
@@ -67,7 +66,7 @@ export default function FormsPage() {
       if (!res.ok) throw new Error("Failed to create contact form");
       toast({ title: "Success", description: "Contact form created", variant: "default" });
       setCfDialog(false); setNewCF({ name: "", welcomeMessage: "" }); fetchAll();
-    } catch (error) {
+    } catch (_error) {
       toast({ title: "Error", description: "Something went wrong", variant: "destructive" });
     }
   };
@@ -79,7 +78,7 @@ export default function FormsPage() {
       if (!res.ok) throw new Error("Failed to create intake form");
       toast({ title: "Success", description: "Intake form created", variant: "default" });
       setIfDialog(false); setNewIF({ name: "", description: "", serviceId: "" }); fetchAll();
-    } catch (error) {
+    } catch (_error) {
       toast({ title: "Error", description: "Something went wrong", variant: "destructive" });
     }
   };
@@ -118,7 +117,7 @@ export default function FormsPage() {
       if (!res.ok) throw new Error("Failed to delete form");
       toast({ title: "Success", description: `${type === "contact" ? "Contact" : "Intake"} form deleted`, variant: "default" });
       fetchAll();
-    } catch (error) {
+    } catch (_error) {
       toast({ title: "Error", description: "Failed to delete form", variant: "destructive" });
     } finally { setDeleting(""); }
   };
@@ -199,9 +198,9 @@ export default function FormsPage() {
                 </DialogContent>
               </Dialog>
             </div>
-            
-            <FormList 
-              forms={contactForms} 
+
+            <FormList
+              forms={contactForms}
               type="contact"
               onToggle={(id, isActive) => toggleForm(id, isActive, "contact")}
               onDelete={(id) => deleteForm(id, "contact")}
@@ -234,8 +233,8 @@ export default function FormsPage() {
               </Dialog>
             </div>
 
-            <FormList 
-              forms={intakeForms} 
+            <FormList
+              forms={intakeForms}
               type="intake"
               onToggle={(id, isActive) => toggleForm(id, isActive, "intake")}
               onDelete={(id) => deleteForm(id, "intake")}
@@ -247,7 +246,7 @@ export default function FormsPage() {
 
           {/* Submissions Tab */}
           <TabsContent value="submissions">
-            <SubmissionList 
+            <SubmissionList
               submissions={submissions}
               onSelect={(sub) => { setSelectedSubmission(sub); setSubmissionDetailOpen(true); }}
               onUpdateStatus={updateSubmissionStatus}
@@ -257,7 +256,7 @@ export default function FormsPage() {
         </Tabs>
       </div>
 
-      <SubmissionDetailDialog 
+      <SubmissionDetailDialog
         open={submissionDetailOpen}
         onOpenChange={setSubmissionDetailOpen}
         submission={selectedSubmission}

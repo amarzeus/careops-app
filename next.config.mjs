@@ -3,7 +3,7 @@ const nextConfig = {
   allowedDevOrigins: ["*"],
   serverExternalPackages: ["better-sqlite3"],
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
 };
 

@@ -83,7 +83,7 @@ function SettingsContent() {
     try {
       const res = await fetch("/api/workspace");
       if (res.ok) setWorkspace((await res.json()).workspace);
-    } catch (error) {
+    } catch (_error) {
       toast({ title: "Error", description: "Failed to load workspace", variant: "destructive" });
     }
   };
@@ -101,7 +101,7 @@ function SettingsContent() {
         setUserError(errorMsg);
         toast({ title: "Error", description: errorMsg, variant: "destructive" });
       }
-    } catch (error) {
+    } catch (_error) {
       const errorMsg = "Failed to load profile";
       setUserError(errorMsg);
       toast({ title: "Error", description: errorMsg, variant: "destructive" });
@@ -119,7 +119,7 @@ function SettingsContent() {
       if (!res.ok) throw new Error("Failed to save workspace");
       toast({ title: "Success", description: "Workspace settings saved", variant: "default" });
       setSavedWorkspace(true); setTimeout(() => setSavedWorkspace(false), 2000);
-    } catch (error) {
+    } catch (_error) {
       toast({ title: "Error", description: "Something went wrong", variant: "destructive" });
     } finally { setSavingWorkspace(false); }
   };
@@ -135,7 +135,7 @@ function SettingsContent() {
       if (!res.ok) throw new Error("Failed to save profile");
       toast({ title: "Success", description: "Profile saved", variant: "default" });
       setSavedProfile(true); setTimeout(() => setSavedProfile(false), 2000);
-    } catch (error) {
+    } catch (_error) {
       toast({ title: "Error", description: "Something went wrong", variant: "destructive" });
     } finally { setSavingProfile(false); }
   };
@@ -189,7 +189,7 @@ function SettingsContent() {
         const data = await res.json();
         toast({ title: "Email Test Failed", description: data.error || "Could not connect", variant: "destructive" });
       }
-    } catch (error) {
+    } catch (_error) {
       toast({ title: "Error", description: "Connection test failed", variant: "destructive" });
     } finally { setTestingEmail(false); }
   };
@@ -204,7 +204,7 @@ function SettingsContent() {
         const data = await res.json();
         toast({ title: "SMS Test Failed", description: data.error || "Could not connect", variant: "destructive" });
       }
-    } catch (error) {
+    } catch (_error) {
       toast({ title: "Error", description: "Connection test failed", variant: "destructive" });
     } finally { setTestingSms(false); }
   };
@@ -223,7 +223,7 @@ function SettingsContent() {
         toast({ title: "Error", description: data.error || "Could not initiate calendar connection", variant: "destructive" });
         setConnectingCalendar(false);
       }
-    } catch (error) {
+    } catch (_error) {
       toast({ title: "Error", description: "Failed to connect Google Calendar", variant: "destructive" });
       setConnectingCalendar(false);
     }
@@ -239,7 +239,7 @@ function SettingsContent() {
       } else {
         toast({ title: "Error", description: "Failed to disconnect", variant: "destructive" });
       }
-    } catch (error) {
+    } catch (_error) {
       toast({ title: "Error", description: "Failed to disconnect Google Calendar", variant: "destructive" });
     } finally { setDisconnectingCalendar(false); }
   };

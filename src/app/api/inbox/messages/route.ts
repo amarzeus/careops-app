@@ -12,15 +12,15 @@ import type { Workspace } from "@prisma/client";
  * @param workspace
  */
 function isEmailAvailable(workspace: Workspace): boolean {
-  if (workspace.emailConfigured) return true;
-  const hasEmailEnv = !!(
-    process.env.EMAIL_HOST &&
-    process.env.EMAIL_PORT &&
-    process.env.EMAIL_USER &&
-    process.env.EMAIL_PASS &&
-    process.env.EMAIL_FROM
-  );
-  return hasEmailEnv;
+    if (workspace.emailConfigured) return true;
+    const hasEmailEnv = !!(
+        process.env.EMAIL_HOST &&
+        process.env.EMAIL_PORT &&
+        process.env.EMAIL_USER &&
+        process.env.EMAIL_PASS &&
+        process.env.EMAIL_FROM
+    );
+    return hasEmailEnv;
 }
 
 /**
@@ -29,13 +29,13 @@ function isEmailAvailable(workspace: Workspace): boolean {
  * @param workspace
  */
 function isSMSAvailable(workspace: Workspace): boolean {
-  if (workspace.smsConfigured) return true;
-  const hasSMSEnv = !!(
-    process.env.TWILIO_ACCOUNT_SID &&
-    process.env.TWILIO_AUTH_TOKEN &&
-    process.env.TWILIO_PHONE_NUMBER
-  );
-  return hasSMSEnv;
+    if (workspace.smsConfigured) return true;
+    const hasSMSEnv = !!(
+        process.env.TWILIO_ACCOUNT_SID &&
+        process.env.TWILIO_AUTH_TOKEN &&
+        process.env.TWILIO_PHONE_NUMBER
+    );
+    return hasSMSEnv;
 }
 
 /**
@@ -79,8 +79,8 @@ export async function GET(req: Request) {
         });
 
         return NextResponse.json({ conversation, messages });
-    } catch (error) {
-        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    } catch (_error) {
+        return NextResponse.json({ error: "Failed to send message" }, { status: 500 });
     }
 }
 

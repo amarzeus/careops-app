@@ -1,0 +1,72 @@
+
+> careops-app@0.1.0 prebuild
+> npm install --include=dev
+
+npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: '@renovatebot/pep440@4.2.1',
+npm warn EBADENGINE   required: { node: '^20.9.0 || ^22.11.0 || ^24', pnpm: '^10.0.0' },
+npm warn EBADENGINE   current: { node: 'v25.6.1', npm: '11.10.0' }
+npm warn EBADENGINE }
+
+> careops-app@0.1.0 postinstall
+> prisma generate || true
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v6.2.1) to ./node_modules/@prisma/client in 631ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Help us improve the Prisma ORM for everyone. Share your feedback in a short 2-min survey: https://pris.ly/orm/survey/release-5-22
+
+
+up to date, audited 863 packages in 14s
+
+213 packages are looking for funding
+  run `npm fund` for details
+
+18 vulnerabilities (15 moderate, 3 high)
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues possible (including breaking changes), run:
+  npm audit fix --force
+
+Some issues need review, and may require choosing
+a different dependency.
+
+Run `npm audit` for details.
+
+> careops-app@0.1.0 build
+> prisma generate && next build
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v6.2.1) to ./node_modules/@prisma/client in 998ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Easily identify and fix slow SQL queries in your app. Optimize helps you enhance your visibility: https://pris.ly/--optimize
+
+▲ Next.js 16.1.6 (Turbopack)
+- Environments: .env
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 57s
+  Running TypeScript ...
+Failed to compile.
+
+./src/app/api/user/route.ts:86:48
+Type error: Cannot find name 'error'. Did you mean '_error'?
+
+[0m [90m 84 |[39m         [36mreturn[39m [33mNextResponse[39m[33m.[39mjson({ message[33m:[39m [32m"Account deleted successfully"[39m })[33m;[39m
+ [90m 85 |[39m     } [36mcatch[39m (_error) {
+[31m[1m>[22m[39m[90m 86 |[39m         console[33m.[39merror([32m"Delete account error:"[39m[33m,[39m error)[33m;[39m
+ [90m    |[39m                                                [31m[1m^[22m[39m
+ [90m 87 |[39m         [36mreturn[39m [33mNextResponse[39m[33m.[39mjson({ error[33m:[39m [32m"Failed to delete account"[39m }[33m,[39m { status[33m:[39m [35m500[39m })[33m;[39m
+ [90m 88 |[39m     }
+ [90m 89 |[39m }[0m
+Next.js build worker exited with code: 1 and signal: null

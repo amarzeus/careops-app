@@ -7,7 +7,7 @@ import { prisma } from "@/lib/prisma";
  *
  * @param req
  */
-export async function POST(req: Request) {
+export async function POST(_req: Request) {
     const user = await getCurrentUser();
     if (!user || !user.workspaceId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 

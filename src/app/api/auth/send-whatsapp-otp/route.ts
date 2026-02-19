@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { generateOTP, storeOTP } from "@/lib/otp";
-import { sendWhatsAppOTP as twilioSendWhatsAppOTP, isConfigured as isTwilioConfigured } from "@/lib/twilio";
+import { sendWhatsAppOTP as twilioSendWhatsAppOTP } from "@/lib/twilio";
 import { isAvailable as isWhatsAppAvailable } from "@/lib/whatsapp";
 
 /**

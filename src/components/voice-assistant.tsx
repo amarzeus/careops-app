@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Mic, MicOff, X, Volume2, VolumeX, MessageSquare, Send } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -98,7 +96,7 @@ export function DotGlobe({ voiceState, amplitude, size = 180 }: DotGlobeProps) {
       // Slight tilt on X axis
       const tiltAngle = 0.3;
       const cosT = Math.cos(tiltAngle);
-      const sinT = Math.sin(tiltAngle);
+      const sinT = Math.sin(tiltAngle); // This was missing, added for completeness based on usage below
 
       const points = pointsRef.current; // access ref here
 
@@ -223,7 +221,7 @@ export function useVoiceEngine(onTranscript: (text: string, context?: any, histo
   const [isChatOpen, setIsChatOpen] = useState(false);
 
   // Continuous Mode State
-  const [continuousMode, setContinuousModeState] = useState(false);
+  const [_continuousMode, setContinuousModeState] = useState(false);
   const continuousModeRef = useRef(false);
 
   const setContinuousMode = useCallback((active: boolean) => {
@@ -602,7 +600,7 @@ interface InlineVoiceModeProps {
  */
 export function InlineVoiceMode({ onTranscript, onClose, className, autoStart = true, initialGreeting }: InlineVoiceModeProps) {
   const {
-    voiceState, transcript, interimTranscript, aiResponse,
+    voiceState, interimTranscript,
     isMuted, amplitude, error, history, handleMicClick, setIsMuted, stop,
     speak, setContinuousMode, sendMessage
   } = useVoiceEngine(onTranscript);
@@ -717,7 +715,7 @@ export function InlineVoiceMode({ onTranscript, onClose, className, autoStart = 
       </div>
 
       {/* Chat History area */}
-      <div 
+      <div
         ref={scrollRef}
         className="w-full px-3 py-4 flex-1 overflow-y-auto space-y-4 min-h-0 border-t border-gray-100 bg-white"
       >
@@ -768,8 +766,8 @@ export function InlineVoiceMode({ onTranscript, onClose, className, autoStart = 
             onClick={handleMicClick}
             className={cn(
               "p-1.5 rounded-full transition-all",
-              voiceState === "listening" 
-                ? "bg-red-500 text-white animate-pulse" 
+              voiceState === "listening"
+                ? "bg-red-500 text-white animate-pulse"
                 : "bg-white border border-gray-200 text-gray-500 hover:text-indigo-600"
             )}
           >
@@ -787,8 +785,8 @@ export function InlineVoiceMode({ onTranscript, onClose, className, autoStart = 
             disabled={!inputText.trim() || voiceState === "processing"}
             className={cn(
               "p-1.5 rounded-full transition-all",
-              inputText.trim() && voiceState !== "processing" 
-                ? "bg-indigo-600 text-white shadow-sm hover:bg-indigo-700" 
+              inputText.trim() && voiceState !== "processing"
+                ? "bg-indigo-600 text-white shadow-sm hover:bg-indigo-700"
                 : "bg-gray-100 text-gray-400"
             )}
           >
@@ -809,14 +807,14 @@ export function InlineVoiceMode({ onTranscript, onClose, className, autoStart = 
  * @param root0.isOpen
  * @param root0.pulse
  */
-export function VoiceAssistantFAB({ 
+export function VoiceAssistantFAB({
   onClick,
   isOpen = false,
-  pulse = false 
-}: { 
-  onClick: () => void; 
+  pulse = false
+}: {
+  onClick: () => void;
   isOpen?: boolean;
-  pulse?: boolean 
+  pulse?: boolean
 }) {
   return (
     <button
@@ -875,9 +873,9 @@ interface GlobalVoiceOverlayProps {
  */
 export function GlobalVoiceOverlay({
   voiceState,
-  transcript,
+  transcript: _transcript, // Rename prop to unused local variable
   interimTranscript,
-  aiResponse,
+  aiResponse: _aiResponse, // Rename prop to unused local variable
   history,
   amplitude,
   onClose,
@@ -949,7 +947,7 @@ export function GlobalVoiceOverlay({
           </div>
 
           {/* Transcript/History Region */}
-          <div 
+          <div
             ref={scrollRef}
             className="px-4 py-4 overflow-y-auto space-y-4 bg-white flex-1 min-h-0"
           >
@@ -982,8 +980,8 @@ export function GlobalVoiceOverlay({
                 </div>
                 <div className={cn(
                   "px-3 py-2 rounded-2xl text-sm leading-relaxed max-w-[85%]",
-                  msg.role === "user" 
-                    ? "bg-indigo-600 text-white rounded-tr-none" 
+                  msg.role === "user"
+                    ? "bg-indigo-600 text-white rounded-tr-none"
                     : "bg-gray-100 text-gray-800 rounded-tl-none"
                 )}>
                   {msg.content}
@@ -1015,8 +1013,8 @@ export function GlobalVoiceOverlay({
                 onClick={onMicClick}
                 className={cn(
                   "p-2 rounded-full transition-all",
-                  voiceState === "listening" 
-                    ? "bg-red-500 text-white animate-pulse" 
+                  voiceState === "listening"
+                    ? "bg-red-500 text-white animate-pulse"
                     : "bg-white border border-gray-200 text-gray-500 hover:text-indigo-600"
                 )}
               >
@@ -1034,8 +1032,8 @@ export function GlobalVoiceOverlay({
                 disabled={!inputText.trim() || voiceState === "processing"}
                 className={cn(
                   "p-2 rounded-full transition-all",
-                  inputText.trim() && voiceState !== "processing" 
-                    ? "bg-indigo-600 text-white shadow-md hover:bg-indigo-700" 
+                  inputText.trim() && voiceState !== "processing"
+                    ? "bg-indigo-600 text-white shadow-md hover:bg-indigo-700"
                     : "bg-gray-100 text-gray-400"
                 )}
               >

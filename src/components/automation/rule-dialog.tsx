@@ -20,13 +20,6 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { AutomationRuleDTO } from "@/types/dto";
-import {
-  Calendar,
-  FileText,
-  MessageSquare,
-  Package,
-  UserPlus,
-} from "lucide-react";
 
 interface RuleDialogProps {
   open: boolean;

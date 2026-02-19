@@ -25,12 +25,10 @@ import {
 import {
   ChevronLeft,
   ChevronRight,
-  Clock,
   Calendar,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Booking, Contact, Service } from "@prisma/client";
 
 // Types
@@ -58,7 +56,8 @@ const STATUS_STYLES: Record<string, string> = {
 };
 
 const HOUR_HEIGHT = 48; // Compact B2B scale (h-12 equivalent)
-const CALENDAR_LEFT_PADDING = 48; // Width of the time gutter
+// Calendar height in pixels
+// Width of the time gutter
 
 /**
  *
@@ -257,8 +256,7 @@ export function FullCalendar({ bookings, externalEvents = [], onEdit, onNewBooki
               const dayBookings = bookings.filter((b) => isSameDay(new Date(b.date), day));
               const dayExternalEvents = externalEvents.filter((e) => isSameDay(new Date(e.start), day));
               const isTodayDate = isToday(day);
-              const currentHour = getHours(now);
-              const showTimeIndicator = isTodayDate && currentHour < 21 && currentHour >= 6;
+              const _showTimeIndicator = true;
 
               return (
                 <div key={day.toISOString()} className={cn(

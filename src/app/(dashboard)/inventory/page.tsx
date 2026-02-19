@@ -53,7 +53,7 @@ export default function InventoryPage() {
             } catch (err) {
                 console.error("AI Forecast failed", err);
             }
-        } catch (error) {
+        } catch (_error) {
             toast({ title: "Error", description: "Could not load inventory", variant: "destructive" });
         } finally {
             setLoading(false);
@@ -147,7 +147,7 @@ export default function InventoryPage() {
             });
             setDialogOpen(false);
             fetchItems();
-        } catch (error) {
+        } catch (_error) {
             toast({ title: "Error", description: "Failed to save item", variant: "destructive" });
         }
     };
@@ -160,7 +160,7 @@ export default function InventoryPage() {
 
             toast({ title: "Deleted", description: "Item removed from inventory" });
             setItems(items.filter(i => i.id !== id));
-        } catch (error) {
+        } catch (_error) {
             toast({ title: "Error", description: "Failed to delete item", variant: "destructive" });
         } finally {
             setDeletingId(null);
@@ -178,7 +178,7 @@ export default function InventoryPage() {
 
             toast({ title: "Updated", description: "Quantity updated" });
             fetchItems();
-        } catch (error) {
+        } catch (_error) {
             toast({ title: "Error", description: "Failed to update quantity", variant: "destructive" });
         }
     };

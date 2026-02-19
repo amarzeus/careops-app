@@ -36,7 +36,7 @@ export function WebhooksSection() {
   const [webhooks, setWebhooks] = useState<Webhook[]>([]);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
-  
+
   // New webhook state
   const [newUrl, setNewUrl] = useState("");
   const [newEvent, setNewEvent] = useState("BOOKING_CREATED");
@@ -68,7 +68,7 @@ export function WebhooksSection() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ url: newUrl, event: newEvent }),
       });
-      
+
       if (res.ok) {
         const data = await res.json();
         setWebhooks((prev) => [data.webhook, ...prev]);
@@ -77,7 +77,7 @@ export function WebhooksSection() {
       } else {
         toast({ title: "Error", description: "Failed to add webhook", variant: "destructive" });
       }
-    } catch (error) {
+    } catch (_error) {
       toast({ title: "Error", description: "Something went wrong", variant: "destructive" });
     } finally {
       setAdding(false);
@@ -93,7 +93,7 @@ export function WebhooksSection() {
       } else {
         toast({ title: "Error", description: "Failed to delete", variant: "destructive" });
       }
-    } catch (error) {
+    } catch (_error) {
       toast({ title: "Error", description: "Failed to delete", variant: "destructive" });
     }
   };
@@ -125,9 +125,9 @@ export function WebhooksSection() {
           <div className="flex flex-col sm:flex-row gap-3 items-end">
             <div className="w-full space-y-1.5">
               <label className="text-xs font-medium text-purple-900">Endpoint URL</label>
-              <Input 
-                placeholder="https://hooks.zapier.com/..." 
-                value={newUrl} 
+              <Input
+                placeholder="https://hooks.zapier.com/..."
+                value={newUrl}
                 onChange={(e) => setNewUrl(e.target.value)}
                 className="bg-white"
               />
@@ -147,8 +147,8 @@ export function WebhooksSection() {
                 </SelectContent>
               </Select>
             </div>
-            <Button 
-              onClick={handleAddWebhook} 
+            <Button
+              onClick={handleAddWebhook}
               disabled={adding || !newUrl}
               className="bg-purple-600 hover:bg-purple-700"
             >
@@ -184,9 +184,9 @@ export function WebhooksSection() {
                     </div>
                   </div>
                 </div>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
+                <Button
+                  variant="ghost"
+                  size="icon"
                   className="text-gray-400 hover:text-red-600 shrink-0"
                   onClick={() => handleDeleteWebhook(hook.id)}
                 >

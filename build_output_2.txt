@@ -1,0 +1,188 @@
+
+> careops-app@0.1.0 prebuild
+> npm install --include=dev
+
+npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: '@renovatebot/pep440@4.2.1',
+npm warn EBADENGINE   required: { node: '^20.9.0 || ^22.11.0 || ^24', pnpm: '^10.0.0' },
+npm warn EBADENGINE   current: { node: 'v25.6.1', npm: '11.10.0' }
+npm warn EBADENGINE }
+
+> careops-app@0.1.0 postinstall
+> prisma generate || true
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v6.2.1) to ./node_modules/@prisma/client in 1.07s
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Interested in query caching in just a few lines of code? Try Accelerate today! https://pris.ly/tip-3-accelerate
+
+
+up to date, audited 863 packages in 14s
+
+213 packages are looking for funding
+  run `npm fund` for details
+
+18 vulnerabilities (15 moderate, 3 high)
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues possible (including breaking changes), run:
+  npm audit fix --force
+
+Some issues need review, and may require choosing
+a different dependency.
+
+Run `npm audit` for details.
+
+> careops-app@0.1.0 build
+> prisma generate && next build
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v6.2.1) to ./node_modules/@prisma/client in 776ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Interested in query caching in just a few lines of code? Try Accelerate today! https://pris.ly/tip-3-accelerate
+
+▲ Next.js 16.1.6 (Turbopack)
+- Environments: .env
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 65s
+  Running TypeScript ...
+  Collecting page data using 3 workers ...
+  Generating static pages using 3 workers (0/95) ...
+  Generating static pages using 3 workers (23/95) 
+  Generating static pages using 3 workers (47/95) 
+  Generating static pages using 3 workers (71/95) 
+✓ Generating static pages using 3 workers (95/95) in 1441.6ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ƒ /api/ai/anomalies
+├ ƒ /api/ai/chat
+├ ƒ /api/ai/classify
+├ ƒ /api/ai/insights
+├ ƒ /api/ai/inventory-forecast
+├ ƒ /api/ai/operations-summary
+├ ƒ /api/ai/preferences
+├ ƒ /api/ai/refine-message
+├ ƒ /api/ai/smart-reply
+├ ƒ /api/ai/voice
+├ ƒ /api/ai/voice/settings
+├ ƒ /api/alerts
+├ ƒ /api/auth/change-password
+├ ƒ /api/auth/forgot-password
+├ ƒ /api/auth/google
+├ ƒ /api/auth/google/callback
+├ ƒ /api/auth/login
+├ ƒ /api/auth/logout
+├ ƒ /api/auth/me
+├ ƒ /api/auth/register
+├ ƒ /api/auth/resend-otp
+├ ƒ /api/auth/reset-password
+├ ƒ /api/auth/send-sms-otp
+├ ƒ /api/auth/send-whatsapp-otp
+├ ƒ /api/auth/verify-otp
+├ ƒ /api/automation
+├ ƒ /api/automation/[id]
+├ ƒ /api/automation/[id]/test
+├ ƒ /api/automation/cron
+├ ƒ /api/automation/scheduler
+├ ƒ /api/automation/trigger
+├ ƒ /api/automation/vendor-alert
+├ ƒ /api/booking/availability
+├ ƒ /api/booking/context/[workspaceId]
+├ ƒ /api/booking/create
+├ ƒ /api/bookings
+├ ƒ /api/bookings/[id]
+├ ƒ /api/contacts
+├ ƒ /api/dashboard
+├ ƒ /api/dashboard/metrics
+├ ƒ /api/forms/contact-forms
+├ ƒ /api/forms/contact-forms/[id]
+├ ƒ /api/forms/intake-forms
+├ ƒ /api/forms/intake-forms/[id]
+├ ƒ /api/forms/submissions
+├ ƒ /api/forms/submissions/[id]
+├ ƒ /api/health
+├ ƒ /api/inbox
+├ ƒ /api/inbox/[id]
+├ ƒ /api/inbox/conversations
+├ ƒ /api/inbox/messages
+├ ƒ /api/integrations/google-calendar
+├ ƒ /api/integrations/google-calendar/callback
+├ ƒ /api/integrations/google-calendar/events
+├ ƒ /api/inventory
+├ ƒ /api/inventory/[id]
+├ ƒ /api/inventory/[id]/history
+├ ƒ /api/inventory/history
+├ ƒ /api/inventory/link
+├ ƒ /api/onboarding/context
+├ ƒ /api/public/book
+├ ƒ /api/public/contact
+├ ƒ /api/public/contact-form/[slug]
+├ ƒ /api/public/form/[slug]
+├ ƒ /api/public/workspaces
+├ ƒ /api/services
+├ ƒ /api/settings/export
+├ ƒ /api/settings/test-email
+├ ƒ /api/settings/test-sms
+├ ƒ /api/settings/test-whatsapp
+├ ƒ /api/settings/voice
+├ ƒ /api/staff
+├ ƒ /api/staff/[id]
+├ ƒ /api/test/seed
+├ ƒ /api/upload
+├ ƒ /api/user
+├ ƒ /api/user/change-password
+├ ƒ /api/voice/agents
+├ ƒ /api/voice/agents/[id]
+├ ƒ /api/voice/calls
+├ ƒ /api/voice/calls/[id]
+├ ƒ /api/voice/dnc
+├ ƒ /api/voice/numbers
+├ ƒ /api/voice/tools
+├ ƒ /api/voice/webhook
+├ ƒ /api/webhooks
+├ ƒ /api/webhooks/[id]
+├ ƒ /api/webhooks/delivery/[id]/retry
+├ ƒ /api/workspace
+├ ƒ /api/workspace/validate-activation
+├ ƒ /automation
+├ ƒ /book/[workspaceId]
+├ ƒ /bookings
+├ ƒ /contact/[slug]
+├ ƒ /contacts
+├ ƒ /dashboard
+├ ○ /forgot-password
+├ ƒ /form/[slug]
+├ ƒ /forms
+├ ƒ /inbox
+├ ƒ /inventory
+├ ○ /login
+├ ○ /onboarding
+├ ○ /privacy
+├ ○ /register
+├ ○ /search
+├ ƒ /settings
+├ ƒ /staff
+├ ○ /terms
+├ ○ /verify-otp
+└ ƒ /voice/calls
+
+
+ƒ Proxy (Middleware)
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

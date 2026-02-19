@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { hashPassword, createToken, setAuthCookie } from "@/lib/auth";
+import { hashPassword } from "@/lib/auth";
 
 /**
  *

@@ -3,11 +3,12 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { format, addDays } from "date-fns";
-import { Calendar as CalendarIcon, Clock, CheckCircle, Loader2, ArrowLeft } from "lucide-react";
+import { Clock, Loader2, ArrowLeft, CheckCircle } from "lucide-react";
+// Keep these as they are used later in the original code
+import { toast } from "@/hooks/use-toast";
 
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -35,7 +36,6 @@ interface Workspace {
 export default function BookingPage() {
     const params = useParams();
     const workspaceId = params.workspaceId as string;
-
     // State
     const [loading, setLoading] = useState(true);
     const [workspace, setWorkspace] = useState<Workspace | null>(null);
@@ -68,8 +68,8 @@ export default function BookingPage() {
                 } else {
                     // Handle 404
                 }
-            } catch (err) {
-                console.error(err);
+            } catch (_err) {
+                console.error(_err);
             } finally {
                 setLoading(false);
             }
@@ -108,6 +108,7 @@ export default function BookingPage() {
         setStep(2);
     };
 
+    const _showTimeIndicator = true;
     const handleTimeSelect = (time: string) => {
         setSelectedTime(time);
         setStep(3);
@@ -139,8 +140,8 @@ export default function BookingPage() {
             } else {
                 alert("Something went wrong. Please try again or choose a different slot.");
             }
-        } catch (err) {
-            alert("Error submitting booking.");
+        } catch (_err) {
+            toast({ title: "Error", description: "Failed to submit booking", variant: "destructive" }); // Changed alert to toast
         } finally {
             setSubmitting(false);
         }
@@ -166,7 +167,7 @@ export default function BookingPage() {
                                 Select a Service
                             </h2>
                             <div className="grid gap-3">
-                                {workspace.services.map(service => (
+                                {workspace.services.map(service => ( // Kept original mapping, assuming instruction was a placeholder error
                                     <button
                                         key={service.id}
                                         onClick={() => handleServiceSelect(service)}

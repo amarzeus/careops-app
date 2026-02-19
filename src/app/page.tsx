@@ -7,23 +7,19 @@ import {
   FileText,
   Package,
   Zap,
-  Sparkles,
-  ArrowRight,
-  Activity,
-  CheckCircle,
   BarChart3,
-  Rocket,
-  Star,
-  Building2,
-  Workflow,
-  Menu,
-  X,
-  Check,
-  Zap as Lightning,
   Layers,
   Gauge,
   Headphones,
-  ChevronRight
+  Activity,
+  X,
+  Menu,
+  Sparkles,
+  Rocket,
+  ArrowRight,
+  Star,
+  Zap as Lightning,
+  Check
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
@@ -461,7 +457,7 @@ export default function LandingPage() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {steps.map((step, index) => (
+            {steps.map((step, _index) => (
               <TiltCard key={step.step}>
                 <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-lg hover:shadow-xl transition-all">
                   <div className="text-4xl font-black text-gray-100 mb-3">{step.step}</div>
@@ -502,8 +498,8 @@ export default function LandingPage() {
               <TiltCard key={testimonial.author}>
                 <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-xl shadow-gray-900/5 h-full">
                   <div className="flex items-center gap-1 mb-6">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />
+                    {[...Array(6)].map((_, _index) => (
+                      <Star key={_index} className="w-5 h-5 fill-amber-400 text-amber-400" />
                     ))}
                   </div>
                   <p className="text-gray-700 mb-8 leading-relaxed text-lg">&quot;{testimonial.quote}&quot;</p>

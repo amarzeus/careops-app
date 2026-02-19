@@ -1,0 +1,63 @@
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/home/amar/Documents/Hackathon/careops-app[39m
+
+[90mstderr[2m | tests/unit/multimodal.test.ts[2m > [22m[2mMultimodal Inventory Scanner[2m > [22m[2mshould extract inventory items from an image correctly
+[22m[39m[vitest] The vi.fn() mock did not use 'function' or 'class' in its implementation, see https://vitest.dev/api/vi#vi-spyon for examples.
+Multimodal Inventory Scan Error: TypeError: () => ({
+    models: {
+      generateContent: mockGenerateContent
+    }
+  }) is not a constructor
+    at new Mock [90m(file:///home/amar/Documents/Hackathon/careops-app/[39mnode_modules/[4m@vitest/spy[24m/dist/index.js:262:27[90m)[39m
+    at getClient [90m(/home/amar/Documents/Hackathon/careops-app/[39msrc/lib/gemini.ts:14:22[90m)[39m
+    at Module.extractInventoryItemsFromImage [90m(/home/amar/Documents/Hackathon/careops-app/[39msrc/lib/gemini.ts:816:20[90m)[39m
+    at [90m/home/amar/Documents/Hackathon/careops-app/[39mtests/unit/multimodal.test.ts:47:30
+    at [90mfile:///home/amar/Documents/Hackathon/careops-app/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:145:11
+    at [90mfile:///home/amar/Documents/Hackathon/careops-app/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:915:26
+    at [90mfile:///home/amar/Documents/Hackathon/careops-app/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1243:20
+    at new Promise (<anonymous>)
+    at runWithTimeout [90m(file:///home/amar/Documents/Hackathon/careops-app/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1209:10[90m)[39m
+    at [90mfile:///home/amar/Documents/Hackathon/careops-app/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1653:37
+
+[90mstderr[2m | tests/unit/multimodal.test.ts[2m > [22m[2mMultimodal Inventory Scanner[2m > [22m[2mshould handle API errors gracefully
+[22m[39m[vitest] The vi.fn() mock did not use 'function' or 'class' in its implementation, see https://vitest.dev/api/vi#vi-spyon for examples.
+Multimodal Inventory Scan Error: TypeError: () => ({
+    models: {
+      generateContent: mockGenerateContent
+    }
+  }) is not a constructor
+    at new Mock [90m(file:///home/amar/Documents/Hackathon/careops-app/[39mnode_modules/[4m@vitest/spy[24m/dist/index.js:262:27[90m)[39m
+    at getClient [90m(/home/amar/Documents/Hackathon/careops-app/[39msrc/lib/gemini.ts:14:22[90m)[39m
+    at Module.extractInventoryItemsFromImage [90m(/home/amar/Documents/Hackathon/careops-app/[39msrc/lib/gemini.ts:816:20[90m)[39m
+    at [90m/home/amar/Documents/Hackathon/careops-app/[39mtests/unit/multimodal.test.ts:58:30
+    at [90mfile:///home/amar/Documents/Hackathon/careops-app/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:145:11
+    at [90mfile:///home/amar/Documents/Hackathon/careops-app/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:915:26
+    at [90mfile:///home/amar/Documents/Hackathon/careops-app/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1243:20
+    at new Promise (<anonymous>)
+    at runWithTimeout [90m(file:///home/amar/Documents/Hackathon/careops-app/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1209:10[90m)[39m
+    at [90mfile:///home/amar/Documents/Hackathon/careops-app/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1653:37
+
+ [31m❯[39m tests/unit/multimodal.test.ts [2m([22m[2m2 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 36[2mms[22m[39m
+[31m     [31m×[31m should extract inventory items from an image correctly[39m[32m 28[2mms[22m[39m
+     [32m✓[39m should handle API errors gracefully[32m 3[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m tests/unit/multimodal.test.ts[2m > [22mMultimodal Inventory Scanner[2m > [22mshould extract inventory items from an image correctly
+[31m[1mAssertionError[22m: expected "vi.fn()" to be called 1 times, but got 0 times[39m
+[36m [2m❯[22m tests/unit/multimodal.test.ts:[2m49:37[22m[39m
+    [90m 47| [39m        const result = await extractInventoryItemsFromImage(imageBase6…
+    [90m 48| [39m
+    [90m 49| [39m        [34mexpect[39m(mockGenerateContent)[33m.[39m[34mtoHaveBeenCalledTimes[39m([34m1[39m)[33m;[39m
+    [90m   | [39m                                    [31m^[39m
+    [90m 50| [39m
+    [90m 51| [39m        [90m// Verify result matches mock data[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
+[2m   Start at [22m 00:44:55
+[2m   Duration [22m 2.28s[2m (transform 292ms, setup 232ms, import 270ms, tests 36ms, environment 1.39s)[22m
+

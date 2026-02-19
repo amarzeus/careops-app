@@ -26,7 +26,7 @@ export async function GET() {
         });
 
         return NextResponse.json({ user });
-    } catch (error) {
+    } catch (_error) {
         return NextResponse.json({ error: "Failed to fetch user" }, { status: 500 });
     }
 }
@@ -58,7 +58,7 @@ export async function PUT(req: Request) {
         });
 
         return NextResponse.json({ user: updatedUser });
-    } catch (error) {
+    } catch (_error) {
         return NextResponse.json({ error: "Failed to update user" }, { status: 500 });
     }
 }

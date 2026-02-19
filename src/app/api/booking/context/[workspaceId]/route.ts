@@ -36,7 +36,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ workspac
         }
 
         return NextResponse.json(workspace);
-    } catch (error) {
+    } catch (_error) {
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }

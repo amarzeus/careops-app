@@ -25,15 +25,15 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
 
     const updated = await prisma.intakeForm.update({
       where: { id },
-      data: { 
-        isActive: body.isActive ?? form.isActive, 
+      data: {
+        isActive: body.isActive ?? form.isActive,
         name: body.name ?? form.name,
         description: body.description ?? form.description,
       },
     });
 
     return NextResponse.json(updated);
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json({ error: "Failed to update" }, { status: 500 });
   }
 }
@@ -60,7 +60,7 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
 
     await prisma.intakeForm.delete({ where: { id } });
     return NextResponse.json({ success: true });
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json({ error: "Failed to delete" }, { status: 500 });
   }
 }
