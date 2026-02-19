@@ -205,10 +205,13 @@ export default function PrivacyPage() {
             <footer className="border-t border-gray-100 py-12 bg-gray-50">
                 <div className="max-w-4xl mx-auto px-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-gray-500">
                     <p>© 2026 CareOps by Amar Kumar. All rights reserved.</p>
-                    <div className="flex gap-6">
+                    <div className="flex gap-6 items-center">
                         <Link href="/terms" className="hover:text-gray-700">Terms of Service</Link>
                         <Link href="/cookies" className="hover:text-gray-700">Cookie Policy</Link>
                         <Link href="/faq" className="hover:text-gray-700">FAQ</Link>
+                        <a href="https://github.com/amarzeus/careops-app" target="_blank" rel="noopener noreferrer" className="hover:text-gray-900 transition-colors">
+                            GitHub
+                        </a>
                     </div>
                 </div>
             </footer>

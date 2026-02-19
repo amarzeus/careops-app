@@ -81,12 +81,30 @@ export default function TermsPage() {
                             We reserve the right to suspend or terminate your access to the Platform at our discretion, without notice, for conduct that we believe violates these Terms.
                         </p>
                     </div>
+                    <div>
+                        <h2 className="text-2xl font-bold text-gray-900 mb-4">8. Contact Us</h2>
+                        <p className="text-gray-600 leading-relaxed">
+                            If you have any questions about these Terms, please contact us at:
+                        </p>
+                        <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-100">
+                            <p className="font-semibold text-gray-900">Amar Kumar</p>
+                            <a href="mailto:amarzeus.dev@gmail.com" className="text-blue-600 hover:underline">amarzeus.dev@gmail.com</a>
+                        </div>
+                    </div>
                 </section>
             </main>
 
             <footer className="border-t border-gray-100 py-12 bg-gray-50">
-                <div className="max-w-4xl mx-auto px-6 text-center">
-                    <p className="text-sm text-gray-500">© 2026 CareOps Platform. All rights reserved.</p>
+                <div className="max-w-4xl mx-auto px-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-gray-500">
+                    <p>© 2026 CareOps by Amar Kumar. All rights reserved.</p>
+                    <div className="flex gap-6 items-center">
+                        <Link href="/terms" className="hover:text-gray-700">Terms of Service</Link>
+                        <Link href="/cookies" className="hover:text-gray-700">Cookie Policy</Link>
+                        <Link href="/faq" className="hover:text-gray-700">FAQ</Link>
+                        <a href="https://github.com/amarzeus/careops-app" target="_blank" rel="noopener noreferrer" className="hover:text-gray-900 transition-colors">
+                            GitHub
+                        </a>
+                    </div>
                 </div>
             </footer>
         </div>
