@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { GoogleGenAI, Type } from "@google/genai";
+import { Type } from "@google/genai";
 import { getClient } from "@/lib/gemini";
 
-const GEMINI_KEY = process.env.GEMINI_API_KEY || "";
+
 
 /**
  *

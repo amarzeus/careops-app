@@ -1,59 +1,62 @@
-# dependencies
+# ─── Dependencies ────────────────────────────────────────────
 /node_modules
 /.pnp
 .pnp.js
 
-# testing
-/coverage
-
-# next.js
+# ─── Next.js ─────────────────────────────────────────────────
 /.next/
 /out/
-
-# production
 /build
 
-# misc
-.DS_Store
-*.pem
-
-# debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# local env files
-.env*.local
+# ─── Environment variables ────────────────────────────────────
 .env
+.env*.local
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
 
-# vercel
-.vercel
-
-# typescript
-*.tsbuildinfo
-next-env.d.ts
-
-# playwright
-/playwright-report/
-/test-results/
-/blob-report/
-/playwright/.cache/
-
-# local database
+# ─── Local database ──────────────────────────────────────────
 *.db
 *.db-journal
 *.sqlite
 *.sqlite-journal
 
-# development scripts
+# ─── Testing & coverage outputs ──────────────────────────────
+/coverage
+/playwright-report/
+/test-results/
+/blob-report/
+/playwright/.cache/
+
+# Captured output files (CI artefacts — never commit)
+test_output.txt
+vitest_output.txt
+tsc_results.txt
+tsc_results_2.txt
+type_errors.txt
+build_output.txt
+build_output_2.txt
+
+# ─── Lint result dumps ───────────────────────────────────────
+lint_output.txt
+lint_errors_round_2.txt
+lint_full_output.txt
+lint_results_*.txt
+lint_results_final.txt
+lint_results_final_*.txt
+new_lint_output.txt
+final_lint_output.txt
+all_lint_results.json
+all_lint_results_v2.json
+src_lint_results.json
+
+# ─── One-off dev/debug scripts ───────────────────────────────
 bypass_otp.ts
 check_booking.ts
 check_contact.ts
 check_dashboard_stats.ts
+check_twilio.ts
 check_user.ts
 debug_smtp.ts
 get_otp.ts
@@ -64,12 +67,38 @@ seed_settings_user.ts
 test_email_delivery.ts
 unverify_user.ts
 
-# IDEs
+# ─── Uploads (user-generated, not source code) ───────────────
+/public/uploads/
+
+# ─── Misc / OS ───────────────────────────────────────────────
+.DS_Store
+*.pem
+*.pem.pub
+Thumbs.db
+
+# ─── Debug logs ──────────────────────────────────────────────
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# ─── IDEs & editors ──────────────────────────────────────────
 .vscode/
 .idea/
+*.swp
+*.swo
 .replit
 replit.md
 
-#docs
-# docs/ is intentionally tracked for project documentation
-CareOps_Hackathon_1770980979292.txt
+# ─── CI / deployment (local only) ────────────────────────────
+.vercel
+
+# ─── TypeScript build info ────────────────────────────────────
+*.tsbuildinfo
+next-env.d.ts
+
+# ─── Hackathon scratch files ──────────────────────────────────
+CareOps_Hackathon_*.txt
+
+# ─── docs/ is intentionally tracked ─────────────────────────
+# (do NOT add docs/ here)
