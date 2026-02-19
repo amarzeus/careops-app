@@ -137,12 +137,12 @@ export default function SearchPage() {
                                     </div>
 
                                     <div className="flex gap-2 mt-auto pt-4 border-t">
-                                        <Link href={`/ book / ${workspace.id} `} className="flex-1">
+                                        <Link href={`/book/${workspace.id}`} className="flex-1">
                                             <Button className="w-full bg-blue-600 hover:bg-blue-700">
                                                 Book Now
                                             </Button>
                                         </Link>
-                                        <Link href={`/ contact / ${workspace.id} `} className="flex-1">
+                                        <Link href={`/contact/${workspace.id}`} className="flex-1">
                                             <Button variant="outline" className="w-full">
                                                 Contact
                                             </Button>
