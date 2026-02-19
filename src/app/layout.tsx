@@ -76,8 +76,7 @@ export const metadata: Metadata = {
     canonical: BASE_URL,
   },
   verification: {
-    // Replace with your actual Google Search Console verification token
-    google: "REPLACE_WITH_GOOGLE_SEARCH_CONSOLE_TOKEN",
+    google: "google2370b9081550b6c5",
   },
 };
 
