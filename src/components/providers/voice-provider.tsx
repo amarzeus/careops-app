@@ -57,7 +57,14 @@ export function VoiceProvider({ children }: { children: React.ReactNode }) {
                     conversationHistory: history,
                 }),
             });
+
             const data = await response.json();
+
+            if (!response.ok) {
+                // API returned error status — still return the fallback message from the response body
+                console.error("Voice API non-ok response:", response.status, data);
+                return data.message || "I'm having trouble processing your request right now.";
+            }
 
             // Handle structured actions
             if (data.action) {
@@ -74,12 +81,16 @@ export function VoiceProvider({ children }: { children: React.ReactNode }) {
             return data.message;
         } catch (error) {
             console.error("Voice API Error:", error);
-            return "I'm having trouble connecting to the server.";
+            return "I'm having trouble connecting to the server. Please check your connection and try again.";
         }
     };
 
     const engine = useVoiceEngine(handleTranscript);
     const [lastUserId, setLastUserId] = useState<string | null>(null);
+
+    // Extract stable refs from engine to avoid `engine` object identity causing
+    // useEffect to re-run every render (engine object is recreated each render)
+    const clearHistory = engine.clearHistory;
 
     // Watch for Auth changes
     useEffect(() => {
@@ -91,13 +102,13 @@ export function VoiceProvider({ children }: { children: React.ReactNode }) {
                     const currentId = data.user?.id || null;
                     if (currentId !== lastUserId) {
                         // User changed (logged in or swapped accounts)
-                        engine.clearHistory();
+                        clearHistory();
                         setLastUserId(currentId);
                         setHasGreeted(false); // Allow fresh greeting for new user
                     }
                 } else if (lastUserId !== null) {
                     // Logged out
-                    engine.clearHistory();
+                    clearHistory();
                     setLastUserId(null);
                 }
             } catch (err) {
@@ -106,7 +117,8 @@ export function VoiceProvider({ children }: { children: React.ReactNode }) {
         };
 
         checkAuth();
-    }, [pathname, lastUserId, engine]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [pathname, lastUserId]); // Intentionally omit clearHistory — it changes identity each render
 
     // Proactive Greeting on Mount (once per session ideally)
     useEffect(() => {

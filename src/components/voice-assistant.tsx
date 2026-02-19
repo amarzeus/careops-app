@@ -220,6 +220,19 @@ export function useVoiceEngine(onTranscript: (text: string, context?: any, histo
   const [history, setHistory] = useState<Array<{ role: "user" | "assistant"; content: string }>>([]);
   const [isChatOpen, setIsChatOpen] = useState(false);
 
+  // Keep a ref that always holds the latest history to avoid stale closures
+  // in processTranscript (which is captured in setTimeout callbacks)
+  const historyRef = useRef<Array<{ role: "user" | "assistant"; content: string }>>([]);
+  useEffect(() => { historyRef.current = history; }, [history]);
+
+  // Keep a ref to the latest voiceState for use inside recognition callbacks
+  const voiceStateRef = useRef<VoiceState>("idle");
+  useEffect(() => { voiceStateRef.current = voiceState; }, [voiceState]);
+
+  // Keep a ref to the latest isMuted for use in speak callback
+  const isMutedRef = useRef(false);
+  useEffect(() => { isMutedRef.current = isMuted; }, [isMuted]);
+
   // Continuous Mode State
   const [_continuousMode, setContinuousModeState] = useState(false);
   const continuousModeRef = useRef(false);
@@ -326,10 +339,16 @@ export function useVoiceEngine(onTranscript: (text: string, context?: any, histo
   const startListeningRef = useRef<() => void>(() => { });
 
   const speak = useCallback((text: string) => {
-    if (!synthRef.current || isMuted) {
+    // Always update aiResponse so text chat shows the reply even when muted
+    setAiResponse(text);
+
+    if (!synthRef.current || isMutedRef.current) {
+      // Muted: skip TTS but still transition state correctly
       setVoiceState(continuousModeRef.current ? "listening" : "idle");
-      // If continuous and muted (which is weird but possible), we might want to restart listening immediately
-      if (continuousModeRef.current && !isMuted) startListeningRef.current();
+      if (continuousModeRef.current) {
+        // Small delay so the UI shows Idle briefly before re-listening
+        setTimeout(() => startListeningRef.current(), 300);
+      }
       return;
     }
 
@@ -405,7 +424,11 @@ export function useVoiceEngine(onTranscript: (text: string, context?: any, histo
     setVoiceState("processing");
     setTranscript(text);
     setInterimTranscript("");
+
+    // Use the ref so we always get the freshest history even inside a stale closure
+    const latestHistory = historyRef.current;
     setHistory(prev => [...prev.slice(-19), { role: "user", content: text }]);
+
     // Stop mic audio analysis
     cancelAnimationFrame(ampFrameRef.current);
     setAmplitude(0);
@@ -422,20 +445,20 @@ export function useVoiceEngine(onTranscript: (text: string, context?: any, histo
     analyserRef.current = null;
 
     try {
-      // Pass window.location.href or other context if needed
-      const currentHistory = [...history, { role: "user" as const, content: text }];
+      // Build history from ref (never stale) + the current user message
+      const currentHistory = [...latestHistory, { role: "user" as const, content: text }];
       const response = await onTranscript(text, {
         url: window.location.pathname,
         title: document.title
       }, currentHistory);
-      setAiResponse(response);
       setHistory(prev => [...prev.slice(-19), { role: "assistant", content: response }]);
       speak(response);
-    } catch {
+    } catch (err) {
+      console.error("Voice processTranscript error:", err);
       setError("Failed to get AI response.");
       setVoiceState("idle");
     }
-  }, [onTranscript, speak, stopSpeaking, history, setContinuousMode]);
+  }, [onTranscript, speak, stopSpeaking, setContinuousMode]);
 
   const startListening = useCallback(async () => {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
@@ -467,37 +490,44 @@ export function useVoiceEngine(onTranscript: (text: string, context?: any, histo
     recognition.interimResults = true;
     recognition.lang = "en-US";
 
-    let finalTranscript = "";
+    // Accumulate final results across multiple onresult events
+    // (Resetting to "" on each event was the bug — Chrome fires multiple onresult events
+    //  and only the latest isFinal segments would be kept)
+    let accumulatedFinal = "";
 
     recognition.onstart = () => setVoiceState("listening");
 
     recognition.onresult = (event: any) => {
       let interim = "";
-      finalTranscript = "";
+      accumulatedFinal = "";
+      // event.results is the full running list since recognition started
       for (let i = 0; i < event.results.length; i++) {
         if (event.results[i].isFinal) {
-          finalTranscript += event.results[i][0].transcript;
+          accumulatedFinal += event.results[i][0].transcript;
         } else {
           interim += event.results[i][0].transcript;
         }
       }
       setInterimTranscript(interim);
-      if (finalTranscript) setTranscript(finalTranscript);
+      if (accumulatedFinal) setTranscript(accumulatedFinal);
 
+      // Reset silence timer on every speech event
       if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
       silenceTimerRef.current = setTimeout(() => {
-        const text = finalTranscript || interim;
+        const text = accumulatedFinal || interim;
         if (text.trim()) {
           stopListening();
           processTranscript(text.trim());
         }
-      }, 1500); // 1.5s silence detection
+      }, 1800); // 1.8s silence detection
     };
 
     recognition.onerror = (event: any) => {
+      // no-speech in continuous mode: just restart recognition
       if (event.error === "no-speech") {
-        // If in continuous mode and no speech, just restart or stay listening?
-        // For now, let's just ignore no-speech errors in continuous mode to prevent loop crashes
+        if (continuousModeRef.current && voiceStateRef.current === "listening") {
+          try { recognition.start(); } catch { /* already started */ }
+        }
         return;
       }
       if (event.error === "aborted") return;
@@ -508,7 +538,20 @@ export function useVoiceEngine(onTranscript: (text: string, context?: any, histo
     };
 
     recognition.onend = () => {
-      // handled by silence timer usually
+      // If we're still supposed to be listening (recognition ended unexpectedly),
+      // restart it — this handles browser killing recognition after ~60s or on network hiccups
+      if (
+        continuousModeRef.current &&
+        (voiceStateRef.current === "listening" || voiceStateRef.current === "idle") &&
+        recognitionRef.current === recognition // only restart if we haven't already created a new one
+      ) {
+        try {
+          recognition.start();
+        } catch {
+          // Recognition couldn't restart — fall back gracefully
+          setVoiceState("idle");
+        }
+      }
     };
 
     recognitionRef.current = recognition;
