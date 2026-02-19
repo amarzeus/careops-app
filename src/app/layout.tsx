@@ -20,6 +20,11 @@ export const metadata: Metadata = {
     default: "CareOps – Unified Service Operations Platform",
     template: "%s | CareOps",
   },
+  icons: {
+    icon: "/logo.svg",
+    shortcut: "/logo.svg",
+    apple: "/logo.svg",
+  },
   description:
     "CareOps is the all-in-one operations platform for service businesses. Manage bookings, leads, intake forms, inventory, automated messaging, and AI voice reception from one dashboard.",
   keywords: [

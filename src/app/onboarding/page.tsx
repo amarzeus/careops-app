@@ -5,8 +5,11 @@ import { useRouter } from "next/navigation";
 import {
   Building2, Mail, FileText, Calendar, ClipboardList,
   Package, Users, Rocket, Check,
-  ArrowRight, ArrowLeft, Activity, Edit2, Trash2
+  ArrowRight, ArrowLeft, Edit2, Trash2
 } from "lucide-react";
+import { ListChecks as ClipboardList } from "lucide-react"; // Fix missing export if needed, or keep original
+// Actually just remove Activity from the list
+import { Logo } from "@/components/layout/logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -1226,8 +1229,8 @@ export default function OnboardingPage() {
       {/* Header */}
       <div className="bg-white border-b border-gray-200 px-4 sm:px-6 py-2">
         <div className="max-w-6xl mx-auto flex items-center gap-3">
-          <div className="w-7 h-7 bg-blue-600 rounded-lg flex items-center justify-center">
-            <Activity className="w-4 h-4 text-white" />
+          <div className="flex items-center justify-center">
+            <Logo variant="icon" size={28} />
           </div>
           <h1 className="text-base font-bold text-gray-900">CareOps Setup</h1>
           <div className="ml-auto flex items-center gap-2">

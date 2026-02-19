@@ -1,4 +1,5 @@
-import { ArrowLeft, Activity } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
+import { Logo } from "@/components/layout/logo";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
@@ -11,10 +12,7 @@ export default function TermsPage() {
             <nav className="border-b border-gray-100">
                 <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
                     <Link href="/" className="flex items-center gap-2">
-                        <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                            <Activity className="w-5 h-5 text-white" />
-                        </div>
-                        <span className="text-xl font-bold text-gray-900">CareOps</span>
+                        <Logo variant="full" size={32} />
                     </Link>
                     <Link href="/">
                         <Button variant="ghost" size="sm">

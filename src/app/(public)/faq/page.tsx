@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { ArrowLeft, Activity, HelpCircle, ChevronDown } from "lucide-react";
+import { ArrowLeft, HelpCircle, ChevronDown } from "lucide-react";
+import { Logo } from "@/components/layout/logo";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
@@ -160,10 +161,7 @@ export default function FAQPage() {
             <nav className="border-b border-gray-100 sticky top-0 z-10 bg-white/90 backdrop-blur-sm">
                 <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
                     <Link href="/" className="flex items-center gap-2">
-                        <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                            <Activity className="w-5 h-5 text-white" />
-                        </div>
-                        <span className="text-xl font-bold text-gray-900">CareOps</span>
+                        <Logo variant="full" size={32} />
                     </Link>
                     <Link href="/">
                         <Button variant="ghost" size="sm">

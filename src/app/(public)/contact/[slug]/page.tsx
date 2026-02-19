@@ -1,7 +1,9 @@
 "use client";
 
 import React, { useCallback, useEffect, useState, use } from "react";
-import { Send, CheckCircle, Activity } from "lucide-react";
+import Link from "next/link";
+import { Send, CheckCircle } from "lucide-react";
+import { Logo } from "@/components/layout/logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -40,7 +42,7 @@ export default function PublicContactPage({ params }: { params: Promise<{ slug: 
         parsed.forEach((f: FormField) => { initial[f.name] = ""; });
         setFormData(initial);
       }
-    } catch {} finally { setLoading(false); }
+    } catch { } finally { setLoading(false); }
   }, [slug]);
 
   useEffect(() => {
@@ -82,8 +84,10 @@ export default function PublicContactPage({ params }: { params: Promise<{ slug: 
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-12">
       <Card className="w-full max-w-lg">
         <CardHeader className="text-center">
-          <div className="mx-auto w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center mb-4">
-            <Activity className="w-7 h-7 text-white" />
+          <div className="flex justify-center mb-6">
+            <Link href="/">
+              <Logo variant="full" size={42} />
+            </Link>
           </div>
           <CardTitle className="text-2xl">{form.workspace?.name || "Contact Us"}</CardTitle>
           <CardDescription>{form.name}</CardDescription>

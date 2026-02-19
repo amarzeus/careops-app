@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Activity } from "lucide-react";
+import { Logo } from "@/components/layout/logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -45,8 +46,10 @@ export default function RegisterPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <div className="mx-auto w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center mb-4">
-            <Activity className="w-7 h-7 text-white" />
+          <div className="flex justify-center mb-6">
+            <Link href="/">
+              <Logo variant="full" size={42} />
+            </Link>
           </div>
           <CardTitle className="text-2xl">Create your account</CardTitle>
           <CardDescription>Start managing your business operations</CardDescription>
