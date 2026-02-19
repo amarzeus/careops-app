@@ -16,12 +16,12 @@ export async function POST(req: Request) {
 
     if (!rateLimit.allowed) {
       return NextResponse.json(
-        { 
+        {
           error: "Rate limit exceeded",
           message: "Too many submissions. Please try again later.",
           retryAfter: Math.ceil((rateLimit.resetTime - Date.now()) / 1000)
         },
-        { 
+        {
           status: 429,
           headers: {
             'X-RateLimit-Limit': String(RATE_LIMITS.CONTACT_FORM.maxRequests),
@@ -40,18 +40,38 @@ export async function POST(req: Request) {
         { status: 400 }
       );
 
-    const form = await prisma.contactForm.findUnique({
-      where: { slug: formSlug },
+    // Find form by slug or workspaceId
+    let form = await prisma.contactForm.findFirst({
+      where: {
+        OR: [
+          { slug: formSlug },
+          { workspaceId: formSlug, isActive: true }
+        ]
+      },
       include: { workspace: true },
     });
-    if (!form || !form.isActive)
-      return NextResponse.json({ error: "Form not found" }, { status: 404 });
+
+    let workspaceId = form?.workspaceId;
+    let welcomeMessage = form?.welcomeMessage;
+
+    if (!form || !form.isActive) {
+      // If no form found, check if formSlug is a valid workspaceId (Default Form)
+      const workspace = await prisma.workspace.findUnique({
+        where: { id: formSlug },
+      });
+
+      if (!workspace) {
+        return NextResponse.json({ error: "Form not found" }, { status: 404 });
+      }
+
+      workspaceId = workspace.id;
+    }
 
     // Find or create contact
     let contact = data.email
       ? await prisma.contact.findFirst({
-          where: { email: data.email, workspaceId: form.workspaceId },
-        })
+        where: { email: data.email, workspaceId: workspaceId! },
+      })
       : null;
 
     if (!contact) {
@@ -61,7 +81,7 @@ export async function POST(req: Request) {
           email: data.email,
           phone: data.phone,
           source: "form",
-          workspaceId: form.workspaceId,
+          workspaceId: workspaceId!,
         },
       });
     }
@@ -74,7 +94,7 @@ export async function POST(req: Request) {
       conversation = await prisma.conversation.create({
         data: {
           contactId: contact.id,
-          workspaceId: form.workspaceId,
+          workspaceId: workspaceId!,
           subject: `New inquiry from ${data.name}`,
         },
       });
@@ -100,12 +120,12 @@ export async function POST(req: Request) {
     }
 
     // Trigger automation
-    await triggerAutomation(form.workspaceId, "NEW_CONTACT", { contact });
+    await triggerAutomation(workspaceId!, "NEW_CONTACT", { contact });
 
     return NextResponse.json({
       success: true,
       message:
-        form.welcomeMessage ||
+        welcomeMessage ||
         "Thank you for contacting us! We will get back to you soon.",
     });
   } catch (error) {
