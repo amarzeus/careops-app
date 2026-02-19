@@ -13,10 +13,10 @@ interface VapiCallsClient {
 }
 
 interface VapiAssistantsClient {
-  create(params: unknown): Promise<any>;
-  update(id: string, params: unknown): Promise<any>;
-  list(): Promise<any>;
-  get(id: string): Promise<any>;
+  create(params: unknown): Promise<unknown>;
+  update(id: string, params: unknown): Promise<unknown>;
+  list(): Promise<unknown>;
+  get(id: string): Promise<unknown>;
 }
 
 interface VapiClientType {
@@ -349,9 +349,10 @@ export function getVapiStatus(): {
 
 /**
  * Create a new Vapi assistant
- * @param params
+ * @param params - The assistant configuration parameters
+ * @returns The created assistant object
  */
-export async function createVapiAssistant(params: any): Promise<any> {
+export async function createVapiAssistant(params: Record<string, unknown>): Promise<unknown> {
   if (!vapiClient) {
     throw new Error('VAPI client not initialized');
   }
@@ -366,10 +367,11 @@ export async function createVapiAssistant(params: any): Promise<any> {
 
 /**
  * Update an existing Vapi assistant
- * @param id
- * @param params
+ * @param id - The assistant ID
+ * @param params - The update parameters
+ * @returns The updated assistant object
  */
-export async function updateVapiAssistant(id: string, params: any): Promise<any> {
+export async function updateVapiAssistant(id: string, params: Record<string, unknown>): Promise<unknown> {
   if (!vapiClient) {
     throw new Error('VAPI client not initialized');
   }

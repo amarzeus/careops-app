@@ -6,13 +6,13 @@ import { X } from "lucide-react";
 import { InlineVoiceMode, VoiceAssistantFAB } from "@/components/voice-assistant";
 
 /**
- *
+ * DashboardVoice component that provides a floating voice assistant.
  */
 export function DashboardVoice() {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleTranscript = useCallback(async (text: string, context?: any, history?: any[]): Promise<string> => {
+  const handleTranscript = useCallback(async (text: string, context?: unknown, history?: unknown[]): Promise<string> => {
     try {
       const res = await fetch("/api/ai/voice", {
         method: "POST",

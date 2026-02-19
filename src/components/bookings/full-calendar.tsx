@@ -21,6 +21,7 @@ import {
   setHours,
   getHours,
   getMinutes,
+  addMinutes,
 } from "date-fns";
 import {
   ChevronLeft,
@@ -37,9 +38,17 @@ export interface BookingWithRelations extends Booking {
   service: Service;
 }
 
+export interface ExternalEvent {
+  id: string;
+  title: string;
+  start: Date | string;
+  end?: Date | string;
+  [key: string]: unknown;
+}
+
 interface FullCalendarProps {
   bookings: BookingWithRelations[];
-  externalEvents?: any[];
+  externalEvents?: ExternalEvent[];
   onEdit: (booking: BookingWithRelations) => void;
   onNewBooking: (date?: Date) => void;
 }
@@ -60,12 +69,12 @@ const HOUR_HEIGHT = 48; // Compact B2B scale (h-12 equivalent)
 // Width of the time gutter
 
 /**
- *
- * @param root0
- * @param root0.bookings
- * @param root0.externalEvents
- * @param root0.onEdit
- * @param root0.onNewBooking
+ * FullCalendar component for managing bookings.
+ * @param props - Component props
+ * @param props.bookings - List of bookings
+ * @param props.externalEvents - External events (e.g. Google Calendar)
+ * @param props.onEdit - Callback when booking is clicked
+ * @param props.onNewBooking - Callback when slot is clicked
  */
 export function FullCalendar({ bookings, externalEvents = [], onEdit, onNewBooking }: FullCalendarProps) {
   const [view, setView] = useState<ViewMode>("week");
@@ -186,9 +195,9 @@ export function FullCalendar({ bookings, externalEvents = [], onEdit, onNewBooki
                       "text-[9px] px-1 py-0.5 rounded truncate font-medium border-l-2 shadow-sm leading-tight",
                       STATUS_STYLES.EXTERNAL
                     )}
-                    title={`${event.summary}\n(Google Calendar)`}
+                    title={`${event.title}\n(Google Calendar)`}
                   >
-                    {format(new Date(event.start), "H:mm")} {event.summary}
+                    {format(new Date(event.start), "H:mm")} {event.title}
                   </div>
                 ))}
               </div>
@@ -320,7 +329,7 @@ export function FullCalendar({ bookings, externalEvents = [], onEdit, onNewBooki
                   {/* External Events (Google) */}
                   {dayExternalEvents.map((event) => {
                     const start = new Date(event.start);
-                    const end = new Date(event.end);
+                    const end = event.end ? new Date(event.end) : addMinutes(start, 30);
                     const startMin = getHours(start) * 60 + getMinutes(start);
                     const duration = Math.max(differenceInMinutes(end, start), 30); // Min 30 mins for visibility
 
@@ -331,7 +340,7 @@ export function FullCalendar({ bookings, externalEvents = [], onEdit, onNewBooki
                       <div
                         key={event.id}
                         style={{ top: `${top}px`, height: `${height}px` }}
-                        title={`${event.summary}\n(Google Calendar)`}
+                        title={`${event.title}\n(Google Calendar)`}
                         className={cn(
                           "absolute inset-x-0.5 z-10 rounded shadow-none border border-black/5 p-1 flex flex-col transition-all hover:z-20 hover:scale-[1.01] overflow-hidden leading-tight",
                           STATUS_STYLES.EXTERNAL
@@ -339,7 +348,7 @@ export function FullCalendar({ bookings, externalEvents = [], onEdit, onNewBooki
                       >
                         <div className="flex items-center gap-1 mb-0.5">
                           <Calendar className="w-2.5 h-2.5 opacity-50" />
-                          <span className="font-bold text-[9px] text-purple-900 truncate tracking-tight">{event.summary}</span>
+                          <span className="font-bold text-[9px] text-purple-900 truncate tracking-tight">{event.title}</span>
                         </div>
                         <div className="text-[8px] font-black opacity-50">{format(start, "H:mm")} - {format(end, "H:mm")}</div>
                       </div>

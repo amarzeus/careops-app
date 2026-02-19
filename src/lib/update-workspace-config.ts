@@ -8,9 +8,12 @@ dotenv.config();
  * Run this script when environment variables are configured but workspace flags are not set
  */
 
+/**
+ * Updates the workspace configuration in the database.
+ */
 async function updateWorkspaceConfig() {
   const workspaceId = process.argv[2];
-  
+
   if (!workspaceId) {
     console.error("❌ Please provide workspace ID as argument");
     console.log("Usage: npx tsx src/lib/update-workspace-config.ts <workspace-id>");
@@ -22,11 +25,12 @@ async function updateWorkspaceConfig() {
   const emailUser = process.env.EMAIL_USER;
   const emailPass = process.env.EMAIL_PASS;
   const emailFrom = process.env.EMAIL_FROM;
-  
+
   const twilioAccountSid = process.env.TWILIO_ACCOUNT_SID;
   const twilioAuthToken = process.env.TWILIO_AUTH_TOKEN;
   const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const updateData: any = {};
 
   // Check if email is configured in environment
@@ -70,14 +74,14 @@ async function updateWorkspaceConfig() {
     console.log(`  Name: ${workspace.name}`);
     console.log(`  Email Configured: ${workspace.emailConfigured}`);
     console.log(`  SMS Configured: ${workspace.smsConfigured}`);
-    
+
     if (updateData.emailConfigured) {
       console.log(`  Email From: ${updateData.emailFromAddress}`);
     }
     if (updateData.smsConfigured) {
       console.log(`  SMS From: ${updateData.smsFromNumber}`);
     }
-    
+
     console.log("\n🎉 Email and SMS are now enabled!");
   } catch (error) {
     console.error("\n❌ Failed to update workspace:", error);

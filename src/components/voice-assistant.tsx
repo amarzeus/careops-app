@@ -7,6 +7,12 @@ import { cn } from "@/lib/utils";
 export type VoiceState = "idle" | "listening" | "processing" | "speaking";
 
 // ---- Fibonacci Sphere Point Distribution ----
+/**
+ * Generates points on a sphere using the Fibonacci spiral algorithm.
+ * @param count - Number of points to generate
+ * @param radius - Radius of the sphere
+ * @returns Array of 3D coordinates
+ */
 function generateSpherePoints(count: number, radius: number) {
   const points: { x: number; y: number; z: number }[] = [];
   const goldenAngle = Math.PI * (3 - Math.sqrt(5));
@@ -209,7 +215,12 @@ export function DotGlobe({ voiceState, amplitude, size = 180 }: DotGlobeProps) {
  *
  * @param onTranscript
  */
-export function useVoiceEngine(onTranscript: (text: string, context?: any, history?: any[]) => Promise<string>) {
+/**
+ * Custom hook to manage the voice interaction engine (Speech Recognition + Synthesis).
+ * @param onTranscript - Callback function to handle the final transcript
+ * @returns Object containing voice state, transcript, and control methods
+ */
+export function useVoiceEngine(onTranscript: (text: string, context?: Record<string, unknown>, history?: Array<{ role: "user" | "assistant"; content: string }>) => Promise<string>) {
   const [voiceState, setVoiceState] = useState<VoiceState>("idle");
   const [transcript, setTranscript] = useState("");
   const [interimTranscript, setInterimTranscript] = useState("");
@@ -242,6 +253,7 @@ export function useVoiceEngine(onTranscript: (text: string, context?: any, histo
     continuousModeRef.current = active;
   }, []);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const recognitionRef = useRef<any>(null);
   const synthRef = useRef<SpeechSynthesis | null>(null);
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
@@ -461,6 +473,7 @@ export function useVoiceEngine(onTranscript: (text: string, context?: any, histo
   }, [onTranscript, speak, stopSpeaking, setContinuousMode]);
 
   const startListening = useCallback(async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) {
       setError("Speech recognition not supported. Use Chrome.");
@@ -497,6 +510,7 @@ export function useVoiceEngine(onTranscript: (text: string, context?: any, histo
 
     recognition.onstart = () => setVoiceState("listening");
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     recognition.onresult = (event: any) => {
       let interim = "";
       accumulatedFinal = "";
@@ -522,6 +536,7 @@ export function useVoiceEngine(onTranscript: (text: string, context?: any, histo
       }, 1800); // 1.8s silence detection
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     recognition.onerror = (event: any) => {
       // no-speech in continuous mode: just restart recognition
       if (event.error === "no-speech") {

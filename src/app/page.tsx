@@ -145,6 +145,8 @@ function TiltCard({ children, className = "" }: { children: React.ReactNode; cla
   );
 }
 
+
+
 // Gradient Orb Animation
 function GradientOrb({ className = "", delay = 0 }: { className?: string; delay?: number }) {
   return (
@@ -211,6 +213,8 @@ function GradientButton({ children, className = "", variant = "primary" }: { chi
     </button>
   );
 }
+
+
 
 function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   if (!isOpen) return null;

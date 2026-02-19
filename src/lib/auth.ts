@@ -47,35 +47,38 @@ function decodeToken(token: string): Record<string, unknown> | null {
 }
 
 /**
- *
- * @param password
+ * Hashes a password using bcrypt.
+ * @param password - The plain text password
+ * @returns The hashed password
  */
 export async function hashPassword(password: string): Promise<string> {
   return bcrypt.hash(password, 12);
 }
 
 /**
- *
- * @param password
- * @param hash
+ * Verifies a password against a hash.
+ * @param password - The plain text password
+ * @param hash - The stored hash
+ * @returns True if password matches
  */
 export async function verifyPassword(password: string, hash: string): Promise<boolean> {
   return bcrypt.compare(password, hash);
 }
 
 /**
- *
- * @param userId
- * @param workspaceId
- * @param role
+ * Creates a JWT token for a user.
+ * @param userId - The user ID
+ * @param workspaceId - The workspace ID
+ * @param role - The user role
+ * @returns The signed JWT token
  */
 export function createToken(userId: string, workspaceId: string | null, role: string): string {
   return encodeToken({ userId, workspaceId, role });
 }
 
 /**
- *
- * @param token
+ * Sets the authentication cookie.
+ * @param token - The JWT token
  */
 export async function setAuthCookie(token: string) {
   const cookieStore = await cookies();
@@ -89,7 +92,8 @@ export async function setAuthCookie(token: string) {
 }
 
 /**
- *
+ * Retrieves the authentication cookie value.
+ * @returns The token string or null
  */
 export async function getAuthCookie(): Promise<string | null> {
   const cookieStore = await cookies();
@@ -97,7 +101,7 @@ export async function getAuthCookie(): Promise<string | null> {
 }
 
 /**
- *
+ * Removes the authentication cookie.
  */
 export async function removeAuthCookie() {
   const cookieStore = await cookies();
@@ -105,26 +109,28 @@ export async function removeAuthCookie() {
 }
 
 /**
- *
+ * Gets the current authenticated user.
+ * @returns The user object or null
  */
 export async function getCurrentUser() {
   const token = await getAuthCookie();
   if (!token) return null;
-  
+
   const payload = decodeToken(token);
   if (!payload || !payload.userId) return null;
-  
+
   const user = await prisma.user.findUnique({
     where: { id: payload.userId as string },
     include: { workspace: true },
   });
-  
+
   return user;
 }
 
 /**
- *
- * @param token
+ * Verifies and decodes a JWT token.
+ * @param token - The JWT token
+ * @returns The decoded payload or null
  */
 export function verifyToken(token: string) {
   return decodeToken(token);

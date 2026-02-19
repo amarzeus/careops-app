@@ -5,7 +5,12 @@ import { prisma } from "./prisma";
  * Run with: npx tsx src/lib/recover-user.ts <email>
  */
 
-async function recoverUser(email: string) {
+/**
+ * Initiates the password recovery process for a user.
+ * @param email - The email of the user
+ * @returns Object indicating success or failure
+ */
+export async function recoverUser(email: string) {
   console.log(`\n🚑 Recovering user: ${email}\n`);
 
   const user = await prisma.user.findUnique({

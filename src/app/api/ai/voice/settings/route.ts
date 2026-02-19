@@ -89,7 +89,7 @@ export async function POST(req: Request) {
       try {
         const vapiConfig = getVapiConfig(data);
         const vapiAssistant = await createVapiAssistant(vapiConfig);
-        vapiAssistantId = vapiAssistant.id;
+        vapiAssistantId = (vapiAssistant as { id: string }).id;
       } catch (e) {
         console.error("Failed to create Vapi assistant:", e);
         // Fallback: proceed without Vapi ID, or fail? specific req says "sync", so maybe warn but proceed
@@ -126,7 +126,7 @@ export async function POST(req: Request) {
         try {
           const vapiConfig = getVapiConfig(data);
           const vapiAssistant = await createVapiAssistant(vapiConfig);
-          data.vapiAssistantId = vapiAssistant.id;
+          data.vapiAssistantId = (vapiAssistant as { id: string }).id;
         } catch (e) {
           console.error("Failed to backfill Vapi assistant:", e);
         }

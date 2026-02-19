@@ -30,6 +30,7 @@ function sleep(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function categorizeError(error: any, statusCode?: number): { code: TwilioErrorCode; retryable: boolean } {
     const message = error?.message?.toLowerCase() || "";
 
@@ -53,8 +54,9 @@ function categorizeError(error: any, statusCode?: number): { code: TwilioErrorCo
 
 
 /**
- *
- * @param phone
+ * Normalizes a phone number to E.164 format.
+ * @param phone - The input phone number
+ * @returns Normalized phone number string
  */
 export function normalizePhoneNumber(phone: string): string {
     const digits = phone.replace(/\D/g, "");
@@ -109,9 +111,10 @@ function validatePhoneNumber(phone: string): { valid: boolean; formatted: string
 }
 
 /**
- *
- * @param to
- * @param body
+ * Sends an SMS message using Twilio.
+ * @param to - The recipient's phone number
+ * @param body - The message content
+ * @returns Result of the SMS operation
  */
 export async function sendSMS(to: string, body: string): Promise<TwilioResult> {
     if (!client || !fromNumber) {
@@ -126,7 +129,7 @@ export async function sendSMS(to: string, body: string): Promise<TwilioResult> {
     }
 
     const formattedPhone = validation.formatted;
-    let lastError: any = null;
+    let lastError: unknown = null;
 
     for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
         try {
@@ -144,6 +147,7 @@ export async function sendSMS(to: string, body: string): Promise<TwilioResult> {
                 success: true,
                 requestId: message.sid,
             };
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
             lastError = error;
             const statusCode = error?.status || error?.response?.status;
@@ -166,19 +170,21 @@ export async function sendSMS(to: string, body: string): Promise<TwilioResult> {
         }
     }
 
+    const errorMessage = lastError instanceof Error ? lastError.message : String(lastError || "Unknown error");
     const { code } = categorizeError(lastError);
     return {
         success: false,
-        error: lastError?.message || "Max retries exceeded",
+        error: errorMessage || "Max retries exceeded",
         errorCode: code,
         retryable: false
     };
 }
 
 /**
- *
- * @param to
- * @param body
+ * Sends a WhatsApp message using Twilio.
+ * @param to - The recipient's phone number
+ * @param body - The message content
+ * @returns Result of the WhatsApp operation
  */
 export async function sendWhatsApp(to: string, body: string): Promise<TwilioResult> {
     if (!client || !fromNumber) {
@@ -193,7 +199,7 @@ export async function sendWhatsApp(to: string, body: string): Promise<TwilioResu
     }
 
     const formattedPhone = validation.formatted;
-    let lastError: any = null;
+    let lastError: unknown = null;
 
     for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
         try {
@@ -214,6 +220,7 @@ export async function sendWhatsApp(to: string, body: string): Promise<TwilioResu
                 success: true,
                 requestId: message.sid,
             };
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
             lastError = error;
             const statusCode = error?.status || error?.response?.status;
@@ -236,19 +243,21 @@ export async function sendWhatsApp(to: string, body: string): Promise<TwilioResu
         }
     }
 
+    const errorMessage = lastError instanceof Error ? lastError.message : String(lastError || "Unknown error");
     const { code } = categorizeError(lastError);
     return {
         success: false,
-        error: lastError?.message || "Max retries exceeded",
+        error: errorMessage || "Max retries exceeded",
         errorCode: code,
         retryable: false
     };
 }
 
 /**
- *
- * @param phone
- * @param otp
+ * Sends a One-Time Password via SMS.
+ * @param phone - Recipient phone number
+ * @param otp - The OTP code
+ * @returns Result of the operation
  */
 export async function sendOTP(phone: string, otp: string): Promise<TwilioResult> {
     const body = `Your CareOps verification code is: ${otp}. It expires in 15 minutes.`;
@@ -256,9 +265,10 @@ export async function sendOTP(phone: string, otp: string): Promise<TwilioResult>
 }
 
 /**
- *
- * @param phone
- * @param otp
+ * Sends a One-Time Password via WhatsApp.
+ * @param phone - Recipient phone number
+ * @param otp - The OTP code
+ * @returns Result of the operation
  */
 export async function sendWhatsAppOTP(phone: string, otp: string): Promise<TwilioResult> {
     const body = `Your CareOps verification code is: *${otp}*\n\nThis code expires in 15 minutes.`;
@@ -266,16 +276,18 @@ export async function sendWhatsAppOTP(phone: string, otp: string): Promise<Twili
 }
 
 /**
- *
+ * Checks if Twilio service is fully configured.
+ * @returns True if configured
  */
 export function isConfigured(): boolean {
     return !!(accountSid && authToken && fromNumber);
 }
 
 /**
- *
+ * Checks the health and connection of the Twilio service.
+ * @returns Object indicating health status and potential errors
  */
-export async function checkTwilioHealth(): Promise<{ healthy: boolean; balance?: any; error?: string }> {
+export async function checkTwilioHealth(): Promise<{ healthy: boolean; balance?: unknown; error?: string }> {
     if (!isConfigured()) {
         return { healthy: false, error: "Twilio not configured" };
     }
@@ -286,10 +298,11 @@ export async function checkTwilioHealth(): Promise<{ healthy: boolean; balance?:
             healthy: !!account,
             balance: account?.status
         };
-    } catch (error: any) {
+    } catch (error: unknown) {
+        const err = error instanceof Error ? error : new Error(String(error));
         return {
             healthy: false,
-            error: error.message
+            error: err.message
         };
     }
 }

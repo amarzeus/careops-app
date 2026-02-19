@@ -33,9 +33,9 @@ export function useVoice() {
 }
 
 /**
- *
- * @param root0
- * @param root0.children
+ * VoiceProvider component that wraps the app with voice capabilities.
+ * @param props - Component props
+ * @param props.children - Child components
  */
 export function VoiceProvider({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
@@ -43,7 +43,7 @@ export function VoiceProvider({ children }: { children: React.ReactNode }) {
     const [hasGreeted, setHasGreeted] = useState(false);
 
     // Define the API handler
-    const handleTranscript = async (text: string, clientContext?: any, history?: any[]) => {
+    const handleTranscript = async (text: string, clientContext?: Record<string, unknown>, history?: unknown[]) => {
         try {
             const response = await fetch("/api/ai/voice", {
                 method: "POST",

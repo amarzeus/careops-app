@@ -20,7 +20,8 @@ export type AutomationTrigger =
 /**
  * Check if email is available for sending
  * Priority: 1) Workspace flag, 2) Environment variables
- * @param workspace
+ * @param workspace - The workspace configuration
+ * @returns True if email is configured and enabled
  */
 function isEmailAvailable(workspace: Workspace): boolean {
   // If workspace flag is explicitly set, use it
@@ -41,7 +42,8 @@ function isEmailAvailable(workspace: Workspace): boolean {
 /**
  * Check if SMS is available for sending
  * Priority: 1) Workspace flag, 2) Environment variables
- * @param workspace
+ * @param workspace - The workspace configuration
+ * @returns True if SMS is configured and enabled
  */
 function isSMSAvailable(workspace: Workspace): boolean {
   // If workspace flag is explicitly set, use it
@@ -57,6 +59,12 @@ function isSMSAvailable(workspace: Workspace): boolean {
   return hasSMSEnv;
 }
 
+/**
+ * Checks if a phone number is on the Do Not Call list.
+ * @param workspaceId - The workspace ID
+ * @param phone - The phone number to check
+ * @returns True if the number is on the DNC list
+ */
 async function isDoNotCall(workspaceId: string, phone: string): Promise<boolean> {
   const normalizedPhone = normalizeVoicePhoneNumber(phone);
 
@@ -104,10 +112,10 @@ export interface FormData {
 }
 
 /**
- *
- * @param workspaceId
- * @param trigger
- * @param data
+ * Triggers an automation workflow based on an event.
+ * @param workspaceId - ID of the workspace
+ * @param trigger - The trigger event ID (e.g., "NEW_CONTACT")
+ * @param data - Context data for the automation
  */
 export async function triggerAutomation(
   workspaceId: string,
@@ -212,10 +220,10 @@ export async function triggerAutomation(
 }
 
 /**
- *
- * @param rule
- * @param workspace
- * @param data
+ * Executes a specific automation rule.
+ * @param rule - The automation rule definition
+ * @param workspace - The workspace configuration
+ * @param data - Context data for execution
  */
 export async function executeRule(
   rule: AutomationRule,
@@ -612,9 +620,9 @@ async function handleInventoryLow(workspace: Workspace, data: Record<string, unk
 }
 
 /**
- *
- * @param conversationId
- * @param workspaceId
+ * Resumes automation for a conversation.
+ * @param conversationId - ID of the conversation
+ * @param workspaceId - ID of the workspace
  */
 export async function resumeAutomation(conversationId: string, workspaceId: string) {
   await prisma.conversation.update({
@@ -634,13 +642,16 @@ export async function resumeAutomation(conversationId: string, workspaceId: stri
 }
 
 /**
- *
- * @param workspaceId
- * @param workspaceName
- * @param contactPhone
- * @param contactName
- * @param serviceName
- * @param bookingDate
+ * Sends a voice call reminder for a booking.
+ * @param workspaceId - Workspace ID
+ * @param workspaceName - Workspace Name
+ * @param contactPhone - Contact's phone number
+ * @param contactName - Contact's name
+ * @param serviceName - Service name
+ * @param bookingDate - Date object of the booking
+ * @param contactId - Optional ID of contact
+ * @param bookingId - Optional ID of booking
+ * @returns Result object with success status and call ID
  */
 export async function sendVoiceCallReminder(
   workspaceId: string,
@@ -710,13 +721,16 @@ export async function sendVoiceCallReminder(
 }
 
 /**
- *
- * @param workspaceId
- * @param workspaceName
- * @param contactPhone
- * @param contactName
- * @param serviceName
- * @param bookingDate
+ * Sends a voice call confirmation for a booking.
+ * @param workspaceId - Workspace ID
+ * @param workspaceName - Workspace Name
+ * @param contactPhone - Contact's phone number
+ * @param contactName - Contact's name
+ * @param serviceName - Service name
+ * @param bookingDate - Date object of the booking
+ * @param contactId - Optional ID of contact
+ * @param bookingId - Optional ID of booking
+ * @returns Result object with success status and call ID
  */
 export async function sendVoiceCallConfirmation(
   workspaceId: string,
@@ -786,12 +800,12 @@ export async function sendVoiceCallConfirmation(
 }
 
 /**
- *
- * @param workspaceId
- * @param workspaceName
- * @param contactPhone
- * @param contactName
- * @param serviceName
+ * Sends a voice call follow-up after a service.
+ * @param workspaceId - Workspace ID
+ * @param workspaceName - Workspace Name
+ * @param contactPhone - Contact's phone
+ * @param contactName - Contact's name
+ * @param serviceName - Service name
  */
 export async function sendVoiceCallFollowUp(
   workspaceId: string,

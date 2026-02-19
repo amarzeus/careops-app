@@ -7,7 +7,6 @@ import {
   Package, Users, Rocket, Check,
   ArrowRight, ArrowLeft, Edit2, Trash2
 } from "lucide-react";
-import { ListChecks as ClipboardList } from "lucide-react"; // Fix missing export if needed, or keep original
 // Actually just remove Activity from the list
 import { Logo } from "@/components/layout/logo";
 import { Button } from "@/components/ui/button";
@@ -21,6 +20,56 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AIChatCard } from "@/components/onboarding/ai-chat-card";
 import { cn } from "@/lib/utils";
+import { toast } from "@/hooks/use-toast";
+import { v4 as uuidv4 } from 'uuid';
+
+interface IncomingService {
+  name?: string;
+  duration?: string | number;
+  location?: string;
+  startTime?: string;
+  endTime?: string;
+  availableDays?: string;
+}
+
+interface IncomingForm {
+  name?: string;
+  description?: string;
+  fields?: string | any[];
+  questions?: any[];
+}
+
+interface IncomingItem {
+  id?: string;
+  name?: string;
+  quantity?: string | number;
+  threshold?: string | number;
+  unit?: string;
+}
+
+interface IncomingUser {
+  id?: string;
+  role?: string;
+  name?: string;
+  email?: string;
+}
+
+interface ContextData {
+  name?: string;
+  address?: string;
+  timezone?: string;
+  contactEmail?: string;
+  contactPhone?: string;
+  emailProvider?: string;
+  emailFromName?: string;
+  emailFromAddress?: string;
+  services?: IncomingService[];
+  intakeForms?: IncomingForm[];
+  inventoryItems?: IncomingItem[];
+  users?: IncomingUser[];
+  contactForms?: any[];
+  emailConfigured?: boolean;
+}
 
 interface ChatMessage {
   role: "user" | "assistant";
@@ -54,7 +103,7 @@ export default function OnboardingPage() {
   const chatEndRef = useRef<HTMLDivElement>(null);
   const fetchCurrentStepRef = useRef<(shouldUpdateStep?: boolean) => Promise<void>>(async () => { });
   const saveStepRef = useRef<(advanceStep?: boolean, isAuto?: boolean) => Promise<void>>(async () => { });
-  const applyExtractedDataRef = useRef<(data: Record<string, any>) => void>(() => { });
+  const applyExtractedDataRef = useRef<(data: Record<string, unknown>) => void>(() => { });
   const [voiceMode, setVoiceMode] = useState(false);
   const [autoAdvance, setAutoAdvance] = useState(false);
 
@@ -91,7 +140,7 @@ export default function OnboardingPage() {
     prevStepRef.current = currentStep;
   }, [currentStep]);
 
-  const triggerAIGreeting = async (step: number, contextData: any) => {
+  const triggerAIGreeting = async (step: number, contextData: ContextData) => {
     setChatLoading(true);
     try {
       const businessInfo = {
@@ -109,18 +158,18 @@ export default function OnboardingPage() {
           emailConfigured: contextData.emailConfigured || false
         },
         contactForm: contextData.contactForms?.[0] || {},
-        services: (contextData.services || []).map((s: any) => ({
-          name: s.name, duration: String(s.duration), location: s.location || "",
+        services: (contextData.services || []).map((s: IncomingService) => ({
+          name: s.name || "", duration: String(s.duration || "30"), location: s.location || "",
           startTime: s.startTime || "09:00", endTime: s.endTime || "17:00"
         })),
-        intakeForms: (contextData.intakeForms || []).map((f: any) => ({
-          name: f.name, description: f.description || "", fields: f.fields || "[]"
+        intakeForms: (contextData.intakeForms || []).map((f: IncomingForm) => ({
+          name: f.name || "", description: f.description || "", fields: typeof f.fields === 'string' ? f.fields : JSON.stringify(f.fields || [])
         })),
-        inventoryItems: (contextData.inventoryItems || []).map((i: any) => ({
-          name: i.name, quantity: String(i.quantity), threshold: String(i.threshold), unit: i.unit || "units"
+        inventoryItems: (contextData.inventoryItems || []).map((i: IncomingItem) => ({
+          name: i.name || "", quantity: String(i.quantity || "0"), threshold: String(i.threshold || "5"), unit: i.unit || "units"
         })),
-        staffMembers: (contextData.users || []).filter((u: any) => u.role === "STAFF").map((s: any) => ({
-          name: s.name, email: s.email
+        staffMembers: (contextData.users || []).filter((u: IncomingUser) => u.role === "STAFF").map((s: IncomingUser) => ({
+          name: s.name || "", email: s.email || ""
         })),
       };
 
@@ -175,17 +224,24 @@ export default function OnboardingPage() {
           }
 
           if (ws.services && ws.services.length > 0) {
-            setServices(ws.services.map((s: any) => ({
+            setServices(ws.services.map((s: IncomingService) => ({
               ...s,
-              duration: String(s.duration)
+              name: s.name || "",
+              location: s.location || "",
+              availableDays: s.availableDays || "1,2,3,4,5",
+              startTime: s.startTime || "09:00",
+              endTime: s.endTime || "17:00",
+              duration: String(s.duration || "30")
             })));
           }
 
           if (ws.inventoryItems && ws.inventoryItems.length > 0) {
-            setInventoryItems(ws.inventoryItems.map((i: any) => ({
+            setInventoryItems(ws.inventoryItems.map((i: IncomingItem) => ({
               ...i,
-              quantity: String(i.quantity),
-              threshold: String(i.threshold)
+              name: i.name || "",
+              unit: i.unit || "units",
+              quantity: String(i.quantity || "0"),
+              threshold: String(i.threshold || "5")
             })));
           }
 
@@ -202,11 +258,11 @@ export default function OnboardingPage() {
           }
 
           if (ws.users && ws.users.length > 1 && staffMembers.length === 0) {
-            const staff = ws.users.filter((u: any) => u.role === "STAFF");
-            setStaffMembers(staff.map((s: any) => ({
+            const staff = ws.users.filter((u: IncomingUser) => u.role === "STAFF");
+            setStaffMembers(staff.map((s: IncomingUser) => ({
               id: s.id,
-              name: s.name,
-              email: s.email,
+              name: s.name || "",
+              email: s.email || "",
               password: "••••••••"
             })));
           }

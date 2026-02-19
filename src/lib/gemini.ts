@@ -5,6 +5,10 @@ const GEMINI_KEY = process.env.GEMINI_API_KEY || "";
 // Lazy initialization to prevent build-time errors if env vars are missing
 let clientInstance: GoogleGenAI | null = null;
 
+/**
+ * Retrieves the singleton GoogleGenAI client instance.
+ * @returns The GoogleGenAI client
+ */
 export function getClient(): GoogleGenAI {
   if (!clientInstance) {
     if (!GEMINI_KEY && process.env.NODE_ENV !== "test") {
@@ -20,13 +24,20 @@ export function getClient(): GoogleGenAI {
 // Core AI Engine
 // ──────────────────────────────────────────────
 
+/**
+ * Calls the Gemini AI model with a prompt and optional schema.
+ * @param prompt - The prompt to send to the AI
+ * @param responseSchema - Optional JSON schema for structured output
+ * @param systemInstruction - Optional system instruction
+ * @returns The parsed JSON response
+ */
 async function callGemini<T>(
   prompt: string,
-  responseSchema?: any, // Type 'any' used here as Schema isn't strictly exported in a way that aligns easily without deep imports
+  responseSchema?: unknown,
   systemInstruction?: string
 ): Promise<T> {
   try {
-    const config: any = {
+    const config: Record<string, unknown> = {
       responseMimeType: "application/json",
     };
 
@@ -58,6 +69,12 @@ async function callGemini<T>(
 // 1. Welcome Message Generation
 // ──────────────────────────────────────────────
 
+/**
+ * Generates a welcome message for a new contact.
+ * @param businessName - Name of the business
+ * @param contactName - Name of the contact
+ * @returns The generated welcome message
+ */
 export async function generateWelcomeMessage(businessName: string, contactName: string): Promise<string> {
   // Simple text generation doesn't need structured output schema for the whole object, 
   // but to keep consistency and reliability, we can ask for a simple object wrapper.
@@ -84,6 +101,15 @@ export async function generateWelcomeMessage(businessName: string, contactName: 
 // 2. Booking Confirmation
 // ──────────────────────────────────────────────
 
+/**
+ * Generates a booking confirmation message.
+ * @param businessName - Name of the business
+ * @param contactName - Name of the contact
+ * @param serviceName - Name of the service booked
+ * @param dateTime - Date and time of the booking
+ * @param location - Optional location of the booking
+ * @returns The generated confirmation message
+ */
 export async function generateBookingConfirmation(
   businessName: string,
   contactName: string,
@@ -114,6 +140,13 @@ export async function generateBookingConfirmation(
 // 3. Smart Reply V2 (Context-Aware)
 // ──────────────────────────────────────────────
 
+/**
+ * Generates smart reply suggestions based on conversation history.
+ * @param businessName - Name of the business
+ * @param conversationHistory - Recent conversation history
+ * @param lastMessage - The last message received from the customer
+ * @returns Array of smart reply suggestions
+ */
 export async function generateSmartReply(
   businessName: string,
   conversationHistory: string,
@@ -160,6 +193,11 @@ RULES:
 // 4. Dashboard Insights (Enhanced)
 // ──────────────────────────────────────────────
 
+/**
+ * Generates actionable insights based on business metrics.
+ * @param data - The business metrics data
+ * @returns Array of prioritized insights
+ */
 export async function generateDashboardInsights(data: {
   totalBookings: number;
   completedBookings: number;
@@ -226,6 +264,12 @@ RULES:
 // 5. Message Refinement
 // ──────────────────────────────────────────────
 
+/**
+ * Refines a message to match a specific tone.
+ * @param content - The original message content
+ * @param tone - The desired tone (default: professional)
+ * @returns The refined message
+ */
 export async function refineMessage(content: string, tone: string = "professional"): Promise<string> {
   const schema = {
     type: Type.OBJECT,
@@ -251,6 +295,11 @@ Original: "${content}"`,
 // 6. Inventory Forecast
 // ──────────────────────────────────────────────
 
+/**
+ * Generates an inventory forecast based on current stock levels.
+ * @param items - Array of inventory items with usage data
+ * @returns Array of forecast objects
+ */
 export async function generateInventoryForecast(
   items: Array<{ name: string; quantity: number; threshold: number; unit: string }>
 ): Promise<Array<{ name: string; daysRemaining: number | string; confidence: string }>> {
@@ -295,6 +344,11 @@ Items: ${JSON.stringify(items)}`,
 // 7. Operations Summary
 // ──────────────────────────────────────────────
 
+/**
+ * Generates a summary of daily operations.
+ * @param data - The daily operations data
+ * @returns A concise summary string
+ */
 export async function generateOperationsSummary(data: {
   bookingsToday: number;
   bookingsCompleted: number;
@@ -336,6 +390,12 @@ Today's Data:
 // 8. AI Message Composer
 // ──────────────────────────────────────────────
 
+/**
+ * Composes a new message based on intent and context.
+ * @param intent - The intent of the message (e.g., "confirm booking")
+ * @param context - Contextual information for the message
+ * @returns The composed message
+ */
 export async function composeMessage(
   intent: string,
   context: {
@@ -487,6 +547,12 @@ const onboardingTools = [
 ];
 
 // Helper for step status building (preserved from original)
+/**
+ * Builds a status string for the current onboarding step.
+ * @param step - Current step number
+ * @param info - Business information object
+ * @returns Formatted status string
+ */
 function buildStepStatus(step: number, info: Record<string, unknown>): string {
   const ws = (info.workspace || {}) as Record<string, unknown>;
   const email = (info.emailConfig || {}) as Record<string, unknown>;
@@ -517,6 +583,11 @@ function buildStepStatus(step: number, info: Record<string, unknown>): string {
 }
 
 // Helper to sanitize history for Gemini SDK
+/**
+ * Sanitizes conversation history for the Gemini API.
+ * @param history - Array of message objects
+ * @returns Array of formatted Content objects
+ */
 function sanitizeGeminiHistory(
   history: Array<{ role: "user" | "assistant"; content: string }>
 ): Array<{ role: "user" | "model"; parts: [{ text: string }] }> {
@@ -527,6 +598,14 @@ function sanitizeGeminiHistory(
   }));
 }
 
+/**
+ * AI Agent for handling the onboarding process.
+ * @param userMessage - The user's input message
+ * @param currentStep - Current step in the onboarding flow
+ * @param businessInfo - Current collected business information
+ * @param conversationHistory - History of the conversation
+ * @returns Object containing the AI's response and any actions taken
+ */
 export async function aiOnboardingAssistant(
   userMessage: string,
   currentStep: number,
@@ -562,8 +641,10 @@ BEHAVIOR RULES:
       model: "gemini-2.0-flash",
       config: {
         systemInstruction: systemPrompt,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         tools: onboardingTools as any,
       },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       contents: contents as any,
     });
 
@@ -631,6 +712,12 @@ export interface ConversationIntent {
   priority: "high" | "medium" | "low";
 }
 
+/**
+ * Classifies the intent of a customer message.
+ * @param messageContent - The message text
+ * @param conversationHistory - Optional recent conversation history
+ * @returns Classified intent object
+ */
 export async function classifyConversationIntent(
   messageContent: string,
   conversationHistory?: string[]
@@ -682,6 +769,12 @@ export interface OperationsAnomaly {
   actualValue: string;
 }
 
+/**
+ * Analyzes operational metrics for anomalies.
+ * @param metrics - The metrics data object
+ * @returns Array of detected anomalies
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function analyzeOperationsAnomalies(metrics: any): Promise<OperationsAnomaly[]> {
   const schema = {
     type: Type.OBJECT,
@@ -732,6 +825,12 @@ export interface ContactScore {
   nextBestAction: string;
 }
 
+/**
+ * Scores a contact or lead based on their data.
+ * @param contactData - The contact's data
+ * @returns Detailed contact score object
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function scoreContact(contactData: any): Promise<ContactScore> {
   const schema = {
     type: Type.OBJECT,
@@ -785,6 +884,12 @@ export interface ScannedInvoice {
   items: Array<{ name: string; quantity: number; unitPrice: number; total: number }>;
 }
 
+/**
+ * Extracts inventory items from an invoice image.
+ * @param imageBase64 - Base64 encoded image data
+ * @param mimeType - MIME type of the image
+ * @returns Extracted invoice data or null if failed
+ */
 export async function extractInventoryItemsFromImage(
   imageBase64: string,
   mimeType: string = "image/jpeg"
@@ -836,7 +941,7 @@ export async function extractInventoryItemsFromImage(
             },
           ],
         },
-      ] as any,
+      ],
     });
 
     const text = response.text;

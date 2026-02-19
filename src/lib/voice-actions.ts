@@ -9,16 +9,17 @@ export type VoiceActionType =
 
 export interface VoiceAction {
     type: VoiceActionType;
-    payload?: any;
+    payload?: Record<string, unknown>;
 }
 
 export const VoiceActionService = {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     execute: (action: VoiceAction, router: any) => {
         console.log("Executing Voice Action:", action);
 
         switch (action.type) {
             case "navigate":
-                if (action.payload?.path) {
+                if (typeof action.payload?.path === 'string') {
                     router.push(action.payload.path);
                 }
                 break;

@@ -5,7 +5,12 @@ import { prisma } from "./prisma";
  * Run with: npx tsx src/lib/check-user.ts <email>
  */
 
-async function checkUser(email: string) {
+/**
+ * Checks if a user already exists by email.
+ * @param email - The email to check
+ * @returns True if user exists
+ */
+export async function checkUserExists(email: string) {
   console.log(`\n🔍 Checking user: ${email}\n`);
 
   const user = await prisma.user.findUnique({
@@ -67,6 +72,6 @@ if (!email) {
   process.exit(1);
 }
 
-checkUser(email)
+checkUserExists(email)
   .catch(console.error)
   .finally(() => prisma.$disconnect());

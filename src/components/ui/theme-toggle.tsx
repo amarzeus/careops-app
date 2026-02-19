@@ -6,6 +6,10 @@ import { useTheme } from "next-themes";
 
 import { Button } from "@/components/ui/button";
 
+/**
+ * Component to toggle between light and dark themes.
+ * Uses next-themes to manage theme state.
+ */
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = React.useState(false);

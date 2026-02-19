@@ -140,6 +140,11 @@ type Toast = Omit<ToasterToast, "id">;
  *
  * @param root0
  */
+/**
+ * Dispatches a toast notification.
+ * @param props - Toast properties (title, description, etc.)
+ * @returns Object with id, dismiss, and update methods
+ */
 function toast({ ...props }: Toast) {
   const id = genId();
 

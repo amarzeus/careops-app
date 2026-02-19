@@ -11,10 +11,23 @@ export interface EmailOptions {
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 1000; // 1 second
 
+/**
+ * Sleeping utility for delays.
+ * @param ms - Milliseconds to sleep
+ */
 async function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+/**
+ * Logs integration events to the database.
+ * @param type - Integration type (email, sms, etc.)
+ * @param status - Status (success, failed)
+ * @param to - Recipient
+ * @param message - Message subject or content summary
+ * @param error - Error message if failed
+ * @param workspaceId - Workspace ID
+ */
 async function logIntegration(type: string, status: string, to: string, message: string, error?: string, workspaceId?: string) {
   if (!workspaceId) return;
 
