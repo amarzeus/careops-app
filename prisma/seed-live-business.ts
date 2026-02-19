@@ -3,6 +3,9 @@ import { subDays, subHours } from "date-fns";
 
 const prisma = new PrismaClient();
 
+/**
+ *
+ */
 async function main() {
   console.log("🌱 Starting CareOps Live Business Seeding...");
 

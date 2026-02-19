@@ -23,6 +23,9 @@ const _actionTypes = {
 
 let count = 0;
 
+/**
+ *
+ */
 function genId() {
   count = (count + 1) % Number.MAX_SAFE_INTEGER;
   return count.toString();
@@ -127,6 +130,9 @@ const listeners: Array<(state: State) => void> = [];
 
 let memoryState: State = { toasts: [] };
 
+/**
+ *
+ */
 function dispatch(action: Action) {
   memoryState = reducer(memoryState, action);
   listeners.forEach((listener) => {

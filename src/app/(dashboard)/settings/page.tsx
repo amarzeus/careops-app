@@ -14,6 +14,9 @@ import { AIPreferencesTab } from "@/components/settings/ai-preferences-tab";
 import { VoiceSettingsTab } from "@/components/settings/voice-settings-tab";
 import { WorkspaceSettingsDTO, UserProfileDTO } from "@/types/dto";
 
+/**
+ *
+ */
 function SettingsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();

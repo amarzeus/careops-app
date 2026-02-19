@@ -25,6 +25,9 @@ interface VoiceWebhookPayload {
   direction?: string;
 }
 
+/**
+ *
+ */
 function parseRetryCount(metadata: Record<string, unknown>): number {
   const raw = metadata.retryCount;
   if (typeof raw === "number" && Number.isFinite(raw)) {
@@ -41,6 +44,9 @@ function parseRetryCount(metadata: Record<string, unknown>): number {
   return 0;
 }
 
+/**
+ *
+ */
 async function resolveContactId(
   workspaceId: string,
   contactIdFromMetadata: string | undefined,
@@ -66,6 +72,9 @@ async function resolveContactId(
   return contact?.id || null;
 }
 
+/**
+ *
+ */
 export async function POST(req: NextRequest) {
   const signature = req.headers.get("x-vapi-signature");
   const secret = process.env.VAPI_WEBHOOK_SECRET;
@@ -323,6 +332,9 @@ export async function POST(req: NextRequest) {
   }
 }
 
+/**
+ *
+ */
 export async function GET() {
   return NextResponse.json({
     status: "ok",

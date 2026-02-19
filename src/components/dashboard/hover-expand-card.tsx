@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
-import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { LucideIcon } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface HoverExpandCardProps {
     title: string;
@@ -46,31 +46,45 @@ export function HoverExpandCard({
     return (
         // Height placeholder to reserve space in the grid
         <div
-            className={cn("relative h-[72px] transition-all z-10 hover:z-50", className)}
+            className={cn("relative h-[72px] z-10 hover:z-50", className)}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
-            <Card
+            <motion.div
+                layout
+                initial={false}
+                animate={{
+                    height: isHovered ? "auto" : 72,
+                    boxShadow: isHovered ? "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)" : "0 1px 2px 0 rgb(0 0 0 / 0.05)"
+                }}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
                 className={cn(
-                    "absolute inset-x-0 top-0 border shadow-sm bg-white transition-all duration-300 ease-out origin-top",
-                    isHovered ? "shadow-xl min-h-[72px] max-h-[400px]" : "h-[72px] overflow-hidden"
+                    "absolute inset-x-0 top-0 border bg-white rounded-xl overflow-hidden",
+                    // We handle height and shadow via motion, but keep base styles
                 )}
             >
-                <CardHeader className="p-4 h-[72px] flex flex-row items-center justify-between space-y-0">
-                    <CardTitle className={cn("text-sm font-semibold flex items-center gap-2", headerColorClass)}>
+                <div className="p-4 h-[72px] flex flex-row items-center justify-between space-y-0">
+                    <div className={cn("text-sm font-semibold flex items-center gap-2", headerColorClass)}>
                         <div className={cn("p-1.5 rounded-md bg-opacity-10", iconColorClass.replace('text-', 'bg-'))}>
                             <Icon className={cn("w-4 h-4", iconColorClass)} />
                         </div>
                         {title}
-                    </CardTitle>
+                    </div>
 
                     {count !== undefined && (
                         <div className="flex items-center gap-2">
-                            {(!isHovered && previewText) && (
-                                <span className="text-xs text-muted-foreground hidden sm:inline-block font-normal truncate max-w-[100px]">
-                                    {previewText}
-                                </span>
-                            )}
+                            <AnimatePresence>
+                                {(!isHovered && previewText) && (
+                                    <motion.span
+                                        initial={{ opacity: 0, width: 0 }}
+                                        animate={{ opacity: 1, width: "auto" }}
+                                        exit={{ opacity: 0, width: 0 }}
+                                        className="text-xs text-muted-foreground hidden sm:inline-block font-normal truncate max-w-[100px] whitespace-nowrap overflow-hidden"
+                                    >
+                                        {previewText}
+                                    </motion.span>
+                                )}
+                            </AnimatePresence>
                             <span className={cn(
                                 "text-xs font-bold px-2 py-0.5 rounded-full transition-colors",
                                 count > 0
@@ -83,20 +97,22 @@ export function HoverExpandCard({
                             </span>
                         </div>
                     )}
-                </CardHeader>
-
-                {/* Expanded Content */}
-                <div
-                    className={cn(
-                        "transition-all duration-300 ease-in-out px-4 pb-4 overflow-hidden grid",
-                        isHovered ? "opacity-100 grid-rows-[1fr]" : "opacity-0 grid-rows-[0fr]"
-                    )}
-                >
-                    <div className="min-h-0">
-                        {children}
-                    </div>
                 </div>
-            </Card>
+
+                <AnimatePresence>
+                    {isHovered && (
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="px-4 pb-4"
+                        >
+                            {children}
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </motion.div>
         </div>
     );
 }

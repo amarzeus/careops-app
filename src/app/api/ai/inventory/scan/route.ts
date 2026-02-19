@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import { extractInventoryItemsFromImage } from "@/lib/gemini";
 import { getCurrentUser } from "@/lib/auth";
 
+/**
+ *
+ */
 export async function POST(req: Request) {
     try {
         const user = await getCurrentUser();

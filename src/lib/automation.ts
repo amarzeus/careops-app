@@ -252,6 +252,9 @@ export async function executeRule(
   }
 }
 
+/**
+ *
+ */
 async function handleNewContact(workspace: Workspace, data: Record<string, unknown>) {
   const contact = data.contact as ContactData | undefined;
   if (!contact?.email && !contact?.phone) return;
@@ -333,6 +336,9 @@ async function handleNewContact(workspace: Workspace, data: Record<string, unkno
   }
 }
 
+/**
+ *
+ */
 async function handleBookingCreated(workspace: Workspace, data: Record<string, unknown>) {
   const booking = data.booking as BookingData | undefined;
   const contact = data.contact as ContactData | undefined;
@@ -482,6 +488,9 @@ async function handleBookingCreated(workspace: Workspace, data: Record<string, u
   });
 }
 
+/**
+ *
+ */
 async function handleFormPending(workspace: Workspace, data: Record<string, unknown>) {
   const contact = data.contact as ContactData | undefined;
   const form = data.form as FormData | undefined;
@@ -505,6 +514,9 @@ async function handleFormPending(workspace: Workspace, data: Record<string, unkn
   }
 }
 
+/**
+ *
+ */
 async function handleBeforeBooking(workspace: Workspace, data: Record<string, unknown>) {
   const booking = data.booking as BookingData | undefined;
   const contact = data.contact as ContactData | undefined;
@@ -563,6 +575,9 @@ async function handleBeforeBooking(workspace: Workspace, data: Record<string, un
   }
 }
 
+/**
+ *
+ */
 async function handleStaffReply(workspace: Workspace, data: Record<string, unknown>) {
   const conversationId = data.conversationId as string;
   if (!conversationId) return;
@@ -592,6 +607,9 @@ async function handleStaffReply(workspace: Workspace, data: Record<string, unkno
   });
 }
 
+/**
+ *
+ */
 async function handleInventoryLow(workspace: Workspace, data: Record<string, unknown>) {
   const item = data.item as InventoryData;
 

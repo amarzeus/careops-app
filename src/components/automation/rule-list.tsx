@@ -91,6 +91,9 @@ const triggerDescriptions: Record<string, string> = {
   STAFF_REPLY: "Fires when a staff member manually replies, pausing automation",
 };
 
+/**
+ *
+ */
 function getRelativeTime(dateStr: string): string {
   const now = new Date();
   const date = new Date(dateStr);

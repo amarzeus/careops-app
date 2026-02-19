@@ -34,6 +34,9 @@ const alertTypeConfig: Record<string, { icon: React.ElementType; color: string }
   automation: { icon: Zap, color: "text-amber-600" },
 };
 
+/**
+ *
+ */
 function getRelativeTime(dateStr: string): string {
   const now = new Date();
   const date = new Date(dateStr);
@@ -167,7 +170,7 @@ export function Header({ title, subtitle, children }: HeaderProps) {
   };
 
   return (
-    <header className="sticky top-0 z-30 border-b border-[var(--border)] bg-[var(--background)]/90 backdrop-blur-md">
+    <header className="sticky top-0 z-30 border-b border-[var(--border)] bg-[var(--background)]/80 backdrop-blur-md transition-all duration-200">
       <div className="flex items-center justify-between py-3 pl-4 pr-4 sm:py-3.5 sm:pl-6 sm:pr-6 lg:pl-6">
         <div className="flex-1 min-w-0 mr-4">
           <h1 className="text-xl sm:text-2xl font-bold text-gray-900 truncate">{title}</h1>

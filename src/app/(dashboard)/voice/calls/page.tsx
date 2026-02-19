@@ -66,6 +66,9 @@ interface CallsResponse {
   };
 }
 
+/**
+ *
+ */
 function parseMetadata(raw: string | null): Record<string, unknown> {
   if (!raw) return {};
   try {
@@ -76,6 +79,9 @@ function parseMetadata(raw: string | null): Record<string, unknown> {
   }
 }
 
+/**
+ *
+ */
 function statusTone(status: string): string {
   const normalized = status.toUpperCase();
   if (["COMPLETED"].includes(normalized)) return "text-emerald-700 border-emerald-200 bg-emerald-50";
@@ -85,6 +91,9 @@ function statusTone(status: string): string {
   return "text-gray-700 border-gray-200 bg-gray-50";
 }
 
+/**
+ *
+ */
 function formatDuration(seconds: number | null): string {
   if (!seconds || seconds < 1) return "-";
   const mins = Math.floor(seconds / 60);
@@ -92,6 +101,9 @@ function formatDuration(seconds: number | null): string {
   return `${mins}:${String(rem).padStart(2, "0")}`;
 }
 
+/**
+ *
+ */
 export default function VoiceCallsPage() {
   const [loading, setLoading] = useState(true);
   const [calls, setCalls] = useState<VoiceCallItem[]>([]);

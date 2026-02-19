@@ -109,6 +109,9 @@ const benefits = [
 ];
 
 // 3D Tilt Card Component
+/**
+ *
+ */
 function TiltCard({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState(false);
@@ -148,6 +151,9 @@ function TiltCard({ children, className = "" }: { children: React.ReactNode; cla
 
 
 // Gradient Orb Animation
+/**
+ *
+ */
 function GradientOrb({ className = "", delay = 0 }: { className?: string; delay?: number }) {
   return (
     <div
@@ -158,6 +164,9 @@ function GradientOrb({ className = "", delay = 0 }: { className?: string; delay?
 }
 
 // Floating Element
+/**
+ *
+ */
 function FloatingElement({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
   const [offset, setOffset] = useState(0);
   const direction = delay % 2 === 0 ? 1 : -1;
@@ -182,6 +191,9 @@ function FloatingElement({ children, delay = 0, className = "" }: { children: Re
 }
 
 // Gradient Button
+/**
+ *
+ */
 function GradientButton({ children, className = "", variant = "primary" }: { children: React.ReactNode; className?: string; variant?: "primary" | "secondary" }) {
   if (variant === "primary") {
     return (
@@ -216,6 +228,9 @@ function GradientButton({ children, className = "", variant = "primary" }: { chi
 
 
 
+/**
+ *
+ */
 function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   if (!isOpen) return null;
 

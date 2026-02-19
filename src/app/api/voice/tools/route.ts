@@ -7,10 +7,16 @@ type ToolParams = Record<string, unknown>;
 type ToolResult = Record<string, unknown>;
 type ToolHandler = (params: ToolParams) => Promise<ToolResult>;
 
+/**
+ *
+ */
 function asString(value: unknown): string | undefined {
   return typeof value === "string" && value.trim() ? value.trim() : undefined;
 }
 
+/**
+ *
+ */
 function parseDateAndTime(dateValue: unknown, timeValue: unknown): Date | null {
   const date = asString(dateValue);
   const time = asString(timeValue);
@@ -28,6 +34,9 @@ function parseDateAndTime(dateValue: unknown, timeValue: unknown): Date | null {
   return new Date(year, month - 1, day, hours, minutes);
 }
 
+/**
+ *
+ */
 function isBookingOpenStatus(status: string): boolean {
   return status === "PENDING" || status === "CONFIRMED";
 }
@@ -309,6 +318,9 @@ const handlers: Record<string, ToolHandler> = {
   },
 };
 
+/**
+ *
+ */
 export async function POST(req: Request) {
   try {
     const body = (await req.json()) as {

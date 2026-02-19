@@ -20,8 +20,6 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AIChatCard } from "@/components/onboarding/ai-chat-card";
 import { cn } from "@/lib/utils";
-import { toast } from "@/hooks/use-toast";
-import { v4 as uuidv4 } from 'uuid';
 
 interface IncomingService {
   name?: string;

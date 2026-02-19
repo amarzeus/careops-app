@@ -13,6 +13,9 @@ interface FormField {
   name: string; label: string; type: string; required: boolean;
 }
 
+/**
+ *
+ */
 function FormContent({ slug }: { slug: string }) {
   const searchParams = useSearchParams();
   const submissionId = searchParams.get("submission");

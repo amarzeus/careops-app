@@ -31,6 +31,9 @@ interface Contact {
   _count: { bookings: number };
 }
 
+/**
+ *
+ */
 function SkeletonRows() {
   return (
     <>
@@ -48,6 +51,9 @@ function SkeletonRows() {
   );
 }
 
+/**
+ *
+ */
 function ContactsTable({ contacts, searchQuery }: { contacts: Contact[]; searchQuery: string }) {
   const filtered = contacts.filter((c) => {
     const q = searchQuery.toLowerCase();

@@ -8,6 +8,9 @@ import {
 import { triggerAutomation } from "@/lib/automation";
 import { logInventoryChange } from "@/lib/inventory-log";
 
+/**
+ *
+ */
 async function decrementInventoryForBooking(bookingId: string, workspaceId: string) {
   const booking = await prisma.booking.findUnique({
     where: { id: bookingId },

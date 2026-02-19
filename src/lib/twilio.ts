@@ -26,11 +26,17 @@ export type TwilioErrorCode =
 const MAX_RETRIES = 3;
 const RETRY_DELAY_MS = 1000;
 
+/**
+ *
+ */
 function sleep(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
+/**
+ *
+ */
 function categorizeError(error: any, statusCode?: number): { code: TwilioErrorCode; retryable: boolean } {
     const message = error?.message?.toLowerCase() || "";
 
@@ -65,6 +71,9 @@ export function normalizePhoneNumber(phone: string): string {
     return phone.startsWith("+") ? `+${digits}` : `+${digits}`;
 }
 
+/**
+ *
+ */
 function validatePhoneNumber(phone: string): { valid: boolean; formatted: string; error?: string } {
     if (!phone) {
         return { valid: false, formatted: "", error: "Phone number is required" };

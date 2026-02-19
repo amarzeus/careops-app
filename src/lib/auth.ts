@@ -23,6 +23,9 @@ function encodeToken(payload: Record<string, unknown>): string {
   return `${encoded}.${signature}`;
 }
 
+/**
+ *
+ */
 function decodeToken(token: string): Record<string, unknown> | null {
   try {
     const parts = token.split(".");

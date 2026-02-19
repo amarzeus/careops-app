@@ -10,6 +10,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 
 type VerifyMethod = "email" | "sms";
 
+/**
+ *
+ */
 function VerifyOtpContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
