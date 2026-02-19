@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard, MessageSquare, Calendar, FileText,
-  Package, Users, Zap, Settings, LogOut, Menu, X, Activity, PhoneCall
+  Package, Users, Zap, Settings, LogOut, Menu, X, Activity, PhoneCall, ChevronRight
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -83,94 +83,220 @@ export function Sidebar({ userName, userRole, workspaceName }: SidebarProps) {
     router.push("/login");
   };
 
-  const sidebarContent = (
-    <div className="flex flex-col h-full">
-      <div className="p-6 border-b border-gray-200">
-        <Link href="/dashboard" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-            <Activity className="w-5 h-5 text-white" />
-          </div>
-          <div>
-            <h1 className="text-lg font-bold text-gray-900">CareOps</h1>
-            <p className="text-xs text-gray-500 truncate max-w-[140px]">{workspaceName || "Workspace"}</p>
-          </div>
-        </Link>
-      </div>
+  // Shared nav items renderer — used in both expanded and collapsed panels
+  const renderNavItems = (collapsed: boolean) =>
+    navItems.map((item) => {
+      const isActive = pathname === item.href || pathname?.startsWith(item.href + "/");
+      const badgeCount = item.badgeKey ? badges[item.badgeKey] : 0;
 
-      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-        {navItems.map((item) => {
-          const isActive = pathname === item.href || pathname?.startsWith(item.href + "/");
-          const badgeCount = item.badgeKey ? badges[item.badgeKey] : 0;
+      if (userRole !== "OWNER" && (item.href === "/settings" || item.href === "/automation")) {
+        return null;
+      }
 
-          // Role-Based Visibility
-          if (userRole !== "OWNER" && (item.href === "/settings" || item.href === "/automation")) {
-            return null;
-          }
-
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={() => setMobileOpen(false)}
-              className={cn(
-                "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
-                isActive
-                  ? "bg-blue-50 text-blue-700"
-                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-              )}
-            >
-              <item.icon className={cn("w-5 h-5", isActive ? "text-blue-700" : "text-gray-400")} />
-              <span className="flex-1">{item.label}</span>
+      return (
+        <Link
+          key={item.href}
+          href={item.href}
+          onClick={() => setMobileOpen(false)}
+          title={collapsed ? item.label : undefined}
+          className={cn(
+            "group relative flex items-center rounded-lg transition-all duration-150",
+            collapsed ? "justify-center p-2.5" : "gap-3 px-3 py-2.5",
+            isActive
+              ? "bg-[var(--sidebar-item-active-bg)] text-[var(--sidebar-item-active-text)]"
+              : "text-slate-500 hover:bg-[var(--sidebar-item-hover-bg)] hover:text-slate-800 dark:hover:text-slate-200"
+          )}
+        >
+          <item.icon
+            className={cn(
+              "shrink-0 transition-colors",
+              collapsed ? "h-5 w-5" : "h-[18px] w-[18px]",
+              isActive ? "text-[var(--sidebar-item-active-text)]" : "text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300"
+            )}
+          />
+          {!collapsed && (
+            <span className="flex-1 truncate text-sm font-medium">{item.label}</span>
+          )}
+          {badgeCount > 0 && !collapsed && (
+            <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-500 px-1.5 text-[10px] font-bold text-white">
+              {badgeCount > 99 ? "99+" : badgeCount}
+            </span>
+          )}
+          {badgeCount > 0 && collapsed && (
+            <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-red-500" />
+          )}
+          {/* Tooltip for collapsed mode */}
+          {collapsed && (
+            <span className="pointer-events-none absolute left-full ml-2.5 z-50 hidden whitespace-nowrap rounded-lg border border-border bg-popover px-2.5 py-1.5 text-xs font-medium text-popover-foreground shadow-lg group-hover:block">
+              {item.label}
               {badgeCount > 0 && (
-                <span className="min-w-[20px] h-5 px-1.5 flex items-center justify-center text-[10px] font-bold text-white bg-red-500 rounded-full">
-                  {badgeCount > 99 ? "99+" : badgeCount}
+                <span className="ml-1.5 rounded-full bg-red-500 px-1 text-[9px] text-white">
+                  {badgeCount}
                 </span>
               )}
-            </Link>
-          );
-        })}
-      </nav>
+            </span>
+          )}
+        </Link>
+      );
+    });
 
-      <div className="p-4 border-t border-gray-200">
-        <div className="flex items-center gap-3 mb-3">
-          <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-sm font-medium text-gray-600">
-            {userName?.charAt(0)?.toUpperCase() || "U"}
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-gray-900 truncate">{userName || "User"}</p>
-            <p className="text-xs text-gray-500 capitalize">{userRole?.toLowerCase() || "owner"}</p>
-          </div>
-        </div>
-        <Button variant="ghost" size="sm" className="w-full justify-start text-gray-500 hover:text-red-600" onClick={handleLogout}>
-          <LogOut className="w-4 h-4 mr-2" />
-          Sign Out
-        </Button>
-      </div>
-    </div>
-  );
+  /* ─── USER AVATAR / FOOTER ─── */
+  const initials = userName?.charAt(0)?.toUpperCase() || "U";
 
   return (
     <>
-      {/* Mobile toggle - visible on mobile only */}
-      <button
-        className="fixed top-4 left-4 z-50 p-2 rounded-lg bg-white shadow-md border border-gray-200 hover:bg-gray-50 lg:hidden"
-        onClick={() => setMobileOpen(!mobileOpen)}
-        aria-label={mobileOpen ? "Close menu" : "Open menu"}
-      >
-        {mobileOpen ? <X className="w-5 h-5 text-gray-700" /> : <Menu className="w-5 h-5 text-gray-700" />}
-      </button>
+      {/* ─────────────────────────────────────────
+          COLLAPSED ICON-ONLY RAIL — always visible
+          (shows on mobile, hidden on lg+)
+          ───────────────────────────────────────── */}
+      <aside className="fixed left-0 top-0 z-40 flex h-screen w-16 flex-col border-r border-[var(--sidebar-border)] bg-[var(--sidebar-bg)] lg:hidden">
+        {/* Logo icon */}
+        <div className="flex h-14 shrink-0 items-center justify-center border-b border-[var(--sidebar-border)]">
+          <Link href="/dashboard" className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600 transition-opacity hover:opacity-80">
+            <Activity className="h-4 w-4 text-white" />
+          </Link>
+        </div>
 
-      {/* Mobile overlay */}
+        {/* Mobile expand button */}
+        <button
+          className="mt-2 flex h-9 w-9 cursor-pointer items-center justify-center self-center rounded-lg transition-colors hover:bg-slate-100 dark:hover:bg-slate-800"
+          onClick={() => setMobileOpen(true)}
+          aria-label="Open menu"
+        >
+          <Menu className="h-4.5 w-4.5 text-slate-500" />
+        </button>
+
+        {/* Collapsed nav */}
+        <nav className="mt-2 flex flex-col gap-0.5 px-2">
+          {renderNavItems(true)}
+        </nav>
+
+        {/* User avatar in rail */}
+        <div className="mt-auto flex items-center justify-center p-2 pt-4 border-t border-[var(--sidebar-border)]">
+          <button
+            onClick={handleLogout}
+            title="Sign Out"
+            className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-200 text-xs font-semibold text-slate-600 transition-colors hover:bg-red-100 hover:text-red-600 dark:bg-slate-700 dark:text-slate-300"
+          >
+            {initials}
+          </button>
+        </div>
+      </aside>
+
+      {/* ─────────────────────────────────────────
+          FULL EXPANDED SIDEBAR — always visible on lg+
+          ───────────────────────────────────────── */}
+      <aside className="fixed left-0 top-0 z-40 hidden h-screen w-64 flex-col border-r border-[var(--sidebar-border)] bg-[var(--sidebar-bg)] lg:flex">
+        {/* Header / Logo */}
+        <div className="flex h-14 shrink-0 items-center gap-3 border-b border-[var(--sidebar-border)] px-5">
+          <Link href="/dashboard" className="flex items-center gap-2.5 hover:opacity-80 transition-opacity">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600">
+              <Activity className="h-4 w-4 text-white" />
+            </div>
+            <div className="min-w-0">
+              <h1 className="text-sm font-bold leading-none text-foreground">CareOps</h1>
+              <p className="mt-0.5 max-w-[140px] truncate text-[11px] text-muted-foreground">
+                {workspaceName || "Workspace"}
+              </p>
+            </div>
+          </Link>
+        </div>
+
+        {/* Navigation */}
+        <nav className="flex-1 overflow-y-auto px-3 py-3">
+          <div className="flex flex-col gap-0.5">
+            {renderNavItems(false)}
+          </div>
+        </nav>
+
+        {/* Footer — user info + logout */}
+        <div className="shrink-0 border-t border-[var(--sidebar-border)] p-3">
+          <div className="mb-2 flex items-center gap-3 rounded-lg px-2 py-1.5">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
+              {initials}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="truncate text-sm font-medium text-foreground">{userName || "User"}</p>
+              <p className="text-[11px] capitalize text-muted-foreground">{userRole?.toLowerCase() || "owner"}</p>
+            </div>
+            <ChevronRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground/50" />
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="w-full justify-start gap-2 text-muted-foreground hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:text-red-400"
+            onClick={handleLogout}
+          >
+            <LogOut className="h-3.5 w-3.5" />
+            <span className="text-xs">Sign Out</span>
+          </Button>
+        </div>
+      </aside>
+
+      {/* ─────────────────────────────────────────
+          MOBILE FULL-SCREEN DRAWER OVERLAY
+          ───────────────────────────────────────── */}
       {mobileOpen && (
-        <div className="fixed inset-0 z-40 bg-black/50 lg:hidden" onClick={() => setMobileOpen(false)} />
+        <div
+          className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm lg:hidden"
+          onClick={() => setMobileOpen(false)}
+        />
       )}
 
-      {/* Sidebar */}
-      <aside className={cn(
-        "fixed top-0 left-0 z-40 h-[100dvh] w-72 bg-white border-r border-gray-200 transition-transform duration-300 ease-in-out lg:translate-x-0 lg:w-64",
-        mobileOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full"
-      )}>
-        {sidebarContent}
+      <aside
+        className={cn(
+          "fixed left-0 top-0 z-50 h-screen w-72 flex-col border-r border-[var(--sidebar-border)] bg-[var(--sidebar-bg)] shadow-xl transition-transform duration-300 ease-in-out lg:hidden",
+          mobileOpen ? "flex translate-x-0" : "-translate-x-full"
+        )}
+      >
+        {/* Drawer header */}
+        <div className="flex h-14 items-center justify-between border-b border-[var(--sidebar-border)] px-5">
+          <Link href="/dashboard" onClick={() => setMobileOpen(false)} className="flex items-center gap-2.5 hover:opacity-80 transition-opacity">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600">
+              <Activity className="h-4 w-4 text-white" />
+            </div>
+            <div>
+              <h1 className="text-sm font-bold text-foreground">CareOps</h1>
+              <p className="max-w-[140px] truncate text-[11px] text-muted-foreground">{workspaceName || "Workspace"}</p>
+            </div>
+          </Link>
+          <button
+            onClick={() => setMobileOpen(false)}
+            className="flex h-8 w-8 items-center justify-center rounded-lg transition-colors hover:bg-slate-100 dark:hover:bg-slate-800"
+            aria-label="Close menu"
+          >
+            <X className="h-4 w-4 text-slate-500" />
+          </button>
+        </div>
+
+        {/* Drawer nav */}
+        <nav className="flex-1 overflow-y-auto px-3 py-3">
+          <div className="flex flex-col gap-0.5">
+            {renderNavItems(false)}
+          </div>
+        </nav>
+
+        {/* Drawer footer */}
+        <div className="shrink-0 border-t border-[var(--sidebar-border)] p-3">
+          <div className="mb-2 flex items-center gap-3 rounded-lg px-2 py-1.5">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
+              {initials}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="truncate text-sm font-medium text-foreground">{userName || "User"}</p>
+              <p className="text-[11px] capitalize text-muted-foreground">{userRole?.toLowerCase() || "owner"}</p>
+            </div>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="w-full justify-start gap-2 text-muted-foreground hover:bg-red-50 hover:text-red-600"
+            onClick={handleLogout}
+          >
+            <LogOut className="h-3.5 w-3.5" />
+            <span className="text-xs">Sign Out</span>
+          </Button>
+        </div>
       </aside>
     </>
   );

@@ -194,7 +194,7 @@ export default function InventoryPage() {
     );
 
     return (
-        <div className="flex flex-col h-full">
+        <div className="flex min-h-full flex-col">
             <Header title="Inventory" subtitle="Track supplies and automate reordering">
                 <div className="flex gap-2">
                     <div className="relative">
@@ -216,7 +216,7 @@ export default function InventoryPage() {
                 </div>
             </Header>
 
-            <div className="flex-1 p-6 space-y-6">
+            <div className="mx-auto w-full max-w-screen-xl flex-1 space-y-4 p-4 sm:p-6">
                 <div className="relative max-w-sm">
                     <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input

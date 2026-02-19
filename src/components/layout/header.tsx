@@ -167,8 +167,8 @@ export function Header({ title, subtitle, children }: HeaderProps) {
   };
 
   return (
-    <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-sm border-b border-gray-200">
-      <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4">
+    <header className="sticky top-0 z-30 border-b border-[var(--border)] bg-[var(--background)]/90 backdrop-blur-md">
+      <div className="flex items-center justify-between py-3 pl-4 pr-4 sm:py-3.5 sm:pl-6 sm:pr-6 lg:pl-6">
         <div className="flex-1 min-w-0 mr-4">
           <h1 className="text-xl sm:text-2xl font-bold text-gray-900 truncate">{title}</h1>
           {subtitle && <p className="text-xs sm:text-sm text-gray-500 mt-0.5 truncate">{subtitle}</p>}

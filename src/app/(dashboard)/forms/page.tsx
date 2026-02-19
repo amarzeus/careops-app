@@ -133,9 +133,9 @@ export default function FormsPage() {
   const overdueCount = submissions.filter(s => s.status === "OVERDUE").length;
 
   return (
-    <div>
+    <div className="flex min-h-full flex-col">
       <Header title="Forms" subtitle="Manage contact forms, intake forms, and submissions" />
-      <div className="p-6">
+      <div className="mx-auto w-full max-w-screen-xl flex-1 p-4 sm:p-6">
         {/* Summary Stats */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <Card>

@@ -90,14 +90,15 @@ export default function StaffPage() {
     };
 
     return (
-        <div className="flex flex-col h-full">
+        <div className="flex min-h-full flex-col">
             <Header title="Team & Permissions" subtitle="Manage staff access to CareOps">
-                <Button onClick={() => setDialogOpen(true)}>
-                    <Plus className="w-4 h-4 mr-2" /> Add Staff
+                <Button size="sm" className="h-9 gap-2 bg-blue-600 text-white hover:bg-blue-700" onClick={() => setDialogOpen(true)}>
+                    <Plus className="h-4 w-4" />
+                    <span className="hidden sm:inline">Add Staff</span>
                 </Button>
             </Header>
 
-            <div className="flex-1 p-6 space-y-6">
+            <div className="mx-auto w-full max-w-screen-xl flex-1 space-y-4 p-4 sm:p-6">
                 {loading ? (
                     <div>Loading team...</div>
                 ) : (

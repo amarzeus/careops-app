@@ -202,7 +202,7 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-gray-50/50">
+    <div className="flex min-h-full flex-col">
       <Header title="Dashboard" subtitle="Overview of your business performance">
         <div className="flex items-center gap-2 text-xs text-gray-500">
           {refreshing ? (
@@ -214,8 +214,8 @@ export default function DashboardPage() {
         </div>
       </Header>
 
-      {/* Main Content */}
-      <main className="mx-auto flex w-full max-w-[1600px] flex-1 flex-col gap-5 overflow-hidden p-4 sm:gap-6 sm:p-6 lg:p-8">
+      {/* Page body */}
+      <div className="mx-auto flex w-full max-w-screen-xl flex-1 flex-col gap-5 p-4 sm:gap-6 sm:p-6">
         {/* ══════ Quick Actions Bar ══════ */}
         <section className="no-scrollbar flex flex-wrap items-center gap-2 overflow-x-auto pb-1 sm:gap-3">
           <Link href="/bookings">
@@ -499,7 +499,7 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
         )}
-      </main>
+      </div>
     </div>
   );
 }

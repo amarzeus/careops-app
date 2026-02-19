@@ -120,17 +120,18 @@ export default function AutomationPage() {
   const inactiveCount = rules.length - activeCount;
 
   return (
-    <div>
+    <div className="flex min-h-full flex-col">
       <Header title="Automation" subtitle="Event-based rules that work for you">
         <Button
-          className="bg-blue-600 hover:bg-blue-700"
+          size="sm"
+          className="h-9 gap-2 bg-blue-600 text-white hover:bg-blue-700"
           onClick={() => { setSelectedRule(null); setDialogOpen(true); }}
         >
           <Plus className="w-4 h-4 mr-2" /> New Rule
         </Button>
       </Header>
 
-      <div className="p-4 sm:p-6">
+      <div className="mx-auto w-full max-w-screen-xl flex-1 p-4 sm:p-6">
         {!loading && rules.length > 0 && (
           <div className="mb-6 flex flex-wrap items-center gap-2 sm:gap-4">
             <div className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-gray-50 border rounded-lg">

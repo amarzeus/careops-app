@@ -257,10 +257,10 @@ function SettingsContent() {
   return (
     <div>
       <Header title="Settings" subtitle="Manage your workspace and account" />
-      <div className="p-4 sm:p-6 max-w-4xl">
+      <div className="mx-auto w-full max-w-4xl p-4 sm:p-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <div className="overflow-x-auto pb-2 -mb-2">
-            <TabsList className="flex-nowrap whitespace-nowrap w-full sm:w-auto">
+          <div className="overflow-x-auto pb-1 -mb-1">
+            <TabsList className="flex-nowrap whitespace-nowrap">
               <TabsTrigger value="workspace" className="flex items-center gap-2"><Settings className="w-4 h-4" /> <span className="hidden sm:inline">Workspace</span></TabsTrigger>
               <TabsTrigger value="ai" className="flex items-center gap-2"><Sparkles className="w-4 h-4" /> <span className="hidden sm:inline">AI</span></TabsTrigger>
               <TabsTrigger value="voice" className="flex items-center gap-2"><Sparkles className="w-4 h-4" /> <span className="hidden sm:inline">Voice</span></TabsTrigger>

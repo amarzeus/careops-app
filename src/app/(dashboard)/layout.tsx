@@ -18,7 +18,6 @@ export default async function DashboardLayout({ children }: { children: React.Re
   if (user.workspace?.status === "ONBOARDING") redirect("/onboarding");
 
   // ROLE-BASED ACCESS CONTROL (RBAC)
-  // Staff cannot access Settings or Automation pages
   if (
     user.role !== "OWNER" &&
     (pathname.startsWith("/settings") || pathname.startsWith("/automation"))
@@ -31,16 +30,17 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const showFooter = !fullScreenPages.some((page) => pathname.startsWith(page));
 
   return (
-    <div className="flex min-h-screen flex-col bg-gray-50">
+    <div className="flex min-h-screen bg-background">
       <Sidebar userName={user.name} userRole={user.role} workspaceName={user.workspace?.name} />
-      <main className="ml-16 flex min-h-screen flex-1 flex-col p-4 lg:ml-64 lg:p-8">
-        {children}
-      </main>
-      {showFooter && (
-        <div className="ml-16 lg:ml-64">
-          <Footer />
-        </div>
-      )}
+
+      {/* Main content area — always offset by the collapsed rail (4rem/64px) on mobile,
+          by the full sidebar (16rem/256px) on lg+ */}
+      <div className="flex min-h-screen flex-1 flex-col pl-16 lg:pl-64">
+        <main className="flex-1 overflow-y-auto">
+          {children}
+        </main>
+        {showFooter && <Footer />}
+      </div>
     </div>
   );
 }
