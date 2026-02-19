@@ -11,7 +11,6 @@ import {
   Layers,
   Gauge,
   Headphones,
-  Activity,
   X,
   Menu,
   Sparkles,
@@ -23,6 +22,7 @@ import {
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
+import { Logo } from "@/components/layout/logo";
 
 const features = [
   {
@@ -220,10 +220,7 @@ function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
       <div className="flex flex-col h-full">
         <div className="flex items-center justify-between p-6 border-b">
           <div className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center">
-              <Activity className="w-6 h-6 text-white" />
-            </div>
-            <span className="text-xl font-bold">CareOps</span>
+            <Logo variant="full" />
           </div>
           <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-xl">
             <X className="w-6 h-6" />
@@ -297,10 +294,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-600/25 hover:scale-105 transition-transform">
-                <Activity className="w-7 h-7 text-white" />
-              </div>
-              <span className="text-2xl font-bold text-gray-900">CareOps</span>
+              <Logo variant="full" size={40} />
             </div>
 
             <div className="hidden lg:flex items-center gap-2">
@@ -567,11 +561,9 @@ export default function LandingPage() {
       <footer className="bg-gray-900 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-8">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center">
-                <Activity className="w-7 h-7 text-white" />
-              </div>
-              <span className="text-2xl font-bold text-white">CareOps</span>
+            <div className="flex items-center gap-3 dark">
+              {/* Force dark mode for footer logo to ensure white text */}
+              <Logo variant="full" size={40} />
             </div>
             <div className="flex items-center gap-8">
               <Link href="/privacy" className="text-sm text-gray-400 hover:text-white">Privacy</Link>

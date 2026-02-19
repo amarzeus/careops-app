@@ -5,10 +5,11 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard, MessageSquare, Calendar, FileText,
-  Package, Users, Zap, Settings, LogOut, Menu, X, Activity, PhoneCall, ChevronRight
+  Package, Users, Zap, Settings, LogOut, Menu, X, PhoneCall, ChevronRight
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Logo } from "./logo";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, badgeKey: null },
@@ -152,8 +153,8 @@ export function Sidebar({ userName, userRole, workspaceName }: SidebarProps) {
       <aside className="fixed left-0 top-0 z-40 flex h-screen w-16 flex-col border-r border-[var(--sidebar-border)] bg-[var(--sidebar-bg)] lg:hidden">
         {/* Logo icon */}
         <div className="flex h-14 shrink-0 items-center justify-center border-b border-[var(--sidebar-border)]">
-          <Link href="/dashboard" className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600 transition-opacity hover:opacity-80">
-            <Activity className="h-4 w-4 text-white" />
+          <Link href="/dashboard" className="transition-opacity hover:opacity-80">
+            <Logo variant="icon" size={32} />
           </Link>
         </div>
 
@@ -189,13 +190,13 @@ export function Sidebar({ userName, userRole, workspaceName }: SidebarProps) {
       <aside className="fixed left-0 top-0 z-40 hidden h-screen w-64 flex-col border-r border-[var(--sidebar-border)] bg-[var(--sidebar-bg)] lg:flex">
         {/* Header / Logo */}
         <div className="flex h-14 shrink-0 items-center gap-3 border-b border-[var(--sidebar-border)] px-5">
-          <Link href="/dashboard" className="flex items-center gap-2.5 hover:opacity-80 transition-opacity">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600">
-              <Activity className="h-4 w-4 text-white" />
-            </div>
-            <div className="min-w-0">
-              <h1 className="text-sm font-bold leading-none text-foreground">CareOps</h1>
-              <p className="mt-0.5 max-w-[140px] truncate text-[11px] text-muted-foreground">
+          <Link href="/dashboard" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+            <Logo variant="icon" size={32} />
+            <div className="min-w-0 flex flex-col justify-center">
+              <span className="text-lg font-bold leading-none tracking-tight text-foreground">
+                Care<span className="text-indigo-600">Ops</span>
+              </span>
+              <p className="max-w-[140px] truncate text-[10px] uppercase tracking-wider font-semibold text-muted-foreground/80">
                 {workspaceName || "Workspace"}
               </p>
             </div>
@@ -251,13 +252,15 @@ export function Sidebar({ userName, userRole, workspaceName }: SidebarProps) {
       >
         {/* Drawer header */}
         <div className="flex h-14 items-center justify-between border-b border-[var(--sidebar-border)] px-5">
-          <Link href="/dashboard" onClick={() => setMobileOpen(false)} className="flex items-center gap-2.5 hover:opacity-80 transition-opacity">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600">
-              <Activity className="h-4 w-4 text-white" />
-            </div>
+          <Link href="/dashboard" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+            <Logo variant="icon" size={32} />
             <div>
-              <h1 className="text-sm font-bold text-foreground">CareOps</h1>
-              <p className="max-w-[140px] truncate text-[11px] text-muted-foreground">{workspaceName || "Workspace"}</p>
+              <span className="text-lg font-bold leading-none tracking-tight text-foreground">
+                Care<span className="text-indigo-600">Ops</span>
+              </span>
+              <p className="max-w-[140px] truncate text-[10px] uppercase tracking-wider font-semibold text-muted-foreground/80">
+                {workspaceName || "Workspace"}
+              </p>
             </div>
           </Link>
           <button
