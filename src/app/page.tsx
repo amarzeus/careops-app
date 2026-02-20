@@ -607,53 +607,76 @@ export default function LandingPage() {
               </motion.p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <SpotlightCard className="p-8 md:p-10 min-h-[320px] flex flex-col justify-between group">
-                <div className="w-14 h-14 rounded-[16px] bg-blue-500/10 flex items-center justify-center mb-6 border border-blue-500/20 group-hover:scale-110 transition-transform duration-500 ease-out">
-                  <Calendar className="w-7 h-7 text-blue-500" />
-                </div>
-                <div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Large Card: Smart Bookings */}
+              <SpotlightCard className="md:col-span-2 md:row-span-2 p-6 md:p-8 lg:p-10 min-h-[300px] lg:min-h-[380px] flex flex-col justify-between group overflow-hidden bg-background/40">
+                <div className="z-10 relative">
+                  <div className="w-12 h-12 rounded-[16px] bg-blue-500/10 flex items-center justify-center mb-6 border border-blue-500/20 group-hover:scale-110 transition-transform duration-500 ease-out shadow-[0_0_30px_rgba(59,130,246,0.1)]">
+                    <Calendar className="w-6 h-6 text-blue-500" />
+                  </div>
                   <h3 className="text-2xl font-bold mb-3 tracking-tight">Smart Bookings</h3>
-                  <p className="text-base text-muted-foreground leading-relaxed font-medium">
-                    Public scheduling pages with real-time availability, automated confirmations, and calendar sync.
+                  <p className="text-base text-muted-foreground leading-relaxed font-medium max-w-sm">
+                    Public scheduling pages with real-time availability, automated confirmations, and flawless calendar sync.
                   </p>
                 </div>
+
+                {/* Decorative background element for large card */}
+                <div className="absolute right-0 bottom-0 w-2/3 h-2/3 bg-gradient-to-tl from-blue-500/10 to-transparent blur-3xl -z-10 transition-opacity duration-500 opacity-50 group-hover:opacity-100" />
+                <div className="absolute -right-10 -bottom-10 w-48 h-48 border border-blue-500/20 rounded-full sm:flex hidden -z-10" />
+                <div className="absolute -right-20 -bottom-20 w-64 h-64 border border-blue-500/20 rounded-full sm:flex hidden -z-10" />
               </SpotlightCard>
 
-              <SpotlightCard className="p-8 md:p-10 min-h-[320px] flex flex-col justify-between group">
-                <div className="w-14 h-14 rounded-[16px] bg-indigo-500/10 flex items-center justify-center mb-6 border border-indigo-500/20 group-hover:scale-110 transition-transform duration-500 ease-out">
-                  <MessageSquare className="w-7 h-7 text-indigo-500" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold mb-3 tracking-tight">Unified Inbox</h3>
-                  <p className="text-base text-muted-foreground leading-relaxed font-medium">
-                    Email, SMS, and AI-powered responses meticulously organized in one flawless interface.
+              {/* Small Card 1: Unified Inbox */}
+              <SpotlightCard className="md:col-span-1 p-6 md:p-8 min-h-[220px] flex flex-col justify-between group overflow-hidden bg-background/40">
+                <div className="z-10 relative">
+                  <div className="w-10 h-10 rounded-[12px] bg-indigo-500/10 flex items-center justify-center mb-5 border border-indigo-500/20 group-hover:scale-110 transition-transform duration-500 ease-out">
+                    <MessageSquare className="w-5 h-5 text-indigo-500" />
+                  </div>
+                  <h3 className="text-lg md:text-xl font-bold mb-2 tracking-tight">Unified Inbox</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed font-medium">
+                    Email, SMS, and AI responses organized in one interface.
                   </p>
                 </div>
+                <div className="absolute right-0 bottom-0 w-1/2 h-1/2 bg-gradient-to-tl from-indigo-500/10 to-transparent blur-2xl -z-10 transition-opacity duration-500 opacity-50 group-hover:opacity-100" />
               </SpotlightCard>
 
-              <SpotlightCard className="p-8 md:p-10 min-h-[320px] flex flex-col justify-between group">
-                <div className="w-14 h-14 rounded-[16px] bg-purple-500/10 flex items-center justify-center mb-6 border border-purple-500/20 group-hover:scale-110 transition-transform duration-500 ease-out">
-                  <FileText className="w-7 h-7 text-purple-500" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold mb-3 tracking-tight">Dynamic Forms</h3>
-                  <p className="text-base text-muted-foreground leading-relaxed font-medium">
-                    Intelligent intake workflows that adapt to user responses and track completion.
+              {/* Small Card 2: Dynamic Forms */}
+              <SpotlightCard className="md:col-span-1 p-6 md:p-8 min-h-[220px] flex flex-col justify-between group overflow-hidden bg-background/40">
+                <div className="z-10 relative">
+                  <div className="w-10 h-10 rounded-[12px] bg-purple-500/10 flex items-center justify-center mb-5 border border-purple-500/20 group-hover:scale-110 transition-transform duration-500 ease-out">
+                    <FileText className="w-5 h-5 text-purple-500" />
+                  </div>
+                  <h3 className="text-lg md:text-xl font-bold mb-2 tracking-tight">Dynamic Forms</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed font-medium">
+                    Intelligent intake workflows that adapt to user responses.
                   </p>
                 </div>
+                <div className="absolute right-0 bottom-0 w-1/2 h-1/2 bg-gradient-to-tl from-purple-500/10 to-transparent blur-2xl -z-10 transition-opacity duration-500 opacity-50 group-hover:opacity-100" />
               </SpotlightCard>
 
-              <SpotlightCard className="p-8 md:p-10 min-h-[320px] flex flex-col justify-between group">
-                <div className="w-14 h-14 rounded-[16px] bg-amber-500/10 flex items-center justify-center mb-6 border border-amber-500/20 group-hover:scale-110 transition-transform duration-500 ease-out">
-                  <Zap className="w-7 h-7 text-amber-500" />
-                </div>
-                <div>
+              {/* Wide Card: Automation Engine */}
+              <SpotlightCard className="md:col-span-3 p-6 md:p-8 lg:p-10 min-h-[200px] flex flex-col md:flex-row items-start md:items-center justify-between group overflow-hidden bg-background/40">
+                <div className="max-w-xl z-10 relative">
+                  <div className="w-12 h-12 rounded-[16px] bg-amber-500/10 flex items-center justify-center mb-5 border border-amber-500/20 group-hover:scale-110 transition-transform duration-500 ease-out">
+                    <Zap className="w-6 h-6 text-amber-500" />
+                  </div>
                   <h3 className="text-2xl font-bold mb-3 tracking-tight">Automation Engine</h3>
                   <p className="text-base text-muted-foreground leading-relaxed font-medium">
-                    Event-driven workflows for reminders, follow-ups, and notifications running silently.
+                    Event-driven workflows for reminders, follow-ups, and notifications running silently in the background.
                   </p>
                 </div>
+
+                {/* Decorative abstract diagram or rings for wide card */}
+                <div className="relative mt-6 md:mt-0 w-full md:w-auto flex-1 flex justify-end z-10 pointer-events-none">
+                  <div className="w-32 h-32 md:w-40 md:h-40 relative opacity-80 group-hover:opacity-100 transition-opacity duration-700">
+                    <div className="absolute inset-0 rounded-full border border-amber-500/30 animate-[spin_10s_linear_infinite]" />
+                    <div className="absolute inset-4 rounded-full border border-dashed border-amber-500/30 animate-[spin_15s_linear_infinite_reverse]" />
+                    <div className="absolute inset-8 rounded-full border border-amber-500/20 animate-[spin_8s_linear_infinite]" />
+                    <div className="absolute inset-0 m-auto w-10 h-10 bg-amber-500/10 rounded-full blur-md" />
+                  </div>
+                </div>
+
+                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-gradient-to-r from-transparent via-amber-500/5 to-transparent blur-3xl -z-10 opacity-50 group-hover:opacity-100 transition-opacity duration-1000" />
               </SpotlightCard>
             </div>
           </div>
@@ -699,7 +722,7 @@ export default function LandingPage() {
                   viewport={{ once: true }}
                   transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
                 >
-                  <div className="text-6xl md:text-7xl font-black tracking-tighter mb-4 text-transparent bg-clip-text bg-gradient-to-br from-background to-background/50">
+                  <div className="text-5xl md:text-6xl font-black tracking-tighter mb-4 text-transparent bg-clip-text bg-gradient-to-br from-background to-background/50">
                     <AnimatedCounter value={stat.value} suffix={stat.suffix} />
                   </div>
                   <div className="text-sm md:text-base font-bold tracking-widest uppercase text-background/60">{stat.label}</div>
