@@ -120,6 +120,17 @@ export function VoiceSettingsTab() {
     canHandleInquiry: true,
   });
 
+  // Phone form state
+  const [showPhoneForm, setShowPhoneForm] = useState(false);
+  const [editingPhone, setEditingPhone] = useState<PhoneNumberLocal | null>(null);
+  const [phoneForm, setPhoneForm] = useState({
+    phoneNumber: "",
+    label: "",
+    voiceAgentId: "",
+    forwardToStaff: false,
+    forwardNumber: "",
+  });
+
   useEffect(() => {
     fetchVoiceData();
   }, []);
@@ -322,6 +333,84 @@ export function VoiceSettingsTab() {
     } finally {
       setSavingDnc(false);
     }
+  };
+
+  const handleSavePhone = async () => {
+    setSaving(true);
+    try {
+      const res = await fetch("/api/ai/voice/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: editingPhone ? "updatePhoneNumber" : "createPhoneNumber",
+          data: {
+            ...phoneForm,
+            id: editingPhone?.id,
+          },
+        }),
+      });
+
+      if (!res.ok) throw new Error("Failed to save phone number");
+
+      toast({ title: "Success", description: `Phone number ${editingPhone ? "updated" : "added"} ` });
+      setShowPhoneForm(false);
+      setEditingPhone(null);
+      setPhoneForm({
+        phoneNumber: "",
+        label: "",
+        voiceAgentId: "",
+        forwardToStaff: false,
+        forwardNumber: "",
+      });
+      fetchVoiceData();
+    } catch (_error) {
+      toast({ title: "Error", description: "Failed to save phone number", variant: "destructive" });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDeletePhone = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this phone number?")) return;
+    try {
+      await fetch("/api/ai/voice/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "deletePhoneNumber", data: { id } }),
+      });
+      toast({ title: "Deleted", description: "Phone number deleted" });
+      fetchVoiceData();
+    } catch (_error) {
+      toast({ title: "Error", description: "Failed to delete phone number", variant: "destructive" });
+    }
+  };
+
+  const handleTogglePhone = async (phone: PhoneNumberLocal) => {
+    try {
+      await fetch("/api/ai/voice/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "updatePhoneNumber",
+          data: { ...phone, isActive: !phone.isActive },
+        }),
+      });
+      fetchVoiceData();
+    } catch (_error) {
+      toast({ title: "Error", description: "Failed to update phone number", variant: "destructive" });
+    }
+  };
+
+  const editPhone = (phone: PhoneNumberLocal) => {
+    setEditingPhone(phone);
+    setPhoneForm({
+      phoneNumber: phone.phoneNumber,
+      label: phone.label || "",
+      voiceAgentId: phone.voiceAgentId || "",
+      forwardToStaff: phone.forwardToStaff,
+      forwardNumber: phone.forwardNumber || "",
+    });
+    setShowPhoneForm(true);
   };
 
   const handleResolveEscalation = async (callId: string) => {
@@ -564,6 +653,7 @@ export function VoiceSettingsTab() {
                   />
                   <Label className="text-sm cursor-pointer">Can Check Status</Label>
                 </div>
+
                 <div className="flex items-center gap-2">
                   <Switch
                     checked={agentForm.canTransfer}
@@ -649,6 +739,166 @@ export function VoiceSettingsTab() {
                   <p className="text-sm text-muted-foreground mt-1">&quot;{agent.greeting}&quot;</p>
                 </div>
               )}
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      <div className="flex flex-wrap items-center justify-between gap-3 mt-8">
+        <h3 className="font-semibold text-lg">Phone Numbers</h3>
+        <Button
+          size="sm"
+          className="bg-emerald-600 hover:bg-emerald-700"
+          onClick={() => {
+            setEditingPhone(null);
+            setShowPhoneForm(true);
+            setPhoneForm({
+              phoneNumber: "",
+              label: "",
+              voiceAgentId: "",
+              forwardToStaff: false,
+              forwardNumber: "",
+            });
+          }}
+        >
+          <Plus className="w-4 h-4 mr-1" /> Add Number
+        </Button>
+      </div>
+
+      {showPhoneForm && (
+        <Card className="border-emerald-200 mt-4">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base font-medium">
+              {editingPhone ? "Edit Phone Number" : "Add Phone Number"}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Phone Number</Label>
+                <Input
+                  value={phoneForm.phoneNumber}
+                  disabled={!!editingPhone}
+                  onChange={(e) => setPhoneForm(prev => ({ ...prev, phoneNumber: e.target.value }))}
+                  placeholder="+15551234567"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Label (Optional)</Label>
+                <Input
+                  value={phoneForm.label}
+                  onChange={(e) => setPhoneForm(prev => ({ ...prev, label: e.target.value }))}
+                  placeholder="Main Office"
+                />
+              </div>
+            </div>
+
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Assigned Agent</Label>
+                <Select
+                  value={phoneForm.voiceAgentId || "none"}
+                  onValueChange={(value) => setPhoneForm(prev => ({ ...prev, voiceAgentId: value === "none" ? "" : value }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select an agent" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">No Agent</SelectItem>
+                    {voiceAgents.map(agent => (
+                      <SelectItem key={agent.id} value={agent.id}>{agent.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Forward to Staff Number (Optional)</Label>
+                <Input
+                  value={phoneForm.forwardNumber}
+                  onChange={(e) => setPhoneForm(prev => ({ ...prev, forwardNumber: e.target.value }))}
+                  placeholder="+15550009999"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Switch
+                id="forward-to-staff"
+                checked={phoneForm.forwardToStaff}
+                onCheckedChange={(checked) => setPhoneForm(prev => ({ ...prev, forwardToStaff: checked }))}
+              />
+              <Label htmlFor="forward-to-staff" className="text-sm cursor-pointer">Forward calls to staff</Label>
+            </div>
+
+            <div className="flex gap-2 pt-2">
+              <Button onClick={handleSavePhone} disabled={saving || !phoneForm.phoneNumber} className="bg-emerald-600 hover:bg-emerald-700">
+                {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                {editingPhone ? "Update Number" : "Add Number"}
+              </Button>
+              <Button variant="outline" onClick={() => {
+                setShowPhoneForm(false);
+                setEditingPhone(null);
+              }}>
+                Cancel
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {!showPhoneForm && phoneNumbers.length === 0 && (
+        <Card className="border-dashed mt-4">
+          <CardContent className="p-8 text-center">
+            <Phone className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+            <p className="text-muted-foreground text-sm">No phone numbers added</p>
+            <p className="text-muted-foreground text-xs mt-1">
+              Add a provisioned Vapi number to link with an agent
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
+      <div className="space-y-3 mt-4">
+        {phoneNumbers.map((number) => (
+          <Card key={number.id} className={cn(!number.isActive && "opacity-60")}>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => handleTogglePhone(number)}
+                    className={cn(
+                      "w-8 h-8 rounded-full flex items-center justify-center transition-colors",
+                      number.isActive
+                        ? "bg-emerald-100 text-emerald-600 hover:bg-emerald-200"
+                        : "bg-muted/30 text-muted-foreground hover:bg-muted/50"
+                    )}
+                  >
+                    {number.isActive ? <Check className="w-3.5 h-3.5" /> : <Pause className="w-3.5 h-3.5" />}
+                  </button>
+                  <div>
+                    <p className="font-medium text-sm">{number.phoneNumber}</p>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <span>{number.label || "No label"}</span>
+                      {number.voiceAgent && (
+                        <>
+                          <span>•</span>
+                          <Badge variant="secondary" className="h-4 px-1 text-[10px] font-normal">
+                            Assigned: {number.voiceAgent.name}
+                          </Badge>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => editPhone(number)}>
+                    <Edit2 className="w-3.5 h-3.5" />
+                  </Button>
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50" onClick={() => handleDeletePhone(number.id)}>
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </Button>
+                </div>
+              </div>
             </CardContent>
           </Card>
         ))}

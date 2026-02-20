@@ -7,299 +7,263 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ──── Models ────
-
 model User {
-  id           String    @id @default(cuid())
-  email        String    @unique
-  name         String
-  passwordHash String
-  role         String    @default("STAFF")
-  workspaceId  String?
-  workspace    Workspace? @relation(fields: [workspaceId], references: [id])
-
-  // Auth fields
-  otpCode       String?
-  otpExpires    DateTime?
-  otpChannel    String?   // "email", "sms", "whatsapp" — which channel last OTP was sent on
-  emailVerified DateTime?
-  googleId      String?   @unique
-  phone         String?
-  phoneVerified DateTime?
-
-  // Permissions
-  canAccessInbox     Boolean @default(true)
-  canAccessBookings  Boolean @default(true)
-  canAccessForms     Boolean @default(true)
-  canAccessInventory Boolean @default(true)
-
-  messages Message[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                 String     @id @default(cuid())
+  email              String     @unique
+  name               String
+  passwordHash       String
+  role               String     @default("STAFF")
+  workspaceId        String?
+  otpCode            String?
+  otpExpires         DateTime?
+  otpChannel         String?
+  emailVerified      DateTime?
+  googleId           String?    @unique
+  phone              String?
+  phoneVerified      DateTime?
+  canAccessInbox     Boolean    @default(true)
+  canAccessBookings  Boolean    @default(true)
+  canAccessForms     Boolean    @default(true)
+  canAccessInventory Boolean    @default(true)
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+  messages           Message[]
+  workspace          Workspace? @relation(fields: [workspaceId], references: [id])
 }
 
 model Workspace {
-  id           String          @id @default(cuid())
-  name         String
-  address      String?
-  timezone     String          @default("UTC")
-  contactEmail String?
-  contactPhone String?
-  status       String          @default("ONBOARDING")
-  onboardingStep Int           @default(1)
-
-  // Email configuration
-  emailProvider    String?
-  emailApiKey      String?
-  emailFromName    String?
-  emailFromAddress String?
-  emailConfigured  Boolean @default(false)
-
-  // SMS configuration
-  smsProvider   String?
-  smsApiKey     String?
-  smsFromNumber String?
-  smsConfigured Boolean @default(false)
-
-  // WhatsApp configuration
-  whatsappProvider         String?
-  whatsappIntegratedNumber String?
-  whatsappConfigured       Boolean @default(false)
-
-  // Google Calendar integration
-  googleCalendarConnected     Boolean  @default(false)
-  googleCalendarAccessToken   String?
-  googleCalendarRefreshToken  String?
-  googleCalendarTokenExpiry   DateTime?
-  googleCalendarEmail         String?
-  googleCalendarId            String?  @default("primary")
-
-  // Relations
-  users           User[]
-  contacts        Contact[]
-  services        Service[]
-  bookings        Booking[]
-  contactForms    ContactForm[]
-  intakeForms     IntakeForm[]
-  formSubmissions FormSubmission[]
-  inventoryItems  InventoryItem[]
-  inventoryLogs   InventoryLog[]
-  conversations   Conversation[]
-  automationRules AutomationRule[]
-  alerts          Alert[]
-  webhooks        Webhook[]
-  integrationLogs IntegrationLog[]
-  webhookDeliveries WebhookDeliveryLog[]
-  voiceCalls      VoiceCall[]
-  voiceAgents     VoiceAgent[]
-  phoneNumbers    PhoneNumber[]
-  doNotCallEntries DoNotCallEntry[]
-  aiPreferences   AIPreferences?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                         String               @id @default(cuid())
+  name                       String
+  address                    String?
+  timezone                   String               @default("UTC")
+  contactEmail               String?
+  contactPhone               String?
+  status                     String               @default("ONBOARDING")
+  onboardingStep             Int                  @default(1)
+  emailProvider              String?
+  emailApiKey                String?
+  emailFromName              String?
+  emailFromAddress           String?
+  emailConfigured            Boolean              @default(false)
+  smsProvider                String?
+  smsApiKey                  String?
+  smsFromNumber              String?
+  smsConfigured              Boolean              @default(false)
+  whatsappProvider           String?
+  whatsappIntegratedNumber   String?
+  whatsappConfigured         Boolean              @default(false)
+  googleCalendarConnected    Boolean              @default(false)
+  googleCalendarAccessToken  String?
+  googleCalendarRefreshToken String?
+  googleCalendarTokenExpiry  DateTime?
+  googleCalendarEmail        String?
+  googleCalendarId           String?              @default("primary")
+  createdAt                  DateTime             @default(now())
+  updatedAt                  DateTime             @updatedAt
+  aiPreferences              AIPreferences?
+  alerts                     Alert[]
+  automationRules            AutomationRule[]
+  bookings                   Booking[]
+  contacts                   Contact[]
+  contactForms               ContactForm[]
+  conversations              Conversation[]
+  doNotCallEntries           DoNotCallEntry[]
+  formSubmissions            FormSubmission[]
+  intakeForms                IntakeForm[]
+  integrationLogs            IntegrationLog[]
+  inventoryItems             InventoryItem[]
+  inventoryLogs              InventoryLog[]
+  phoneNumbers               PhoneNumber[]
+  services                   Service[]
+  users                      User[]
+  voiceAgents                VoiceAgent[]
+  voiceCalls                 VoiceCall[]
+  webhooks                   Webhook[]
+  webhookDeliveries          WebhookDeliveryLog[]
 }
 
 model Webhook {
-  id          String            @id @default(cuid())
+  id          String               @id @default(cuid())
   url         String
   event       String
-  secret      String?           // HMAC secret for signature verification
-  isActive    Boolean           @default(true)
+  secret      String?
+  isActive    Boolean              @default(true)
   workspaceId String
-  workspace   Workspace         @relation(fields: [workspaceId], references: [id])
+  createdAt   DateTime             @default(now())
+  workspace   Workspace            @relation(fields: [workspaceId], references: [id])
   deliveries  WebhookDeliveryLog[]
-  createdAt   DateTime          @default(now())
 }
 
 model WebhookDeliveryLog {
   id           String    @id @default(cuid())
   webhookId    String
-  webhook      Webhook   @relation(fields: [webhookId], references: [id])
-  status       String    // SUCCESS, FAILED, PENDING_RETRY
+  status       String
   statusCode   Int?
   responseBody String?
   error        String?
-  requestBody  String?   // Store the payload for debugging
-  signature    String?   // Store the signature used
+  requestBody  String?
+  signature    String?
   retryCount   Int       @default(0)
-  retryAt      DateTime? // When to retry (for failed webhooks)
+  retryAt      DateTime?
   workspaceId  String
-  workspace    Workspace @relation(fields: [workspaceId], references: [id])
   createdAt    DateTime  @default(now())
+  webhook      Webhook   @relation(fields: [webhookId], references: [id])
+  workspace    Workspace @relation(fields: [workspaceId], references: [id])
 
   @@index([webhookId, createdAt])
   @@index([status, retryAt])
 }
 
 model Contact {
-  id          String  @id @default(cuid())
-  name        String
-  email       String?
-  phone       String?
-  source      String  @default("form")
-  notes       String?
-  workspaceId String
-  workspace   Workspace @relation(fields: [workspaceId], references: [id])
-
+  id              String           @id @default(cuid())
+  name            String
+  email           String?
+  phone           String?
+  source          String           @default("form")
+  notes           String?
+  workspaceId     String
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
   bookings        Booking[]
+  workspace       Workspace        @relation(fields: [workspaceId], references: [id])
   conversation    Conversation?
   formSubmissions FormSubmission[]
   voiceCalls      VoiceCall[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 
   @@unique([email, workspaceId])
 }
 
 model Service {
-  id          String  @id @default(cuid())
-  name        String
-  description String?
-  duration    Int     // in minutes
-  price       Float   @default(0.0)
-  location    String?
-  isActive    Boolean @default(true)
-  workspaceId String
-  workspace   Workspace @relation(fields: [workspaceId], references: [id])
-
-  availableDays String @default("1,2,3,4,5")
-  startTime     String @default("09:00")
-  endTime       String @default("17:00")
-
-  bookings    Booking[]
-  linkedForms IntakeForm[]
+  id             String                 @id @default(cuid())
+  name           String
+  description    String?
+  duration       Int
+  price          Float                  @default(0.0)
+  location       String?
+  isActive       Boolean                @default(true)
+  workspaceId    String
+  availableDays  String                 @default("1,2,3,4,5")
+  startTime      String                 @default("09:00")
+  endTime        String                 @default("17:00")
+  createdAt      DateTime               @default(now())
+  updatedAt      DateTime               @updatedAt
+  bookings       Booking[]
+  linkedForms    IntakeForm[]
+  workspace      Workspace              @relation(fields: [workspaceId], references: [id])
   inventoryLinks ServiceInventoryLink[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }
 
 model Booking {
-  id          String        @id @default(cuid())
-  date        DateTime
-  endTime     DateTime
-  status      String        @default("PENDING")
-  notes       String?
-  serviceId   String
-  service     Service       @relation(fields: [serviceId], references: [id])
-  contactId   String
-  contact     Contact       @relation(fields: [contactId], references: [id])
-  workspaceId String
-  workspace   Workspace     @relation(fields: [workspaceId], references: [id])
-
-  // Google Calendar sync
+  id                    String           @id @default(cuid())
+  date                  DateTime
+  endTime               DateTime
+  status                String           @default("PENDING")
+  notes                 String?
+  serviceId             String
+  contactId             String
+  workspaceId           String
   googleCalendarEventId String?
-
-  formSubmissions FormSubmission[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt             DateTime         @default(now())
+  updatedAt             DateTime         @updatedAt
+  contact               Contact          @relation(fields: [contactId], references: [id])
+  service               Service          @relation(fields: [serviceId], references: [id])
+  workspace             Workspace        @relation(fields: [workspaceId], references: [id])
+  formSubmissions       FormSubmission[]
 }
 
 model ContactForm {
-  id             String  @id @default(cuid())
+  id             String    @id @default(cuid())
   name           String
-  fields         String  @default("[]")
-  isActive       Boolean @default(true)
-  slug           String  @unique @default(cuid())
+  fields         String    @default("[]")
+  isActive       Boolean   @default(true)
+  slug           String    @unique @default(cuid())
   welcomeMessage String?
   workspaceId    String
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
   workspace      Workspace @relation(fields: [workspaceId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }
 
 model IntakeForm {
-  id          String  @id @default(cuid())
+  id          String           @id @default(cuid())
   name        String
   description String?
-  fields      String  @default("[]")
-  documents   String  @default("[]") // JSON: [{ name, url }]
-  isActive    Boolean @default(true)
-  slug        String  @unique @default(cuid())
+  fields      String           @default("[]")
+  documents   String           @default("[]")
+  isActive    Boolean          @default(true)
+  slug        String           @unique @default(cuid())
   serviceId   String?
-  service     Service? @relation(fields: [serviceId], references: [id])
   workspaceId String
-  workspace   Workspace @relation(fields: [workspaceId], references: [id])
-
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
   submissions FormSubmission[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  service     Service?         @relation(fields: [serviceId], references: [id])
+  workspace   Workspace        @relation(fields: [workspaceId], references: [id])
 }
 
 model FormSubmission {
-  id           String     @id @default(cuid())
-  data         String     @default("{}")
-  status       String     @default("PENDING")
+  id           String      @id @default(cuid())
+  data         String      @default("{}")
+  status       String      @default("PENDING")
   intakeFormId String?
-  intakeForm   IntakeForm? @relation(fields: [intakeFormId], references: [id])
   contactId    String
-  contact      Contact    @relation(fields: [contactId], references: [id])
   bookingId    String?
-  booking      Booking?   @relation(fields: [bookingId], references: [id])
   workspaceId  String
-  workspace    Workspace  @relation(fields: [workspaceId], references: [id])
-
-  sentAt      DateTime?
-  completedAt DateTime?
-  dueDate     DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  sentAt       DateTime?
+  completedAt  DateTime?
+  dueDate      DateTime?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  booking      Booking?    @relation(fields: [bookingId], references: [id])
+  contact      Contact     @relation(fields: [contactId], references: [id])
+  intakeForm   IntakeForm? @relation(fields: [intakeFormId], references: [id])
+  workspace    Workspace   @relation(fields: [workspaceId], references: [id])
 }
 
 model InventoryItem {
-  id          String  @id @default(cuid())
-  name        String
-  description String?
-  quantity    Int     @default(0)
-  threshold   Int     @default(5)
-  unit        String  @default("units")
-  vendorName  String?
-  vendorEmail String?
-  vendorPhone String?
-  workspaceId String
-  workspace   Workspace @relation(fields: [workspaceId], references: [id])
-
-  serviceLinks ServiceInventoryLink[]
+  id           String                 @id @default(cuid())
+  name         String
+  description  String?
+  quantity     Int                    @default(0)
+  threshold    Int                    @default(5)
+  unit         String                 @default("units")
+  vendorName   String?
+  vendorEmail  String?
+  vendorPhone  String?
+  workspaceId  String
+  createdAt    DateTime               @default(now())
+  updatedAt    DateTime               @updatedAt
+  workspace    Workspace              @relation(fields: [workspaceId], references: [id])
   logs         InventoryLog[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  serviceLinks ServiceInventoryLink[]
 }
 
 model InventoryLog {
   id            String        @id @default(cuid())
   itemId        String
-  item          InventoryItem @relation(fields: [itemId], references: [id])
   previousQty   Int
   newQty        Int
   change        Int
-  reason        String        // "booking_completed", "manual_adjustment", "restock", "initial"
-  referenceId   String?       // bookingId or manual entry id
-  referenceType String?       // "booking", "manual", "system"
+  reason        String
+  referenceId   String?
+  referenceType String?
   workspaceId   String
-  workspace     Workspace     @relation(fields: [workspaceId], references: [id])
   createdAt     DateTime      @default(now())
+  item          InventoryItem @relation(fields: [itemId], references: [id])
+  workspace     Workspace     @relation(fields: [workspaceId], references: [id])
 
   @@index([itemId, createdAt])
   @@index([workspaceId, createdAt])
 }
 
 model ServiceInventoryLink {
-  id          String  @id @default(cuid())
+  id          String        @id @default(cuid())
   serviceId   String
-  service     Service @relation(fields: [serviceId], references: [id])
   inventoryId String
+  quantity    Int           @default(1)
+  createdAt   DateTime      @default(now())
   inventory   InventoryItem @relation(fields: [inventoryId], references: [id])
-  quantity    Int     @default(1)
-
-  createdAt DateTime @default(now())
+  service     Service       @relation(fields: [serviceId], references: [id])
 
   @@unique([serviceId, inventoryId])
 }
@@ -309,126 +273,105 @@ model Conversation {
   subject       String?
   isActive      Boolean   @default(true)
   lastMessageAt DateTime  @default(now())
-  autoResumeAt  DateTime? // When to auto-resume automation after staff reply
+  autoResumeAt  DateTime?
   unreadCount   Int       @default(0)
-  contactId     String   @unique
-  contact       Contact  @relation(fields: [contactId], references: [id])
+  contactId     String    @unique
   workspaceId   String
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  contact       Contact   @relation(fields: [contactId], references: [id])
   workspace     Workspace @relation(fields: [workspaceId], references: [id])
-
-  messages Message[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  messages      Message[]
 }
 
 model Message {
-  id             String           @id @default(cuid())
+  id             String       @id @default(cuid())
   content        String
-  channel        String           @default("EMAIL")
-  direction      String           @default("OUTBOUND")
-  status         String           @default("SENT")
-  isAutomated    Boolean          @default(false)
+  channel        String       @default("EMAIL")
+  direction      String       @default("OUTBOUND")
+  status         String       @default("SENT")
+  isAutomated    Boolean      @default(false)
   conversationId String
-  conversation   Conversation     @relation(fields: [conversationId], references: [id])
   senderId       String?
-  sender         User?            @relation(fields: [senderId], references: [id])
-
-  createdAt DateTime @default(now())
+  createdAt      DateTime     @default(now())
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  sender         User?        @relation(fields: [senderId], references: [id])
 }
 
 model AutomationRule {
-  id              String            @id @default(cuid())
+  id              String          @id @default(cuid())
   name            String
   trigger         String
-  isActive        Boolean           @default(true)
+  isActive        Boolean         @default(true)
   messageTemplate String?
-  delayMinutes    Int               @default(0)
+  delayMinutes    Int             @default(0)
   workspaceId     String
-  workspace       Workspace         @relation(fields: [workspaceId], references: [id])
-
-  logs AutomationLog[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  logs            AutomationLog[]
+  workspace       Workspace       @relation(fields: [workspaceId], references: [id])
 }
 
 model AutomationLog {
-  id        String  @id @default(cuid())
+  id        String         @id @default(cuid())
   ruleId    String
-  rule      AutomationRule @relation(fields: [ruleId], references: [id])
   trigger   String
-  status    String  @default("SUCCESS") // SUCCESS, FAILED, SKIPPED
-  details   String? // JSON string with execution details
-  recipient String? // Email/phone of recipient
-
-  createdAt DateTime @default(now())
+  status    String         @default("SUCCESS")
+  details   String?
+  recipient String?
+  createdAt DateTime       @default(now())
+  rule      AutomationRule @relation(fields: [ruleId], references: [id])
 }
 
 model Alert {
-  id        String  @id @default(cuid())
-  type      String
-  title     String
-  message   String
-  isRead    Boolean @default(false)
-  actionUrl String?
+  id          String    @id @default(cuid())
+  type        String
+  title       String
+  message     String
+  isRead      Boolean   @default(false)
+  actionUrl   String?
   workspaceId String
+  createdAt   DateTime  @default(now())
   workspace   Workspace @relation(fields: [workspaceId], references: [id])
-
-  createdAt DateTime @default(now())
 }
 
 model IntegrationLog {
   id          String    @id @default(cuid())
-  type        String    // "email", "sms", "webhook", "calendar"
-  status      String    // "success", "failed", "bounced"
+  type        String
+  status      String
   to          String?
   message     String?
   error       String?
   workspaceId String
+  createdAt   DateTime  @default(now())
   workspace   Workspace @relation(fields: [workspaceId], references: [id])
-
-  createdAt DateTime @default(now())
 }
 
-// ──── Voice AI (VAPI) Models ────
-
 model VoiceCall {
-  id              String    @id @default(cuid())
-  callSid         String?   @unique  // VAPI Call SID
-  direction       String // INBOUND | OUTBOUND
-  status          String    // INITIATED, RINGING, IN_PROGRESS, COMPLETED, FAILED, NO_ANSWER, BUSY
-  contactId       String?
-  contact         Contact?  @relation(fields: [contactId], references: [id])
-  workspaceId     String
-  workspace       Workspace @relation(fields: [workspaceId], references: [id])
-  
-  // Call details
-  duration        Int?      // seconds
-  recordingUrl    String?
-  transcript      String?
-  cost            Float?
-  startedAt       DateTime?
-  endedAt         DateTime?
-  
-  // AI Agent details
-  assistantId     String?   // VAPI Assistant ID
-  summary         String?   // AI-generated call summary
-  outcome         String?   // CALL_BACK, BOOKING_CREATED, INFO_PROVIDED, TRANSFERRED, etc.
-  
-  // Metadata
-  metadata        String?   // JSON string with additional data
-  
-  // Escalation tracking
-  escalated       Boolean   @default(false)
-  escalationReason String?  // frustration, request, complexity
-  transferredTo   String?   // Staff user ID if transferred
-  
-  // Consent
-  consent         CallConsent?
-  
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  id               String       @id @default(cuid())
+  callSid          String?      @unique
+  direction        String
+  status           String
+  contactId        String?
+  workspaceId      String
+  duration         Int?
+  recordingUrl     String?
+  transcript       String?
+  cost             Float?
+  startedAt        DateTime?
+  endedAt          DateTime?
+  assistantId      String?
+  summary          String?
+  outcome          String?
+  metadata         String?
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+  escalated        Boolean      @default(false)
+  escalationReason String?
+  transferredTo    String?
+  consent          CallConsent?
+  contact          Contact?     @relation(fields: [contactId], references: [id])
+  workspace        Workspace    @relation(fields: [workspaceId], references: [id])
 
   @@index([workspaceId, status])
   @@index([contactId])
@@ -436,134 +379,92 @@ model VoiceCall {
 }
 
 model VoiceAgent {
-  id              String    @id @default(cuid())
-  name            String
-  description     String?
-  isActive        Boolean   @default(true)
-  
-  // VAPI Configuration
-  vapiAssistantId String?   // VAPI assistant ID
-  prompt          String?   // System prompt for the AI
-  voiceId         String?   // Voice provider ID (e.g., ElevenLabs)
-  
-  // Capabilities
-  canBook         Boolean   @default(false)
-  canCheckStatus Boolean   @default(false)
-  canTransfer     Boolean   @default(false)
-  canHandleInquiry Boolean @default(true)
-  
-  // Tool configuration (JSON)
-  tools           String?   // JSON array of enabled tools
-  
-  // Greeting
-  greeting        String?   // Initial greeting message
-  
-  workspaceId     String
-  workspace       Workspace @relation(fields: [workspaceId], references: [id])
-  
-  phoneNumbers    PhoneNumber[]
-  
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  
+  id               String        @id @default(cuid())
+  name             String
+  description      String?
+  isActive         Boolean       @default(true)
+  vapiAssistantId  String?
+  prompt           String?
+  voiceId          String?
+  canBook          Boolean       @default(false)
+  canCheckStatus   Boolean       @default(false)
+  canTransfer      Boolean       @default(false)
+  canHandleInquiry Boolean       @default(true)
+  tools            String?
+  greeting         String?
+  workspaceId      String
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  phoneNumbers     PhoneNumber[]
+  workspace        Workspace     @relation(fields: [workspaceId], references: [id])
+
   @@index([workspaceId])
 }
 
 model PhoneNumber {
-  id              String    @id @default(cuid())
-  phoneNumber     String    @unique
-  label           String?   // e.g., "Main Line", "Booking Line"
-  
-  // VAPI Configuration
-  vapiPhoneId     String?   // VAPI phone number ID
-  isActive        Boolean   @default(true)
-  
-  // Forwarding
-  forwardToStaff  Boolean   @default(false)
-  forwardNumber   String?   // If not using VAPI assistant
-  
-  // Voice Agent assignment
-  voiceAgentId    String?
-  voiceAgent      VoiceAgent? @relation(fields: [voiceAgentId], references: [id])
-  
-  workspaceId     String
-  workspace       Workspace @relation(fields: [workspaceId], references: [id])
-  
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  id             String      @id @default(cuid())
+  phoneNumber    String      @unique
+  label          String?
+  vapiPhoneId    String?
+  isActive       Boolean     @default(true)
+  forwardToStaff Boolean     @default(false)
+  forwardNumber  String?
+  voiceAgentId   String?
+  workspaceId    String
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  voiceAgent     VoiceAgent? @relation(fields: [voiceAgentId], references: [id])
+  workspace      Workspace   @relation(fields: [workspaceId], references: [id])
 
   @@index([workspaceId])
 }
 
-// ──── Voice Compliance Models ────
-
 model CallConsent {
   id              String    @id @default(cuid())
   voiceCallId     String    @unique
-  voiceCall       VoiceCall @relation(fields: [voiceCallId], references: [id])
-  
-  // Consent details
-  consentText     String    // What was asked
-  consentResponse Boolean   // true = granted, false = denied
+  consentText     String
+  consentResponse Boolean
   capturedAt      DateTime  @default(now())
-  
-  // Metadata
-  channel         String    @default("voice") // voice, sms, email
+  channel         String    @default("voice")
   notes           String?
-  
   createdAt       DateTime  @default(now())
-  
+  voiceCall       VoiceCall @relation(fields: [voiceCallId], references: [id])
+
   @@index([voiceCallId])
   @@index([capturedAt])
 }
 
 model DoNotCallEntry {
-  id              String    @id @default(cuid())
-  phoneNumber     String
-  workspaceId     String
-  workspace       Workspace @relation(fields: [workspaceId], references: [id])
-  
-  // DNC details
-  source          String    @default("customer_request") // customer_request, legal, admin
-  reason          String?
-  
-  // Metadata
-  addedBy         String?   // User ID who added
-  isActive        Boolean   @default(true)
-  
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  
+  id          String    @id @default(cuid())
+  phoneNumber String
+  workspaceId String
+  source      String    @default("customer_request")
+  reason      String?
+  addedBy     String?
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+
   @@unique([workspaceId, phoneNumber])
   @@index([phoneNumber])
   @@index([workspaceId, isActive])
 }
 
-// ──── AI Preferences (Per Workspace) ────
-
 model AIPreferences {
-  id                          String    @id @default(cuid())
-  workspaceId                 String    @unique
-  workspace                   Workspace @relation(fields: [workspaceId], references: [id])
-  
-  // Feature toggles
-  smartReplyEnabled           Boolean   @default(true)
-  insightsEnabled             Boolean   @default(true)
-  voiceEnabled                Boolean   @default(false)
-  anomalyDetectionEnabled     Boolean   @default(true)
-  inventoryForecastEnabled    Boolean   @default(true)
-  autoClassifyEnabled        Boolean   @default(true)
-  
-  // Preferences
-  defaultReplyTone            String    @default("professional") // professional, friendly, casual
-  
-  // Notification preferences
-  alertOnAnomaly              Boolean   @default(true)
-  dailyInsightTime           String?   // "09:00"
-  
-  // Model preferences
-  geminiModel                String    @default("gemini-2.0-flash")
-  
-  createdAt                  DateTime  @default(now())
-  updatedAt                  DateTime  @updatedAt
+  id                       String    @id @default(cuid())
+  workspaceId              String    @unique
+  smartReplyEnabled        Boolean   @default(true)
+  insightsEnabled          Boolean   @default(true)
+  voiceEnabled             Boolean   @default(false)
+  anomalyDetectionEnabled  Boolean   @default(true)
+  inventoryForecastEnabled Boolean   @default(true)
+  autoClassifyEnabled      Boolean   @default(true)
+  defaultReplyTone         String    @default("professional")
+  alertOnAnomaly           Boolean   @default(true)
+  dailyInsightTime         String?
+  geminiModel              String    @default("gemini-2.0-flash")
+  createdAt                DateTime  @default(now())
+  updatedAt                DateTime  @updatedAt
+  workspace                Workspace @relation(fields: [workspaceId], references: [id])
 }
