@@ -10,8 +10,6 @@ import {
   Menu,
   Sparkles,
   ArrowRight,
-  Zap as Lightning,
-  Check,
 } from "lucide-react";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";

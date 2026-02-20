@@ -41,7 +41,7 @@ export async function POST(req: Request) {
       );
 
     // Find form by slug or workspaceId
-    let form = await prisma.contactForm.findFirst({
+    const form = await prisma.contactForm.findFirst({
       where: {
         OR: [
           { slug: formSlug },
@@ -52,7 +52,7 @@ export async function POST(req: Request) {
     });
 
     let workspaceId = form?.workspaceId;
-    let welcomeMessage = form?.welcomeMessage;
+    const welcomeMessage = form?.welcomeMessage;
 
     if (!form || !form.isActive) {
       // If no form found, check if formSlug is a valid workspaceId (Default Form)
