@@ -23,9 +23,9 @@ const intentConfig = {
   complaint: { label: "Complaint", color: "bg-orange-100 text-orange-700 border-orange-200", icon: FileWarning },
   booking_request: { label: "Booking", color: "bg-blue-100 text-blue-700 border-blue-200", icon: Calendar },
   inquiry: { label: "Inquiry", color: "bg-violet-100 text-violet-700 border-violet-200", icon: Zap },
-  cancellation: { label: "Cancel", color: "bg-gray-100 text-gray-700 border-gray-200", icon: Clock },
+  cancellation: { label: "Cancel", color: "bg-muted/30 text-muted-foreground border-border/40", icon: Clock },
   follow_up: { label: "Follow-up", color: "bg-amber-100 text-amber-700 border-amber-200", icon: Clock },
-  general: { label: "General", color: "bg-gray-50 text-gray-500 border-gray-200", icon: MessageSquare },
+  general: { label: "General", color: "bg-muted/30 text-muted-foreground border-border/40", icon: MessageSquare },
 };
 
 /**
@@ -53,8 +53,8 @@ export function ConversationList({
   );
 
   return (
-    <div className="flex flex-col h-full bg-white border-r border-gray-200">
-      <div className="p-4 border-b border-gray-200 flex items-center justify-between bg-gray-50/50">
+    <div className="flex flex-col h-full bg-background border-r border-border/40">
+      <div className="p-4 border-b border-border/40 flex items-center justify-between bg-muted/30/50">
         <h1 className="font-semibold text-lg flex items-center gap-2">
           <MessageSquare className="w-5 h-5 text-blue-600" /> Inbox
           {totalUnread > 0 && (
@@ -69,10 +69,10 @@ export function ConversationList({
       </div>
       <div className="p-2">
         <div className="relative">
-          <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+          <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search messages..."
-            className="pl-9 bg-gray-50 border-none focus-visible:ring-1"
+            className="pl-9 bg-muted/30 border-none focus-visible:ring-1"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -81,7 +81,7 @@ export function ConversationList({
               onClick={() => setSearchQuery("")}
               className="absolute right-3 top-2.5"
             >
-              <X className="h-4 w-4 text-gray-400 hover:text-gray-600" />
+              <X className="h-4 w-4 text-muted-foreground hover:text-muted-foreground" />
             </button>
           )}
         </div>
@@ -98,12 +98,12 @@ export function ConversationList({
                 onClick={() => onSelect(c.id)}
                 className={cn(
                   "w-full text-left p-3 rounded-lg flex items-start gap-3 transition-colors",
-                  activeId === c.id ? "bg-blue-50" : "hover:bg-gray-100"
+                  activeId === c.id ? "bg-blue-50" : "hover:bg-muted/30"
                 )}
               >
                 <div className="relative">
-                  <Avatar className="w-10 h-10 border border-gray-200">
-                    <AvatarFallback className="bg-white text-blue-600">
+                  <Avatar className="w-10 h-10 border border-border/40">
+                    <AvatarFallback className="bg-background text-blue-600">
                       {c.contactName.charAt(0).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
@@ -118,12 +118,12 @@ export function ConversationList({
                     <span
                       className={cn(
                         "font-medium truncate",
-                        c.unreadCount > 0 ? "text-gray-900" : "text-gray-700"
+                        c.unreadCount > 0 ? "text-foreground" : "text-muted-foreground"
                       )}
                     >
                       {c.contactName}
                     </span>
-                    <span className="text-xs text-gray-400 whitespace-nowrap ml-2">
+                    <span className="text-xs text-muted-foreground whitespace-nowrap ml-2">
                       {format(new Date(c.lastMessageAt), "MMM d")}
                     </span>
                   </div>
@@ -142,8 +142,8 @@ export function ConversationList({
                     className={cn(
                       "text-xs truncate",
                       c.unreadCount > 0
-                        ? "font-medium text-gray-900"
-                        : "text-gray-500"
+                        ? "font-medium text-foreground"
+                        : "text-muted-foreground"
                     )}
                   >
                     {c.lastMessage}
@@ -153,14 +153,14 @@ export function ConversationList({
             );
           })}
           {filteredConversations.length === 0 && conversations.length > 0 && (
-            <div className="text-center p-8 text-gray-400 text-sm">
+            <div className="text-center p-8 text-muted-foreground text-sm">
               No conversations match &quot;{searchQuery}&quot;
             </div>
           )}
           {conversations.length === 0 && (
-            <div className="flex flex-col items-center justify-center p-10 text-gray-400">
+            <div className="flex flex-col items-center justify-center p-10 text-muted-foreground">
               <InboxIcon className="w-12 h-12 mb-3 opacity-30" />
-              <p className="font-medium text-gray-500 mb-1">Inbox is empty</p>
+              <p className="font-medium text-muted-foreground mb-1">Inbox is empty</p>
               <p className="text-xs text-center">
                 Conversations will appear here when contacts send messages or you
                 start new ones.

@@ -101,7 +101,7 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-12">
+    <div className="min-h-screen flex items-center justify-center bg-muted/30 px-4 py-12">
       <Card className="w-full max-w-md shadow-lg border-blue-100">
         <CardHeader className="text-center pb-2">
           <div className="flex justify-center mb-6">
@@ -115,7 +115,7 @@ export default function ForgotPasswordPage() {
             {step === "reset" && "Create New Password"}
             {step === "success" && "Password Reset!"}
           </CardTitle>
-          <CardDescription className="text-gray-500">
+          <CardDescription className="text-muted-foreground">
             {step === "request" && "Choose how you want to receive your reset code"}
             {step === "verify" && `Enter the 6-digit code sent to your ${method}`}
             {step === "reset" && "Choose a strong password for your account"}
@@ -145,7 +145,7 @@ export default function ForgotPasswordPage() {
                   <div className="space-y-2">
                     <Label htmlFor="email" className="text-sm font-semibold">Email Address</Label>
                     <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                       <Input
                         id="email"
                         type="email"
@@ -163,7 +163,7 @@ export default function ForgotPasswordPage() {
                   <div className="space-y-2">
                     <Label htmlFor="phone" className="text-sm font-semibold">Phone Number</Label>
                     <div className="relative">
-                      <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                      <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                       <Input
                         id="phone"
                         type="tel"
@@ -214,7 +214,7 @@ export default function ForgotPasswordPage() {
                 />
               </div>
               <div className="flex flex-col items-center gap-2">
-                <p className="text-center text-xs text-gray-500">
+                <p className="text-center text-xs text-muted-foreground">
                   Didn&apos;t get the code?{" "}
                   <button
                     type="button"
@@ -246,7 +246,7 @@ export default function ForgotPasswordPage() {
               <div className="space-y-2">
                 <Label htmlFor="newPassword">New Password</Label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <Input
                     id="newPassword"
                     type={showPassword ? "text" : "password"}
@@ -258,7 +258,7 @@ export default function ForgotPasswordPage() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-muted-foreground"
                   >
                     {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
@@ -267,7 +267,7 @@ export default function ForgotPasswordPage() {
               <div className="space-y-2">
                 <Label htmlFor="confirmPassword">Confirm Password</Label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <Input
                     id="confirmPassword"
                     type={showPassword ? "text" : "password"}
@@ -294,7 +294,7 @@ export default function ForgotPasswordPage() {
                 <ShieldCheck className="w-10 h-10 text-green-600 animate-in zoom-in duration-300" />
               </div>
               <div className="space-y-2">
-                <p className="text-gray-600">
+                <p className="text-muted-foreground">
                   Secure access restored! Your password has been successfully updated.
                 </p>
               </div>
@@ -307,10 +307,10 @@ export default function ForgotPasswordPage() {
           )}
 
           {step !== "success" && (
-            <div className="mt-8 pt-6 border-t border-gray-100 text-center">
+            <div className="mt-8 pt-6 border-t border-border/40 text-center">
               <Link
                 href="/login"
-                className="text-sm text-gray-500 hover:text-blue-600 inline-flex items-center font-medium transition-colors"
+                className="text-sm text-muted-foreground hover:text-blue-600 inline-flex items-center font-medium transition-colors"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" /> Back to Sign In
               </Link>

@@ -21,7 +21,7 @@ const colorMap = {
   violet: { bg: "bg-violet-50", icon: "text-violet-600", ring: "ring-violet-200" },
   amber: { bg: "bg-amber-50", icon: "text-amber-600", ring: "ring-amber-200" },
   red: { bg: "bg-red-50", icon: "text-red-600", ring: "ring-red-200" },
-  gray: { bg: "bg-gray-50", icon: "text-gray-600", ring: "ring-gray-200" },
+  gray: { bg: "bg-muted/30", icon: "text-muted-foreground", ring: "ring-gray-200" },
 };
 
 /**
@@ -52,7 +52,7 @@ export function MetricCard({
   const content = (
     <div
       className={cn(
-        "relative overflow-hidden rounded-xl bg-white p-4 shadow-sm border transition-all",
+        "relative overflow-hidden rounded-xl bg-background p-4 shadow-sm border transition-all",
         href && "cursor-pointer hover:shadow-md",
         alert && "border-red-200 ring-1 ring-red-100"
       )}
@@ -62,9 +62,9 @@ export function MetricCard({
     >
       <div className="flex items-center justify-between gap-4">
         <div className="space-y-1 min-w-0">
-          <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider truncate">{title}</p>
+          <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider truncate">{title}</p>
           <div className="flex items-baseline gap-2">
-            <p className={cn("text-2xl font-bold tracking-tight", alert ? "text-red-700" : "text-gray-900")}>
+            <p className={cn("text-2xl font-bold tracking-tight", alert ? "text-red-700" : "text-foreground")}>
               {value}
             </p>
             {trend && (
@@ -78,12 +78,12 @@ export function MetricCard({
                   {trend.value >= 0 ? "+" : ""}
                   {trend.value}
                 </span>
-                <span className="text-[10px] text-gray-400 hidden xl:inline">{trend.label}</span>
+                <span className="text-[10px] text-muted-foreground hidden xl:inline">{trend.label}</span>
               </div>
             )}
           </div>
           {description && (
-            <p className="text-[11px] text-gray-500 truncate">{description}</p>
+            <p className="text-[11px] text-muted-foreground truncate">{description}</p>
           )}
         </div>
         <div className={cn("p-2 rounded-lg shrink-0", colors.bg)}>

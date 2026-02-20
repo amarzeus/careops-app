@@ -914,16 +914,16 @@ export default function OnboardingPage() {
         return (
           <div className="space-y-2">
             <div className="space-y-1">
-              <Label className="text-[10px] font-bold uppercase text-gray-500">Business Name *</Label>
+              <Label className="text-[10px] font-bold uppercase text-muted-foreground">Business Name *</Label>
               <Input placeholder="Acme Health Clinic" value={workspace.name} onChange={e => setWorkspace(prev => ({ ...prev, name: e.target.value }))} className="h-8 text-sm" />
             </div>
             <div className="grid sm:grid-cols-2 gap-2">
               <div className="space-y-1">
-                <Label className="text-[10px] font-bold uppercase text-gray-500">Address</Label>
+                <Label className="text-[10px] font-bold uppercase text-muted-foreground">Address</Label>
                 <Input placeholder="123 Main St" value={workspace.address} onChange={e => setWorkspace(prev => ({ ...prev, address: e.target.value }))} className="h-8 text-sm" />
               </div>
               <div className="space-y-1">
-                <Label className="text-[10px] font-bold uppercase text-gray-500">Timezone</Label>
+                <Label className="text-[10px] font-bold uppercase text-muted-foreground">Timezone</Label>
                 <Select value={workspace.timezone} onValueChange={v => setWorkspace(prev => ({ ...prev, timezone: v }))}>
                   <SelectTrigger className="h-8 text-sm"><SelectValue /></SelectTrigger>
                   <SelectContent>
@@ -940,11 +940,11 @@ export default function OnboardingPage() {
             </div>
             <div className="grid sm:grid-cols-2 gap-2">
               <div className="space-y-1">
-                <Label className="text-[10px] font-bold uppercase text-gray-500">Contact Email *</Label>
+                <Label className="text-[10px] font-bold uppercase text-muted-foreground">Contact Email *</Label>
                 <Input type="email" placeholder="contact@business.com" value={workspace.contactEmail} onChange={e => setWorkspace(prev => ({ ...prev, contactEmail: e.target.value }))} className="h-8 text-sm" />
               </div>
               <div className="space-y-1">
-                <Label className="text-[10px] font-bold uppercase text-gray-500">Phone</Label>
+                <Label className="text-[10px] font-bold uppercase text-muted-foreground">Phone</Label>
                 <Input placeholder="+1 (555) 123-4567" value={workspace.contactPhone} onChange={e => setWorkspace(prev => ({ ...prev, contactPhone: e.target.value }))} className="h-8 text-sm" />
               </div>
             </div>
@@ -958,19 +958,19 @@ export default function OnboardingPage() {
             </div>
             <div className="grid sm:grid-cols-2 gap-2">
               <div className="space-y-1">
-                <Label className="text-[10px] font-bold uppercase text-gray-500">Sender Name</Label>
+                <Label className="text-[10px] font-bold uppercase text-muted-foreground">Sender Name</Label>
                 <Input placeholder="Acme Clinic" value={emailConfig.emailFromName} onChange={e => setEmailConfig(prev => ({ ...prev, emailFromName: e.target.value }))} className="h-8 text-sm" />
               </div>
               <div className="space-y-1">
-                <Label className="text-[10px] font-bold uppercase text-gray-500">Sender Email</Label>
+                <Label className="text-[10px] font-bold uppercase text-muted-foreground">Sender Email</Label>
                 <Input type="email" placeholder="hello@acmeclinic.com" value={emailConfig.emailFromAddress} onChange={e => setEmailConfig(prev => ({ ...prev, emailFromAddress: e.target.value }))} className="h-8 text-sm" />
               </div>
             </div>
-            <div className="flex items-center gap-3 p-2 border rounded-lg bg-gray-50/50">
+            <div className="flex items-center gap-3 p-2 border rounded-lg bg-muted/30/50">
               <Switch checked={emailConfig.emailConfigured} onCheckedChange={v => setEmailConfig(prev => ({ ...prev, emailConfigured: v }))} id="email-switch" />
               <Label htmlFor="email-switch" className="cursor-pointer">
-                <p className="text-xs font-bold uppercase text-gray-500">Enable Email</p>
-                <p className="text-[10px] text-gray-500">Auto-send confirmations</p>
+                <p className="text-xs font-bold uppercase text-muted-foreground">Enable Email</p>
+                <p className="text-[10px] text-muted-foreground">Auto-send confirmations</p>
               </Label>
             </div>
           </div>
@@ -982,17 +982,17 @@ export default function OnboardingPage() {
               This form will be public.
             </div>
             <div className="space-y-1">
-              <Label className="text-[10px] font-bold uppercase text-gray-500">Form Name</Label>
+              <Label className="text-[10px] font-bold uppercase text-muted-foreground">Form Name</Label>
               <Input placeholder="Contact Us" value={contactForm.name} onChange={e => setContactForm(prev => ({ ...prev, name: e.target.value }))} className="h-8 text-sm" />
             </div>
             <div className="space-y-1">
-              <Label className="text-[10px] font-bold uppercase text-gray-500">Welcome Message</Label>
+              <Label className="text-[10px] font-bold uppercase text-muted-foreground">Welcome Message</Label>
               <Textarea placeholder="Thank you for reaching out..." value={contactForm.welcomeMessage} onChange={e => setContactForm(prev => ({ ...prev, welcomeMessage: e.target.value }))} className="h-16 text-sm" />
-              <p className="text-[10px] text-gray-500">Sent automatically to new contacts</p>
+              <p className="text-[10px] text-muted-foreground">Sent automatically to new contacts</p>
             </div>
-            <div className="p-2 border rounded-lg bg-gray-50">
-              <p className="text-[10px] font-bold uppercase text-gray-500 mb-1">Default Fields</p>
-              <div className="space-y-0.5 text-[10px] text-gray-600 grid grid-cols-2">
+            <div className="p-2 border rounded-lg bg-muted/30">
+              <p className="text-[10px] font-bold uppercase text-muted-foreground mb-1">Default Fields</p>
+              <div className="space-y-0.5 text-[10px] text-muted-foreground grid grid-cols-2">
                 <p>Full Name (required)</p>
                 <p>Email (required)</p>
                 <p>Phone (optional)</p>
@@ -1007,26 +1007,26 @@ export default function OnboardingPage() {
             <div className="p-2 bg-blue-50 rounded-lg text-xs text-blue-800">
               Create services customers can book. Tell the AI your business type and it will suggest services automatically.
             </div>
-            <div className="space-y-2 p-2 border rounded-lg bg-gray-50/50">
+            <div className="space-y-2 p-2 border rounded-lg bg-muted/30/50">
               <div className="space-y-1">
-                <Label className="text-[10px] font-bold uppercase text-gray-500">Service Name *</Label>
+                <Label className="text-[10px] font-bold uppercase text-muted-foreground">Service Name *</Label>
                 <Input placeholder="Initial Consultation" value={newService.name} onChange={e => setNewService(prev => ({ ...prev, name: e.target.value }))} className="h-8 text-sm" />
               </div>
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
                 <div className="space-y-1">
-                  <Label className="text-[10px] font-bold uppercase text-gray-500">Duration (min)</Label>
+                  <Label className="text-[10px] font-bold uppercase text-muted-foreground">Duration (min)</Label>
                   <Input type="number" value={newService.duration} onChange={e => setNewService(prev => ({ ...prev, duration: e.target.value }))} className="h-8 text-sm" />
                 </div>
                 <div className="space-y-1">
-                  <Label className="text-[10px] font-bold uppercase text-gray-500">Location</Label>
+                  <Label className="text-[10px] font-bold uppercase text-muted-foreground">Location</Label>
                   <Input placeholder="Office" value={newService.location} onChange={e => setNewService(prev => ({ ...prev, location: e.target.value }))} className="h-8 text-sm" />
                 </div>
                 <div className="space-y-1">
-                  <Label className="text-[10px] font-bold uppercase text-gray-500">Start Time</Label>
+                  <Label className="text-[10px] font-bold uppercase text-muted-foreground">Start Time</Label>
                   <Input type="time" value={newService.startTime} onChange={e => setNewService(prev => ({ ...prev, startTime: e.target.value }))} className="h-8 text-sm" />
                 </div>
                 <div className="space-y-1">
-                  <Label className="text-[10px] font-bold uppercase text-gray-500">End Time</Label>
+                  <Label className="text-[10px] font-bold uppercase text-muted-foreground">End Time</Label>
                   <Input type="time" value={newService.endTime} onChange={e => setNewService(prev => ({ ...prev, endTime: e.target.value }))} className="h-8 text-sm" />
                 </div>
               </div>
@@ -1036,19 +1036,19 @@ export default function OnboardingPage() {
             </div>
             {services.length > 0 && (
               <div className="space-y-1">
-                <Label className="text-[10px] font-bold uppercase text-gray-500">Added Services ({services.length})</Label>
+                <Label className="text-[10px] font-bold uppercase text-muted-foreground">Added Services ({services.length})</Label>
                 <div className="max-h-[120px] overflow-y-auto space-y-1 pr-1">
                   {services.map((s, i) => (
-                    <div key={i} className="flex items-center justify-between p-2 border rounded bg-white text-xs animate-fade-in group hover:border-blue-200 transition-colors">
+                    <div key={i} className="flex items-center justify-between p-2 border rounded bg-background text-xs animate-fade-in group hover:border-blue-200 transition-colors">
                       <div>
                         <p className="font-medium">{s.name}</p>
-                        <p className="text-[10px] text-gray-500">{s.duration}m | {s.startTime}-{s.endTime} {s.location ? `| ${s.location}` : ""}</p>
+                        <p className="text-[10px] text-muted-foreground">{s.duration}m | {s.startTime}-{s.endTime} {s.location ? `| ${s.location}` : ""}</p>
                       </div>
                       <div className="flex items-center gap-1">
-                        <Button variant="ghost" size="icon" className="h-6 w-6 text-gray-400 hover:text-blue-600" onClick={() => editService(i)}>
+                        <Button variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground hover:text-blue-600" onClick={() => editService(i)}>
                           <Edit2 className="h-3 w-3" />
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-6 w-6 text-gray-400 hover:text-red-600" onClick={() => removeService(i)}>
+                        <Button variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground hover:text-red-600" onClick={() => removeService(i)}>
                           <Trash2 className="h-3 w-3" />
                         </Button>
                         <Badge variant="outline" className="text-green-600 border-green-200 bg-green-50 text-[10px] h-5 px-1 ml-1">Added</Badge>
@@ -1066,17 +1066,17 @@ export default function OnboardingPage() {
             <div className="p-2 bg-blue-50 rounded-lg text-xs text-blue-800">
               Auto-send forms after booking. AI can generate forms with relevant questions for your business.
             </div>
-            <div className="space-y-2 p-2 border rounded-lg bg-gray-50/50">
+            <div className="space-y-2 p-2 border rounded-lg bg-muted/30/50">
               <div className="space-y-1">
-                <Label className="text-[10px] font-bold uppercase text-gray-500">Form Name *</Label>
+                <Label className="text-[10px] font-bold uppercase text-muted-foreground">Form Name *</Label>
                 <Input placeholder="Patient Intake Form" value={newIntakeForm.name} onChange={e => setNewIntakeForm(prev => ({ ...prev, name: e.target.value }))} className="h-8 text-sm" />
               </div>
               <div className="space-y-1">
-                <Label className="text-[10px] font-bold uppercase text-gray-500">Description</Label>
+                <Label className="text-[10px] font-bold uppercase text-muted-foreground">Description</Label>
                 <Textarea placeholder="Please fill out this form..." value={newIntakeForm.description} onChange={e => setNewIntakeForm(prev => ({ ...prev, description: e.target.value }))} className="h-16 text-sm" />
               </div>
               <div className="space-y-1">
-                <Label className="text-[10px] font-bold uppercase text-gray-500">Link to Service (Optional)</Label>
+                <Label className="text-[10px] font-bold uppercase text-muted-foreground">Link to Service (Optional)</Label>
                 <Select value={newIntakeForm.serviceId || "none"} onValueChange={v => setNewIntakeForm(prev => ({ ...prev, serviceId: v === "none" ? "" : v }))}>
                   <SelectTrigger className="h-8 text-sm"><SelectValue placeholder="Select a service..." /></SelectTrigger>
                   <SelectContent>
@@ -1086,10 +1086,10 @@ export default function OnboardingPage() {
                     ))}
                   </SelectContent>
                 </Select>
-                <p className="text-[10px] text-gray-500">Form will be sent automatically when this service is booked.</p>
+                <p className="text-[10px] text-muted-foreground">Form will be sent automatically when this service is booked.</p>
               </div>
               <div className="space-y-1">
-                <Label className="text-[10px] font-bold uppercase text-gray-500">Documents (Agreement, etc.)</Label>
+                <Label className="text-[10px] font-bold uppercase text-muted-foreground">Documents (Agreement, etc.)</Label>
                 <Input type="file" onChange={handleFileUpload} className="h-8 text-sm" />
                 {newIntakeForm.documents.map((doc, i) => (
                   <div key={i} className="flex items-center gap-1 text-[10px] text-blue-600">
@@ -1103,21 +1103,21 @@ export default function OnboardingPage() {
             </div>
             {intakeForms.length > 0 && (
               <div className="space-y-1">
-                <Label className="text-[10px] font-bold uppercase text-gray-500">Added Forms ({intakeForms.length})</Label>
+                <Label className="text-[10px] font-bold uppercase text-muted-foreground">Added Forms ({intakeForms.length})</Label>
                 <div className="max-h-[120px] overflow-y-auto space-y-1 pr-1">
                   {intakeForms.map((f, i) => (
-                    <div key={i} className="flex items-center justify-between p-2 border rounded bg-white text-xs animate-fade-in group hover:border-blue-200 transition-colors">
+                    <div key={i} className="flex items-center justify-between p-2 border rounded bg-background text-xs animate-fade-in group hover:border-blue-200 transition-colors">
                       <div>
                         <p className="font-medium">{f.name}</p>
                         {f.fields && JSON.parse(f.fields).length > 0 && (
-                          <p className="text-[10px] text-gray-500">{JSON.parse(f.fields).length} Questions</p>
+                          <p className="text-[10px] text-muted-foreground">{JSON.parse(f.fields).length} Questions</p>
                         )}
                       </div>
                       <div className="flex items-center gap-1">
-                        <Button variant="ghost" size="icon" className="h-6 w-6 text-gray-400 hover:text-blue-600" onClick={() => editIntakeForm(i)}>
+                        <Button variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground hover:text-blue-600" onClick={() => editIntakeForm(i)}>
                           <Edit2 className="h-3 w-3" />
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-6 w-6 text-gray-400 hover:text-red-600" onClick={() => removeIntakeForm(i)}>
+                        <Button variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground hover:text-red-600" onClick={() => removeIntakeForm(i)}>
                           <Trash2 className="h-3 w-3" />
                         </Button>
                         <Badge variant="outline" className="text-green-600 border-green-200 bg-green-50 text-[10px] h-5 px-1 ml-1">Added</Badge>
@@ -1135,22 +1135,22 @@ export default function OnboardingPage() {
             <div className="p-2 bg-blue-50 rounded-lg text-xs text-blue-800">
               Track stock levels. Get alerts when low. AI can suggest items for your business type.
             </div>
-            <div className="space-y-2 p-2 border rounded-lg bg-gray-50/50">
+            <div className="space-y-2 p-2 border rounded-lg bg-muted/30/50">
               <div className="space-y-1">
-                <Label className="text-[10px] font-bold uppercase text-gray-500">Item Name *</Label>
+                <Label className="text-[10px] font-bold uppercase text-muted-foreground">Item Name *</Label>
                 <Input placeholder="Surgical Gloves" value={newItem.name} onChange={e => setNewItem(prev => ({ ...prev, name: e.target.value }))} className="h-8 text-sm" />
               </div>
               <div className="grid grid-cols-3 gap-2">
                 <div className="space-y-1">
-                  <Label className="text-[10px] font-bold uppercase text-gray-500">Quantity</Label>
+                  <Label className="text-[10px] font-bold uppercase text-muted-foreground">Quantity</Label>
                   <Input type="number" value={newItem.quantity} onChange={e => setNewItem(prev => ({ ...prev, quantity: e.target.value }))} className="h-8 text-sm" />
                 </div>
                 <div className="space-y-1">
-                  <Label className="text-[10px] font-bold uppercase text-gray-500">Threshold</Label>
+                  <Label className="text-[10px] font-bold uppercase text-muted-foreground">Threshold</Label>
                   <Input type="number" value={newItem.threshold} onChange={e => setNewItem(prev => ({ ...prev, threshold: e.target.value }))} className="h-8 text-sm" />
                 </div>
                 <div className="space-y-1">
-                  <Label className="text-[10px] font-bold uppercase text-gray-500">Unit</Label>
+                  <Label className="text-[10px] font-bold uppercase text-muted-foreground">Unit</Label>
                   <Input placeholder="boxes" value={newItem.unit} onChange={e => setNewItem(prev => ({ ...prev, unit: e.target.value }))} className="h-8 text-sm" />
                 </div>
               </div>
@@ -1160,19 +1160,19 @@ export default function OnboardingPage() {
             </div>
             {inventoryItems.length > 0 && (
               <div className="space-y-1">
-                <Label className="text-[10px] font-bold uppercase text-gray-500">Added Items ({inventoryItems.length})</Label>
+                <Label className="text-[10px] font-bold uppercase text-muted-foreground">Added Items ({inventoryItems.length})</Label>
                 <div className="max-h-[120px] overflow-y-auto space-y-1 pr-1">
                   {inventoryItems.map((item, i) => (
-                    <div key={i} className="flex items-center justify-between p-2 border rounded bg-white text-xs animate-fade-in group hover:border-blue-200 transition-colors">
+                    <div key={i} className="flex items-center justify-between p-2 border rounded bg-background text-xs animate-fade-in group hover:border-blue-200 transition-colors">
                       <div>
                         <p className="font-medium">{item.name}</p>
-                        <p className="text-[10px] text-gray-500">{item.quantity} {item.unit} (alert: {item.threshold})</p>
+                        <p className="text-[10px] text-muted-foreground">{item.quantity} {item.unit} (alert: {item.threshold})</p>
                       </div>
                       <div className="flex items-center gap-1">
-                        <Button variant="ghost" size="icon" className="h-6 w-6 text-gray-400 hover:text-blue-600" onClick={() => editInventoryItem(i)}>
+                        <Button variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground hover:text-blue-600" onClick={() => editInventoryItem(i)}>
                           <Edit2 className="h-3 w-3" />
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-6 w-6 text-gray-400 hover:text-red-600" onClick={() => removeInventoryItem(i)}>
+                        <Button variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground hover:text-red-600" onClick={() => removeInventoryItem(i)}>
                           <Trash2 className="h-3 w-3" />
                         </Button>
                         <Badge variant="outline" className="text-green-600 border-green-200 bg-green-50 text-[10px] h-5 px-1 ml-1">Added</Badge>
@@ -1190,17 +1190,17 @@ export default function OnboardingPage() {
             <div className="p-2 bg-blue-50 rounded-lg text-xs text-blue-800">
               Invite staff members. This step is optional — you can add team members later.
             </div>
-            <div className="space-y-2 p-2 border rounded-lg bg-gray-50/50">
+            <div className="space-y-2 p-2 border rounded-lg bg-muted/30/50">
               <div className="space-y-1">
-                <Label className="text-[10px] font-bold uppercase text-gray-500">Name *</Label>
+                <Label className="text-[10px] font-bold uppercase text-muted-foreground">Name *</Label>
                 <Input placeholder="Jane Smith" value={newStaff.name} onChange={e => setNewStaff(prev => ({ ...prev, name: e.target.value }))} className="h-8 text-sm" />
               </div>
               <div className="space-y-1">
-                <Label className="text-[10px] font-bold uppercase text-gray-500">Email *</Label>
+                <Label className="text-[10px] font-bold uppercase text-muted-foreground">Email *</Label>
                 <Input type="email" placeholder="jane@clinic.com" value={newStaff.email} onChange={e => setNewStaff(prev => ({ ...prev, email: e.target.value }))} className="h-8 text-sm" />
               </div>
               <div className="space-y-1">
-                <Label className="text-[10px] font-bold uppercase text-gray-500">Password *</Label>
+                <Label className="text-[10px] font-bold uppercase text-muted-foreground">Password *</Label>
                 <Input type="password" placeholder="Temporary password" value={newStaff.password} onChange={e => setNewStaff(prev => ({ ...prev, password: e.target.value }))} className="h-8 text-sm" />
               </div>
               <Button onClick={addStaffMember} size="sm" className="w-full bg-blue-600 hover:bg-blue-700 h-8 text-xs" disabled={!newStaff.name || !newStaff.email || !newStaff.password}>
@@ -1209,19 +1209,19 @@ export default function OnboardingPage() {
             </div>
             {staffMembers.length > 0 && (
               <div className="space-y-1">
-                <Label className="text-[10px] font-bold uppercase text-gray-500">Staff Members</Label>
+                <Label className="text-[10px] font-bold uppercase text-muted-foreground">Staff Members</Label>
                 <div className="max-h-[100px] overflow-y-auto space-y-1 pr-1">
                   {staffMembers.map((s, i) => (
-                    <div key={i} className="flex items-center justify-between p-2 border rounded bg-white text-xs animate-fade-in group hover:border-blue-200 transition-colors">
+                    <div key={i} className="flex items-center justify-between p-2 border rounded bg-background text-xs animate-fade-in group hover:border-blue-200 transition-colors">
                       <div>
                         <p className="font-medium">{s.name}</p>
-                        <p className="text-[10px] text-gray-500">{s.email}</p>
+                        <p className="text-[10px] text-muted-foreground">{s.email}</p>
                       </div>
                       <div className="flex items-center gap-1">
-                        <Button variant="ghost" size="icon" className="h-6 w-6 text-gray-400 hover:text-blue-600" onClick={() => editStaffMember(i)}>
+                        <Button variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground hover:text-blue-600" onClick={() => editStaffMember(i)}>
                           <Edit2 className="h-3 w-3" />
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-6 w-6 text-gray-400 hover:text-red-600" onClick={() => removeStaffMember(i)}>
+                        <Button variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground hover:text-red-600" onClick={() => removeStaffMember(i)}>
                           <Trash2 className="h-3 w-3" />
                         </Button>
                         <Badge variant="outline" className="text-green-600 border-green-200 bg-green-50 text-[10px] h-5 px-1 ml-1">Added</Badge>
@@ -1231,7 +1231,7 @@ export default function OnboardingPage() {
                 </div>
               </div>
             )}
-            <p className="text-[10px] text-gray-500 text-center">You can skip/add later.</p>
+            <p className="text-[10px] text-muted-foreground text-center">You can skip/add later.</p>
           </div>
         );
       case 8:
@@ -1241,32 +1241,32 @@ export default function OnboardingPage() {
               Your workspace is ready to go live! Review the checklist below.
             </div>
             <div className="space-y-2">
-              <div className="flex items-center gap-3 p-2.5 border rounded-md bg-white">
-                <Check className={cn("w-4 h-4", workspace.name ? "text-green-600" : "text-gray-300")} />
+              <div className="flex items-center gap-3 p-2.5 border rounded-md bg-background">
+                <Check className={cn("w-4 h-4", workspace.name ? "text-green-600" : "text-muted-foreground")} />
                 <span className="text-sm">Workspace configured: <strong>{workspace.name || "Not set"}</strong></span>
               </div>
-              <div className="flex items-center gap-3 p-2.5 border rounded-md bg-white">
-                <Check className={cn("w-4 h-4", emailConfig.emailConfigured ? "text-green-600" : "text-gray-300")} />
+              <div className="flex items-center gap-3 p-2.5 border rounded-md bg-background">
+                <Check className={cn("w-4 h-4", emailConfig.emailConfigured ? "text-green-600" : "text-muted-foreground")} />
                 <span className="text-sm">Communication: <strong>{emailConfig.emailConfigured ? "Enabled" : "Not configured"}</strong></span>
               </div>
-              <div className="flex items-center gap-3 p-2.5 border rounded-md bg-white">
+              <div className="flex items-center gap-3 p-2.5 border rounded-md bg-background">
                 <Check className="w-4 h-4 text-green-600" />
                 <span className="text-sm">Contact form created</span>
               </div>
-              <div className="flex items-center gap-3 p-2.5 border rounded-md bg-white">
-                <Check className={cn("w-4 h-4", services.length > 0 ? "text-green-600" : "text-gray-300")} />
+              <div className="flex items-center gap-3 p-2.5 border rounded-md bg-background">
+                <Check className={cn("w-4 h-4", services.length > 0 ? "text-green-600" : "text-muted-foreground")} />
                 <span className="text-sm">Services: <strong>{services.length}</strong></span>
               </div>
-              <div className="flex items-center gap-3 p-2.5 border rounded-md bg-white">
-                <Check className={cn("w-4 h-4", intakeForms.length > 0 ? "text-green-600" : "text-gray-300")} />
+              <div className="flex items-center gap-3 p-2.5 border rounded-md bg-background">
+                <Check className={cn("w-4 h-4", intakeForms.length > 0 ? "text-green-600" : "text-muted-foreground")} />
                 <span className="text-sm">Intake forms: <strong>{intakeForms.length}</strong></span>
               </div>
-              <div className="flex items-center gap-3 p-2.5 border rounded-md bg-white">
-                <Check className={cn("w-4 h-4", inventoryItems.length > 0 ? "text-green-600" : "text-gray-300")} />
+              <div className="flex items-center gap-3 p-2.5 border rounded-md bg-background">
+                <Check className={cn("w-4 h-4", inventoryItems.length > 0 ? "text-green-600" : "text-muted-foreground")} />
                 <span className="text-sm">Inventory items: <strong>{inventoryItems.length}</strong></span>
               </div>
-              <div className="flex items-center gap-3 p-2.5 border rounded-md bg-white">
-                <Check className={cn("w-4 h-4", staffMembers.length > 0 ? "text-green-600" : "text-gray-300")} />
+              <div className="flex items-center gap-3 p-2.5 border rounded-md bg-background">
+                <Check className={cn("w-4 h-4", staffMembers.length > 0 ? "text-green-600" : "text-muted-foreground")} />
                 <span className="text-sm">Staff members: <strong>{staffMembers.length}</strong></span>
               </div>
             </div>
@@ -1279,14 +1279,14 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-muted/30">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-4 sm:px-6 py-2">
-        <div className="max-w-6xl mx-auto flex items-center gap-3">
+      <div className="bg-background border-b border-border/40 px-4 sm:px-6 py-2">
+        <div className="max-w-7xl mx-auto flex items-center gap-3">
           <div className="flex items-center justify-center">
             <Logo variant="icon" size={28} />
           </div>
-          <h1 className="text-base font-bold text-gray-900">CareOps Setup</h1>
+          <h1 className="text-base font-bold text-foreground">CareOps Setup</h1>
           <div className="ml-auto flex items-center gap-2">
             <Badge variant="secondary" className="text-xs">Step {currentStep}/8</Badge>
           </div>
@@ -1294,15 +1294,15 @@ export default function OnboardingPage() {
       </div>
 
       {/* Progress */}
-      <div className="bg-white border-b border-gray-200 px-4 sm:px-6 py-1.5">
-        <div className="max-w-6xl mx-auto">
+      <div className="bg-background border-b border-border/40 px-4 sm:px-6 py-1.5">
+        <div className="max-w-7xl mx-auto">
           <Progress value={(currentStep / 8) * 100} className="h-1.5" />
           <div className="flex justify-between mt-2 overflow-x-auto pb-1">
             {steps.map((step) => (
-              <div key={step.id} className={cn("flex flex-col items-center min-w-[60px]", step.id === currentStep ? "text-blue-600" : step.id < currentStep ? "text-green-600" : "text-gray-400")}>
+              <div key={step.id} className={cn("flex flex-col items-center min-w-[60px]", step.id === currentStep ? "text-blue-600" : step.id < currentStep ? "text-green-600" : "text-muted-foreground")}>
                 <div className={cn(
                   "w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-medium mb-0.5",
-                  step.id === currentStep ? "bg-blue-100 text-blue-700" : step.id < currentStep ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-400"
+                  step.id === currentStep ? "bg-blue-100 text-blue-700" : step.id < currentStep ? "bg-green-100 text-green-700" : "bg-muted/30 text-muted-foreground"
                 )}>
                   {step.id < currentStep ? <Check className="w-3 h-3" /> : step.id}
                 </div>
@@ -1314,7 +1314,7 @@ export default function OnboardingPage() {
       </div>
 
       {/* Content */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
         <div className="grid lg:grid-cols-5 gap-4 lg:gap-6">
           {/* Form Section */}
           <div className="lg:col-span-3">

@@ -53,13 +53,13 @@ export function AISidebar({
   }, [chatMessages]);
 
   return (
-    <div className="w-80 border-l bg-white flex flex-col h-[calc(100vh-64px)] sticky top-16 hidden lg:flex shadow-sm">
+    <div className="w-80 border-l bg-background flex flex-col h-[calc(100vh-64px)] sticky top-16 hidden lg:flex shadow-sm">
       <div className="p-4 border-b bg-gradient-to-r from-blue-50 to-white">
         <h3 className="font-semibold text-sm flex items-center gap-2 text-blue-900">
           <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
           CareOps Assistant
         </h3>
-        <p className="text-xs text-gray-500 mt-1">
+        <p className="text-xs text-muted-foreground mt-1">
           I can help you fill forms and set up your workspace.
         </p>
       </div>
@@ -72,7 +72,7 @@ export function AISidebar({
               className={cn(
                 "p-3 rounded-lg text-sm max-w-[90%]",
                 msg.role === "assistant"
-                  ? "bg-gray-100 text-gray-800 rounded-tl-none"
+                  ? "bg-muted/30 text-muted-foreground rounded-tl-none"
                   : "bg-blue-600 text-white ml-auto rounded-tr-none"
               )}
             >
@@ -81,13 +81,13 @@ export function AISidebar({
           ))}
           {chatLoading && (
             <div className="flex gap-1 p-2">
-              <div className="w-2 h-2 bg-gray-300 rounded-full animate-bounce" />
+              <div className="w-2 h-2 bg-muted/50 rounded-full animate-bounce" />
               <div
-                className="w-2 h-2 bg-gray-300 rounded-full animate-bounce"
+                className="w-2 h-2 bg-muted/50 rounded-full animate-bounce"
                 style={{ animationDelay: "0.2s" }}
               />
               <div
-                className="w-2 h-2 bg-gray-300 rounded-full animate-bounce"
+                className="w-2 h-2 bg-muted/50 rounded-full animate-bounce"
                 style={{ animationDelay: "0.4s" }}
               />
             </div>
@@ -96,7 +96,7 @@ export function AISidebar({
         </div>
       </ScrollArea>
 
-      <div className="p-4 border-t bg-gray-50">
+      <div className="p-4 border-t bg-muted/30">
         {voiceMode ? (
           <InlineVoiceMode
             onTranscript={onVoiceTranscript}
@@ -118,7 +118,7 @@ export function AISidebar({
                 onChange={(e) => setChatInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && onSendMessage()}
                 placeholder="Type or speak..."
-                className="pr-8 rounded-full border-gray-300 focus-visible:ring-blue-500"
+                className="pr-8 rounded-full border-border/40 focus-visible:ring-blue-500"
               />
               <button
                 onClick={onSendMessage}

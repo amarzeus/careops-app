@@ -76,24 +76,24 @@ function FormContent({ slug }: { slug: string }) {
     } catch { setError("Something went wrong"); } finally { setSubmitting(false); }
   };
 
-  if (loading) return <div className="min-h-screen bg-gray-50 flex items-center justify-center"><div className="animate-pulse text-gray-400">Loading...</div></div>;
-  if (!form) return <div className="min-h-screen bg-gray-50 flex items-center justify-center"><p className="text-gray-500">Form not found</p></div>;
+  if (loading) return <div className="min-h-screen bg-muted/30 flex items-center justify-center"><div className="animate-pulse text-muted-foreground">Loading...</div></div>;
+  if (!form) return <div className="min-h-screen bg-muted/30 flex items-center justify-center"><p className="text-muted-foreground">Form not found</p></div>;
 
   if (success) return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-muted/30 flex items-center justify-center px-4">
       <Card className="w-full max-w-md text-center">
         <CardContent className="pt-8 pb-8">
           <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
           <h2 className="text-2xl font-bold mb-2">Form Submitted!</h2>
-          <p className="text-gray-600">Thank you for completing the form. Your information has been received.</p>
+          <p className="text-muted-foreground">Thank you for completing the form. Your information has been received.</p>
         </CardContent>
       </Card>
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4">
-      <Card className="w-full max-w-2xl mx-auto">
+    <div className="min-h-screen bg-muted/30 py-12 px-4">
+      <Card className="w-full max-w-7xl mx-auto">
         <CardHeader>
           <div className="flex items-center gap-3 mb-2">
             <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
@@ -137,7 +137,7 @@ export default function PublicIntakeFormPage({ params }: { params: Promise<{ slu
   const { slug } = use(params);
 
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">Loading form...</div>}>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-muted/30 px-4">Loading form...</div>}>
       <FormContent slug={slug} />
     </Suspense>
   );

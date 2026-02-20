@@ -127,7 +127,7 @@ export function RuleDialog({
           <div className="space-y-2">
             <Label>Trigger Event *</Label>
             {rule ? (
-              <div className="flex items-center gap-2 text-sm font-medium text-gray-700 bg-gray-50 p-2 rounded border">
+              <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground bg-muted/30 p-2 rounded border">
                 {triggerConfig[rule.trigger]?.label || rule.trigger}
               </div>
             ) : (
@@ -150,7 +150,7 @@ export function RuleDialog({
               </Select>
             )}
             {form.trigger && (
-              <p className="text-xs text-gray-500 bg-gray-50 p-2 rounded">
+              <p className="text-xs text-muted-foreground bg-muted/30 p-2 rounded">
                 {triggerDescriptions[form.trigger]}
               </p>
             )}

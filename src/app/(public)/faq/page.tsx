@@ -135,7 +135,7 @@ const faqs = [
  */
 export default function FAQPage() {
     return (
-        <div className="min-h-screen bg-white">
+        <div className="min-h-screen bg-background">
             {/* Schema.org FAQ structured data */}
             <script
                 type="application/ld+json"
@@ -158,8 +158,8 @@ export default function FAQPage() {
             />
 
             {/* Nav */}
-            <nav className="border-b border-gray-100 sticky top-0 z-10 bg-white/90 backdrop-blur-sm">
-                <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
+            <nav className="border-b border-border/40 sticky top-0 z-10 bg-background/90 backdrop-blur-sm">
+                <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
                     <Link href="/" className="flex items-center gap-2">
                         <Logo variant="full" size={32} />
                     </Link>
@@ -178,10 +178,10 @@ export default function FAQPage() {
                         <HelpCircle className="w-8 h-8 text-blue-600" />
                     </div>
                 </div>
-                <h1 className="text-4xl font-bold text-gray-900 mb-4">
+                <h1 className="text-4xl font-bold text-foreground mb-4">
                     Frequently Asked Questions
                 </h1>
-                <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+                <p className="text-xl text-muted-foreground max-w-7xl mx-auto">
                     Everything you need to know about CareOps. Can&apos;t find an answer?{" "}
                     <a href="mailto:amarzeus.dev@gmail.com" className="text-blue-600 hover:underline">
                         Email us
@@ -191,20 +191,20 @@ export default function FAQPage() {
             </div>
 
             {/* FAQ Content */}
-            <main className="max-w-3xl mx-auto px-6 py-16 space-y-16">
+            <main className="max-w-7xl mx-auto px-6 py-16 space-y-16">
                 {faqs.map((category) => (
                     <section key={category.category}>
-                        <h2 className="text-2xl font-bold text-gray-900 mb-8 pb-3 border-b border-gray-100 flex items-center gap-2">
+                        <h2 className="text-2xl font-bold text-foreground mb-8 pb-3 border-b border-border/40 flex items-center gap-2">
                             <ChevronDown className="w-5 h-5 text-blue-600" />
                             {category.category}
                         </h2>
                         <div className="space-y-6">
                             {category.items.map((item) => (
-                                <div key={item.q} className="bg-gray-50 rounded-xl p-6">
-                                    <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                                <div key={item.q} className="bg-muted/30 rounded-xl p-6">
+                                    <h3 className="text-lg font-semibold text-foreground mb-3">
                                         {item.q}
                                     </h3>
-                                    <p className="text-gray-600 leading-relaxed">{item.a}</p>
+                                    <p className="text-muted-foreground leading-relaxed">{item.a}</p>
                                 </div>
                             ))}
                         </div>
@@ -220,20 +220,20 @@ export default function FAQPage() {
                     </p>
                     <a
                         href="mailto:amarzeus.dev@gmail.com"
-                        className="inline-flex items-center gap-2 bg-white text-blue-600 font-semibold px-6 py-3 rounded-lg hover:bg-blue-50 transition-colors"
+                        className="inline-flex items-center gap-2 bg-background text-blue-600 font-semibold px-6 py-3 rounded-lg hover:bg-blue-50 transition-colors"
                     >
                         Contact Support
                     </a>
                 </div>
             </main>
 
-            <footer className="border-t border-gray-100 py-12 bg-gray-50">
-                <div className="max-w-4xl mx-auto px-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-gray-500">
+            <footer className="border-t border-border/40 py-12 bg-muted/30">
+                <div className="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
                     <p>© 2026 CareOps by Amar Kumar. All rights reserved.</p>
                     <div className="flex gap-6">
-                        <Link href="/privacy" className="hover:text-gray-700">Privacy Policy</Link>
-                        <Link href="/terms" className="hover:text-gray-700">Terms of Service</Link>
-                        <Link href="/cookies" className="hover:text-gray-700">Cookie Policy</Link>
+                        <Link href="/privacy" className="hover:text-muted-foreground">Privacy Policy</Link>
+                        <Link href="/terms" className="hover:text-muted-foreground">Terms of Service</Link>
+                        <Link href="/cookies" className="hover:text-muted-foreground">Cookie Policy</Link>
                     </div>
                 </div>
             </footer>

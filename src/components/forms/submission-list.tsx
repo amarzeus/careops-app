@@ -55,7 +55,7 @@ export function SubmissionList({
               <p className="font-medium text-sm truncate">
                 {sub.contact?.name || "Unknown"}
               </p>
-              <p className="text-xs text-gray-500 truncate">
+              <p className="text-xs text-muted-foreground truncate">
                 {sub.intakeForm?.name || "Contact Form"} |{" "}
                 {new Date(sub.createdAt).toLocaleDateString()}
               </p>

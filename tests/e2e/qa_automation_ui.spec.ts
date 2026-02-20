@@ -6,7 +6,7 @@ test.describe('Feature UI Tests', () => {
   test('AI Wiring: Should chat with onboarding assistant', async ({ page, request, context }) => {
     // Skip test if no Gemini API key is configured (CI environments)
     test.skip(!process.env.GEMINI_API_KEY, 'GEMINI_API_KEY not configured - skipping AI test');
-    
+
     // 1. Seed user in onboarding
     const email = `test-ai-${Date.now()}@example.com`;
     const seedRes = await request.post('/api/test/seed', {
@@ -32,7 +32,7 @@ test.describe('Feature UI Tests', () => {
     await page.goto('/onboarding');
     // Wait for loading to finish if any
     await expect(page.locator('.animate-pulse')).toBeHidden();
-    
+
     await expect(page).toHaveURL(/onboarding/);
 
     // 4. Interact with Chat
@@ -45,7 +45,7 @@ test.describe('Feature UI Tests', () => {
 
     // 5. Expect AI Response
     // Look for a message bubble with gray background (assistant)
-    await expect(page.locator('.bg-gray-100').filter({ hasText: /dental|smile|great|help/i }).first()).toBeVisible({ timeout: 15000 });
+    await expect(page.locator('.bg-muted\\/30').filter({ hasText: /dental|smile|great|help/i }).first()).toBeVisible({ timeout: 15000 });
   });
 
   test('Webhooks: Should add a new webhook', async ({ page, request, context }) => {
@@ -73,7 +73,7 @@ test.describe('Feature UI Tests', () => {
     // 3. Go to Settings
     await page.goto('/settings');
     await expect(page.locator('.animate-pulse')).toBeHidden({ timeout: 30000 });
-    
+
     // 4. Find Webhooks Section in Integrations Tab
     const integrationsTab = page.getByRole('tab', { name: /integrations/i });
     await integrationsTab.click();
@@ -85,10 +85,10 @@ test.describe('Feature UI Tests', () => {
     // Fill inputs FIRST
     const urlInput = page.getByPlaceholder(/hooks\.zapier\.com/i);
     await urlInput.fill('https://example.com/hook');
-    
+
     // Click Add Button
     await page.getByRole('button').filter({ has: page.locator('.lucide-plus') }).click();
-    
+
     // 6. Verify
     await expect(page.getByText('https://example.com/hook')).toBeVisible();
   });

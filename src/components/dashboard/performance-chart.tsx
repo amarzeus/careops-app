@@ -24,32 +24,32 @@ export function PerformanceChart({ data }: PerformanceChartProps) {
   const hasData = data.some(d => d.bookings > 0 || d.leads > 0 || d.completed > 0);
 
   return (
-    <Card className="shadow-sm border-0 bg-white">
+    <Card className="shadow-sm border-0 bg-background">
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-base font-semibold text-gray-900 flex items-center gap-2">
+          <CardTitle className="text-base font-semibold text-foreground flex items-center gap-2">
             <TrendingUp className="w-4 h-4 text-blue-600" />
             7-Day Performance
           </CardTitle>
           <div className="flex items-center gap-4 text-xs">
             <div className="flex items-center gap-1.5">
               <div className="w-2.5 h-2.5 rounded-full bg-blue-500" />
-              <span className="text-gray-500">Bookings</span>
+              <span className="text-muted-foreground">Bookings</span>
             </div>
             <div className="flex items-center gap-1.5">
               <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-              <span className="text-gray-500">Leads</span>
+              <span className="text-muted-foreground">Leads</span>
             </div>
             <div className="flex items-center gap-1.5">
               <div className="w-2.5 h-2.5 rounded-full bg-violet-500" />
-              <span className="text-gray-500">Completed</span>
+              <span className="text-muted-foreground">Completed</span>
             </div>
           </div>
         </div>
       </CardHeader>
       <CardContent>
         {!hasData ? (
-          <div className="h-[260px] flex items-center justify-center text-gray-400 text-sm">
+          <div className="h-[260px] flex items-center justify-center text-muted-foreground text-sm">
             <div className="text-center">
               <TrendingUp className="w-10 h-10 mx-auto mb-2 opacity-30" />
               <p>Performance data will appear as activity grows</p>
@@ -72,17 +72,19 @@ export function PerformanceChart({ data }: PerformanceChartProps) {
                   <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-              <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} allowDecimals={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+              <XAxis dataKey="name" tick={{ fontSize: 11, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 11, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} allowDecimals={false} />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: "#fff",
-                  border: "1px solid #e2e8f0",
+                  backgroundColor: "var(--background)",
+                  border: "1px solid var(--border)",
+                  color: "var(--foreground)",
                   borderRadius: "8px",
                   fontSize: "12px",
                   boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
                 }}
+                itemStyle={{ color: "var(--foreground)" }}
               />
               <Area type="monotone" dataKey="bookings" stroke="#3b82f6" strokeWidth={2} fillOpacity={1} fill="url(#colorBookings)" />
               <Area type="monotone" dataKey="leads" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#colorLeads)" />

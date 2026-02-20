@@ -252,7 +252,7 @@ function SettingsContent() {
     setCopied(key); setTimeout(() => setCopied(""), 2000);
   };
 
-  if (loading) return <div className="p-8"><div className="animate-pulse space-y-4">{[...Array(3)].map((_, i) => <div key={i} className="h-40 bg-gray-100 rounded-xl" />)}</div></div>;
+  if (loading) return <div className="p-8"><div className="animate-pulse space-y-4">{[...Array(3)].map((_, i) => <div key={i} className="h-40 bg-muted/30 rounded-xl" />)}</div></div>;
 
   const bookingUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/book/${workspace?.id}`;
   const contactFormUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/contact/${workspace?.id}`;
@@ -260,7 +260,7 @@ function SettingsContent() {
   return (
     <div>
       <Header title="Settings" subtitle="Manage your workspace and account" />
-      <div className="mx-auto w-full max-w-4xl p-4 sm:p-6">
+      <div className="mx-auto w-full max-w-7xl p-4 sm:p-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <div className="overflow-x-auto pb-1 -mb-1">
             <TabsList className="flex-nowrap whitespace-nowrap">

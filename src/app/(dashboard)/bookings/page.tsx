@@ -219,7 +219,7 @@ export default function BookingsPage() {
               onClick={() => setViewMode("list")}
               className={cn(
                 "h-7 rounded-md px-2 text-[10px] font-bold sm:px-3 sm:text-[11px]",
-                viewMode === "list" && "bg-white shadow-sm"
+                viewMode === "list" && "bg-background shadow-sm"
               )}
             >
               <List className="h-3.5 w-3.5 sm:mr-1.5" />{" "}
@@ -231,7 +231,7 @@ export default function BookingsPage() {
               onClick={() => setViewMode("calendar")}
               className={cn(
                 "h-7 rounded-md px-2 text-[10px] font-bold sm:px-3 sm:text-[11px]",
-                viewMode === "calendar" && "bg-white shadow-sm"
+                viewMode === "calendar" && "bg-background shadow-sm"
               )}
             >
               <CalendarIcon className="h-3.5 w-3.5 sm:mr-1.5" />{" "}
@@ -269,7 +269,7 @@ export default function BookingsPage() {
             ].map((s) => (
               <Card
                 key={s.label}
-                className="border-border/40 group overflow-hidden border bg-white shadow-sm"
+                className="border-border/40 group overflow-hidden border bg-background shadow-sm"
               >
                 <CardContent className="relative p-3 sm:p-4">
                   <div className="flex items-center justify-between">
@@ -298,7 +298,7 @@ export default function BookingsPage() {
             ))}
           </div>
 
-          <div className="border-border/40 flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border bg-white shadow-sm">
+          <div className="border-border/40 flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border bg-background shadow-sm">
             {viewMode === "list" ? (
               <div className="flex h-full flex-col">
                 {/* Inline Filters for List View */}
@@ -307,12 +307,12 @@ export default function BookingsPage() {
                     <Search className="text-muted-foreground/60 absolute top-1/2 left-2.5 h-3 w-3 -translate-y-1/2" />
                     <Input
                       placeholder="Search bookings..."
-                      className="h-8 rounded-lg border-slate-200 bg-white pl-8 text-[11px]"
+                      className="h-8 rounded-lg border-slate-200 bg-background pl-8 text-[11px]"
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                     />
                   </div>
-                  <div className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white p-0.5">
+                  <div className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-background p-0.5">
                     <Popover>
                       <PopoverTrigger asChild>
                         <Button

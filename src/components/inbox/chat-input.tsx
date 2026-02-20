@@ -59,10 +59,10 @@ export function ChatInput({
   };
 
   return (
-    <div className="p-3 sm:p-4 bg-white border-t border-gray-200">
+    <div className="p-3 sm:p-4 bg-background border-t border-border/40">
       {/* Channel selector dropdown */}
       {showChannelPicker && (
-        <div className="mb-2 flex gap-1 p-1 bg-gray-50 rounded-lg border border-gray-200">
+        <div className="mb-2 flex gap-1 p-1 bg-muted/30 rounded-lg border border-border/40">
           {availableChannels.map(({ key }) => {
             const cfg = channelConfig[key];
             const Icon = cfg.icon;
@@ -75,8 +75,8 @@ export function ChatInput({
                   setShowChannelPicker(false);
                 }}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium transition-all ${isActive
-                  ? "bg-white shadow-sm border border-gray-200"
-                  : "hover:bg-gray-100 text-gray-500"
+                  ? "bg-background shadow-sm border border-border/40"
+                  : "hover:bg-muted/30 text-muted-foreground"
                   }`}
               >
                 <Icon className={`w-3.5 h-3.5 ${isActive ? cfg.color : ""}`} />
@@ -87,16 +87,16 @@ export function ChatInput({
         </div>
       )}
 
-      <div className="flex items-end gap-2 bg-white rounded-xl border border-gray-300 p-2 focus-within:ring-2 focus-within:ring-blue-100 focus-within:border-blue-400 transition-all">
+      <div className="flex items-end gap-2 bg-background rounded-xl border border-border/40 p-2 focus-within:ring-2 focus-within:ring-blue-100 focus-within:border-blue-400 transition-all">
         {/* Channel indicator button */}
         {availableChannels.length > 1 && (
           <button
             onClick={() => setShowChannelPicker(!showChannelPicker)}
-            className="flex items-center gap-0.5 px-2 py-1.5 rounded-md hover:bg-gray-100 transition-colors mb-1 shrink-0"
+            className="flex items-center gap-0.5 px-2 py-1.5 rounded-md hover:bg-muted/30 transition-colors mb-1 shrink-0"
             title={`Sending via ${config.label}`}
           >
             <ChannelIcon className={`w-4 h-4 ${config.color}`} />
-            <ChevronDown className="w-3 h-3 text-gray-400" />
+            <ChevronDown className="w-3 h-3 text-muted-foreground" />
           </button>
         )}
 

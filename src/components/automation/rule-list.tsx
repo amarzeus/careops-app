@@ -77,8 +77,8 @@ const triggerConfig: Record<
   STAFF_REPLY: {
     label: "Staff Reply",
     icon: MessageSquare,
-    color: "text-gray-600",
-    bgColor: "bg-gray-100",
+    color: "text-muted-foreground",
+    bgColor: "bg-muted/30",
   },
 };
 
@@ -131,11 +131,11 @@ export function RuleList({
   if (rules.length === 0) {
     return (
       <div className="text-center py-20">
-        <Zap className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-        <h3 className="text-lg font-medium text-gray-500">
+        <Zap className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+        <h3 className="text-lg font-medium text-muted-foreground">
           No automation rules
         </h3>
-        <p className="text-sm text-gray-400 mt-1">
+        <p className="text-sm text-muted-foreground mt-1">
           Create rules to automate your workflows
         </p>
       </div>
@@ -163,13 +163,13 @@ export function RuleList({
             {/* Group header */}
             <div className="flex items-center gap-2 mb-3">
               <GroupIcon className={`w-4 h-4 ${config.color}`} />
-              <h3 className="text-sm font-semibold text-gray-600">
+              <h3 className="text-sm font-semibold text-muted-foreground">
                 {config.label}
               </h3>
               <Badge variant="secondary" className="text-[10px]">
                 {triggerRules.length}
               </Badge>
-              <p className="text-xs text-gray-400 ml-2">
+              <p className="text-xs text-muted-foreground ml-2">
                 {triggerDescriptions[trigger]}
               </p>
             </div>
@@ -189,7 +189,7 @@ export function RuleList({
                         >
                           <Icon className={`w-5 h-5 ${ruleConfig.color}`} />
                         </div>
-                        <ArrowRight className="w-4 h-4 text-gray-300 shrink-0" />
+                        <ArrowRight className="w-4 h-4 text-muted-foreground shrink-0" />
                         <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
                           <Mail className="w-5 h-5 text-blue-600" />
                         </div>
@@ -204,17 +204,17 @@ export function RuleList({
                             </Badge>
                           </div>
                           {rule.messageTemplate && (
-                            <p className="text-xs text-gray-500 mt-1 truncate max-w-md">
+                            <p className="text-xs text-muted-foreground mt-1 truncate max-w-md">
                               {rule.messageTemplate}
                             </p>
                           )}
                           <div className="flex items-center gap-3 mt-1">
                             {rule.delayMinutes > 0 && (
-                              <span className="text-[10px] text-gray-400">
+                              <span className="text-[10px] text-muted-foreground">
                                 Delay: {rule.delayMinutes} min
                               </span>
                             )}
-                            <span className="flex items-center gap-1 text-[10px] text-gray-400">
+                            <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
                               <Clock className="w-3 h-3" />
                               Last triggered: {getRelativeTime(rule.createdAt)}
                             </span>

@@ -107,7 +107,7 @@ export function AIChatCard({
                     "max-w-[85%] rounded-2xl px-4 py-2.5 text-sm animate-fade-in",
                     msg.role === "user"
                       ? "bg-blue-600 text-white rounded-br-md"
-                      : "bg-gray-100 text-gray-800 rounded-bl-md"
+                      : "bg-muted/30 text-muted-foreground rounded-bl-md"
                   )}
                 >
                   {msg.content}
@@ -116,18 +116,18 @@ export function AIChatCard({
             ))}
             {chatLoading && (
               <div className="flex justify-start">
-                <div className="bg-gray-100 rounded-2xl rounded-bl-md px-4 py-3">
+                <div className="bg-muted/30 rounded-2xl rounded-bl-md px-4 py-3">
                   <div className="flex gap-1">
                     <span
-                      className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                      className="w-2 h-2 bg-muted rounded-full animate-bounce"
                       style={{ animationDelay: "0ms" }}
                     />
                     <span
-                      className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                      className="w-2 h-2 bg-muted rounded-full animate-bounce"
                       style={{ animationDelay: "150ms" }}
                     />
                     <span
-                      className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                      className="w-2 h-2 bg-muted rounded-full animate-bounce"
                       style={{ animationDelay: "300ms" }}
                     />
                   </div>

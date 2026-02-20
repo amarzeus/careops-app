@@ -98,7 +98,7 @@ export function ProfileTab({
             <CardDescription>Update your personal details</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-gray-500">No profile data available.</p>
+            <p className="text-muted-foreground">No profile data available.</p>
           </CardContent>
         </Card>
       </div>
@@ -125,9 +125,9 @@ export function ProfileTab({
             <Input
               value={user?.email || ""}
               disabled
-              className="bg-gray-50"
+              className="bg-muted/30"
             />
-            <p className="text-[10px] text-gray-500">
+            <p className="text-[10px] text-muted-foreground">
               Email cannot be changed securely at this time.
             </p>
           </div>
@@ -139,7 +139,7 @@ export function ProfileTab({
             />
           </div>
         </CardContent>
-        <CardFooter className="bg-gray-50 border-t flex flex-col sm:flex-row justify-end gap-3 px-4 sm:px-6 py-4">
+        <CardFooter className="bg-muted/30 border-t flex flex-col sm:flex-row justify-end gap-3 px-4 sm:px-6 py-4">
           <Button onClick={onSave} disabled={saving} className="w-full sm:w-auto">
             {saved ? (
               <>
@@ -166,19 +166,19 @@ export function ProfileTab({
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
               <div className="flex items-center gap-3">
                 <div className="w-2 h-2 bg-green-500 rounded-full" />
                 <div>
                   <p className="text-sm font-medium">Active Session</p>
-                  <p className="text-xs text-gray-500">{user?.email}</p>
+                  <p className="text-xs text-muted-foreground">{user?.email}</p>
                 </div>
               </div>
               <div className="text-right">
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-muted-foreground">
                   Role: {user?.role || "OWNER"}
                 </p>
-                <p className="text-xs text-gray-400">Logged in now</p>
+                <p className="text-xs text-muted-foreground">Logged in now</p>
               </div>
             </div>
           </div>

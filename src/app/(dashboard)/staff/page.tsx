@@ -98,7 +98,7 @@ export default function StaffPage() {
                 </Button>
             </Header>
 
-            <div className="mx-auto w-full max-w-screen-xl flex-1 space-y-4 p-4 sm:p-6">
+            <div className="mx-auto w-full max-w-7xl flex-1 space-y-4 p-4 sm:p-6">
                 {loading ? (
                     <div>Loading team...</div>
                 ) : (

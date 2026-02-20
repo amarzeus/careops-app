@@ -713,12 +713,12 @@ export function InlineVoiceMode({ onTranscript, onClose, className, autoStart = 
         <div className="flex items-center gap-1.5">
           <div className={cn(
             "w-2 h-2 rounded-full",
-            voiceState === "idle" && "bg-gray-300",
+            voiceState === "idle" && "bg-muted/50",
             voiceState === "listening" && "bg-red-500 voice-status-pulse",
             voiceState === "processing" && "bg-purple-500 animate-pulse",
             voiceState === "speaking" && "bg-emerald-500 voice-status-pulse",
           )} />
-          <span className="text-[10px] text-gray-500 font-medium uppercase tracking-wider">
+          <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
             {voiceState === "idle" && "Ready"}
             {voiceState === "listening" && "Listening"}
             {voiceState === "processing" && "Thinking"}
@@ -728,17 +728,17 @@ export function InlineVoiceMode({ onTranscript, onClose, className, autoStart = 
         <div className="flex items-center gap-1">
           <button
             onClick={() => setIsMuted(!isMuted)}
-            className="p-1.5 rounded-full hover:bg-gray-100 transition-colors"
+            className="p-1.5 rounded-full hover:bg-muted/30 transition-colors"
             title={isMuted ? "Unmute" : "Mute"}
           >
-            {isMuted ? <VolumeX className="w-3.5 h-3.5 text-gray-400" /> : <Volume2 className="w-3.5 h-3.5 text-gray-400" />}
+            {isMuted ? <VolumeX className="w-3.5 h-3.5 text-muted-foreground" /> : <Volume2 className="w-3.5 h-3.5 text-muted-foreground" />}
           </button>
           <button
             onClick={handleClose}
-            className="p-1.5 rounded-full hover:bg-gray-100 transition-colors"
+            className="p-1.5 rounded-full hover:bg-muted/30 transition-colors"
             title="Back to chat"
           >
-            <MessageSquare className="w-3.5 h-3.5 text-gray-400" />
+            <MessageSquare className="w-3.5 h-3.5 text-muted-foreground" />
           </button>
         </div>
       </div>
@@ -757,14 +757,14 @@ export function InlineVoiceMode({ onTranscript, onClose, className, autoStart = 
             "absolute inset-0 flex items-center justify-center transition-opacity duration-300",
             voiceState === "idle" ? "opacity-60 group-hover:opacity-100" : "opacity-0"
           )}>
-            <div className="w-10 h-10 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center shadow-sm">
+            <div className="w-10 h-10 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center shadow-sm">
               <Mic className="w-4 h-4 text-indigo-600" />
             </div>
           </div>
           {/* Stop icon when listening */}
           {voiceState === "listening" && (
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+              <div className="w-8 h-8 rounded-full bg-background/20 backdrop-blur-sm flex items-center justify-center">
                 <MicOff className="w-3.5 h-3.5 text-white/80" />
               </div>
             </div>
@@ -775,7 +775,7 @@ export function InlineVoiceMode({ onTranscript, onClose, className, autoStart = 
       {/* Chat History area */}
       <div
         ref={scrollRef}
-        className="w-full px-3 py-4 flex-1 overflow-y-auto space-y-4 min-h-0 border-t border-gray-100 bg-white"
+        className="w-full px-3 py-4 flex-1 overflow-y-auto space-y-4 min-h-0 border-t border-border/40 bg-background"
       >
         {history.map((msg, idx) => (
           <div key={idx} className={cn(
@@ -784,18 +784,18 @@ export function InlineVoiceMode({ onTranscript, onClose, className, autoStart = 
           )}>
             <div className={cn(
               "w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5",
-              msg.role === "user" ? "bg-indigo-600" : "bg-gray-100"
+              msg.role === "user" ? "bg-indigo-600" : "bg-muted/30"
             )}>
               <span className={cn(
                 "text-[8px] font-bold",
-                msg.role === "user" ? "text-white" : "text-gray-500"
+                msg.role === "user" ? "text-white" : "text-muted-foreground"
               )}>
                 {msg.role === "user" ? "YOU" : "AI"}
               </span>
             </div>
             <div className={cn(
               "max-w-[85%] px-3 py-2 rounded-2xl text-[11px] leading-relaxed",
-              msg.role === "user" ? "bg-indigo-600 text-white rounded-tr-none" : "bg-gray-100 text-gray-700 rounded-tl-none"
+              msg.role === "user" ? "bg-indigo-600 text-white rounded-tr-none" : "bg-muted/30 text-muted-foreground rounded-tl-none"
             )}>
               {msg.content}
             </div>
@@ -806,7 +806,7 @@ export function InlineVoiceMode({ onTranscript, onClose, className, autoStart = 
             <div className="w-6 h-6 rounded-full bg-indigo-400 flex items-center justify-center shrink-0 mt-0.5">
               <span className="text-[8px] font-bold text-white">YOU</span>
             </div>
-            <div className="max-w-[85%] px-3 py-2 rounded-2xl bg-indigo-400/10 text-gray-400 text-[11px] italic rounded-tr-none border border-indigo-100">
+            <div className="max-w-[85%] px-3 py-2 rounded-2xl bg-indigo-400/10 text-muted-foreground text-[11px] italic rounded-tr-none border border-indigo-100">
               {interimTranscript}
             </div>
           </div>
@@ -817,7 +817,7 @@ export function InlineVoiceMode({ onTranscript, onClose, className, autoStart = 
       </div>
 
       {/* Chat Input Region */}
-      <div className="w-full px-3 py-3 border-t border-gray-100 bg-gray-50/50 shrink-0">
+      <div className="w-full px-3 py-3 border-t border-border/40 bg-muted/30/50 shrink-0">
         <form onSubmit={handleSubmit} className="relative flex items-center gap-2">
           <button
             type="button"
@@ -826,7 +826,7 @@ export function InlineVoiceMode({ onTranscript, onClose, className, autoStart = 
               "p-1.5 rounded-full transition-all",
               voiceState === "listening"
                 ? "bg-red-500 text-white animate-pulse"
-                : "bg-white border border-gray-200 text-gray-500 hover:text-indigo-600"
+                : "bg-background border border-border/40 text-muted-foreground hover:text-indigo-600"
             )}
           >
             <Mic size={14} />
@@ -836,7 +836,7 @@ export function InlineVoiceMode({ onTranscript, onClose, className, autoStart = 
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             placeholder="Type a message..."
-            className="flex-1 bg-white border border-gray-200 rounded-full px-3 py-1.5 text-[11px] focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-sm"
+            className="flex-1 bg-background border border-border/40 rounded-full px-3 py-1.5 text-[11px] focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-sm"
           />
           <button
             type="submit"
@@ -845,7 +845,7 @@ export function InlineVoiceMode({ onTranscript, onClose, className, autoStart = 
               "p-1.5 rounded-full transition-all",
               inputText.trim() && voiceState !== "processing"
                 ? "bg-indigo-600 text-white shadow-sm hover:bg-indigo-700"
-                : "bg-gray-100 text-gray-400"
+                : "bg-muted/30 text-muted-foreground"
             )}
           >
             <Send size={14} />
@@ -970,7 +970,7 @@ export function GlobalVoiceOverlay({
           initial={{ opacity: 0, y: 50, scale: 0.9 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 50, scale: 0.9 }}
-          className="fixed bottom-24 right-6 z-50 w-80 md:w-96 bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl border border-indigo-100 overflow-hidden flex flex-col max-h-[600px] h-[500px]"
+          className="fixed bottom-24 right-6 z-50 w-80 md:w-96 bg-background/95 backdrop-blur-md rounded-2xl shadow-2xl border border-indigo-100 overflow-hidden flex flex-col max-h-[600px] h-[500px]"
           style={{ right: '24px', bottom: '96px', left: 'auto' }}
         >
           {/* Header */}
@@ -981,7 +981,7 @@ export function GlobalVoiceOverlay({
                 voiceState === "listening" && "bg-red-500 animate-pulse",
                 voiceState === "processing" && "bg-purple-500 animate-pulse",
                 voiceState === "speaking" && "bg-emerald-500 animate-pulse",
-                voiceState === "idle" && "bg-gray-400"
+                voiceState === "idle" && "bg-muted"
               )} />
               <span className="text-xs font-semibold text-indigo-900 uppercase tracking-wide">
                 {voiceState === "listening" ? "Listening..." :
@@ -990,10 +990,10 @@ export function GlobalVoiceOverlay({
               </span>
             </div>
             <div className="flex gap-1">
-              <button onClick={toggleMute} className="p-1.5 hover:bg-white/50 rounded-full text-indigo-400 hover:text-indigo-600 transition-colors">
+              <button onClick={toggleMute} className="p-1.5 hover:bg-background/50 rounded-full text-indigo-400 hover:text-indigo-600 transition-colors">
                 {isMuted ? <VolumeX size={14} /> : <Volume2 size={14} />}
               </button>
-              <button onClick={onClose} className="p-1.5 hover:bg-red-50 rounded-full text-gray-400 hover:text-red-500 transition-colors">
+              <button onClick={onClose} className="p-1.5 hover:bg-red-50 rounded-full text-muted-foreground hover:text-red-500 transition-colors">
                 <X size={14} />
               </button>
             </div>
@@ -1007,10 +1007,10 @@ export function GlobalVoiceOverlay({
           {/* Transcript/History Region */}
           <div
             ref={scrollRef}
-            className="px-4 py-4 overflow-y-auto space-y-4 bg-white flex-1 min-h-0"
+            className="px-4 py-4 overflow-y-auto space-y-4 bg-background flex-1 min-h-0"
           >
             {history.length === 0 && !interimTranscript && (
-              <p className="text-xs text-center text-gray-400 py-4">
+              <p className="text-xs text-center text-muted-foreground py-4">
                 How can I help you today?
               </p>
             )}
@@ -1027,11 +1027,11 @@ export function GlobalVoiceOverlay({
               >
                 <div className={cn(
                   "w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5",
-                  msg.role === "user" ? "bg-indigo-600" : "bg-gray-100"
+                  msg.role === "user" ? "bg-indigo-600" : "bg-muted/30"
                 )}>
                   <span className={cn(
                     "text-[8px] font-bold",
-                    msg.role === "user" ? "text-white" : "text-gray-500"
+                    msg.role === "user" ? "text-white" : "text-muted-foreground"
                   )}>
                     {msg.role === "user" ? "YOU" : "AI"}
                   </span>
@@ -1040,7 +1040,7 @@ export function GlobalVoiceOverlay({
                   "px-3 py-2 rounded-2xl text-sm leading-relaxed max-w-[85%]",
                   msg.role === "user"
                     ? "bg-indigo-600 text-white rounded-tr-none"
-                    : "bg-gray-100 text-gray-800 rounded-tl-none"
+                    : "bg-muted/30 text-muted-foreground rounded-tl-none"
                 )}>
                   {msg.content}
                 </div>
@@ -1056,7 +1056,7 @@ export function GlobalVoiceOverlay({
                 <div className="w-6 h-6 rounded-full bg-indigo-400 flex items-center justify-center shrink-0 mt-0.5">
                   <span className="text-[8px] font-bold text-white">YOU</span>
                 </div>
-                <div className="px-3 py-2 rounded-2xl bg-indigo-400/10 text-gray-400 text-sm italic rounded-tr-none border border-indigo-100">
+                <div className="px-3 py-2 rounded-2xl bg-indigo-400/10 text-muted-foreground text-sm italic rounded-tr-none border border-indigo-100">
                   {interimTranscript}
                 </div>
               </motion.div>
@@ -1064,7 +1064,7 @@ export function GlobalVoiceOverlay({
           </div>
 
           {/* Chat Input Region */}
-          <div className="p-3 border-t border-gray-100 bg-gray-50/50 shrink-0">
+          <div className="p-3 border-t border-border/40 bg-muted/30/50 shrink-0">
             <form onSubmit={handleSubmit} className="relative flex items-center gap-2">
               <button
                 type="button"
@@ -1073,7 +1073,7 @@ export function GlobalVoiceOverlay({
                   "p-2 rounded-full transition-all",
                   voiceState === "listening"
                     ? "bg-red-500 text-white animate-pulse"
-                    : "bg-white border border-gray-200 text-gray-500 hover:text-indigo-600"
+                    : "bg-background border border-border/40 text-muted-foreground hover:text-indigo-600"
                 )}
               >
                 <Mic size={16} />
@@ -1083,7 +1083,7 @@ export function GlobalVoiceOverlay({
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
                 placeholder="Type a message..."
-                className="flex-1 bg-white border border-gray-200 rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-sm"
+                className="flex-1 bg-background border border-border/40 rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-sm"
               />
               <button
                 type="submit"
@@ -1092,7 +1092,7 @@ export function GlobalVoiceOverlay({
                   "p-2 rounded-full transition-all",
                   inputText.trim() && voiceState !== "processing"
                     ? "bg-indigo-600 text-white shadow-md hover:bg-indigo-700"
-                    : "bg-gray-100 text-gray-400"
+                    : "bg-muted/30 text-muted-foreground"
                 )}
               >
                 <Send size={16} />

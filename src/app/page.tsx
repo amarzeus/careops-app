@@ -252,7 +252,7 @@ function Navbar({
           <ThemeToggle />
           <button
             onClick={() => setMobileMenuOpen(true)}
-            className="md:hidden p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
+            className="md:hidden p-2 rounded-full hover:bg-black/5 dark:hover:bg-background/10 transition-colors"
           >
             <Menu className="w-5 h-5 text-foreground" />
           </button>
@@ -336,7 +336,7 @@ function Hero3D() {
       </div>
 
       {/* Text Content */}
-      <div className="max-w-5xl mx-auto px-6 text-center relative z-10 flex flex-col items-center">
+      <div className="max-w-7xl mx-auto px-6 text-center relative z-10 flex flex-col items-center">
         <motion.div
           initial={{ opacity: 0, y: 30, filter: "blur(12px)" }}
           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
@@ -367,7 +367,7 @@ function Hero3D() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-          className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed font-medium"
+          className="text-lg md:text-xl text-muted-foreground max-w-7xl mx-auto mb-10 leading-relaxed font-medium"
         >
           The absolute pinnacle of service operations. Replace your entire fragmented stack with one beautifully unified engine.
         </motion.p>
@@ -397,12 +397,12 @@ function Hero3D() {
         initial={{ opacity: 0, y: 150, rotateX: 20, scale: 0.9 }}
         animate={{ opacity: 1, y: 0, rotateX: 0, scale: 1 }}
         transition={{ duration: 1.5, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        className="relative mt-24 w-full max-w-6xl px-6"
+        className="relative mt-24 w-full max-w-7xl px-6"
         style={{ perspective: 1500 }}
       >
         <motion.div
           style={{ rotateX: prefersReducedMotion ? 0 : rotateX, rotateY: prefersReducedMotion ? 0 : rotateY }}
-          className="relative w-full aspect-[16/10] rounded-[32px] overflow-hidden border border-white/20 dark:border-white/10 bg-white/40 dark:bg-black/40 backdrop-blur-[40px] shadow-[0_40px_120px_-20px_rgba(0,0,0,0.2)] dark:shadow-[0_40px_120px_-20px_rgba(0,0,0,0.6)]"
+          className="relative w-full aspect-[16/10] rounded-[32px] overflow-hidden border border-white/20 dark:border-white/10 bg-background/40 dark:bg-black/40 backdrop-blur-[40px] shadow-[0_40px_120px_-20px_rgba(0,0,0,0.2)] dark:shadow-[0_40px_120px_-20px_rgba(0,0,0,0.6)]"
         >
           {/* Faux dashboard glowing grid lines */}
           <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+Cjwvc3ZnPg==')] opacity-[0.03] dark:opacity-[0.05]" />
@@ -450,7 +450,7 @@ function Hero3D() {
                   </div>
                 ))}
               </div>
-              
+
               {/* Main Area */}
               <div className="flex-1 flex flex-col gap-6">
                 {/* KPI Cards */}
@@ -472,34 +472,34 @@ function Hero3D() {
 
                 {/* Real Recharts Area */}
                 <div className="flex-1 rounded-2xl bg-muted/10 border border-border/40 backdrop-blur-md relative overflow-hidden flex flex-col p-4 shadow-inner pointer-events-auto">
-                   <div className="flex items-center justify-between mb-2 px-2">
-                      <h3 className="text-sm font-bold text-foreground">Revenue Overview</h3>
-                      <span className="text-xs font-medium text-muted-foreground">Last 7 Days</span>
-                   </div>
-                   <div className="flex-1 w-full min-h-0">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <AreaChart data={mockChartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                          <defs>
-                            <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.4}/>
-                              <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
-                            </linearGradient>
-                          </defs>
-                          <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} dy={10} />
-                          <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'hsl(var(--primary))', strokeWidth: 1, strokeDasharray: '4 4' }} />
-                          <Area 
-                            type="monotone" 
-                            dataKey="revenue" 
-                            stroke="hsl(var(--primary))" 
-                            strokeWidth={3}
-                            fillOpacity={1} 
-                            fill="url(#colorRevenue)" 
-                            activeDot={{ r: 6, strokeWidth: 0, fill: "hsl(var(--primary))" }}
-                            animationDuration={1500}
-                          />
-                        </AreaChart>
-                      </ResponsiveContainer>
-                   </div>
+                  <div className="flex items-center justify-between mb-2 px-2">
+                    <h3 className="text-sm font-bold text-foreground">Revenue Overview</h3>
+                    <span className="text-xs font-medium text-muted-foreground">Last 7 Days</span>
+                  </div>
+                  <div className="flex-1 w-full min-h-[200px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={mockChartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                        <defs>
+                          <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.4} />
+                            <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
+                          </linearGradient>
+                        </defs>
+                        <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: 'var(--muted-foreground)' }} dy={10} />
+                        <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'var(--primary)', strokeWidth: 1, strokeDasharray: '4 4' }} />
+                        <Area
+                          type="monotone"
+                          dataKey="revenue"
+                          stroke="var(--primary)"
+                          strokeWidth={3}
+                          fillOpacity={1}
+                          fill="url(#colorRevenue)"
+                          activeDot={{ r: 6, strokeWidth: 0, fill: "var(--primary)" }}
+                          animationDuration={1500}
+                        />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
                 </div>
               </div>
             </div>
@@ -550,7 +550,7 @@ export default function LandingPage() {
                 <Logo variant="full" size={32} />
                 <button
                   onClick={() => setMobileMenuOpen(false)}
-                  className="p-3 rounded-full bg-white/10 border border-white/20 backdrop-blur-md"
+                  className="p-3 rounded-full bg-background/10 border border-white/20 backdrop-blur-md"
                 >
                   <X className="w-6 h-6" />
                 </button>
@@ -583,7 +583,7 @@ export default function LandingPage() {
         <section id="features" className="py-32 lg:py-56 bg-background relative z-10">
           <div className="max-w-7xl mx-auto px-6">
             <div className="flex flex-col md:flex-row justify-between items-end mb-24 gap-8">
-              <div className="max-w-2xl">
+              <div className="max-w-7xl">
                 <motion.h2
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
@@ -684,7 +684,7 @@ export default function LandingPage() {
 
         {/* ─── SOCIAL PROOF - Minimal Numbers ─── */}
         <section className="py-32 bg-foreground text-background">
-          <div className="max-w-6xl mx-auto px-6">
+          <div className="max-w-7xl mx-auto px-6">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-16 text-center">
               {[
                 { value: "6", suffix: "+", label: "Tools replaced" },
@@ -716,7 +716,7 @@ export default function LandingPage() {
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-r from-primary/10 via-purple-500/10 to-transparent rounded-full blur-[150px] animate-pulse-slow" />
           </div>
 
-          <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
+          <div className="max-w-7xl mx-auto px-6 text-center relative z-10">
             <motion.h2
               initial={{ opacity: 0, y: 40, scale: 0.95 }}
               whileInView={{ opacity: 1, y: 0, scale: 1 }}
@@ -757,7 +757,7 @@ export default function LandingPage() {
       </main>
 
       {/* ─── FOOTER ─── */}
-      <footer className="bg-background py-16 border-t border-border/40 relative z-10">
+      <footer className="bg-background py-8 border-t border-border/40 relative z-10">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-8">
             <div className="flex items-center gap-3 opacity-60 hover:opacity-100 transition-opacity">

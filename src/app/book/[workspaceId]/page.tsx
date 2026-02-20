@@ -151,8 +151,8 @@ export default function BookingPage() {
     if (!workspace) return <div className="h-screen flex items-center justify-center">Workspace not found</div>;
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col items-center py-10 px-4">
-            <div className="w-full max-w-2xl bg-white rounded-xl shadow-sm border overflow-hidden">
+        <div className="min-h-screen bg-muted/30 flex flex-col items-center py-10 px-4">
+            <div className="w-full max-w-7xl bg-background rounded-xl shadow-sm border overflow-hidden">
                 {/* Header */}
                 <div className="bg-blue-600 p-6 text-white text-center">
                     <h1 className="text-2xl font-bold">{workspace.name}</h1>
@@ -174,19 +174,19 @@ export default function BookingPage() {
                                         className="flex flex-col text-left p-4 rounded-lg border hover:border-blue-500 hover:bg-blue-50 transition-all group"
                                     >
                                         <div className="flex justify-between w-full">
-                                            <span className="font-medium text-gray-900">{service.name}</span>
-                                            <span className="text-gray-600">${service.price}</span>
+                                            <span className="font-medium text-foreground">{service.name}</span>
+                                            <span className="text-muted-foreground">${service.price}</span>
                                         </div>
-                                        <div className="flex items-center gap-4 mt-1 text-sm text-gray-500">
+                                        <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
                                             <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {service.duration} mins</span>
                                         </div>
                                         {service.description && (
-                                            <p className="text-sm text-gray-500 mt-2 line-clamp-2">{service.description}</p>
+                                            <p className="text-sm text-muted-foreground mt-2 line-clamp-2">{service.description}</p>
                                         )}
                                     </button>
                                 ))}
                                 {workspace.services.length === 0 && (
-                                    <p className="text-center text-gray-500 py-10">No public services available.</p>
+                                    <p className="text-center text-muted-foreground py-10">No public services available.</p>
                                 )}
                             </div>
                         </div>
@@ -199,7 +199,7 @@ export default function BookingPage() {
                                 <Button variant="ghost" size="sm" onClick={() => setStep(1)} className="-ml-2">
                                     <ArrowLeft className="w-4 h-4 mr-1" /> Back
                                 </Button>
-                                <span className="text-sm font-medium text-gray-500">Booking: {selectedService.name}</span>
+                                <span className="text-sm font-medium text-muted-foreground">Booking: {selectedService.name}</span>
                             </div>
 
                             <div className="flex flex-col md:flex-row gap-8">
@@ -216,7 +216,7 @@ export default function BookingPage() {
                                     <h3 className="font-medium mb-3">Available Times ({date ? format(date, "MMM d") : ""})</h3>
 
                                     {loadingSlots ? (
-                                        <div className="flex items-center justify-center h-40"><Loader2 className="animate-spin text-gray-400" /></div>
+                                        <div className="flex items-center justify-center h-40"><Loader2 className="animate-spin text-muted-foreground" /></div>
                                     ) : (
                                         <div className="grid grid-cols-2 gap-2 max-h-[300px] overflow-y-auto">
                                             {availableSlots.length > 0 ? availableSlots.map(time => (
@@ -229,7 +229,7 @@ export default function BookingPage() {
                                                     {time}
                                                 </Button>
                                             )) : (
-                                                <p className="col-span-2 text-center text-gray-500 py-4 text-sm">No slots available for this day.</p>
+                                                <p className="col-span-2 text-center text-muted-foreground py-4 text-sm">No slots available for this day.</p>
                                             )}
                                         </div>
                                     )}
@@ -247,17 +247,17 @@ export default function BookingPage() {
                                 </Button>
                             </div>
 
-                            <div className="bg-gray-50 p-4 rounded-lg text-sm space-y-2">
+                            <div className="bg-muted/30 p-4 rounded-lg text-sm space-y-2">
                                 <div className="flex justify-between">
-                                    <span className="text-gray-500">Service</span>
+                                    <span className="text-muted-foreground">Service</span>
                                     <span className="font-medium">{selectedService.name}</span>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-gray-500">Date</span>
+                                    <span className="text-muted-foreground">Date</span>
                                     <span className="font-medium">{date ? format(date, "MMMM d, yyyy") : ""}</span>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-gray-500">Time</span>
+                                    <span className="text-muted-foreground">Time</span>
                                     <span className="font-medium">{selectedTime}</span>
                                 </div>
                             </div>
@@ -294,8 +294,8 @@ export default function BookingPage() {
                             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
                                 <CheckCircle className="w-10 h-10 text-green-600" />
                             </div>
-                            <h2 className="text-2xl font-bold text-gray-900">Booking Confirmed!</h2>
-                            <p className="text-gray-600 max-w-sm">
+                            <h2 className="text-2xl font-bold text-foreground">Booking Confirmed!</h2>
+                            <p className="text-muted-foreground max-w-sm">
                                 We have sent a confirmation email to <strong>{form.email}</strong>. See you on {date ? format(date, "MMMM d") : ""} at {selectedTime}.
                             </p>
                             <Button variant="outline" className="mt-4" onClick={() => window.location.reload()}>

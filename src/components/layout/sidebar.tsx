@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { Logo } from "./logo";
 
 const navItems = [
@@ -173,7 +174,8 @@ export function Sidebar({ userName, userRole, workspaceName }: SidebarProps) {
         </nav>
 
         {/* User avatar in rail */}
-        <div className="mt-auto flex items-center justify-center p-2 pt-4 border-t border-[var(--sidebar-border)]">
+        <div className="mt-auto flex flex-col items-center justify-center p-2 pt-4 border-t border-[var(--sidebar-border)] gap-2">
+          <ThemeToggle />
           <button
             onClick={handleLogout}
             title="Sign Out"
@@ -221,6 +223,9 @@ export function Sidebar({ userName, userRole, workspaceName }: SidebarProps) {
               <p className="text-[11px] capitalize text-muted-foreground">{userRole?.toLowerCase() || "owner"}</p>
             </div>
             <ChevronRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground/50" />
+          </div>
+          <div className="flex gap-2 mb-2 px-2">
+            <ThemeToggle />
           </div>
           <Button
             variant="ghost"
@@ -289,6 +294,9 @@ export function Sidebar({ userName, userRole, workspaceName }: SidebarProps) {
               <p className="truncate text-sm font-medium text-foreground">{userName || "User"}</p>
               <p className="text-[11px] capitalize text-muted-foreground">{userRole?.toLowerCase() || "owner"}</p>
             </div>
+          </div>
+          <div className="flex gap-2 mb-2 px-2">
+            <ThemeToggle />
           </div>
           <Button
             variant="ghost"

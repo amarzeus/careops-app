@@ -47,7 +47,7 @@ function Calendar({
     const prevMonth = () => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1))
 
     return (
-        <div className={cn("p-4 bg-white rounded-2xl shadow-xl border border-border/40 w-[300px] select-none", className)}>
+        <div className={cn("p-4 bg-background rounded-2xl shadow-xl border border-border/40 w-[300px] select-none", className)}>
             {/* Navigation Header */}
             <div className="flex items-center justify-between mb-5 px-1">
                 <span className="text-[13px] font-bold text-slate-900 tracking-tight">

@@ -102,7 +102,7 @@ export function SecurityTab({
             </div>
           )}
         </CardContent>
-        <CardFooter className="bg-gray-50 border-t flex justify-end px-6 py-4">
+        <CardFooter className="bg-muted/30 border-t flex justify-end px-6 py-4">
           <Button
             onClick={onChangePassword}
             disabled={changingPassword || !currentPassword || !newPassword}

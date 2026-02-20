@@ -48,15 +48,15 @@ export function DashboardVoice() {
       {/* Floating voice panel */}
       {isOpen && (
         <div className="fixed bottom-24 right-6 z-50 w-80 h-[380px] animate-in slide-in-from-bottom-4 fade-in duration-300">
-          <div className="relative w-full h-full bg-white rounded-2xl shadow-2xl border border-gray-200/80 overflow-hidden flex flex-col">
+          <div className="relative w-full h-full bg-background rounded-2xl shadow-2xl border border-border/40/80 overflow-hidden flex flex-col">
             {/* Panel header */}
             <div className="flex items-center justify-between px-4 py-2.5 border-b bg-gradient-to-r from-indigo-50 to-purple-50">
-              <span className="text-xs font-semibold text-gray-700">Voice Assistant</span>
+              <span className="text-xs font-semibold text-muted-foreground">Voice Assistant</span>
               <button
                 onClick={() => setIsOpen(false)}
-                className="p-1 rounded-full hover:bg-gray-200/60 transition-colors"
+                className="p-1 rounded-full hover:bg-muted/50/60 transition-colors"
               >
-                <X className="w-3.5 h-3.5 text-gray-500" />
+                <X className="w-3.5 h-3.5 text-muted-foreground" />
               </button>
             </div>
 

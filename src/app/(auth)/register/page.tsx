@@ -47,7 +47,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen w-full flex bg-white overflow-hidden relative">
+    <div className="min-h-screen w-full flex bg-background overflow-hidden relative">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
         <GradientOrb className="w-[800px] h-[800px] bg-blue-400/20 -top-[200px] -left-[200px]" delay={0} />
@@ -61,13 +61,13 @@ export default function RegisterPage() {
             <Link href="/" className="inline-block mb-6 transition-transform hover:scale-105">
               <Logo variant="full" size={40} />
             </Link>
-            <h1 className="text-3xl font-bold tracking-tight text-gray-900">Create Account</h1>
-            <p className="mt-2 text-gray-500">
+            <h1 className="text-3xl font-bold tracking-tight text-foreground">Create Account</h1>
+            <p className="mt-2 text-muted-foreground">
               Start managing your business operations today.
             </p>
           </div>
 
-          <Card className="border-gray-100 shadow-xl shadow-gray-200/50 backdrop-blur-sm bg-white/80">
+          <Card className="border-border/40 shadow-xl shadow-border/50 backdrop-blur-sm bg-background/80">
             <CardContent className="pt-6">
               <form onSubmit={handleSubmit} className="space-y-5">
                 {error && (
@@ -81,7 +81,7 @@ export default function RegisterPage() {
                   <Button
                     type="button"
                     variant="outline"
-                    className="w-full h-11 bg-white hover:bg-gray-50 text-gray-700 border-gray-200 shadow-sm transition-all hover:-translate-y-0.5"
+                    className="w-full h-11 bg-background hover:bg-muted/30 text-muted-foreground border-border/40 shadow-sm transition-all hover:-translate-y-0.5"
                     onClick={() => window.location.href = "/api/auth/google"}
                   >
                     <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
@@ -94,43 +94,43 @@ export default function RegisterPage() {
                   </Button>
 
                   <div className="relative flex py-1 items-center">
-                    <div className="flex-grow border-t border-gray-200"></div>
-                    <span className="flex-shrink-0 mx-4 text-xs font-semibold text-gray-400 uppercase">Or register with email</span>
-                    <div className="flex-grow border-t border-gray-200"></div>
+                    <div className="flex-grow border-t border-border/40"></div>
+                    <span className="flex-shrink-0 mx-4 text-xs font-semibold text-muted-foreground uppercase">Or register with email</span>
+                    <div className="flex-grow border-t border-border/40"></div>
                   </div>
 
                   <div className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="name" className="text-gray-700">Full Name</Label>
+                      <Label htmlFor="name" className="text-muted-foreground">Full Name</Label>
                       <Input
                         id="name"
                         type="text"
                         placeholder="John Doe"
-                        className="h-11 bg-gray-50 border-gray-200 focus:bg-white transition-colors"
+                        className="h-11 bg-muted/30 border-border/40 focus:bg-background transition-colors"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         required
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="email" className="text-gray-700">Email</Label>
+                      <Label htmlFor="email" className="text-muted-foreground">Email</Label>
                       <Input
                         id="email"
                         type="email"
                         placeholder="name@work.com"
-                        className="h-11 bg-gray-50 border-gray-200 focus:bg-white transition-colors"
+                        className="h-11 bg-muted/30 border-border/40 focus:bg-background transition-colors"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="password" className="text-gray-700">Password</Label>
+                      <Label htmlFor="password" className="text-muted-foreground">Password</Label>
                       <Input
                         id="password"
                         type="password"
                         placeholder="Create a strong password"
-                        className="h-11 bg-gray-50 border-gray-200 focus:bg-white transition-colors"
+                        className="h-11 bg-muted/30 border-border/40 focus:bg-background transition-colors"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
@@ -159,7 +159,7 @@ export default function RegisterPage() {
             </CardContent>
           </Card>
 
-          <p className="text-center text-sm text-gray-500">
+          <p className="text-center text-sm text-muted-foreground">
             Already have an account?{" "}
             <Link href="/login" className="font-semibold text-blue-600 hover:text-blue-700 hover:underline transition-colors">
               Sign in
@@ -169,14 +169,14 @@ export default function RegisterPage() {
       </div>
 
       {/* Right Column - Visuals (Hidden on Mobile) */}
-      <div className="hidden lg:flex w-1/2 bg-gray-50 relative overflow-hidden items-center justify-center">
+      <div className="hidden lg:flex w-1/2 bg-muted/30 relative overflow-hidden items-center justify-center">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-800 opacity-90" />
         <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%23ffffff%22%20fill-opacity%3D%220.05%22%3E%3Cpath%20d%3D%22M36%2034v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6%2034v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6%204V0H4v4H0v2h4v4h2V6h4V4H6z%22%2F%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E')] opacity-20" />
 
-        <div className="relative z-10 max-w-lg text-white p-12">
+        <div className="relative z-10 max-w-7xlg text-white p-12">
           <FloatingElement delay={0}>
             <TiltCard className="mb-8">
-              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 shadow-2xl">
+              <div className="bg-background/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 shadow-2xl">
                 <div className="flex items-center gap-4 mb-4">
                   <div className="w-12 h-12 rounded-full bg-blue-400/20 flex items-center justify-center text-blue-400">
                     <Activity className="w-6 h-6" />
@@ -187,7 +187,7 @@ export default function RegisterPage() {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                  <div className="h-2 bg-background/10 rounded-full overflow-hidden">
                     <div className="h-full bg-blue-400 w-[65%] animate-pulse"></div>
                   </div>
                   <div className="flex justify-between text-xs text-blue-200">
@@ -231,7 +231,7 @@ export default function RegisterPage() {
           <div className="w-24 h-24 rounded-full border-4 border-white/10" />
         </FloatingElement>
         <FloatingElement className="absolute bottom-20 left-20" delay={2}>
-          <div className="w-16 h-16 rounded-xl bg-white/5 rotate-12 backdrop-blur-sm" />
+          <div className="w-16 h-16 rounded-xl bg-background/5 rotate-12 backdrop-blur-sm" />
         </FloatingElement>
       </div>
     </div>

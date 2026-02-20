@@ -39,9 +39,9 @@ export function FormList({
   if (forms.length === 0) {
     return (
       <div className="text-center py-12">
-        <FileText className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-        <p className="text-gray-500 mb-1">No {type} forms yet</p>
-        <p className="text-xs text-gray-400 mb-4">
+        <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+        <p className="text-muted-foreground mb-1">No {type} forms yet</p>
+        <p className="text-xs text-muted-foreground mb-4">
           Create a {type} form to start collecting data.
         </p>
       </div>
@@ -56,7 +56,7 @@ export function FormList({
             <div className="min-w-0 flex-1">
               <p className="font-medium truncate">{form.name}</p>
               {type === "contact" ? (
-                <p className="text-xs text-gray-500 mt-1">Slug: {form.slug}</p>
+                <p className="text-xs text-muted-foreground mt-1">Slug: {form.slug}</p>
               ) : (
                 <div className="flex items-center gap-2 mt-1 flex-wrap">
                   {(form as IntakeFormDTO).service && (
@@ -64,7 +64,7 @@ export function FormList({
                       {(form as IntakeFormDTO).service?.name}
                     </Badge>
                   )}
-                  <span className="text-xs text-gray-500">
+                  <span className="text-xs text-muted-foreground">
                     {(form as IntakeFormDTO)._count?.submissions || 0} submissions
                   </span>
                 </div>
@@ -83,7 +83,7 @@ export function FormList({
                 {form.isActive ? (
                   <ToggleRight className="w-4 h-4 text-green-600" />
                 ) : (
-                  <ToggleLeft className="w-4 h-4 text-gray-400" />
+                  <ToggleLeft className="w-4 h-4 text-muted-foreground" />
                 )}
               </Button>
               <Button

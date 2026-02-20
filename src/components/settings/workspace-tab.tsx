@@ -42,8 +42,8 @@ const workspaceStatusConfig: Record<
   },
   INACTIVE: {
     label: "Inactive",
-    color: "text-gray-700",
-    bgColor: "bg-gray-100 border-gray-300",
+    color: "text-muted-foreground",
+    bgColor: "bg-muted/30 border-border/40",
   },
 };
 
@@ -86,7 +86,7 @@ export function WorkspaceTab({
           <p className={`text-sm font-medium ${statusConfig.color}`}>
             Workspace Status: {statusConfig.label}
           </p>
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-muted-foreground">
             {workspace?.status === "ONBOARDING" &&
               "Complete your setup to activate your workspace"}
             {workspace?.status === "ACTIVE" &&
@@ -145,8 +145,8 @@ export function WorkspaceTab({
             </div>
           </div>
         </CardContent>
-        <CardFooter className="bg-gray-50 border-t flex justify-between items-center px-6 py-4">
-          <div className="text-xs text-gray-500">
+        <CardFooter className="bg-muted/30 border-t flex justify-between items-center px-6 py-4">
+          <div className="text-xs text-muted-foreground">
             Public links will use this info
           </div>
           <Button onClick={onSave} disabled={saving}>
@@ -176,11 +176,11 @@ export function WorkspaceTab({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
-          <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-            <Link2 className="w-4 h-4 text-gray-400 shrink-0" />
+          <div className="flex items-center gap-3 p-3 bg-muted/30 rounded-lg">
+            <Link2 className="w-4 h-4 text-muted-foreground shrink-0" />
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-medium text-gray-600">Booking Page</p>
-              <code className="text-xs text-gray-500 truncate block">
+              <p className="text-xs font-medium text-muted-foreground">Booking Page</p>
+              <code className="text-xs text-muted-foreground truncate block">
                 {bookingUrl}
               </code>
             </div>
@@ -192,11 +192,11 @@ export function WorkspaceTab({
               {copied === "booking" ? "Copied!" : "Copy"}
             </Button>
           </div>
-          <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-            <Link2 className="w-4 h-4 text-gray-400 shrink-0" />
+          <div className="flex items-center gap-3 p-3 bg-muted/30 rounded-lg">
+            <Link2 className="w-4 h-4 text-muted-foreground shrink-0" />
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-medium text-gray-600">Contact Form</p>
-              <code className="text-xs text-gray-500 truncate block">
+              <p className="text-xs font-medium text-muted-foreground">Contact Form</p>
+              <code className="text-xs text-muted-foreground truncate block">
                 {contactFormUrl}
               </code>
             </div>

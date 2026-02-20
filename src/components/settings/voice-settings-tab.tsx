@@ -410,7 +410,7 @@ export function VoiceSettingsTab() {
           <Mic className="w-5 h-5 text-emerald-600" />
           Voice AI Settings
         </h2>
-        <p className="text-sm text-gray-500 mt-1">
+        <p className="text-sm text-muted-foreground mt-1">
           Configure your AI voice assistant for handling phone calls
         </p>
       </div>
@@ -434,20 +434,20 @@ export function VoiceSettingsTab() {
           <CardContent className="p-4 flex items-center gap-3">
             <div className={cn(
               "w-10 h-10 rounded-full flex items-center justify-center",
-              vapiStatus.configured ? "bg-emerald-100 text-emerald-600" : "bg-gray-100 text-gray-400"
+              vapiStatus.configured ? "bg-emerald-100 text-emerald-600" : "bg-muted/30 text-muted-foreground"
             )}>
               <Phone className="w-5 h-5" />
             </div>
             <div>
               <p className="font-medium text-sm">VAPI Status</p>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-muted-foreground">
                 {vapiStatus.configured ? "Connected" : "Not configured"}
               </p>
             </div>
             {vapiStatus.configured ? (
               <CheckCircle2 className="w-5 h-5 text-emerald-500 ml-auto" />
             ) : (
-              <XCircle className="w-5 h-5 text-gray-300 ml-auto" />
+              <XCircle className="w-5 h-5 text-muted-foreground ml-auto" />
             )}
           </CardContent>
         </Card>
@@ -459,9 +459,9 @@ export function VoiceSettingsTab() {
             </div>
             <div>
               <p className="font-medium text-sm">Voice Agents</p>
-              <p className="text-xs text-gray-500">{voiceAgents.length} configured</p>
+              <p className="text-xs text-muted-foreground">{voiceAgents.length} configured</p>
             </div>
-            <Badge variant="outline" className="ml-auto bg-white">
+            <Badge variant="outline" className="ml-auto bg-background">
               {voiceAgents.filter(a => a.isActive).length} active
             </Badge>
           </CardContent>
@@ -474,9 +474,9 @@ export function VoiceSettingsTab() {
             </div>
             <div>
               <p className="font-medium text-sm">Phone Numbers</p>
-              <p className="text-xs text-gray-500">{phoneNumbers.length} numbers</p>
+              <p className="text-xs text-muted-foreground">{phoneNumbers.length} numbers</p>
             </div>
-            <Badge variant="outline" className="ml-auto bg-white">
+            <Badge variant="outline" className="ml-auto bg-background">
               {phoneNumbers.filter(p => p.isActive).length} active
             </Badge>
           </CardContent>
@@ -542,7 +542,7 @@ export function VoiceSettingsTab() {
                 placeholder="You are a professional receptionist for..."
                 rows={3}
               />
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-muted-foreground">
                 Customize how the AI behaves during calls. Leave empty for default behavior.
               </p>
             </div>
@@ -600,9 +600,9 @@ export function VoiceSettingsTab() {
       {voiceAgents.length === 0 && !showAgentForm && (
         <Card className="border-dashed">
           <CardContent className="p-8 text-center">
-            <Mic className="w-10 h-10 text-gray-300 mx-auto mb-3" />
-            <p className="text-gray-500 text-sm">No voice agents configured</p>
-            <p className="text-gray-400 text-xs mt-1">
+            <Mic className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+            <p className="text-muted-foreground text-sm">No voice agents configured</p>
+            <p className="text-muted-foreground text-xs mt-1">
               Create a voice agent to handle incoming calls
             </p>
           </CardContent>
@@ -621,14 +621,14 @@ export function VoiceSettingsTab() {
                       "w-8 h-8 rounded-full flex items-center justify-center transition-colors",
                       agent.isActive
                         ? "bg-emerald-100 text-emerald-600 hover:bg-emerald-200"
-                        : "bg-gray-100 text-gray-400 hover:bg-gray-200"
+                        : "bg-muted/30 text-muted-foreground hover:bg-muted/50"
                     )}
                   >
                     {agent.isActive ? <Play className="w-3.5 h-3.5" /> : <Pause className="w-3.5 h-3.5" />}
                   </button>
                   <div>
                     <p className="font-medium text-sm">{agent.name}</p>
-                    <p className="text-xs text-gray-500">{agent.description || "No description"}</p>
+                    <p className="text-xs text-muted-foreground">{agent.description || "No description"}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -644,9 +644,9 @@ export function VoiceSettingsTab() {
                 </div>
               </div>
               {agent.greeting && (
-                <div className="mt-3 pt-3 border-t border-gray-100">
-                  <p className="text-xs text-gray-500">Greeting:</p>
-                  <p className="text-sm text-gray-700 mt-1">&quot;{agent.greeting}&quot;</p>
+                <div className="mt-3 pt-3 border-t border-border/40">
+                  <p className="text-xs text-muted-foreground">Greeting:</p>
+                  <p className="text-sm text-muted-foreground mt-1">&quot;{agent.greeting}&quot;</p>
                 </div>
               )}
             </CardContent>
@@ -666,7 +666,7 @@ export function VoiceSettingsTab() {
         </CardHeader>
         <CardContent className="space-y-3">
           {escalationCalls.length === 0 ? (
-            <p className="text-sm text-gray-500">No escalated calls right now.</p>
+            <p className="text-sm text-muted-foreground">No escalated calls right now.</p>
           ) : (
             escalationCalls.map((call) => (
               <div
@@ -674,16 +674,16 @@ export function VoiceSettingsTab() {
                 className="flex flex-col gap-2 rounded-lg border border-amber-200 bg-amber-50/40 p-3 sm:flex-row sm:items-start sm:justify-between"
               >
                 <div className="space-y-1">
-                  <p className="text-sm font-medium text-gray-900">
+                  <p className="text-sm font-medium text-foreground">
                     {call.contact?.name || "Unknown Caller"}
                     {call.contact?.phone ? ` (${call.contact.phone})` : ""}
                   </p>
-                  <p className="text-xs text-gray-600">
+                  <p className="text-xs text-muted-foreground">
                     {call.escalationReason || "Escalation flagged"} · {new Date(call.createdAt).toLocaleString()}
                   </p>
-                  {call.summary && <p className="text-xs text-gray-700">Summary: {call.summary}</p>}
+                  {call.summary && <p className="text-xs text-muted-foreground">Summary: {call.summary}</p>}
                   {!call.summary && call.transcript && (
-                    <p className="text-xs text-gray-700">
+                    <p className="text-xs text-muted-foreground">
                       Transcript: {call.transcript.slice(0, 180)}{call.transcript.length > 180 ? "..." : ""}
                     </p>
                   )}
@@ -721,7 +721,7 @@ export function VoiceSettingsTab() {
       </Card>
 
       <Dialog open={!!selectedEscalationId} onOpenChange={(open) => !open && closeEscalationDetails()}>
-        <DialogContent className="max-w-3xl">
+        <DialogContent className="max-w-7xl">
           <DialogHeader>
             <DialogTitle>Escalated Call Details</DialogTitle>
             <DialogDescription>
@@ -742,17 +742,17 @@ export function VoiceSettingsTab() {
                   <CardTitle className="text-sm">Summary</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2 text-sm">
-                  <p><span className="text-gray-500">Status:</span> {selectedEscalationDetail.status}</p>
-                  <p><span className="text-gray-500">Outcome:</span> {selectedEscalationDetail.outcome || "-"}</p>
+                  <p><span className="text-muted-foreground">Status:</span> {selectedEscalationDetail.status}</p>
+                  <p><span className="text-muted-foreground">Outcome:</span> {selectedEscalationDetail.outcome || "-"}</p>
                   <p>
-                    <span className="text-gray-500">Duration:</span>{" "}
+                    <span className="text-muted-foreground">Duration:</span>{" "}
                     {selectedEscalationDetail.duration != null
                       ? `${Math.floor(selectedEscalationDetail.duration / 60)}:${String(selectedEscalationDetail.duration % 60).padStart(2, "0")} `
                       : "-"}
                   </p>
-                  <p><span className="text-gray-500">Escalation reason:</span> {selectedEscalationDetail.escalationReason || "Flagged"}</p>
+                  <p><span className="text-muted-foreground">Escalation reason:</span> {selectedEscalationDetail.escalationReason || "Flagged"}</p>
                   {selectedEscalationDetail.summary ? (
-                    <p className="rounded-md bg-gray-50 p-2 text-xs text-gray-700">{selectedEscalationDetail.summary}</p>
+                    <p className="rounded-md bg-muted/30 p-2 text-xs text-muted-foreground">{selectedEscalationDetail.summary}</p>
                   ) : null}
                 </CardContent>
               </Card>
@@ -765,16 +765,16 @@ export function VoiceSettingsTab() {
                   {selectedEscalationDetail.consent ? (
                     <>
                       <p>
-                        <span className="text-gray-500">Consent:</span>{" "}
+                        <span className="text-muted-foreground">Consent:</span>{" "}
                         {selectedEscalationDetail.consent.consentResponse ? "Granted" : "Denied"}
                       </p>
-                      <p><span className="text-gray-500">Prompt:</span> {selectedEscalationDetail.consent.consentText}</p>
-                      <p className="text-xs text-gray-500">
+                      <p><span className="text-muted-foreground">Prompt:</span> {selectedEscalationDetail.consent.consentText}</p>
+                      <p className="text-xs text-muted-foreground">
                         Captured at {new Date(selectedEscalationDetail.consent.capturedAt).toLocaleString()}
                       </p>
                     </>
                   ) : (
-                    <p className="text-gray-500">No consent record attached.</p>
+                    <p className="text-muted-foreground">No consent record attached.</p>
                   )}
 
                   {(() => {
@@ -784,7 +784,7 @@ export function VoiceSettingsTab() {
                     const smsFallbackRequired = metadata.smsFallbackRequired as boolean | undefined;
 
                     return (
-                      <div className="rounded-md bg-gray-50 p-2 text-xs text-gray-600">
+                      <div className="rounded-md bg-muted/30 p-2 text-xs text-muted-foreground">
                         <p>Retry count: {typeof retryCount === "number" ? retryCount : 0}</p>
                         <p>Next retry: {nextRetryAt ? new Date(nextRetryAt).toLocaleString() : "-"}</p>
                         <p>SMS fallback required: {smsFallbackRequired ? "Yes" : "No"}</p>
@@ -799,14 +799,14 @@ export function VoiceSettingsTab() {
                   <CardTitle className="text-sm">Transcript</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="max-h-64 overflow-auto rounded-md bg-gray-50 p-3 text-sm text-gray-700 whitespace-pre-wrap">
+                  <div className="max-h-64 overflow-auto rounded-md bg-muted/30 p-3 text-sm text-muted-foreground whitespace-pre-wrap">
                     {selectedEscalationDetail.transcript || "No transcript available."}
                   </div>
                 </CardContent>
               </Card>
             </div>
           ) : (
-            <p className="text-sm text-gray-500">No escalation details available.</p>
+            <p className="text-sm text-muted-foreground">No escalation details available.</p>
           )}
         </DialogContent>
       </Dialog>
@@ -853,7 +853,7 @@ export function VoiceSettingsTab() {
           />
 
           {dncEntries.length === 0 ? (
-            <p className="text-sm text-gray-500">No DNC entries yet.</p>
+            <p className="text-sm text-muted-foreground">No DNC entries yet.</p>
           ) : (
             <div className="space-y-2">
               {dncEntries.map((entry) => (
@@ -863,7 +863,7 @@ export function VoiceSettingsTab() {
                 >
                   <div>
                     <p className="text-sm font-medium">{entry.phoneNumber}</p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-muted-foreground">
                       {entry.source} · {entry.reason || "No reason"} · {new Date(entry.createdAt).toLocaleDateString()}
                     </p>
                   </div>
@@ -871,8 +871,8 @@ export function VoiceSettingsTab() {
                     <Badge
                       variant="outline"
                       className={cn(
-                        "bg-white",
-                        entry.isActive ? "text-red-700 border-red-200" : "text-gray-500 border-gray-200"
+                        "bg-background",
+                        entry.isActive ? "text-red-700 border-red-200" : "text-muted-foreground border-border/40"
                       )}
                     >
                       {entry.isActive ? "Blocked" : "Inactive"}

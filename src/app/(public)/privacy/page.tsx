@@ -22,9 +22,9 @@ export const metadata: Metadata = {
  */
 export default function PrivacyPage() {
     return (
-        <div className="min-h-screen bg-white">
-            <nav className="border-b border-gray-100 sticky top-0 z-10 bg-white/90 backdrop-blur-sm">
-                <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="min-h-screen bg-background">
+            <nav className="border-b border-border/40 sticky top-0 z-10 bg-background/90 backdrop-blur-sm">
+                <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
                     <Link href="/" className="flex items-center gap-2">
                         <Logo variant="full" size={32} />
                     </Link>
@@ -42,14 +42,14 @@ export default function PrivacyPage() {
                         <Shield className="w-8 h-8 text-blue-600" />
                     </div>
                 </div>
-                <h1 className="text-4xl font-bold text-gray-900 mb-2">Privacy Policy</h1>
-                <p className="text-gray-500">Last Updated: February 19, 2026</p>
+                <h1 className="text-4xl font-bold text-foreground mb-2">Privacy Policy</h1>
+                <p className="text-muted-foreground">Last Updated: February 19, 2026</p>
             </div>
 
-            <main className="max-w-3xl mx-auto px-6 py-12 space-y-10 text-gray-700 leading-relaxed">
+            <main className="max-w-7xl mx-auto px-6 py-12 space-y-10 text-muted-foreground leading-relaxed">
 
                 <section>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-4">1. Introduction</h2>
+                    <h2 className="text-2xl font-bold text-foreground mb-4">1. Introduction</h2>
                     <p>
                         CareOps (&quot;we,&quot; &quot;our,&quot; or &quot;us&quot;), operated by Amar Kumar
                         (<a href="mailto:amarzeus.dev@gmail.com" className="text-blue-600 hover:underline">amarzeus.dev@gmail.com</a>),
@@ -59,7 +59,7 @@ export default function PrivacyPage() {
                 </section>
 
                 <section>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-4">2. Information We Collect</h2>
+                    <h2 className="text-2xl font-bold text-foreground mb-4">2. Information We Collect</h2>
                     <p className="mb-4">We may collect the following categories of information:</p>
                     <ul className="list-disc pl-6 space-y-3">
                         <li><strong>Account Information:</strong> Name, email address, and password (hashed) when you register.</li>
@@ -73,7 +73,7 @@ export default function PrivacyPage() {
                 </section>
 
                 <section>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-4">3. How We Use Your Information</h2>
+                    <h2 className="text-2xl font-bold text-foreground mb-4">3. How We Use Your Information</h2>
                     <ul className="list-disc pl-6 space-y-3">
                         <li>Provide, maintain, and improve the CareOps platform.</li>
                         <li>Sync bookings with your connected Google Calendar.</li>
@@ -86,39 +86,39 @@ export default function PrivacyPage() {
                 </section>
 
                 <section>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-4">4. Google OAuth API Scopes</h2>
+                    <h2 className="text-2xl font-bold text-foreground mb-4">4. Google OAuth API Scopes</h2>
                     <p className="mb-4">
                         CareOps uses Google OAuth 2.0 to authenticate users and to connect Google Calendar.
                         We request only the minimum scopes necessary:
                     </p>
                     <ul className="list-disc pl-6 space-y-2">
-                        <li><code className="bg-gray-100 px-1 rounded">openid</code>, <code className="bg-gray-100 px-1 rounded">email</code>, <code className="bg-gray-100 px-1 rounded">profile</code> — for authentication.</li>
-                        <li><code className="bg-gray-100 px-1 rounded">https://www.googleapis.com/auth/calendar</code> — to manage bookings in your calendar.</li>
-                        <li><code className="bg-gray-100 px-1 rounded">https://www.googleapis.com/auth/calendar.events</code> — to create, update, and delete booking events.</li>
+                        <li><code className="bg-muted/30 px-1 rounded">openid</code>, <code className="bg-muted/30 px-1 rounded">email</code>, <code className="bg-muted/30 px-1 rounded">profile</code> — for authentication.</li>
+                        <li><code className="bg-muted/30 px-1 rounded">https://www.googleapis.com/auth/calendar</code> — to manage bookings in your calendar.</li>
+                        <li><code className="bg-muted/30 px-1 rounded">https://www.googleapis.com/auth/calendar.events</code> — to create, update, and delete booking events.</li>
                     </ul>
-                    <p className="mt-4 italic text-gray-500">
+                    <p className="mt-4 italic text-muted-foreground">
                         CareOps does not share your Google Calendar data with third parties for marketing
                         or advertising purposes. Use of Google APIs is subject to Google&apos;s Privacy Policy.
                     </p>
                 </section>
 
                 <section>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-4">5. Third-Party Services</h2>
+                    <h2 className="text-2xl font-bold text-foreground mb-4">5. Third-Party Services</h2>
                     <p className="mb-4">CareOps integrates with the following third-party providers:</p>
                     <div className="overflow-x-auto">
-                        <table className="w-full text-sm border border-gray-200 rounded-lg overflow-hidden">
-                            <thead className="bg-gray-50">
+                        <table className="w-full text-sm border border-border/40 rounded-lg overflow-hidden">
+                            <thead className="bg-muted/30">
                                 <tr>
-                                    <th className="px-4 py-3 text-left font-semibold text-gray-700">Provider</th>
-                                    <th className="px-4 py-3 text-left font-semibold text-gray-700">Purpose</th>
-                                    <th className="px-4 py-3 text-left font-semibold text-gray-700">Privacy Policy</th>
+                                    <th className="px-4 py-3 text-left font-semibold text-muted-foreground">Provider</th>
+                                    <th className="px-4 py-3 text-left font-semibold text-muted-foreground">Purpose</th>
+                                    <th className="px-4 py-3 text-left font-semibold text-muted-foreground">Privacy Policy</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
                                 <tr><td className="px-4 py-3 font-medium">Google</td><td className="px-4 py-3">Authentication, Calendar sync</td><td className="px-4 py-3"><a href="https://policies.google.com/privacy" className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">View</a></td></tr>
-                                <tr className="bg-gray-50/50"><td className="px-4 py-3 font-medium">Twilio</td><td className="px-4 py-3">SMS, WhatsApp, OTP</td><td className="px-4 py-3"><a href="https://www.twilio.com/legal/privacy" className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">View</a></td></tr>
+                                <tr className="bg-muted/30/50"><td className="px-4 py-3 font-medium">Twilio</td><td className="px-4 py-3">SMS, WhatsApp, OTP</td><td className="px-4 py-3"><a href="https://www.twilio.com/legal/privacy" className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">View</a></td></tr>
                                 <tr><td className="px-4 py-3 font-medium">Vapi.ai</td><td className="px-4 py-3">AI voice calls</td><td className="px-4 py-3"><a href="https://vapi.ai/privacy" className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">View</a></td></tr>
-                                <tr className="bg-gray-50/50"><td className="px-4 py-3 font-medium">Google Gemini</td><td className="px-4 py-3">AI features</td><td className="px-4 py-3"><a href="https://ai.google.dev/terms" className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">View</a></td></tr>
+                                <tr className="bg-muted/30/50"><td className="px-4 py-3 font-medium">Google Gemini</td><td className="px-4 py-3">AI features</td><td className="px-4 py-3"><a href="https://ai.google.dev/terms" className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">View</a></td></tr>
                                 <tr><td className="px-4 py-3 font-medium">Google AdSense</td><td className="px-4 py-3">Advertising</td><td className="px-4 py-3"><a href="https://policies.google.com/technologies/ads" className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">View</a></td></tr>
                             </tbody>
                         </table>
@@ -126,7 +126,7 @@ export default function PrivacyPage() {
                 </section>
 
                 <section>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-4">6. Data Sharing &amp; Disclosure</h2>
+                    <h2 className="text-2xl font-bold text-foreground mb-4">6. Data Sharing &amp; Disclosure</h2>
                     <p>
                         We do not sell your personal information. We may share data with the third-party
                         providers listed above only as necessary to provide our services. We may also
@@ -136,7 +136,7 @@ export default function PrivacyPage() {
                 </section>
 
                 <section>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-4">7. Google AdSense &amp; Advertising</h2>
+                    <h2 className="text-2xl font-bold text-foreground mb-4">7. Google AdSense &amp; Advertising</h2>
                     <p>
                         CareOps uses Google AdSense to display advertisements. Google, as a third-party
                         vendor, uses cookies (including the DoubleClick cookie) to serve ads based on
@@ -150,7 +150,7 @@ export default function PrivacyPage() {
                 </section>
 
                 <section>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-4">8. Data Retention</h2>
+                    <h2 className="text-2xl font-bold text-foreground mb-4">8. Data Retention</h2>
                     <p>
                         We retain your data for as long as your account is active or as needed to provide
                         our services. You may request deletion of your account and associated data at
@@ -160,7 +160,7 @@ export default function PrivacyPage() {
                 </section>
 
                 <section>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-4">9. Your Rights</h2>
+                    <h2 className="text-2xl font-bold text-foreground mb-4">9. Your Rights</h2>
                     <p className="mb-4">Depending on your location, you may have the right to:</p>
                     <ul className="list-disc pl-6 space-y-2">
                         <li>Access the personal data we hold about you.</li>
@@ -173,7 +173,7 @@ export default function PrivacyPage() {
                 </section>
 
                 <section>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-4">10. Security</h2>
+                    <h2 className="text-2xl font-bold text-foreground mb-4">10. Security</h2>
                     <p>
                         We implement industry-standard security measures including HTTPS encryption,
                         bcrypt password hashing, and environment-variable-based secret management.
@@ -183,7 +183,7 @@ export default function PrivacyPage() {
                 </section>
 
                 <section>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-4">11. Changes to This Policy</h2>
+                    <h2 className="text-2xl font-bold text-foreground mb-4">11. Changes to This Policy</h2>
                     <p>
                         We may update this Privacy Policy from time to time. We will notify you of
                         significant changes by updating the &quot;Last Updated&quot; date. Continued use
@@ -192,7 +192,7 @@ export default function PrivacyPage() {
                 </section>
 
                 <section>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-4">12. Contact Us</h2>
+                    <h2 className="text-2xl font-bold text-foreground mb-4">12. Contact Us</h2>
                     <p>
                         For any privacy-related questions, contact:<br /><br />
                         <strong>Amar Kumar</strong><br />
@@ -202,14 +202,14 @@ export default function PrivacyPage() {
                 </section>
             </main>
 
-            <footer className="border-t border-gray-100 py-12 bg-gray-50">
-                <div className="max-w-4xl mx-auto px-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-gray-500">
+            <footer className="border-t border-border/40 py-12 bg-muted/30">
+                <div className="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
                     <p>© 2026 CareOps by Amar Kumar. All rights reserved.</p>
                     <div className="flex gap-6 items-center">
-                        <Link href="/terms" className="hover:text-gray-700">Terms of Service</Link>
-                        <Link href="/cookies" className="hover:text-gray-700">Cookie Policy</Link>
-                        <Link href="/faq" className="hover:text-gray-700">FAQ</Link>
-                        <a href="https://github.com/amarzeus/careops-app" target="_blank" rel="noopener noreferrer" className="hover:text-gray-900 transition-colors">
+                        <Link href="/terms" className="hover:text-muted-foreground">Terms of Service</Link>
+                        <Link href="/cookies" className="hover:text-muted-foreground">Cookie Policy</Link>
+                        <Link href="/faq" className="hover:text-muted-foreground">FAQ</Link>
+                        <a href="https://github.com/amarzeus/careops-app" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">
                             GitHub
                         </a>
                     </div>

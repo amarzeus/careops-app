@@ -133,8 +133,8 @@ export function FullCalendar({ bookings, externalEvents = [], onEdit, onNewBooki
   }, [currentDate]);
 
   const renderMonthView = () => (
-    <div className="flex flex-col h-full bg-white border border-slate-100 rounded-xl overflow-hidden shadow-sm">
-      <div className="grid grid-cols-7 border-b border-slate-100 sticky top-0 bg-white z-20">
+    <div className="flex flex-col h-full bg-background border border-slate-100 rounded-xl overflow-hidden shadow-sm">
+      <div className="grid grid-cols-7 border-b border-slate-100 sticky top-0 bg-background z-20">
         {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
           <div key={day} className="py-2 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest border-r border-slate-100 last:border-r-0">
             {day}
@@ -209,9 +209,9 @@ export function FullCalendar({ bookings, externalEvents = [], onEdit, onNewBooki
   );
 
   const renderTimeGrid = (daysList: Date[]) => (
-    <div className="flex flex-col h-full bg-white relative">
+    <div className="flex flex-col h-full bg-background relative">
       {/* Sticky Header Row */}
-      <div className="flex border-b border-slate-100 sticky top-0 bg-white z-30 shadow-[0_1px_0_0_rgba(0,0,0,0.03)] shrink-0">
+      <div className="flex border-b border-slate-100 sticky top-0 bg-background z-30 shadow-[0_1px_0_0_rgba(0,0,0,0.03)] shrink-0">
         <div className="w-12 flex-shrink-0 border-r border-slate-100 bg-slate-50/30"></div>
         <div className="flex flex-1 grid grid-cols-7">
           {daysList.map((day) => {
@@ -247,7 +247,7 @@ export function FullCalendar({ bookings, externalEvents = [], onEdit, onNewBooki
         ref={scrollContainerRef}
         className="flex-1 overflow-y-auto relative no-scrollbar"
       >
-        <div className="flex flex-1 relative bg-white" style={{ height: 24 * HOUR_HEIGHT }}>
+        <div className="flex flex-1 relative bg-background" style={{ height: 24 * HOUR_HEIGHT }}>
           {/* Time Gutter */}
           <div className="w-12 flex-shrink-0 border-r border-slate-100 bg-slate-50/30 select-none">
             {Array.from({ length: 24 }).map((_, hour) => (
@@ -269,7 +269,7 @@ export function FullCalendar({ bookings, externalEvents = [], onEdit, onNewBooki
 
               return (
                 <div key={day.toISOString()} className={cn(
-                  "border-r border-slate-100 last:border-r-0 relative bg-white",
+                  "border-r border-slate-100 last:border-r-0 relative bg-background",
                   isTodayDate && "bg-blue-50/[0.1]"
                 )}>
                   {/* Grid Lines */}
@@ -366,16 +366,16 @@ export function FullCalendar({ bookings, externalEvents = [], onEdit, onNewBooki
   return (
     <div className="flex flex-col h-full overflow-hidden">
       {/* Navigation Toolbar */}
-      <div className="flex items-center justify-between p-3 border-b border-slate-100 bg-white shrink-0">
+      <div className="flex items-center justify-between p-3 border-b border-slate-100 bg-background shrink-0">
         <div className="flex items-center gap-2">
           <div className="flex bg-slate-50 p-0.5 rounded-lg border border-slate-200">
-            <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md hover:bg-white" onClick={prev}>
+            <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md hover:bg-background" onClick={prev}>
               <ChevronLeft className="w-4 h-4 text-slate-500" />
             </Button>
-            <Button variant="ghost" className="h-7 px-3 text-[10px] font-bold text-slate-600 rounded-md hover:bg-white transition-all active:scale-95" onClick={goToToday}>
+            <Button variant="ghost" className="h-7 px-3 text-[10px] font-bold text-slate-600 rounded-md hover:bg-background transition-all active:scale-95" onClick={goToToday}>
               Today
             </Button>
-            <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md hover:bg-white" onClick={next}>
+            <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md hover:bg-background" onClick={next}>
               <ChevronRight className="w-4 h-4 text-slate-500" />
             </Button>
           </div>
@@ -393,7 +393,7 @@ export function FullCalendar({ bookings, externalEvents = [], onEdit, onNewBooki
                 className={cn(
                   "px-3 py-1 text-[9px] font-bold rounded-md capitalize transition-all",
                   view === m
-                    ? "bg-white text-blue-600 shadow-sm border border-slate-100"
+                    ? "bg-background text-blue-600 shadow-sm border border-slate-100"
                     : "text-slate-400 hover:text-slate-600"
                 )}
               >

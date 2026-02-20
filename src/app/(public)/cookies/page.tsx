@@ -22,9 +22,9 @@ export const metadata: Metadata = {
  */
 export default function CookiePolicyPage() {
     return (
-        <div className="min-h-screen bg-white">
-            <nav className="border-b border-gray-100 sticky top-0 z-10 bg-white/90 backdrop-blur-sm">
-                <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="min-h-screen bg-background">
+            <nav className="border-b border-border/40 sticky top-0 z-10 bg-background/90 backdrop-blur-sm">
+                <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
                     <Link href="/" className="flex items-center gap-2">
                         <Logo variant="full" size={32} />
                     </Link>
@@ -42,14 +42,14 @@ export default function CookiePolicyPage() {
                         <Cookie className="w-8 h-8 text-amber-600" />
                     </div>
                 </div>
-                <h1 className="text-4xl font-bold text-gray-900 mb-2">Cookie Policy</h1>
-                <p className="text-gray-500">Last Updated: February 19, 2026</p>
+                <h1 className="text-4xl font-bold text-foreground mb-2">Cookie Policy</h1>
+                <p className="text-muted-foreground">Last Updated: February 19, 2026</p>
             </div>
 
-            <main className="max-w-3xl mx-auto px-6 py-12 space-y-10 text-gray-700 leading-relaxed">
+            <main className="max-w-7xl mx-auto px-6 py-12 space-y-10 text-muted-foreground leading-relaxed">
 
                 <section>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-4">1. What Are Cookies?</h2>
+                    <h2 className="text-2xl font-bold text-foreground mb-4">1. What Are Cookies?</h2>
                     <p>
                         Cookies are small text files that a website stores on your device when you visit it.
                         They are widely used to make websites function efficiently, to provide analytics
@@ -58,15 +58,15 @@ export default function CookiePolicyPage() {
                 </section>
 
                 <section>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-4">2. How We Use Cookies</h2>
+                    <h2 className="text-2xl font-bold text-foreground mb-4">2. How We Use Cookies</h2>
                     <p className="mb-4">CareOps uses cookies for the following purposes:</p>
                     <div className="overflow-x-auto">
-                        <table className="w-full text-sm border border-gray-200 rounded-lg overflow-hidden">
-                            <thead className="bg-gray-50">
+                        <table className="w-full text-sm border border-border/40 rounded-lg overflow-hidden">
+                            <thead className="bg-muted/30">
                                 <tr>
-                                    <th className="px-4 py-3 text-left font-semibold text-gray-700">Category</th>
-                                    <th className="px-4 py-3 text-left font-semibold text-gray-700">Purpose</th>
-                                    <th className="px-4 py-3 text-left font-semibold text-gray-700">Required?</th>
+                                    <th className="px-4 py-3 text-left font-semibold text-muted-foreground">Category</th>
+                                    <th className="px-4 py-3 text-left font-semibold text-muted-foreground">Purpose</th>
+                                    <th className="px-4 py-3 text-left font-semibold text-muted-foreground">Required?</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
@@ -75,7 +75,7 @@ export default function CookiePolicyPage() {
                                     <td className="px-4 py-3">Session authentication, security tokens, CSRF protection</td>
                                     <td className="px-4 py-3 text-green-600 font-medium">Yes</td>
                                 </tr>
-                                <tr className="bg-gray-50/50">
+                                <tr className="bg-muted/30/50">
                                     <td className="px-4 py-3 font-medium">Preference</td>
                                     <td className="px-4 py-3">Remembering your theme (light/dark) and language settings</td>
                                     <td className="px-4 py-3 text-yellow-600 font-medium">Optional</td>
@@ -85,7 +85,7 @@ export default function CookiePolicyPage() {
                                     <td className="px-4 py-3">Understanding how users navigate the platform to improve it</td>
                                     <td className="px-4 py-3 text-yellow-600 font-medium">Optional</td>
                                 </tr>
-                                <tr className="bg-gray-50/50">
+                                <tr className="bg-muted/30/50">
                                     <td className="px-4 py-3 font-medium">Advertising</td>
                                     <td className="px-4 py-3">
                                         Delivering relevant ads via Google AdSense. Google may use cookies
@@ -99,7 +99,7 @@ export default function CookiePolicyPage() {
                 </section>
 
                 <section>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-4">3. Third-Party Cookies</h2>
+                    <h2 className="text-2xl font-bold text-foreground mb-4">3. Third-Party Cookies</h2>
                     <p className="mb-4">
                         We use services that may set their own cookies on your device:
                     </p>
@@ -127,7 +127,7 @@ export default function CookiePolicyPage() {
                 </section>
 
                 <section>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-4">4. Managing Cookies</h2>
+                    <h2 className="text-2xl font-bold text-foreground mb-4">4. Managing Cookies</h2>
                     <p className="mb-4">
                         You can control and/or delete cookies as you wish. You can delete all cookies
                         already on your device and set most browsers to prevent them from being placed.
@@ -143,7 +143,7 @@ export default function CookiePolicyPage() {
                 </section>
 
                 <section>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-4">5. Google&apos;s Personalised Advertising</h2>
+                    <h2 className="text-2xl font-bold text-foreground mb-4">5. Google&apos;s Personalised Advertising</h2>
                     <p>
                         CareOps uses Google AdSense to display advertisements. Google may use cookies
                         and web beacons to collect data about your visits to this and other websites
@@ -160,7 +160,7 @@ export default function CookiePolicyPage() {
                 </section>
 
                 <section>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-4">6. Changes to This Policy</h2>
+                    <h2 className="text-2xl font-bold text-foreground mb-4">6. Changes to This Policy</h2>
                     <p>
                         We may update this Cookie Policy from time to time. Any changes will be
                         posted on this page with an updated revision date. Continued use of CareOps
@@ -169,7 +169,7 @@ export default function CookiePolicyPage() {
                 </section>
 
                 <section>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-4">7. Contact Us</h2>
+                    <h2 className="text-2xl font-bold text-foreground mb-4">7. Contact Us</h2>
                     <p>
                         For any questions about our use of cookies, contact{" "}
                         <a href="mailto:amarzeus.dev@gmail.com" className="text-blue-600 hover:underline">
@@ -179,13 +179,13 @@ export default function CookiePolicyPage() {
                 </section>
             </main>
 
-            <footer className="border-t border-gray-100 py-12 bg-gray-50">
-                <div className="max-w-4xl mx-auto px-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-gray-500">
+            <footer className="border-t border-border/40 py-12 bg-muted/30">
+                <div className="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
                     <p>© 2026 CareOps by Amar Kumar. All rights reserved.</p>
                     <div className="flex gap-6">
-                        <Link href="/privacy" className="hover:text-gray-700">Privacy Policy</Link>
-                        <Link href="/terms" className="hover:text-gray-700">Terms of Service</Link>
-                        <Link href="/faq" className="hover:text-gray-700">FAQ</Link>
+                        <Link href="/privacy" className="hover:text-muted-foreground">Privacy Policy</Link>
+                        <Link href="/terms" className="hover:text-muted-foreground">Terms of Service</Link>
+                        <Link href="/faq" className="hover:text-muted-foreground">FAQ</Link>
                     </div>
                 </div>
             </footer>

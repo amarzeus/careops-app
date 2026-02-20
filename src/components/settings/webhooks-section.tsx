@@ -129,13 +129,13 @@ export function WebhooksSection() {
                 placeholder="https://hooks.zapier.com/..."
                 value={newUrl}
                 onChange={(e) => setNewUrl(e.target.value)}
-                className="bg-white"
+                className="bg-background"
               />
             </div>
             <div className="w-full sm:w-[200px] space-y-1.5">
               <label className="text-xs font-medium text-purple-900">Event</label>
               <Select value={newEvent} onValueChange={setNewEvent}>
-                <SelectTrigger className="bg-white">
+                <SelectTrigger className="bg-background">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -158,16 +158,16 @@ export function WebhooksSection() {
         </div>
 
         {loading ? (
-          <div className="text-center py-4 text-sm text-gray-500">Loading webhooks...</div>
+          <div className="text-center py-4 text-sm text-muted-foreground">Loading webhooks...</div>
         ) : (
           <div className="space-y-2">
             {webhooks.length === 0 && (
-              <div className="text-center py-6 border-2 border-dashed rounded-lg text-gray-400 text-sm">
+              <div className="text-center py-6 border-2 border-dashed rounded-lg text-muted-foreground text-sm">
                 No webhooks configured. Add one above.
               </div>
             )}
             {webhooks.map((hook) => (
-              <div key={hook.id} className="flex items-center justify-between p-3 border rounded-lg bg-white group hover:border-purple-200 transition-colors">
+              <div key={hook.id} className="flex items-center justify-between p-3 border rounded-lg bg-background group hover:border-purple-200 transition-colors">
                 <div className="flex items-center gap-3 overflow-hidden">
                   <div className="w-8 h-8 bg-purple-100 rounded-md flex items-center justify-center shrink-0">
                     <WebhookIcon className="w-4 h-4 text-purple-600" />
@@ -178,7 +178,7 @@ export function WebhooksSection() {
                       <Badge variant="outline" className="text-[10px] h-5 px-1.5">
                         {triggerOptions.find(o => o.value === hook.event)?.label || hook.event}
                       </Badge>
-                      <span className="text-[10px] text-gray-400">
+                      <span className="text-[10px] text-muted-foreground">
                         {new Date(hook.createdAt).toLocaleDateString()}
                       </span>
                     </div>
@@ -187,7 +187,7 @@ export function WebhooksSection() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="text-gray-400 hover:text-red-600 shrink-0"
+                  className="text-muted-foreground hover:text-red-600 shrink-0"
                   onClick={() => handleDeleteWebhook(hook.id)}
                 >
                   <Trash2 className="w-4 h-4" />

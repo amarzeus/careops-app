@@ -74,7 +74,7 @@ function ContactsTable({ contacts, searchQuery }: { contacts: Contact[]; searchQ
         <h3 className="text-sm font-medium text-foreground">
           {searchQuery ? "No contacts found" : "No contacts yet"}
         </h3>
-        <p className="mt-1 max-w-xs text-sm text-muted-foreground">
+        <p className="mt-1 max-w-7xl text-sm text-muted-foreground">
           {searchQuery
             ? `No results for "${searchQuery}"`
             : "Contacts appear here when they book or fill out a form. You can also add them manually."}
@@ -210,10 +210,10 @@ export default function ContactsPage() {
         />
       </Header>
 
-      <div className="mx-auto w-full max-w-screen-xl flex-1 p-4 sm:p-6">
+      <div className="mx-auto w-full max-w-7xl flex-1 p-4 sm:p-6">
         {/* Search bar + stats summary */}
         <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="relative max-w-sm flex-1">
+          <div className="relative max-w-7xl flex-1">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               className="h-9 bg-background pl-9 text-sm"

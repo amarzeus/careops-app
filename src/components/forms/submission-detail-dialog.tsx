@@ -55,7 +55,7 @@ export function SubmissionDetailDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-w-7xlg">
         <DialogHeader>
           <DialogTitle>Submission Details</DialogTitle>
           <DialogDescription>
@@ -65,30 +65,30 @@ export function SubmissionDetailDialog({
         <div className="space-y-5">
           <div className="flex items-center justify-between">
             {statusBadge(submission.status)}
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-muted-foreground">
               Submitted {new Date(submission.createdAt).toLocaleString()}
             </p>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <p className="text-xs text-gray-500 mb-1">Contact</p>
+              <p className="text-xs text-muted-foreground mb-1">Contact</p>
               <p className="font-medium text-sm">
                 {submission.contact?.name || "Unknown"}
               </p>
               {submission.contact?.email && (
-                <p className="text-xs text-gray-500 mt-0.5">
+                <p className="text-xs text-muted-foreground mt-0.5">
                   {submission.contact.email}
                 </p>
               )}
               {submission.contact?.phone && (
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-muted-foreground">
                   {submission.contact.phone}
                 </p>
               )}
             </div>
             <div>
-              <p className="text-xs text-gray-500 mb-1">Form</p>
+              <p className="text-xs text-muted-foreground mb-1">Form</p>
               <p className="font-medium text-sm">
                 {submission.intakeForm?.name || "Contact Form"}
               </p>
@@ -97,11 +97,11 @@ export function SubmissionDetailDialog({
 
           {submission.data && Object.keys(submission.data).length > 0 && (
             <div>
-              <p className="text-xs text-gray-500 mb-2">Submission Data</p>
-              <div className="bg-gray-50 rounded-md p-3 space-y-2 max-h-60 overflow-y-auto">
+              <p className="text-xs text-muted-foreground mb-2">Submission Data</p>
+              <div className="bg-muted/30 rounded-md p-3 space-y-2 max-h-60 overflow-y-auto">
                 {Object.entries(submission.data).map(([key, value]) => (
                   <div key={key}>
-                    <p className="text-xs font-medium text-gray-600 capitalize">
+                    <p className="text-xs font-medium text-muted-foreground capitalize">
                       {key.replace(/([A-Z])/g, " $1").replace(/_/g, " ")}
                     </p>
                     <p className="text-sm">{String(value)}</p>

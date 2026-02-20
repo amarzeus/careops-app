@@ -32,7 +32,7 @@ export function MessageThread({ messages, loading, contactName }: MessageThreadP
   if (loading) {
     return (
       <div className="flex justify-center p-4">
-        <Loader2 className="animate-spin text-gray-400" />
+        <Loader2 className="animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -70,14 +70,14 @@ export function MessageThread({ messages, loading, contactName }: MessageThreadP
                   "p-3 rounded-2xl text-sm leading-relaxed shadow-sm",
                   msg.direction === "OUTBOUND"
                     ? "bg-blue-600 text-white rounded-br-none"
-                    : "bg-white border border-gray-200 text-gray-800 rounded-bl-none"
+                    : "bg-background border border-border/40 text-muted-foreground rounded-bl-none"
                 )}
               >
                 <div className="whitespace-pre-wrap break-words">{msg.content}</div>
                 <div
                   className={cn(
                     "flex items-center gap-1.5 mt-1 text-right",
-                    msg.direction === "OUTBOUND" ? "text-blue-100" : "text-gray-400"
+                    msg.direction === "OUTBOUND" ? "text-blue-100" : "text-muted-foreground"
                   )}
                 >
                   <span
@@ -85,7 +85,7 @@ export function MessageThread({ messages, loading, contactName }: MessageThreadP
                       "inline-flex items-center gap-0.5 text-[9px] font-medium rounded px-1 py-0.5",
                       msg.direction === "OUTBOUND"
                         ? "bg-blue-500/30 text-blue-100"
-                        : "bg-gray-100 text-gray-500"
+                        : "bg-muted/30 text-muted-foreground"
                     )}
                   >
                     {channel === "SMS" ? (

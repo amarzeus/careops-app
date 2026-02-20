@@ -75,7 +75,7 @@ function LoginContent() {
   };
 
   return (
-    <div className="min-h-screen w-full flex bg-white overflow-hidden relative">
+    <div className="min-h-screen w-full flex bg-background overflow-hidden relative">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
         <GradientOrb className="w-[800px] h-[800px] bg-blue-400/20 -top-[200px] -left-[200px]" delay={0} />
@@ -89,13 +89,13 @@ function LoginContent() {
             <Link href="/" className="inline-block mb-6 transition-transform hover:scale-105">
               <Logo variant="full" size={40} />
             </Link>
-            <h1 className="text-3xl font-bold tracking-tight text-gray-900">Welcome back</h1>
-            <p className="mt-2 text-gray-500">
+            <h1 className="text-3xl font-bold tracking-tight text-foreground">Welcome back</h1>
+            <p className="mt-2 text-muted-foreground">
               Sign in to manage your operations and bookings.
             </p>
           </div>
 
-          <Card className="border-gray-100 shadow-xl shadow-gray-200/50 backdrop-blur-sm bg-white/80">
+          <Card className="border-border/40 shadow-xl shadow-border/50 backdrop-blur-sm bg-background/80">
             <CardContent className="pt-6">
               <form onSubmit={handleSubmit} className="space-y-5">
                 {error && (
@@ -109,7 +109,7 @@ function LoginContent() {
                   <Button
                     type="button"
                     variant="outline"
-                    className="w-full h-11 bg-white hover:bg-gray-50 text-gray-700 border-gray-200 shadow-sm transition-all hover:-translate-y-0.5"
+                    className="w-full h-11 bg-background hover:bg-muted/30 text-muted-foreground border-border/40 shadow-sm transition-all hover:-translate-y-0.5"
                     onClick={() => window.location.href = "/api/auth/google"}
                   >
                     <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
@@ -122,19 +122,19 @@ function LoginContent() {
                   </Button>
 
                   <div className="relative flex py-1 items-center">
-                    <div className="flex-grow border-t border-gray-200"></div>
-                    <span className="flex-shrink-0 mx-4 text-xs font-semibold text-gray-400 uppercase">Or sign in with email</span>
-                    <div className="flex-grow border-t border-gray-200"></div>
+                    <div className="flex-grow border-t border-border/40"></div>
+                    <span className="flex-shrink-0 mx-4 text-xs font-semibold text-muted-foreground uppercase">Or sign in with email</span>
+                    <div className="flex-grow border-t border-border/40"></div>
                   </div>
 
                   <div className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="email" className="text-gray-700">Email</Label>
+                      <Label htmlFor="email" className="text-muted-foreground">Email</Label>
                       <Input
                         id="email"
                         type="email"
                         placeholder="name@work.com"
-                        className="h-11 bg-gray-50 border-gray-200 focus:bg-white transition-colors"
+                        className="h-11 bg-muted/30 border-border/40 focus:bg-background transition-colors"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
@@ -142,7 +142,7 @@ function LoginContent() {
                     </div>
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <Label htmlFor="password" className="text-gray-700">Password</Label>
+                        <Label htmlFor="password" className="text-muted-foreground">Password</Label>
                         <Link href="/forgot-password" className="text-xs font-medium text-blue-600 hover:text-blue-700 hover:underline">
                           Forgot password?
                         </Link>
@@ -151,7 +151,7 @@ function LoginContent() {
                         id="password"
                         type="password"
                         placeholder="••••••••"
-                        className="h-11 bg-gray-50 border-gray-200 focus:bg-white transition-colors"
+                        className="h-11 bg-muted/30 border-border/40 focus:bg-background transition-colors"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
@@ -179,7 +179,7 @@ function LoginContent() {
             </CardContent>
           </Card>
 
-          <p className="text-center text-sm text-gray-500">
+          <p className="text-center text-sm text-muted-foreground">
             Don&apos;t have an account?{" "}
             <Link href="/register" className="font-semibold text-blue-600 hover:text-blue-700 hover:underline transition-colors">
               Start your free trial
@@ -189,14 +189,14 @@ function LoginContent() {
       </div>
 
       {/* Right Column - Visuals (Hidden on Mobile) */}
-      <div className="hidden lg:flex w-1/2 bg-gray-50 relative overflow-hidden items-center justify-center">
+      <div className="hidden lg:flex w-1/2 bg-muted/30 relative overflow-hidden items-center justify-center">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-800 opacity-90" />
         <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%23ffffff%22%20fill-opacity%3D%220.05%22%3E%3Cpath%20d%3D%22M36%2034v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6%2034v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6%204V0H4v4H0v2h4v4h2V6h4V4H6z%22%2F%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E')] opacity-20" />
 
-        <div className="relative z-10 max-w-lg text-white p-12">
+        <div className="relative z-10 max-w-7xlg text-white p-12">
           <FloatingElement delay={0}>
             <TiltCard className="mb-8">
-              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 shadow-2xl">
+              <div className="bg-background/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 shadow-2xl">
                 <div className="flex items-center gap-4 mb-4">
                   <div className="w-12 h-12 rounded-full bg-green-400/20 flex items-center justify-center text-green-400">
                     <Check className="w-6 h-6" />
@@ -206,7 +206,7 @@ function LoginContent() {
                     <div className="text-blue-100 text-sm">All services running smoothly</div>
                   </div>
                 </div>
-                <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                <div className="h-2 bg-background/10 rounded-full overflow-hidden">
                   <div className="h-full bg-green-400 w-[92%]"></div>
                 </div>
               </div>
@@ -223,7 +223,7 @@ function LoginContent() {
           <div className="flex items-center gap-4 text-sm font-medium text-blue-200">
             <div className="flex -space-x-2">
               {[1, 2, 3, 4].map((i) => (
-                <div key={i} className={`w-8 h-8 rounded-full border-2 border-indigo-600 bg-gray-300 flex items-center justify-center text-xs text-gray-600 font-bold bg-gradient-to-br from-gray-100 to-gray-300`}>
+                <div key={i} className={`w-8 h-8 rounded-full border-2 border-indigo-600 bg-muted/50 flex items-center justify-center text-xs text-muted-foreground font-bold bg-gradient-to-br from-gray-100 to-gray-300`}>
                   {String.fromCharCode(64 + i)}
                 </div>
               ))}
@@ -237,7 +237,7 @@ function LoginContent() {
           <div className="w-24 h-24 rounded-full border-4 border-white/10" />
         </FloatingElement>
         <FloatingElement className="absolute bottom-20 left-20" delay={2}>
-          <div className="w-16 h-16 rounded-xl bg-white/5 rotate-12 backdrop-blur-sm" />
+          <div className="w-16 h-16 rounded-xl bg-background/5 rotate-12 backdrop-blur-sm" />
         </FloatingElement>
       </div>
     </div>
@@ -250,7 +250,7 @@ function LoginContent() {
 export default function LoginPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+      <div className="min-h-screen flex items-center justify-center bg-muted/30 px-4">
         <Activity className="w-8 h-8 text-blue-600 animate-spin" />
       </div>
     }>

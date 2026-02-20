@@ -55,12 +55,12 @@ export function InventoryList({
 
   if (items.length === 0) {
     return (
-      <div className="text-center py-20 bg-white rounded-2xl border-2 border-dashed border-gray-100 italic transition-colors">
+      <div className="text-center py-20 bg-background rounded-2xl border-2 border-dashed border-border/40 italic transition-colors">
         <Package className="w-16 h-16 text-gray-200 mx-auto mb-4" />
-        <h3 className="text-lg font-medium text-gray-400">
+        <h3 className="text-lg font-medium text-muted-foreground">
           Your inventory is empty
         </h3>
-        <p className="text-sm text-gray-400 mt-1">
+        <p className="text-sm text-muted-foreground mt-1">
           Start tracking supplies to see AI forecasting in action.
         </p>
       </div>
@@ -81,7 +81,7 @@ export function InventoryList({
           <Card
             key={item.id}
             className={cn(
-              "transition-all hover:shadow-md border-0 bg-white shadow-sm overflow-hidden",
+              "transition-all hover:shadow-md border-0 bg-background shadow-sm overflow-hidden",
               isLow && "ring-1 ring-red-100"
             )}
           >
@@ -89,11 +89,11 @@ export function InventoryList({
               <div className="p-6">
                 <div className="flex items-start justify-between mb-4">
                   <div className="min-w-0 flex-1">
-                    <p className="font-bold text-gray-900 truncate">
+                    <p className="font-bold text-foreground truncate">
                       {item.name}
                     </p>
                     {item.description && (
-                      <p className="text-xs text-gray-500 mt-1 truncate">
+                      <p className="text-xs text-muted-foreground mt-1 truncate">
                         {item.description}
                       </p>
                     )}
@@ -153,38 +153,38 @@ export function InventoryList({
                         setEditQty(String(item.quantity));
                       }}
                     >
-                      <span className="text-3xl font-black text-gray-900 tracking-tighter">
+                      <span className="text-3xl font-black text-foreground tracking-tighter">
                         {item.quantity}
                       </span>
-                      <span className="text-sm font-medium text-gray-500 uppercase">
+                      <span className="text-sm font-medium text-muted-foreground uppercase">
                         {item.unit}
                       </span>
-                      <Edit2 className="w-3.5 h-3.5 text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity ml-1" />
+                      <Edit2 className="w-3.5 h-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity ml-1" />
                     </div>
                   )}
                 </div>
 
                 <div className="space-y-2">
-                  <div className="flex justify-between text-[10px] uppercase font-bold tracking-widest text-gray-400">
+                  <div className="flex justify-between text-[10px] uppercase font-bold tracking-widest text-muted-foreground">
                     <span>Stock Level</span>
                     <span>Threshold: {item.threshold}</span>
                   </div>
                   <Progress
                     value={pct}
                     className={cn(
-                      "h-2 bg-gray-100",
+                      "h-2 bg-muted/30",
                       isLow && "[&>div]:bg-red-500"
                     )}
                   />
                 </div>
               </div>
 
-              <div className="px-6 py-3 bg-gray-50/50 flex items-center justify-between border-t border-gray-50">
+              <div className="px-6 py-3 bg-muted/30/50 flex items-center justify-between border-t border-gray-50">
                 <div className="flex items-baseline gap-2">
-                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider italic">
+                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider italic">
                     Vendor
                   </span>
-                  <span className="text-xs font-semibold text-gray-600 truncate max-w-[120px]">
+                  <span className="text-xs font-semibold text-muted-foreground truncate max-w-[120px]">
                     {item.vendorName || "Not assigned"}
                   </span>
                 </div>
@@ -202,7 +202,7 @@ export function InventoryList({
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-gray-400 hover:text-blue-600 h-8 px-2"
+                    className="text-muted-foreground hover:text-blue-600 h-8 px-2"
                     onClick={() => onEdit(item)}
                   >
                     <Edit2 className="w-3.5 h-3.5" />

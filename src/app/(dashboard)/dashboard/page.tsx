@@ -160,7 +160,7 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen space-y-6 bg-gray-50/50 p-4 lg:p-6">
+      <div className="min-h-screen space-y-6 bg-muted/30/50 p-4 lg:p-6">
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {[...Array(3)].map((_, i) => (
             <Skeleton key={i} className="h-40 rounded-xl sm:h-48" />
@@ -204,7 +204,7 @@ export default function DashboardPage() {
   return (
     <div className="flex min-h-full flex-col">
       <Header title="Dashboard" subtitle="Overview of your business performance">
-        <div className="flex items-center gap-2 text-xs text-gray-500">
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
           {refreshing ? (
             <Sparkles className="h-3.5 w-3.5 animate-pulse text-blue-500" />
           ) : (
@@ -215,7 +215,7 @@ export default function DashboardPage() {
       </Header>
 
       {/* Page body */}
-      <div className="mx-auto flex w-full max-w-screen-xl flex-1 flex-col gap-5 p-4 sm:gap-6 sm:p-6">
+      <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-5 p-4 sm:gap-6 sm:p-6">
         {/* ══════ Quick Actions Bar ══════ */}
         <section className="no-scrollbar flex flex-wrap items-center gap-2 overflow-x-auto pb-1 sm:gap-3">
           <Link href="/bookings">
@@ -310,7 +310,7 @@ export default function DashboardPage() {
                   <button
                     key={i}
                     onClick={() => alert.link && (window.location.href = alert.link)}
-                    className="group/item flex w-full items-start gap-3 rounded-lg border bg-white p-2.5 text-left transition-colors hover:bg-gray-50"
+                    className="group/item flex w-full items-start gap-3 rounded-lg border bg-background p-2.5 text-left transition-colors hover:bg-muted/30"
                   >
                     <div
                       className={cn(
@@ -323,19 +323,19 @@ export default function DashboardPage() {
                       )}
                     />
                     <div className="min-w-0 flex-1">
-                      <p className="group-hover/item:text-primary text-xs leading-tight font-medium text-gray-900 transition-colors">
+                      <p className="group-hover/item:text-primary text-xs leading-tight font-medium text-foreground transition-colors">
                         {alert.message}
                       </p>
-                      <p className="mt-0.5 text-[10px] tracking-wide text-gray-500 uppercase">
+                      <p className="mt-0.5 text-[10px] tracking-wide text-muted-foreground uppercase">
                         {alert.category}
                       </p>
                     </div>
-                    <ArrowRight className="mt-0.5 h-3.5 w-3.5 shrink-0 text-gray-400 group-hover/item:text-gray-600" />
+                    <ArrowRight className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground group-hover/item:text-muted-foreground" />
                   </button>
                 ))}
               </div>
             ) : (
-              <div className="py-4 text-center text-xs text-gray-500">
+              <div className="py-4 text-center text-xs text-muted-foreground">
                 No alerts needing attention.
               </div>
             )}
@@ -358,7 +358,7 @@ export default function DashboardPage() {
                 {data.aiInsights.slice(0, 5).map((insight, i) => (
                   <div
                     key={i}
-                    className="flex items-start gap-2.5 rounded-md border border-violet-100 bg-white p-2.5 transition-colors hover:border-violet-200"
+                    className="flex items-start gap-2.5 rounded-md border border-violet-100 bg-background p-2.5 transition-colors hover:border-violet-200"
                   >
                     <div
                       className={cn(
@@ -371,7 +371,7 @@ export default function DashboardPage() {
                       )}
                     />
                     <div className="min-w-0 flex-1">
-                      <p className="mb-1 text-xs leading-snug text-gray-700">{insight.message}</p>
+                      <p className="mb-1 text-xs leading-snug text-muted-foreground">{insight.message}</p>
                       <Badge
                         variant="secondary"
                         className="h-4 border border-violet-100 bg-violet-50 px-1 text-[9px] text-violet-700 hover:bg-violet-100"
@@ -384,7 +384,7 @@ export default function DashboardPage() {
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-4 opacity-50">
-                <p className="text-xs text-gray-500">No suggestions right now</p>
+                <p className="text-xs text-muted-foreground">No suggestions right now</p>
               </div>
             )}
           </HoverExpandCard>
@@ -408,10 +408,10 @@ export default function DashboardPage() {
                 {data.lowStockDetails.slice(0, 5).map((item) => (
                   <div
                     key={item.id}
-                    className="flex items-center justify-between rounded border border-red-100 bg-white p-2.5 text-xs"
+                    className="flex items-center justify-between rounded border border-red-100 bg-background p-2.5 text-xs"
                   >
                     <span
-                      className="flex-1 truncate pr-2 font-medium text-gray-900"
+                      className="flex-1 truncate pr-2 font-medium text-foreground"
                       title={item.name}
                     >
                       {item.name}
@@ -434,7 +434,7 @@ export default function DashboardPage() {
             ) : (
               <div className="flex flex-col items-center justify-center py-4 opacity-50">
                 <CheckCircle className="mb-2 h-6 w-6 text-emerald-300" />
-                <p className="text-xs text-gray-500">Inventory levels healthy</p>
+                <p className="text-xs text-muted-foreground">Inventory levels healthy</p>
               </div>
             )}
           </HoverExpandCard>
@@ -455,10 +455,10 @@ export default function DashboardPage() {
 
         {/* ══════ 4. Activity Feed ══════ */}
         {data?.recentActivity && data.recentActivity.length > 0 && (
-          <Card className="border-gray-200/80">
+          <Card className="border-border/40/80">
             <CardHeader className="pb-2">
               <CardTitle className="flex items-center gap-2 text-sm font-semibold">
-                <Activity className="h-4 w-4 text-gray-500" />
+                <Activity className="h-4 w-4 text-muted-foreground" />
                 Recent Activity
               </CardTitle>
             </CardHeader>
@@ -467,7 +467,7 @@ export default function DashboardPage() {
                 {data.recentActivity.slice(0, 8).map((activity) => (
                   <div
                     key={activity.id}
-                    className="flex cursor-pointer items-center gap-3 rounded-lg p-2 text-xs transition-colors hover:bg-gray-50"
+                    className="flex cursor-pointer items-center gap-3 rounded-lg p-2 text-xs transition-colors hover:bg-muted/30"
                     onClick={() => activity.link && (window.location.href = activity.link)}
                   >
                     <div
@@ -483,11 +483,11 @@ export default function DashboardPage() {
                                 ? "bg-red-500"
                                 : activity.type === "automation"
                                   ? "bg-amber-500"
-                                  : "bg-gray-400"
+                                  : "bg-muted"
                       )}
                     />
-                    <span className="flex-1 text-gray-700">{activity.message}</span>
-                    <span className="text-[10px] whitespace-nowrap text-gray-400">
+                    <span className="flex-1 text-muted-foreground">{activity.message}</span>
+                    <span className="text-[10px] whitespace-nowrap text-muted-foreground">
                       {new Date(activity.timestamp).toLocaleTimeString([], {
                         hour: "2-digit",
                         minute: "2-digit",

@@ -64,25 +64,25 @@ export default function PublicContactPage({ params }: { params: Promise<{ slug: 
     } catch { setError("Something went wrong"); } finally { setSubmitting(false); }
   };
 
-  if (loading) return <div className="min-h-screen bg-gray-50 flex items-center justify-center"><div className="animate-pulse text-gray-400">Loading...</div></div>;
+  if (loading) return <div className="min-h-screen bg-muted/30 flex items-center justify-center"><div className="animate-pulse text-muted-foreground">Loading...</div></div>;
 
-  if (!form) return <div className="min-h-screen bg-gray-50 flex items-center justify-center"><p className="text-gray-500">Form not found</p></div>;
+  if (!form) return <div className="min-h-screen bg-muted/30 flex items-center justify-center"><p className="text-muted-foreground">Form not found</p></div>;
 
   if (success) return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-muted/30 flex items-center justify-center px-4">
       <Card className="w-full max-w-md text-center">
         <CardContent className="pt-8 pb-8">
           <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
           <h2 className="text-2xl font-bold mb-2">Thank You!</h2>
-          <p className="text-gray-600">{successMessage}</p>
+          <p className="text-muted-foreground">{successMessage}</p>
         </CardContent>
       </Card>
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-12">
-      <Card className="w-full max-w-lg">
+    <div className="min-h-screen bg-muted/30 flex items-center justify-center px-4 py-12">
+      <Card className="w-full max-w-7xlg">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-6">
             <Link href="/">

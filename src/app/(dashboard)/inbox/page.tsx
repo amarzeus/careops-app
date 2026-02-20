@@ -193,10 +193,10 @@ export default function InboxPage() {
   }
 
   return (
-    <div className="flex h-screen bg-white">
+    <div className="flex h-screen bg-background">
       <div
         className={cn(
-          "w-full flex-col border-r border-gray-200 md:w-80",
+          "w-full flex-col border-r border-border/40 md:w-80",
           mobileShowChat ? "hidden md:flex" : "flex"
         )}
       >
@@ -212,14 +212,14 @@ export default function InboxPage() {
 
       <div
         className={cn(
-          "flex min-w-0 flex-1 flex-col bg-gray-50/30",
+          "flex min-w-0 flex-1 flex-col bg-muted/30/30",
           mobileShowChat ? "flex" : "hidden md:flex"
         )}
       >
         {activeConversation ? (
           <>
             {/* Header */}
-            <div className="flex h-16 items-center justify-between border-b border-gray-200 bg-white px-4 sm:px-6">
+            <div className="flex h-16 items-center justify-between border-b border-border/40 bg-background px-4 sm:px-6">
               <div className="flex items-center gap-3">
                 <Button
                   variant="ghost"
@@ -235,16 +235,16 @@ export default function InboxPage() {
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <h2 className="font-semibold text-gray-900">{activeConversation.contactName}</h2>
-                  <p className="text-xs text-gray-500">{activeConversation.contactEmail}</p>
+                  <h2 className="font-semibold text-foreground">{activeConversation.contactName}</h2>
+                  <p className="text-xs text-muted-foreground">{activeConversation.contactEmail}</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 <Button variant="ghost" size="icon">
-                  <Phone className="h-4 w-4 text-gray-500" />
+                  <Phone className="h-4 w-4 text-muted-foreground" />
                 </Button>
                 <Button variant="ghost" size="icon">
-                  <MoreVertical className="h-4 w-4 text-gray-500" />
+                  <MoreVertical className="h-4 w-4 text-muted-foreground" />
                 </Button>
               </div>
             </div>
@@ -262,7 +262,7 @@ export default function InboxPage() {
                     <span className="text-[11px] font-medium text-violet-700">AI Suggestions</span>
                     <Badge
                       variant="outline"
-                      className="h-4 border-violet-200 bg-white px-1 text-[9px]"
+                      className="h-4 border-violet-200 bg-background px-1 text-[9px]"
                     >
                       Tap to use
                     </Badge>
@@ -272,7 +272,7 @@ export default function InboxPage() {
                       <button
                         key={i}
                         onClick={() => setInputText(s)}
-                        className="flex items-center gap-1.5 rounded-lg border border-violet-200 bg-white px-3 py-2 text-xs whitespace-nowrap text-violet-800 shadow-sm transition-all hover:border-violet-300 hover:bg-violet-50 hover:shadow-md"
+                        className="flex items-center gap-1.5 rounded-lg border border-violet-200 bg-background px-3 py-2 text-xs whitespace-nowrap text-violet-800 shadow-sm transition-all hover:border-violet-300 hover:bg-violet-50 hover:shadow-md"
                       >
                         <Wand2 className="h-3 w-3 shrink-0 text-violet-400" />
                         <span className="line-clamp-2">{s}</span>
@@ -282,9 +282,9 @@ export default function InboxPage() {
                 </div>
               )}
               {loadingSuggestions && (
-                <div className="flex items-center gap-2 border-t border-gray-100 bg-gray-50 px-4 py-3">
-                  <Loader2 className="h-3.5 w-3.5 animate-spin text-gray-400" />
-                  <span className="text-[11px] text-gray-500">Generating suggestions...</span>
+                <div className="flex items-center gap-2 border-t border-border/40 bg-muted/30 px-4 py-3">
+                  <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />
+                  <span className="text-[11px] text-muted-foreground">Generating suggestions...</span>
                 </div>
               )}
               <ChatInput
@@ -298,13 +298,13 @@ export default function InboxPage() {
             </div>
           </>
         ) : (
-          <div className="flex flex-1 flex-col items-center justify-center bg-gray-50/50 px-6 text-gray-400">
-            <div className="flex max-w-sm flex-col items-center text-center">
+          <div className="flex flex-1 flex-col items-center justify-center bg-muted/30/50 px-6 text-muted-foreground">
+            <div className="flex max-w-7xl flex-col items-center text-center">
               <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-blue-50">
                 <MessageSquare className="h-10 w-10 text-blue-300" />
               </div>
-              <h3 className="mb-2 text-lg font-medium text-gray-600">No conversation selected</h3>
-              <p className="text-sm text-gray-400">
+              <h3 className="mb-2 text-lg font-medium text-muted-foreground">No conversation selected</h3>
+              <p className="text-sm text-muted-foreground">
                 Choose a conversation from the sidebar to view messages and start replying.
               </p>
             </div>

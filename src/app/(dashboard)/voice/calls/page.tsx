@@ -88,7 +88,7 @@ function statusTone(status: string): string {
   if (["NO_ANSWER", "FAILED", "BUSY"].includes(normalized)) return "text-rose-700 border-rose-200 bg-rose-50";
   if (["INITIATED", "RINGING", "IN_PROGRESS"].includes(normalized)) return "text-blue-700 border-blue-200 bg-blue-50";
   if (["SKIPPED"].includes(normalized)) return "text-amber-700 border-amber-200 bg-amber-50";
-  return "text-gray-700 border-gray-200 bg-gray-50";
+  return "text-muted-foreground border-border/40 bg-muted/30";
 }
 
 /**
@@ -248,8 +248,8 @@ export default function VoiceCallsPage() {
             <Card>
               <CardContent className="flex items-center justify-between p-4">
                 <div>
-                  <p className="text-xs tracking-wide text-gray-500 uppercase">Total Calls</p>
-                  <p className="text-2xl font-bold text-gray-900">{total}</p>
+                  <p className="text-xs tracking-wide text-muted-foreground uppercase">Total Calls</p>
+                  <p className="text-2xl font-bold text-foreground">{total}</p>
                 </div>
                 <PhoneCall className="h-5 w-5 text-blue-600" />
               </CardContent>
@@ -257,7 +257,7 @@ export default function VoiceCallsPage() {
             <Card>
               <CardContent className="flex items-center justify-between p-4">
                 <div>
-                  <p className="text-xs tracking-wide text-gray-500 uppercase">Escalated</p>
+                  <p className="text-xs tracking-wide text-muted-foreground uppercase">Escalated</p>
                   <p className="text-2xl font-bold text-amber-700">{stats.escalated}</p>
                 </div>
                 <AlertTriangle className="h-5 w-5 text-amber-600" />
@@ -266,7 +266,7 @@ export default function VoiceCallsPage() {
             <Card>
               <CardContent className="flex items-center justify-between p-4">
                 <div>
-                  <p className="text-xs tracking-wide text-gray-500 uppercase">DNC Blocked</p>
+                  <p className="text-xs tracking-wide text-muted-foreground uppercase">DNC Blocked</p>
                   <p className="text-2xl font-bold text-rose-700">{stats.blocked}</p>
                 </div>
                 <Shield className="h-5 w-5 text-rose-600" />
@@ -275,7 +275,7 @@ export default function VoiceCallsPage() {
           </div>
 
           <Card className="flex min-h-0 flex-1 flex-col overflow-hidden">
-            <CardHeader className="border-b bg-white/70">
+            <CardHeader className="border-b bg-background/70">
               <CardTitle className="text-base">Call Log</CardTitle>
               {!canResolveEscalations ? (
                 <p className="mt-1 text-xs text-amber-700">
@@ -284,7 +284,7 @@ export default function VoiceCallsPage() {
               ) : null}
               <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-6">
                 <div className="relative lg:col-span-2">
-                  <Search className="absolute top-1/2 left-2.5 h-3.5 w-3.5 -translate-y-1/2 text-gray-400" />
+                  <Search className="absolute top-1/2 left-2.5 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
                   <Input
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
@@ -341,14 +341,14 @@ export default function VoiceCallsPage() {
                   <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
                 </div>
               ) : filteredCalls.length === 0 ? (
-                <div className="flex h-full flex-col items-center justify-center p-8 text-center text-gray-500">
-                  <Phone className="mb-3 h-8 w-8 text-gray-300" />
+                <div className="flex h-full flex-col items-center justify-center p-8 text-center text-muted-foreground">
+                  <Phone className="mb-3 h-8 w-8 text-muted-foreground" />
                   <p className="font-medium">No calls found</p>
                   <p className="text-xs">Try changing filters or search terms.</p>
                 </div>
               ) : (
                 <table className="w-full min-w-[900px] text-sm">
-                  <thead className="sticky top-0 bg-gray-50 text-xs tracking-wide text-gray-500 uppercase">
+                  <thead className="sticky top-0 bg-muted/30 text-xs tracking-wide text-muted-foreground uppercase">
                     <tr>
                       <th className="px-4 py-3 text-left">Caller</th>
                       <th className="px-4 py-3 text-left">Direction</th>
@@ -362,10 +362,10 @@ export default function VoiceCallsPage() {
                   </thead>
                   <tbody>
                     {filteredCalls.map((call) => (
-                      <tr key={call.id} className="border-t hover:bg-gray-50/70">
+                      <tr key={call.id} className="border-t hover:bg-muted/30/70">
                         <td className="px-4 py-3">
-                          <div className="font-medium text-gray-900">{call.contact?.name || "Unknown"}</div>
-                          <div className="text-xs text-gray-500">{call.contact?.phone || call.callSid || "-"}</div>
+                          <div className="font-medium text-foreground">{call.contact?.name || "Unknown"}</div>
+                          <div className="text-xs text-muted-foreground">{call.contact?.phone || call.callSid || "-"}</div>
                         </td>
                         <td className="px-4 py-3">
                           <Badge variant="outline">{call.direction}</Badge>
@@ -393,10 +393,10 @@ export default function VoiceCallsPage() {
                               {call.consent.consentResponse ? "Granted" : "Denied"}
                             </Badge>
                           ) : (
-                            <span className="text-xs text-gray-400">-</span>
+                            <span className="text-xs text-muted-foreground">-</span>
                           )}
                         </td>
-                        <td className="px-4 py-3 text-xs text-gray-500">
+                        <td className="px-4 py-3 text-xs text-muted-foreground">
                           {new Date(call.createdAt).toLocaleString()}
                         </td>
                         <td className="px-4 py-3">
@@ -432,7 +432,7 @@ export default function VoiceCallsPage() {
       </div>
 
       <Dialog open={!!selectedCall} onOpenChange={(open) => !open && setSelectedCall(null)}>
-        <DialogContent className="max-w-3xl">
+        <DialogContent className="max-w-7xl">
           <DialogHeader>
             <DialogTitle>Call Details</DialogTitle>
             <DialogDescription>
@@ -447,15 +447,15 @@ export default function VoiceCallsPage() {
                   <CardTitle className="text-sm">Summary</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2 text-sm">
-                  <p><span className="text-gray-500">Status:</span> {selectedCall.status}</p>
-                  <p><span className="text-gray-500">Outcome:</span> {selectedCall.outcome || "-"}</p>
-                  <p><span className="text-gray-500">Duration:</span> {formatDuration(selectedCall.duration)}</p>
-                  <p><span className="text-gray-500">Escalated:</span> {selectedCall.escalated ? "Yes" : "No"}</p>
+                  <p><span className="text-muted-foreground">Status:</span> {selectedCall.status}</p>
+                  <p><span className="text-muted-foreground">Outcome:</span> {selectedCall.outcome || "-"}</p>
+                  <p><span className="text-muted-foreground">Duration:</span> {formatDuration(selectedCall.duration)}</p>
+                  <p><span className="text-muted-foreground">Escalated:</span> {selectedCall.escalated ? "Yes" : "No"}</p>
                   {selectedCall.escalationReason && (
-                    <p><span className="text-gray-500">Escalation reason:</span> {selectedCall.escalationReason}</p>
+                    <p><span className="text-muted-foreground">Escalation reason:</span> {selectedCall.escalationReason}</p>
                   )}
                   {selectedCall.summary && (
-                    <p className="rounded-md bg-gray-50 p-2 text-xs text-gray-700">{selectedCall.summary}</p>
+                    <p className="rounded-md bg-muted/30 p-2 text-xs text-muted-foreground">{selectedCall.summary}</p>
                   )}
                 </CardContent>
               </Card>
@@ -468,16 +468,16 @@ export default function VoiceCallsPage() {
                   {selectedCall.consent ? (
                     <>
                       <p>
-                        <span className="text-gray-500">Consent:</span>{" "}
+                        <span className="text-muted-foreground">Consent:</span>{" "}
                         {selectedCall.consent.consentResponse ? "Granted" : "Denied"}
                       </p>
-                      <p><span className="text-gray-500">Prompt:</span> {selectedCall.consent.consentText}</p>
-                      <p className="text-xs text-gray-500">
+                      <p><span className="text-muted-foreground">Prompt:</span> {selectedCall.consent.consentText}</p>
+                      <p className="text-xs text-muted-foreground">
                         Captured at {new Date(selectedCall.consent.capturedAt).toLocaleString()}
                       </p>
                     </>
                   ) : (
-                    <p className="text-gray-500">No consent record attached.</p>
+                    <p className="text-muted-foreground">No consent record attached.</p>
                   )}
 
                   {(() => {
@@ -487,7 +487,7 @@ export default function VoiceCallsPage() {
                     const smsFallbackRequired = metadata.smsFallbackRequired as boolean | undefined;
 
                     return (
-                      <div className="rounded-md bg-gray-50 p-2 text-xs text-gray-600">
+                      <div className="rounded-md bg-muted/30 p-2 text-xs text-muted-foreground">
                         <p>Retry count: {typeof retryCount === "number" ? retryCount : 0}</p>
                         <p>Next retry: {nextRetryAt ? new Date(nextRetryAt).toLocaleString() : "-"}</p>
                         <p>SMS fallback required: {smsFallbackRequired ? "Yes" : "No"}</p>
@@ -502,7 +502,7 @@ export default function VoiceCallsPage() {
                   <CardTitle className="text-sm">Transcript</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="max-h-64 overflow-auto rounded-md bg-gray-50 p-3 text-sm text-gray-700">
+                  <div className="max-h-64 overflow-auto rounded-md bg-muted/30 p-3 text-sm text-muted-foreground">
                     {selectedCall.transcript || "No transcript available."}
                   </div>
                 </CardContent>

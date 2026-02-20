@@ -156,7 +156,7 @@ export function InventoryDialog({
             </div>
           </div>
           <div className="border-t pt-4 space-y-3">
-            <p className="text-sm font-medium text-gray-700">
+            <p className="text-sm font-medium text-muted-foreground">
               Vendor (optional)
             </p>
             <div className="grid grid-cols-2 gap-4">

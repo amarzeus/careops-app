@@ -42,7 +42,7 @@ export function BookingList({ bookings, onStatusUpdate, onEdit }: BookingListPro
   if (bookings.length === 0) {
     return (
       <div className="flex h-[300px] flex-col items-center justify-center rounded-xl border border-dashed text-center animate-in fade-in-50 bg-slate-50/50">
-        <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-sm border border-slate-100">
+        <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-background shadow-sm border border-slate-100">
           <CalendarX className="h-5 w-5 text-slate-400" />
         </div>
         <h3 className="mt-3 text-sm font-bold text-slate-900">No bookings found</h3>
@@ -54,7 +54,7 @@ export function BookingList({ bookings, onStatusUpdate, onEdit }: BookingListPro
   }
 
   return (
-    <div className="rounded-xl border border-border/40 bg-white shadow-sm overflow-hidden">
+    <div className="rounded-xl border border-border/40 bg-background shadow-sm overflow-hidden">
       <div className="overflow-x-auto">
         <Table>
           <TableHeader className="bg-slate-50/50">
@@ -108,7 +108,7 @@ export function BookingList({ bookings, onStatusUpdate, onEdit }: BookingListPro
                 <TableCell className="text-right py-2 px-4">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-7 w-7 p-0 rounded-lg hover:bg-white hover:shadow-sm border border-transparent hover:border-slate-200 transition-all">
+                      <Button variant="ghost" className="h-7 w-7 p-0 rounded-lg hover:bg-background hover:shadow-sm border border-transparent hover:border-slate-200 transition-all">
                         <span className="sr-only">Open menu</span>
                         <MoreHorizontal className="h-3.5 w-3.5 text-slate-400" />
                       </Button>

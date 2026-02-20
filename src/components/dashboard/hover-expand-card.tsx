@@ -37,8 +37,8 @@ export function HoverExpandCard({
     countLabel,
     children,
     className,
-    headerColorClass = "text-gray-900",
-    iconColorClass = "text-gray-600",
+    headerColorClass = "text-foreground",
+    iconColorClass = "text-muted-foreground",
     previewText
 }: HoverExpandCardProps) {
     const [isHovered, setIsHovered] = useState(false);
@@ -59,7 +59,7 @@ export function HoverExpandCard({
                 }}
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
                 className={cn(
-                    "absolute inset-x-0 top-0 border bg-white rounded-xl overflow-hidden",
+                    "absolute inset-x-0 top-0 border bg-background rounded-xl overflow-hidden",
                     // We handle height and shadow via motion, but keep base styles
                 )}
             >
@@ -90,7 +90,7 @@ export function HoverExpandCard({
                                 count > 0
                                     ? (iconColorClass.includes('red') ? "bg-red-50 text-red-600" :
                                         iconColorClass.includes('amber') ? "bg-amber-50 text-amber-600" :
-                                            iconColorClass.includes('violet') ? "bg-violet-50 text-violet-600" : "bg-gray-100 text-gray-700")
+                                            iconColorClass.includes('violet') ? "bg-violet-50 text-violet-600" : "bg-muted/30 text-muted-foreground")
                                     : "bg-emerald-50 text-emerald-600"
                             )}>
                                 {countLabel || count}

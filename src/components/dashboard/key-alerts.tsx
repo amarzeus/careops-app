@@ -21,7 +21,7 @@ const priorityConfig = {
   critical: { bg: "bg-red-50 border-red-200", dot: "bg-red-500 animate-pulse", text: "text-red-700" },
   high: { bg: "bg-amber-50 border-amber-200", dot: "bg-amber-500", text: "text-amber-700" },
   medium: { bg: "bg-blue-50 border-blue-200", dot: "bg-blue-500", text: "text-blue-700" },
-  low: { bg: "bg-gray-50 border-gray-200", dot: "bg-gray-400", text: "text-gray-600" },
+  low: { bg: "bg-muted/30 border-border/40", dot: "bg-muted", text: "text-muted-foreground" },
 };
 
 /**
@@ -34,17 +34,17 @@ export function KeyAlerts({ alerts }: KeyAlertsProps) {
 
   if (!alerts.length) {
     return (
-      <Card className="shadow-sm border-0 bg-white h-full">
+      <Card className="shadow-sm border-0 bg-background h-full">
         <CardHeader className="pb-3">
-          <CardTitle className="text-base font-semibold text-gray-900">Operational Status</CardTitle>
+          <CardTitle className="text-base font-semibold text-foreground">Operational Status</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col items-center justify-center py-8 text-center">
             <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center mb-3">
               <CheckCircle2 className="w-6 h-6 text-emerald-600" />
             </div>
-            <p className="text-sm font-medium text-gray-700">All Clear</p>
-            <p className="text-xs text-gray-500 mt-1">No issues requiring attention</p>
+            <p className="text-sm font-medium text-muted-foreground">All Clear</p>
+            <p className="text-xs text-muted-foreground mt-1">No issues requiring attention</p>
           </div>
         </CardContent>
       </Card>
@@ -52,10 +52,10 @@ export function KeyAlerts({ alerts }: KeyAlertsProps) {
   }
 
   return (
-    <Card className="shadow-sm border-0 bg-white h-full">
+    <Card className="shadow-sm border-0 bg-background h-full">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-base font-semibold text-gray-900 flex items-center gap-2">
+          <CardTitle className="text-base font-semibold text-foreground flex items-center gap-2">
             <AlertCircle className="w-4 h-4 text-amber-600" />
             Attention Required
           </CardTitle>
@@ -81,11 +81,11 @@ export function KeyAlerts({ alerts }: KeyAlertsProps) {
                 <p className={cn("text-sm font-medium leading-tight", config.text)}>
                   {alert.message}
                 </p>
-                <p className="text-[10px] text-gray-500 mt-0.5 uppercase tracking-wide font-medium">
+                <p className="text-[10px] text-muted-foreground mt-0.5 uppercase tracking-wide font-medium">
                   {alert.category}
                 </p>
               </div>
-              <ArrowRight className="w-3.5 h-3.5 text-gray-400 group-hover:text-gray-600 mt-0.5 shrink-0 transition-colors" />
+              <ArrowRight className="w-3.5 h-3.5 text-muted-foreground group-hover:text-muted-foreground mt-0.5 shrink-0 transition-colors" />
             </button>
           );
         })}

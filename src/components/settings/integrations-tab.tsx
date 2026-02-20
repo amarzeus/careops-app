@@ -62,12 +62,12 @@ export function IntegrationsTab({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+          <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg">
             <div className="flex items-center gap-3">
               <Mail className="w-5 h-5 text-blue-600" />
               <div>
                 <p className="font-medium">Email Service</p>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-muted-foreground">
                   {workspace?.emailConfigured ? "Connected" : "Not configured"}
                 </p>
               </div>
@@ -100,12 +100,12 @@ export function IntegrationsTab({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+          <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg">
             <div className="flex items-center gap-3">
               <MessageSquare className="w-5 h-5 text-blue-600" />
               <div>
                 <p className="font-medium">Twilio SMS</p>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-muted-foreground">
                   {workspace?.smsConfigured ? "Connected" : "Not configured"}
                 </p>
               </div>
@@ -160,28 +160,28 @@ export function IntegrationsTab({
             </div>
             <Badge
               variant={calendarConnected ? "default" : "secondary"}
-              className={calendarConnected ? "bg-blue-600" : "bg-gray-100 text-gray-600"}
+              className={calendarConnected ? "bg-blue-600" : "bg-muted/30 text-muted-foreground"}
             >
               {calendarConnected ? "Connected" : "Disconnected"}
             </Badge>
           </div>
 
           {/* Calendar capabilities */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-gray-600">
-            <div className="flex items-center gap-1.5 p-2 bg-gray-50 rounded">
-              <span className={`w-1.5 h-1.5 rounded-full ${calendarConnected ? "bg-blue-500" : "bg-gray-300"}`} />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-muted-foreground">
+            <div className="flex items-center gap-1.5 p-2 bg-muted/30 rounded">
+              <span className={`w-1.5 h-1.5 rounded-full ${calendarConnected ? "bg-blue-500" : "bg-muted/50"}`} />
               Auto-sync new bookings
             </div>
-            <div className="flex items-center gap-1.5 p-2 bg-gray-50 rounded">
-              <span className={`w-1.5 h-1.5 rounded-full ${calendarConnected ? "bg-blue-500" : "bg-gray-300"}`} />
+            <div className="flex items-center gap-1.5 p-2 bg-muted/30 rounded">
+              <span className={`w-1.5 h-1.5 rounded-full ${calendarConnected ? "bg-blue-500" : "bg-muted/50"}`} />
               Update on reschedule
             </div>
-            <div className="flex items-center gap-1.5 p-2 bg-gray-50 rounded">
-              <span className={`w-1.5 h-1.5 rounded-full ${calendarConnected ? "bg-blue-500" : "bg-gray-300"}`} />
+            <div className="flex items-center gap-1.5 p-2 bg-muted/30 rounded">
+              <span className={`w-1.5 h-1.5 rounded-full ${calendarConnected ? "bg-blue-500" : "bg-muted/50"}`} />
               Cancel on booking cancel
             </div>
-            <div className="flex items-center gap-1.5 p-2 bg-gray-50 rounded">
-              <span className={`w-1.5 h-1.5 rounded-full ${calendarConnected ? "bg-blue-500" : "bg-gray-300"}`} />
+            <div className="flex items-center gap-1.5 p-2 bg-muted/30 rounded">
+              <span className={`w-1.5 h-1.5 rounded-full ${calendarConnected ? "bg-blue-500" : "bg-muted/50"}`} />
               Calendar reminders
             </div>
           </div>

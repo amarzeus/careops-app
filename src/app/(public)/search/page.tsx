@@ -207,7 +207,7 @@ export default function SearchPage() {
                             </MagneticButton>
                         </div>
                         <ThemeToggle />
-                        <button className="md:hidden p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors">
+                        <button className="md:hidden p-2 rounded-full hover:bg-black/5 dark:hover:bg-background/10 transition-colors">
                             <Menu className="w-5 h-5 text-foreground" />
                         </button>
                     </div>
@@ -235,7 +235,7 @@ export default function SearchPage() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, delay: 0.2 }}
-                    className="text-muted-foreground mb-12 max-w-2xl mx-auto text-lg md:text-xl font-medium"
+                    className="text-muted-foreground mb-12 max-w-7xl mx-auto text-lg md:text-xl font-medium"
                 >
                     Browse top-rated businesses, check real-time availability, and schedule appointments without ever signing up.
                 </motion.p>
@@ -244,7 +244,7 @@ export default function SearchPage() {
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, delay: 0.3 }}
-                    className="max-w-2xl mx-auto relative group"
+                    className="max-w-7xl mx-auto relative group"
                 >
                     <div className="absolute -inset-1 bg-gradient-to-r from-primary to-purple-500 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-500"></div>
                     <div className="relative flex items-center bg-background border border-border/50 rounded-2xl shadow-2xl backdrop-blur-xl transition-all duration-300 p-2 pl-4">
@@ -356,8 +356,16 @@ export default function SearchPage() {
 
             {/* Footer */}
             <footer className="border-t border-border/40 bg-muted/10 py-10 mt-auto backdrop-blur-lg">
-                <div className="max-w-7xl mx-auto px-6 text-center">
+                <div className="max-w-7xl mx-auto px-6 flex flex-col items-center justify-between gap-4 text-center sm:flex-row">
                     <p className="text-sm font-medium text-muted-foreground">&copy; 2026 CareOps Directory. All rights reserved.</p>
+                    <a
+                        href="https://github.com/amarzeus/careops-app"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                        GitHub
+                    </a>
                 </div>
             </footer>
         </div>

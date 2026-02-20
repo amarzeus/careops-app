@@ -61,7 +61,7 @@ export function StaffList({ staff, onEdit, onDelete }: StaffListProps) {
                                     {member.role === "OWNER" ? (
                                         <Shield className="h-4 w-4 text-purple-500" />
                                     ) : (
-                                        <User className="h-4 w-4 text-gray-400" />
+                                        <User className="h-4 w-4 text-muted-foreground" />
                                     )}
                                     <span className="text-sm">
                                         {member.role.charAt(0) + member.role.slice(1).toLowerCase()}

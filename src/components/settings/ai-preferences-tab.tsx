@@ -119,7 +119,7 @@ export function AIPreferencesTab({ _onSelectTab }: { _onSelectTab?: (tab: string
     return (
       <div className="flex items-center justify-center p-8">
         <Loader2 className="animate-spin text-blue-600 w-6 h-6" />
-        <span className="ml-2 text-gray-500">Loading AI settings...</span>
+        <span className="ml-2 text-muted-foreground">Loading AI settings...</span>
       </div>
     );
   }
@@ -184,7 +184,7 @@ export function AIPreferencesTab({ _onSelectTab }: { _onSelectTab?: (tab: string
           <Sparkles className="w-5 h-5 text-violet-600" />
           AI Features
         </h2>
-        <p className="text-sm text-gray-500 mt-1">
+        <p className="text-sm text-muted-foreground mt-1">
           Configure which AI features are enabled for your workspace
         </p>
       </div>
@@ -202,13 +202,13 @@ export function AIPreferencesTab({ _onSelectTab }: { _onSelectTab?: (tab: string
                     "w-10 h-10 rounded-lg flex items-center justify-center",
                     feature.enabled
                       ? `bg-${feature.color}-100 text-${feature.color}-600`
-                      : "bg-gray-100 text-gray-400"
+                      : "bg-muted/30 text-muted-foreground"
                   )}>
                     <feature.icon className="w-5 h-5" />
                   </div>
                   <div>
                     <p className="font-medium text-sm">{feature.title}</p>
-                    <p className="text-xs text-gray-500">{feature.description}</p>
+                    <p className="text-xs text-muted-foreground">{feature.description}</p>
                   </div>
                 </div>
                 <Switch
@@ -279,7 +279,7 @@ export function AIPreferencesTab({ _onSelectTab }: { _onSelectTab?: (tab: string
             </Select>
           </div>
 
-          <div className="flex items-center gap-3 p-3 border rounded-lg bg-gray-50">
+          <div className="flex items-center gap-3 p-3 border rounded-lg bg-muted/30">
             <Switch
               checked={prefs.alertOnAnomaly}
               onCheckedChange={(checked) => updatePreference("alertOnAnomaly", checked)}
@@ -287,7 +287,7 @@ export function AIPreferencesTab({ _onSelectTab }: { _onSelectTab?: (tab: string
             />
             <Label htmlFor="alertOnAnomaly" className="cursor-pointer">
               <p className="text-sm font-medium">Alert on Anomaly</p>
-              <p className="text-xs text-gray-500">Get notified when operations anomalies are detected</p>
+              <p className="text-xs text-muted-foreground">Get notified when operations anomalies are detected</p>
             </Label>
           </div>
         </div>

@@ -135,25 +135,25 @@ export default function FormsPage() {
   return (
     <div className="flex min-h-full flex-col">
       <Header title="Forms" subtitle="Manage contact forms, intake forms, and submissions" />
-      <div className="mx-auto w-full max-w-screen-xl flex-1 p-4 sm:p-6">
+      <div className="mx-auto w-full max-w-7xl flex-1 p-4 sm:p-6">
         {/* Summary Stats */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <Card>
             <CardContent className="p-4 text-center">
               <p className="text-2xl font-bold">{contactForms.length}</p>
-              <p className="text-xs text-gray-500">Contact Forms</p>
+              <p className="text-xs text-muted-foreground">Contact Forms</p>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="p-4 text-center">
               <p className="text-2xl font-bold">{intakeForms.length}</p>
-              <p className="text-xs text-gray-500">Intake Forms</p>
+              <p className="text-xs text-muted-foreground">Intake Forms</p>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="p-4 text-center">
               <p className="text-2xl font-bold text-yellow-600">{pendingCount}</p>
-              <p className="text-xs text-gray-500">Pending / Sent</p>
+              <p className="text-xs text-muted-foreground">Pending / Sent</p>
             </CardContent>
           </Card>
           <Card>
@@ -161,12 +161,12 @@ export default function FormsPage() {
               <div className="flex items-center justify-center gap-4">
                 <div>
                   <p className="text-2xl font-bold text-green-600">{completedCount}</p>
-                  <p className="text-xs text-gray-500">Completed</p>
+                  <p className="text-xs text-muted-foreground">Completed</p>
                 </div>
                 {overdueCount > 0 && (
                   <div>
                     <p className="text-2xl font-bold text-red-600">{overdueCount}</p>
-                    <p className="text-xs text-gray-500">Overdue</p>
+                    <p className="text-xs text-muted-foreground">Overdue</p>
                   </div>
                 )}
               </div>
