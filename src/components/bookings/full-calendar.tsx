@@ -59,7 +59,7 @@ const STATUS_STYLES: Record<string, string> = {
   CONFIRMED: "bg-blue-50/90 border-l-[3px] border-blue-500 text-blue-700 shadow-sm ring-1 ring-blue-500/10 hover:bg-blue-100",
   PENDING: "bg-amber-50/90 border-l-[3px] border-amber-500 text-amber-700 shadow-sm ring-1 ring-amber-500/10 hover:bg-amber-100",
   COMPLETED: "bg-emerald-50/90 border-l-[3px] border-emerald-500 text-emerald-700 shadow-sm ring-1 ring-emerald-500/10 hover:bg-emerald-100",
-  CANCELLED: "bg-slate-50/70 border-l-[3px] border-slate-300 text-slate-500/80 grayscale shadow-none hover:grayscale-0",
+  CANCELLED: "bg-muted/30 border-l-[3px] border-border/40 text-muted-foreground/80 grayscale shadow-none hover:grayscale-0",
   NO_SHOW: "bg-rose-50/90 border-l-[3px] border-rose-500 text-rose-700 shadow-sm ring-1 ring-rose-500/10 hover:bg-rose-100",
   EXTERNAL: "bg-purple-50/80 border-l-[3px] border-purple-400 text-purple-700 shadow-none ring-1 ring-purple-500/10 hover:bg-purple-100 opacity-80",
 };
@@ -133,16 +133,16 @@ export function FullCalendar({ bookings, externalEvents = [], onEdit, onNewBooki
   }, [currentDate]);
 
   const renderMonthView = () => (
-    <div className="flex flex-col h-full bg-background border border-slate-100 rounded-xl overflow-hidden shadow-sm">
-      <div className="grid grid-cols-7 border-b border-slate-100 sticky top-0 bg-background z-20">
+    <div className="flex flex-col h-full bg-background border border-border/40 rounded-xl overflow-hidden shadow-sm">
+      <div className="grid grid-cols-7 border-b border-border/40 sticky top-0 bg-background z-20">
         {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
-          <div key={day} className="py-2 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest border-r border-slate-100 last:border-r-0">
+          <div key={day} className="py-2 text-center text-[10px] font-bold text-muted-foreground uppercase tracking-widest border-r border-border/40 last:border-r-0">
             {day}
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-7 flex-1 auto-rows-fr overflow-y-auto border-l border-slate-100 no-scrollbar">
+      <div className="grid grid-cols-7 flex-1 auto-rows-fr overflow-y-auto border-l border-border/40 no-scrollbar">
         {monthDays.map((day) => {
           const isSelectedMonth = isSameMonth(day, currentDate);
           const dayBookings = bookings.filter((b) => isSameDay(new Date(b.date), day));
@@ -153,8 +153,8 @@ export function FullCalendar({ bookings, externalEvents = [], onEdit, onNewBooki
             <div
               key={day.toISOString()}
               className={cn(
-                "min-h-[80px] p-1.5 border-b border-r border-slate-100 transition-all cursor-pointer relative group flex flex-col",
-                !isSelectedMonth && "bg-slate-50/30 text-slate-300",
+                "min-h-[80px] p-1.5 border-b border-r border-border/40 transition-all cursor-pointer relative group flex flex-col",
+                !isSelectedMonth && "bg-muted/30 text-slate-300",
                 isTodayDate && "bg-blue-50/30"
               )}
               onClick={() => onNewBooking(setHours(day, 9))}
@@ -165,7 +165,7 @@ export function FullCalendar({ bookings, externalEvents = [], onEdit, onNewBooki
                     "text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full transition-all",
                     isTodayDate
                       ? "bg-blue-600 text-white shadow-sm"
-                      : "text-slate-500 group-hover:text-slate-900"
+                      : "text-muted-foreground group-hover:text-foreground"
                   )}
                 >
                   {format(day, "d")}
@@ -182,7 +182,7 @@ export function FullCalendar({ bookings, externalEvents = [], onEdit, onNewBooki
                     }}
                     className={cn(
                       "text-[9px] px-1 py-0.5 rounded truncate font-semibold border-l-2 shadow-sm leading-tight",
-                      STATUS_STYLES[booking.status] || "bg-slate-100"
+                      STATUS_STYLES[booking.status] || "bg-muted/50"
                     )}
                   >
                     {format(new Date(booking.date), "H:mm")} {booking.contact.name.split(" ")[0]}
@@ -211,8 +211,8 @@ export function FullCalendar({ bookings, externalEvents = [], onEdit, onNewBooki
   const renderTimeGrid = (daysList: Date[]) => (
     <div className="flex flex-col h-full bg-background relative">
       {/* Sticky Header Row */}
-      <div className="flex border-b border-slate-100 sticky top-0 bg-background z-30 shadow-[0_1px_0_0_rgba(0,0,0,0.03)] shrink-0">
-        <div className="w-12 flex-shrink-0 border-r border-slate-100 bg-slate-50/30"></div>
+      <div className="flex border-b border-border/40 sticky top-0 bg-background z-30 shadow-[0_1px_0_0_rgba(0,0,0,0.03)] shrink-0">
+        <div className="w-12 flex-shrink-0 border-r border-border/40 bg-muted/30"></div>
         <div className="flex flex-1 grid grid-cols-7">
           {daysList.map((day) => {
             const isTodayDate = isToday(day);
@@ -220,19 +220,19 @@ export function FullCalendar({ bookings, externalEvents = [], onEdit, onNewBooki
               <div
                 key={day.toISOString()}
                 className={cn(
-                  "text-center py-2 border-r border-slate-100 last:border-r-0 transition-colors",
+                  "text-center py-2 border-r border-border/40 last:border-r-0 transition-colors",
                   isTodayDate && "bg-blue-50/20"
                 )}
               >
                 <div className={cn(
                   "text-[9px] font-bold uppercase tracking-widest mb-0.5",
-                  isTodayDate ? "text-blue-600" : "text-slate-400"
+                  isTodayDate ? "text-blue-600" : "text-muted-foreground"
                 )}>
                   {format(day, "EEE")}
                 </div>
                 <div className={cn(
                   "text-xs font-bold w-6 h-6 flex items-center justify-center rounded-full mx-auto transition-all",
-                  isTodayDate ? "bg-blue-600 text-white shadow-sm" : "text-slate-600"
+                  isTodayDate ? "bg-blue-600 text-white shadow-sm" : "text-muted-foreground"
                 )}>
                   {format(day, "d")}
                 </div>
@@ -249,10 +249,10 @@ export function FullCalendar({ bookings, externalEvents = [], onEdit, onNewBooki
       >
         <div className="flex flex-1 relative bg-background" style={{ height: 24 * HOUR_HEIGHT }}>
           {/* Time Gutter */}
-          <div className="w-12 flex-shrink-0 border-r border-slate-100 bg-slate-50/30 select-none">
+          <div className="w-12 flex-shrink-0 border-r border-border/40 bg-muted/30 select-none">
             {Array.from({ length: 24 }).map((_, hour) => (
               <div key={hour} className="relative border-b border-slate-50/50 h-[48px]">
-                <span className="absolute -top-2 w-full text-center text-[9px] text-slate-400 font-bold tracking-tight">
+                <span className="absolute -top-2 w-full text-center text-[9px] text-muted-foreground font-bold tracking-tight">
                   {hour === 0 ? "12 AM" : hour < 12 ? `${hour} AM` : hour === 12 ? "12 PM" : `${hour - 12} PM`}
                 </span>
               </div>
@@ -269,7 +269,7 @@ export function FullCalendar({ bookings, externalEvents = [], onEdit, onNewBooki
 
               return (
                 <div key={day.toISOString()} className={cn(
-                  "border-r border-slate-100 last:border-r-0 relative bg-background",
+                  "border-r border-border/40 last:border-r-0 relative bg-background",
                   isTodayDate && "bg-blue-50/[0.1]"
                 )}>
                   {/* Grid Lines */}
@@ -277,8 +277,8 @@ export function FullCalendar({ bookings, externalEvents = [], onEdit, onNewBooki
                     <div
                       key={hour}
                       className={cn(
-                        "border-b border-slate-50/50 h-[48px] hover:bg-slate-50/30 cursor-pointer transition-colors",
-                        hour % 2 === 0 ? "bg-transparent" : "bg-slate-50/20"
+                        "border-b border-slate-50/50 h-[48px] hover:bg-muted/30 cursor-pointer transition-colors",
+                        hour % 2 === 0 ? "bg-transparent" : "bg-muted/30"
                       )}
                       onClick={() => onNewBooking(setHours(day, hour))}
                     />
@@ -314,11 +314,11 @@ export function FullCalendar({ bookings, externalEvents = [], onEdit, onNewBooki
                         style={{ top: `${top}px`, height: `${height}px` }}
                         className={cn(
                           "absolute inset-x-0.5 z-10 rounded shadow-sm border border-black/5 p-1 flex flex-col transition-all hover:z-20 hover:scale-[1.01] cursor-pointer overflow-hidden leading-tight",
-                          STATUS_STYLES[booking.status] || "bg-slate-100"
+                          STATUS_STYLES[booking.status] || "bg-muted/50"
                         )}
                       >
                         <div className="flex flex-wrap items-center justify-between gap-1 mb-0.5">
-                          <span className="font-bold text-[9px] text-slate-900 break-words line-clamp-1 uppercase tracking-tight">{booking.service.name}</span>
+                          <span className="font-bold text-[9px] text-foreground break-words line-clamp-1 uppercase tracking-tight">{booking.service.name}</span>
                           <span className="text-[8px] font-black opacity-50 whitespace-nowrap">{format(start, "H:mm")}</span>
                         </div>
                         <div className="text-[9px] font-bold text-slate-700 truncate">{booking.contact.name}</div>
@@ -366,26 +366,26 @@ export function FullCalendar({ bookings, externalEvents = [], onEdit, onNewBooki
   return (
     <div className="flex flex-col h-full overflow-hidden">
       {/* Navigation Toolbar */}
-      <div className="flex items-center justify-between p-3 border-b border-slate-100 bg-background shrink-0">
+      <div className="flex items-center justify-between p-3 border-b border-border/40 bg-background shrink-0">
         <div className="flex items-center gap-2">
-          <div className="flex bg-slate-50 p-0.5 rounded-lg border border-slate-200">
+          <div className="flex bg-muted/30 p-0.5 rounded-lg border border-border/40">
             <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md hover:bg-background" onClick={prev}>
-              <ChevronLeft className="w-4 h-4 text-slate-500" />
+              <ChevronLeft className="w-4 h-4 text-muted-foreground" />
             </Button>
-            <Button variant="ghost" className="h-7 px-3 text-[10px] font-bold text-slate-600 rounded-md hover:bg-background transition-all active:scale-95" onClick={goToToday}>
+            <Button variant="ghost" className="h-7 px-3 text-[10px] font-bold text-muted-foreground rounded-md hover:bg-background transition-all active:scale-95" onClick={goToToday}>
               Today
             </Button>
             <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md hover:bg-background" onClick={next}>
-              <ChevronRight className="w-4 h-4 text-slate-500" />
+              <ChevronRight className="w-4 h-4 text-muted-foreground" />
             </Button>
           </div>
-          <h2 className="text-sm font-bold tracking-tight text-slate-800 ml-1">
+          <h2 className="text-sm font-bold tracking-tight text-foreground ml-1">
             {headerTitle}
           </h2>
         </div>
 
         <div className="flex items-center gap-2">
-          <div className="flex bg-slate-50 p-0.5 rounded-lg border border-slate-200">
+          <div className="flex bg-muted/30 p-0.5 rounded-lg border border-border/40">
             {(["month", "week", "day"] as ViewMode[]).map((m) => (
               <button
                 key={m}
@@ -393,8 +393,8 @@ export function FullCalendar({ bookings, externalEvents = [], onEdit, onNewBooki
                 className={cn(
                   "px-3 py-1 text-[9px] font-bold rounded-md capitalize transition-all",
                   view === m
-                    ? "bg-background text-blue-600 shadow-sm border border-slate-100"
-                    : "text-slate-400 hover:text-slate-600"
+                    ? "bg-background text-blue-600 shadow-sm border border-border/40"
+                    : "text-muted-foreground hover:text-muted-foreground"
                 )}
               >
                 {m}
@@ -410,7 +410,7 @@ export function FullCalendar({ bookings, externalEvents = [], onEdit, onNewBooki
         </div>
       </div>
 
-      <div className="flex-1 min-h-0 bg-slate-50/10">
+      <div className="flex-1 min-h-0 bg-muted/30">
         {view === "month" && renderMonthView()}
         {view === "week" && renderTimeGrid(weekDays)}
         {view === "day" && renderTimeGrid([currentDate])}

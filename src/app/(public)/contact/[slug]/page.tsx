@@ -82,7 +82,7 @@ export default function PublicContactPage({ params }: { params: Promise<{ slug: 
 
   return (
     <div className="min-h-screen bg-muted/30 flex items-center justify-center px-4 py-12">
-      <Card className="w-full max-w-7xlg">
+      <Card className="w-full max-w-7xl">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-6">
             <Link href="/">

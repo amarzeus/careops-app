@@ -106,14 +106,14 @@ export function Sidebar({ userName, userRole, workspaceName }: SidebarProps) {
             collapsed ? "justify-center p-2.5" : "gap-3 px-3 py-2.5",
             isActive
               ? "bg-[var(--sidebar-item-active-bg)] text-[var(--sidebar-item-active-text)]"
-              : "text-slate-500 hover:bg-[var(--sidebar-item-hover-bg)] hover:text-slate-800 dark:hover:text-slate-200"
+              : "text-muted-foreground hover:bg-[var(--sidebar-item-hover-bg)] hover:text-foreground dark:hover:text-slate-200"
           )}
         >
           <item.icon
             className={cn(
               "shrink-0 transition-colors",
               collapsed ? "h-5 w-5" : "h-[18px] w-[18px]",
-              isActive ? "text-[var(--sidebar-item-active-text)]" : "text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300"
+              isActive ? "text-[var(--sidebar-item-active-text)]" : "text-muted-foreground group-hover:text-muted-foreground dark:group-hover:text-slate-300"
             )}
           />
           {!collapsed && (
@@ -161,11 +161,11 @@ export function Sidebar({ userName, userRole, workspaceName }: SidebarProps) {
 
         {/* Mobile expand button */}
         <button
-          className="mt-2 flex h-9 w-9 cursor-pointer items-center justify-center self-center rounded-lg transition-colors hover:bg-slate-100 dark:hover:bg-slate-800"
+          className="mt-2 flex h-9 w-9 cursor-pointer items-center justify-center self-center rounded-lg transition-colors hover:bg-muted/50 dark:hover:bg-slate-800"
           onClick={() => setMobileOpen(true)}
           aria-label="Open menu"
         >
-          <Menu className="h-4.5 w-4.5 text-slate-500" />
+          <Menu className="h-4.5 w-4.5 text-muted-foreground" />
         </button>
 
         {/* Collapsed nav */}
@@ -179,7 +179,7 @@ export function Sidebar({ userName, userRole, workspaceName }: SidebarProps) {
           <button
             onClick={handleLogout}
             title="Sign Out"
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-200 text-xs font-semibold text-slate-600 transition-colors hover:bg-red-100 hover:text-red-600 dark:bg-slate-700 dark:text-slate-300"
+            className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-200 text-xs font-semibold text-muted-foreground transition-colors hover:bg-red-100 hover:text-red-600 dark:bg-slate-700 dark:text-slate-300"
           >
             {initials}
           </button>
@@ -270,10 +270,10 @@ export function Sidebar({ userName, userRole, workspaceName }: SidebarProps) {
           </Link>
           <button
             onClick={() => setMobileOpen(false)}
-            className="flex h-8 w-8 items-center justify-center rounded-lg transition-colors hover:bg-slate-100 dark:hover:bg-slate-800"
+            className="flex h-8 w-8 items-center justify-center rounded-lg transition-colors hover:bg-muted/50 dark:hover:bg-slate-800"
             aria-label="Close menu"
           >
-            <X className="h-4 w-4 text-slate-500" />
+            <X className="h-4 w-4 text-muted-foreground" />
           </button>
         </div>
 

@@ -10,7 +10,7 @@ export default function TermsPage() {
     return (
         <div className="min-h-screen bg-background">
             <nav className="border-b border-border/40">
-                <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
                     <Link href="/" className="flex items-center gap-2">
                         <Logo variant="full" size={32} />
                     </Link>
@@ -22,7 +22,7 @@ export default function TermsPage() {
                 </div>
             </nav>
 
-            <main className="max-w-7xl mx-auto px-6 py-16">
+            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
                 <h1 className="text-4xl font-bold text-foreground mb-8">Terms of Service</h1>
                 <p className="text-muted-foreground mb-6">Last Updated: February 14, 2026</p>
 
@@ -95,7 +95,7 @@ export default function TermsPage() {
             </main>
 
             <footer className="border-t border-border/40 py-12 bg-muted/30">
-                <div className="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
                     <p>© 2026 CareOps by Amar Kumar. All rights reserved.</p>
                     <div className="flex gap-6 items-center">
                         <Link href="/terms" className="hover:text-muted-foreground">Terms of Service</Link>

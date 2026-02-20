@@ -159,7 +159,7 @@ export default function FAQPage() {
 
             {/* Nav */}
             <nav className="border-b border-border/40 sticky top-0 z-10 bg-background/90 backdrop-blur-sm">
-                <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
                     <Link href="/" className="flex items-center gap-2">
                         <Logo variant="full" size={32} />
                     </Link>
@@ -191,7 +191,7 @@ export default function FAQPage() {
             </div>
 
             {/* FAQ Content */}
-            <main className="max-w-7xl mx-auto px-6 py-16 space-y-16">
+            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-16">
                 {faqs.map((category) => (
                     <section key={category.category}>
                         <h2 className="text-2xl font-bold text-foreground mb-8 pb-3 border-b border-border/40 flex items-center gap-2">
@@ -228,7 +228,7 @@ export default function FAQPage() {
             </main>
 
             <footer className="border-t border-border/40 py-12 bg-muted/30">
-                <div className="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
                     <p>© 2026 CareOps by Amar Kumar. All rights reserved.</p>
                     <div className="flex gap-6">
                         <Link href="/privacy" className="hover:text-muted-foreground">Privacy Policy</Link>

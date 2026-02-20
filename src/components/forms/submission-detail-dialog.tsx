@@ -55,7 +55,7 @@ export function SubmissionDetailDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-7xlg">
+      <DialogContent className="max-w-7xl">
         <DialogHeader>
           <DialogTitle>Submission Details</DialogTitle>
           <DialogDescription>
@@ -114,15 +114,15 @@ export function SubmissionDetailDialog({
           <div className="flex gap-2 pt-2 border-t">
             {(submission.status === "PENDING" ||
               submission.status === "SENT") && (
-              <Button
-                size="sm"
-                variant="outline"
-                className="text-blue-600"
-                onClick={() => onResend(submission.id)}
-              >
-                <Send className="w-3 h-3 mr-1" /> Re-send Form
-              </Button>
-            )}
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="text-blue-600"
+                  onClick={() => onResend(submission.id)}
+                >
+                  <Send className="w-3 h-3 mr-1" /> Re-send Form
+                </Button>
+              )}
             {submission.status !== "COMPLETED" && (
               <Button
                 size="sm"

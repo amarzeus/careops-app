@@ -24,7 +24,7 @@ export default function CookiePolicyPage() {
     return (
         <div className="min-h-screen bg-background">
             <nav className="border-b border-border/40 sticky top-0 z-10 bg-background/90 backdrop-blur-sm">
-                <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
                     <Link href="/" className="flex items-center gap-2">
                         <Logo variant="full" size={32} />
                     </Link>
@@ -46,7 +46,7 @@ export default function CookiePolicyPage() {
                 <p className="text-muted-foreground">Last Updated: February 19, 2026</p>
             </div>
 
-            <main className="max-w-7xl mx-auto px-6 py-12 space-y-10 text-muted-foreground leading-relaxed">
+            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-10 text-muted-foreground leading-relaxed">
 
                 <section>
                     <h2 className="text-2xl font-bold text-foreground mb-4">1. What Are Cookies?</h2>
@@ -180,7 +180,7 @@ export default function CookiePolicyPage() {
             </main>
 
             <footer className="border-t border-border/40 py-12 bg-muted/30">
-                <div className="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
                     <p>© 2026 CareOps by Amar Kumar. All rights reserved.</p>
                     <div className="flex gap-6">
                         <Link href="/privacy" className="hover:text-muted-foreground">Privacy Policy</Link>

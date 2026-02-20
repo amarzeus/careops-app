@@ -239,7 +239,7 @@ export default function VoiceCallsPage() {
   };
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-slate-50/30">
+    <div className="flex h-screen flex-col overflow-hidden bg-muted/30">
       <Header title="Voice Calls" subtitle="Review call outcomes, escalations, and consent" />
 
       <div className="flex flex-1 flex-col gap-4 overflow-hidden p-4 sm:p-6">

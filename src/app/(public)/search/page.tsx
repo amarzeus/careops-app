@@ -179,12 +179,12 @@ export default function SearchPage() {
                 initial={{ y: -100 }}
                 animate={{ y: 0 }}
                 transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                className={`fixed top-0 left-0 right-0 z-50 transition-all duration-[600ms] ${scrolled
-                    ? "bg-background/70 backdrop-blur-2xl border-b border-border/40 py-3 shadow-sm"
-                    : "bg-transparent py-6"
+                className={`fixed top-4 left-4 right-4 z-50 transition-all duration-[600ms] rounded-2xl ${scrolled
+                    ? "bg-background/80 backdrop-blur-2xl border border-border/40 py-3 shadow-lg"
+                    : "bg-transparent py-4"
                     }`}
             >
-                <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
                     <Link href="/" className="flex items-center gap-2 group">
                         <Logo variant="full" size={32} />
                         <span className="font-bold text-xl tracking-tight hidden sm:block bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent ml-2">Directory</span>
@@ -356,7 +356,7 @@ export default function SearchPage() {
 
             {/* Footer */}
             <footer className="border-t border-border/40 bg-muted/10 py-10 mt-auto backdrop-blur-lg">
-                <div className="max-w-7xl mx-auto px-6 flex flex-col items-center justify-between gap-4 text-center sm:flex-row">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-between gap-4 text-center sm:flex-row">
                     <p className="text-sm font-medium text-muted-foreground">&copy; 2026 CareOps Directory. All rights reserved.</p>
                     <a
                         href="https://github.com/amarzeus/careops-app"

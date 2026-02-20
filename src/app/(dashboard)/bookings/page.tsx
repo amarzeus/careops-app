@@ -207,12 +207,12 @@ export default function BookingsPage() {
   };
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-slate-50/20">
+    <div className="flex h-screen flex-col overflow-hidden bg-muted/30">
       {/* Fixed Sticky Header */}
       <Header title="Bookings" subtitle="Manage appointments and schedules">
         <div className="flex items-center gap-2 sm:gap-4">
           {/* List/Calendar Switcher */}
-          <div className="xs:flex flex hidden rounded-lg border border-slate-200 bg-slate-100 p-0.5">
+          <div className="xs:flex flex hidden rounded-lg border border-border/40 bg-muted/50 p-0.5">
             <Button
               variant={viewMode === "list" ? "secondary" : "ghost"}
               size="sm"
@@ -274,10 +274,10 @@ export default function BookingsPage() {
                 <CardContent className="relative p-3 sm:p-4">
                   <div className="flex items-center justify-between">
                     <div className="min-w-0 flex-1">
-                      <p className="mb-0.5 truncate text-[10px] font-bold tracking-widest text-slate-500 uppercase sm:text-xs">
+                      <p className="mb-0.5 truncate text-[10px] font-bold tracking-widest text-muted-foreground uppercase sm:text-xs">
                         {s.label}
                       </p>
-                      <h3 className="text-xl leading-none font-black tracking-tight text-slate-900 sm:text-2xl">
+                      <h3 className="text-xl leading-none font-black tracking-tight text-foreground sm:text-2xl">
                         {s.val}
                       </h3>
                     </div>
@@ -302,22 +302,22 @@ export default function BookingsPage() {
             {viewMode === "list" ? (
               <div className="flex h-full flex-col">
                 {/* Inline Filters for List View */}
-                <div className="border-border/40 flex flex-col items-center gap-2 border-b bg-slate-50/30 p-3 md:flex-row">
+                <div className="border-border/40 flex flex-col items-center gap-2 border-b bg-muted/30 p-3 md:flex-row">
                   <div className="relative flex-1">
                     <Search className="text-muted-foreground/60 absolute top-1/2 left-2.5 h-3 w-3 -translate-y-1/2" />
                     <Input
                       placeholder="Search bookings..."
-                      className="h-8 rounded-lg border-slate-200 bg-background pl-8 text-[11px]"
+                      className="h-8 rounded-lg border-border/40 bg-background pl-8 text-[11px]"
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                     />
                   </div>
-                  <div className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-background p-0.5">
+                  <div className="flex items-center gap-1.5 rounded-lg border border-border/40 bg-background p-0.5">
                     <Popover>
                       <PopoverTrigger asChild>
                         <Button
                           variant="ghost"
-                          className="h-7 px-2 text-[10px] font-medium text-slate-500"
+                          className="h-7 px-2 text-[10px] font-medium text-muted-foreground"
                         >
                           <CalendarIcon className="mr-1.5 h-3 w-3 opacity-60" />
                           {dateFrom ? format(parseISO(dateFrom), "MMM d") : "Start Date"}
@@ -337,7 +337,7 @@ export default function BookingsPage() {
                       <PopoverTrigger asChild>
                         <Button
                           variant="ghost"
-                          className="h-7 px-2 text-[10px] font-medium text-slate-500"
+                          className="h-7 px-2 text-[10px] font-medium text-muted-foreground"
                         >
                           <CalendarIcon className="mr-1.5 h-3 w-3 opacity-60" />
                           {dateTo ? format(parseISO(dateTo), "MMM d") : "End Date"}

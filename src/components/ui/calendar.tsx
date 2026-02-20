@@ -50,21 +50,21 @@ function Calendar({
         <div className={cn("p-4 bg-background rounded-2xl shadow-xl border border-border/40 w-[300px] select-none", className)}>
             {/* Navigation Header */}
             <div className="flex items-center justify-between mb-5 px-1">
-                <span className="text-[13px] font-bold text-slate-900 tracking-tight">
+                <span className="text-[13px] font-bold text-foreground tracking-tight">
                     {format(currentDate, "MMMM yyyy")}
                 </span>
                 <div className="flex items-center gap-1">
                     <button
                         type="button"
                         onClick={prevMonth}
-                        className="p-1.5 hover:bg-slate-100 rounded-lg transition-all text-slate-400 hover:text-slate-900 active:scale-95"
+                        className="p-1.5 hover:bg-muted/50 rounded-lg transition-all text-muted-foreground hover:text-foreground active:scale-95"
                     >
                         <ChevronLeft className="w-4 h-4" />
                     </button>
                     <button
                         type="button"
                         onClick={nextMonth}
-                        className="p-1.5 hover:bg-slate-100 rounded-lg transition-all text-slate-400 hover:text-slate-900 active:scale-95"
+                        className="p-1.5 hover:bg-muted/50 rounded-lg transition-all text-muted-foreground hover:text-foreground active:scale-95"
                     >
                         <ChevronRight className="w-4 h-4" />
                     </button>
@@ -106,7 +106,7 @@ function Calendar({
                                 "aspect-square text-[13px] flex items-center justify-center rounded-xl m-0.5 transition-all duration-200 relative group",
                                 isSelected
                                     ? "bg-primary text-white font-bold shadow-lg shadow-primary/20 scale-[1.05]"
-                                    : "text-slate-600 hover:bg-slate-50 font-medium active:scale-95",
+                                    : "text-muted-foreground hover:bg-muted/30 font-medium active:scale-95",
                                 isTod && !isSelected && "text-primary font-bold",
                                 isDisabled && "opacity-40 cursor-not-allowed hover:bg-transparent"
                             )}
