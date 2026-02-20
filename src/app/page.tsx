@@ -10,7 +10,13 @@ import {
   Menu,
   Sparkles,
   ArrowRight,
+  LayoutDashboard,
+  Users,
+  Settings,
+  Bell,
+  Search,
 } from "lucide-react";
+import { AreaChart, Area, ResponsiveContainer, Tooltip, XAxis } from "recharts";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/layout/logo";
@@ -257,6 +263,33 @@ function Navbar({
 }
 
 // ─────────────────────────────────────────────
+// MOCK DATA FOR CHART
+// ─────────────────────────────────────────────
+const mockChartData = [
+  { name: "Mon", revenue: 2400 },
+  { name: "Tue", revenue: 4200 },
+  { name: "Wed", revenue: 3800 },
+  { name: "Thu", revenue: 5900 },
+  { name: "Fri", revenue: 4800 },
+  { name: "Sat", revenue: 7200 },
+  { name: "Sun", revenue: 8500 },
+];
+
+function CustomTooltip({ active, payload, label }: any) {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-background/90 backdrop-blur-md border border-border/50 p-3 rounded-xl shadow-xl">
+        <p className="text-sm font-medium text-muted-foreground mb-1">{label}</p>
+        <p className="text-xl font-bold bg-gradient-to-r from-primary to-purple-500 bg-clip-text text-transparent">
+          ${payload[0].value.toLocaleString()}
+        </p>
+      </div>
+    );
+  }
+  return null;
+}
+
+// ─────────────────────────────────────────────
 // UI/UX PRO MAX 3D HERO — Liquid Glass
 // ─────────────────────────────────────────────
 function Hero3D() {
@@ -374,48 +407,99 @@ function Hero3D() {
           {/* Faux dashboard glowing grid lines */}
           <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+Cjwvc3ZnPg==')] opacity-[0.03] dark:opacity-[0.05]" />
 
-          <div className="absolute inset-0 p-8 flex flex-col">
-            {/* Topbar Glass */}
-            <div className="w-full h-12 rounded-xl bg-white/20 dark:bg-white/5 border border-white/20 dark:border-white/10 backdrop-blur-md mb-6 flex items-center px-4 justify-between">
-              <div className="flex gap-2">
-                <div className="w-3 h-3 rounded-full bg-red-400/80" />
-                <div className="w-3 h-3 rounded-full bg-yellow-400/80" />
-                <div className="w-3 h-3 rounded-full bg-green-400/80" />
+          <div className="absolute inset-0 p-8 flex flex-col pointer-events-none">
+            {/* Dashboard Header */}
+            <div className="flex items-center justify-between border-b border-border/40 pb-4">
+              <div className="flex items-center gap-4">
+                <div className="flex gap-2">
+                  <div className="w-3 h-3 rounded-full bg-red-400/80 shadow-[0_0_8px_rgba(248,113,113,0.5)]" />
+                  <div className="w-3 h-3 rounded-full bg-yellow-400/80 shadow-[0_0_8px_rgba(250,204,21,0.5)]" />
+                  <div className="w-3 h-3 rounded-full bg-green-400/80 shadow-[0_0_8px_rgba(74,222,128,0.5)]" />
+                </div>
+                <div className="h-8 w-48 bg-muted/30 rounded-lg flex items-center px-3 border border-border/20">
+                  <Search className="w-4 h-4 text-muted-foreground mr-2" />
+                  <span className="text-xs text-muted-foreground">Search patients...</span>
+                </div>
               </div>
-              <div className="h-6 w-1/3 bg-background/40 rounded-md" />
-              <div className="w-8 h-8 rounded-full bg-background/50" />
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-muted/50 flex items-center justify-center border border-border/50 transition-colors">
+                  <Bell className="w-4 h-4 text-foreground/70" />
+                </div>
+                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-primary to-purple-500 p-[2px]">
+                  <div className="w-full h-full rounded-full bg-background flex items-center justify-center">
+                    <span className="text-xs font-bold text-foreground">AK</span>
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Dashboard Content */}
-            <div className="flex-1 flex gap-6">
+            <div className="flex-1 flex gap-6 mt-6">
               {/* Sidebar List */}
-              <div className="w-48 hidden md:flex flex-col gap-3">
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <div key={i} className={`h-10 rounded-xl border border-white/10 backdrop-blur-sm ${i === 2 ? 'bg-primary/20 shadow-lg shadow-primary/10' : 'bg-white/10 dark:bg-white/5'}`} />
+              <div className="w-48 hidden md:flex flex-col gap-2">
+                {[
+                  { icon: LayoutDashboard, label: "Overview", active: true },
+                  { icon: Calendar, label: "Appointments", active: false },
+                  { icon: Users, label: "Patients", active: false },
+                  { icon: FileText, label: "Invoices", active: false },
+                  { icon: Settings, label: "Settings", active: false },
+                ].map((item, i) => (
+                  <div key={i} className={`h-10 rounded-xl px-3 flex items-center gap-3 transition-colors border border-transparent ${item.active ? 'bg-primary/10 border-primary/20 text-primary shadow-sm' : 'bg-muted/10 text-muted-foreground'}`}>
+                    <item.icon className={`w-4 h-4 ${item.active ? 'text-primary' : 'text-muted-foreground'}`} />
+                    <span className="text-sm font-medium">{item.label}</span>
+                  </div>
                 ))}
               </div>
+              
               {/* Main Area */}
               <div className="flex-1 flex flex-col gap-6">
+                {/* KPI Cards */}
                 <div className="grid grid-cols-3 gap-6">
-                  {['bg-blue-500/15', 'bg-indigo-500/15', 'bg-purple-500/15'].map((bg, i) => (
-                    <div key={i} className={`h-28 rounded-2xl ${bg} border border-white/10 backdrop-blur-md p-5 flex flex-col justify-end`}>
-                      <div className="w-20 h-3 rounded bg-foreground/20 mb-2" />
-                      <div className="w-12 h-6 rounded bg-foreground/40" />
+                  {[
+                    { title: "Total Revenue", value: "$24,500", trend: "+12.5%", color: "from-blue-500/20 to-blue-500/5", ring: "ring-blue-500/20", trendColor: "text-green-500 bg-green-500/10" },
+                    { title: "New Bookings", value: "145", trend: "+5.2%", color: "from-purple-500/20 to-purple-500/5", ring: "ring-purple-500/20", trendColor: "text-green-500 bg-green-500/10" },
+                    { title: "Cancellations", value: "3", trend: "-2.1%", color: "from-orange-500/20 to-orange-500/5", ring: "ring-orange-500/20", trendColor: "text-red-500 bg-red-500/10" },
+                  ].map((stat, i) => (
+                    <div key={i} className={`rounded-2xl bg-gradient-to-b ${stat.color} border border-border/40 backdrop-blur-md p-5 flex flex-col justify-between shadow-sm ring-1 ring-inset ${stat.ring}`}>
+                      <div className="flex justify-between items-start mb-2">
+                        <span className="text-sm font-semibold text-muted-foreground">{stat.title}</span>
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${stat.trendColor}`}>{stat.trend}</span>
+                      </div>
+                      <span className="text-2xl font-black tracking-tight text-foreground">{stat.value}</span>
                     </div>
                   ))}
                 </div>
-                {/* Fluid Chart Area */}
-                <div className="flex-1 rounded-2xl bg-white/10 dark:bg-white/5 border border-white/10 backdrop-blur-md relative overflow-hidden flex items-end">
-                  <svg className="w-full h-4/5" preserveAspectRatio="none">
-                    <defs>
-                      <linearGradient id="fluidGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="var(--primary)" stopOpacity="0.3" />
-                        <stop offset="100%" stopColor="var(--primary)" stopOpacity="0" />
-                      </linearGradient>
-                    </defs>
-                    <path d="M0,100 C100,80 200,120 300,60 C400,0 500,80 600,40 C700,0 800,20 1000,10 L1000,200 L0,200 Z" fill="url(#fluidGrad)" />
-                    <path d="M0,100 C100,80 200,120 300,60 C400,0 500,80 600,40 C700,0 800,20 1000,10" fill="none" stroke="var(--primary)" strokeWidth="3" strokeOpacity="0.8" className="drop-shadow-[0_5px_15px_rgba(var(--primary),0.5)]" />
-                  </svg>
+
+                {/* Real Recharts Area */}
+                <div className="flex-1 rounded-2xl bg-muted/10 border border-border/40 backdrop-blur-md relative overflow-hidden flex flex-col p-4 shadow-inner pointer-events-auto">
+                   <div className="flex items-center justify-between mb-2 px-2">
+                      <h3 className="text-sm font-bold text-foreground">Revenue Overview</h3>
+                      <span className="text-xs font-medium text-muted-foreground">Last 7 Days</span>
+                   </div>
+                   <div className="flex-1 w-full min-h-0">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <AreaChart data={mockChartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                          <defs>
+                            <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.4}/>
+                              <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
+                            </linearGradient>
+                          </defs>
+                          <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} dy={10} />
+                          <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'hsl(var(--primary))', strokeWidth: 1, strokeDasharray: '4 4' }} />
+                          <Area 
+                            type="monotone" 
+                            dataKey="revenue" 
+                            stroke="hsl(var(--primary))" 
+                            strokeWidth={3}
+                            fillOpacity={1} 
+                            fill="url(#colorRevenue)" 
+                            activeDot={{ r: 6, strokeWidth: 0, fill: "hsl(var(--primary))" }}
+                            animationDuration={1500}
+                          />
+                        </AreaChart>
+                      </ResponsiveContainer>
+                   </div>
                 </div>
               </div>
             </div>
