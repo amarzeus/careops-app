@@ -30,13 +30,9 @@
 /playwright/.cache/
 
 # Captured output files (CI artefacts — never commit)
-*_output.txt
-*_results.txt
-*_results_*.txt
-*_fresh_output.txt
-*_verify_output.txt
+*output*.txt
+*results*.txt
 render_validate_output.txt
-tsc_fresh_output.txt
 type_errors.txt
 
 # ─── Lint result dumps ───────────────────────────────────────
