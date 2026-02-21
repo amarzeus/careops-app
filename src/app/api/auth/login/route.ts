@@ -69,7 +69,7 @@ export async function POST(req: Request) {
         role: user.role,
       },
       workspace: user.workspace,
-      token,
+      // Token is set via httpOnly cookie - not exposed in response for security
     });
   } catch (error) {
     console.error("Login error:", error);

@@ -80,6 +80,7 @@ model Workspace {
   voiceCalls                 VoiceCall[]
   webhooks                   Webhook[]
   webhookDeliveries          WebhookDeliveryLog[]
+  webhookJobs                WebhookJob[]
 }
 
 model Webhook {
@@ -131,6 +132,8 @@ model Contact {
   voiceCalls      VoiceCall[]
 
   @@unique([email, workspaceId])
+  @@index([workspaceId, createdAt])
+  @@index([phone])
 }
 
 model Service {
@@ -169,6 +172,10 @@ model Booking {
   service               Service          @relation(fields: [serviceId], references: [id])
   workspace             Workspace        @relation(fields: [workspaceId], references: [id])
   formSubmissions       FormSubmission[]
+
+  @@index([workspaceId, date])
+  @@index([workspaceId, status])
+  @@index([workspaceId, date, status])
 }
 
 model ContactForm {
@@ -218,6 +225,9 @@ model FormSubmission {
   contact      Contact     @relation(fields: [contactId], references: [id])
   intakeForm   IntakeForm? @relation(fields: [intakeFormId], references: [id])
   workspace    Workspace   @relation(fields: [workspaceId], references: [id])
+
+  @@index([workspaceId, status])
+  @@index([workspaceId, dueDate])
 }
 
 model InventoryItem {
@@ -449,6 +459,28 @@ model DoNotCallEntry {
   @@unique([workspaceId, phoneNumber])
   @@index([phoneNumber])
   @@index([workspaceId, isActive])
+}
+
+model WebhookJob {
+  id           String    @id @default(cuid())
+  type         String
+  callId       String
+  callSid      String
+  workspaceId  String
+  payload      String
+  metadata     String    @default("{}")
+  status       String    @default("pending")
+  retryCount   Int       @default(0)
+  error        String?
+  nextRetryAt  DateTime?
+  processedAt  DateTime?
+  completedAt  DateTime?
+  createdAt    DateTime  @default(now())
+  workspace    Workspace @relation(fields: [workspaceId], references: [id])
+
+  @@index([status, nextRetryAt])
+  @@index([workspaceId, createdAt])
+  @@index([callSid])
 }
 
 model AIPreferences {

@@ -10,11 +10,12 @@ interface RateLimitConfig {
   maxRequests: number;
 }
 
-interface RateLimitResult {
+export interface RateLimitResult {
   allowed: boolean;
   remaining: number;
   resetTime: number;
   totalHits: number;
+  retryAfter?: number;
 }
 
 // In-memory cache for rate limiting
