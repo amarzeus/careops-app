@@ -18,6 +18,8 @@
     "db:sqlite:generate": "prisma generate --schema=prisma/schema.sqlite.prisma",
     "db:sqlite:seed": "npm run db:seed",
     "test": "vitest run",
+    "test:unit": "vitest run",
+    "test:unit:watch": "vitest",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "render": "bash ./scripts/render-cli.sh",
