@@ -378,13 +378,34 @@ async function main() {
   // ============================================
   console.log("\n🤖 Creating Automation Rules & Failed Logs...");
 
-  // Create automation rules
+  // Create all 6 PRD automation rules
+  const welcomeRule = await prisma.automationRule.create({
+    data: {
+      workspaceId: workspace.id,
+      name: "Welcome New Contact",
+      trigger: "NEW_CONTACT",
+      messageTemplate: "Welcome to {{workspace_name}}! We're glad you reached out. How can we help you today?",
+      isActive: true,
+    },
+  });
+
   const bookingRule = await prisma.automationRule.create({
     data: {
       workspaceId: workspace.id,
       name: "Booking Confirmation",
       trigger: "BOOKING_CREATED",
-      messageTemplate: "Your booking is confirmed for {{date}}",
+      messageTemplate: "Your booking is confirmed for {{date}}. We look forward to seeing you!",
+      isActive: true,
+    },
+  });
+
+  await prisma.automationRule.create({
+    data: {
+      workspaceId: workspace.id,
+      name: "Booking Reminder",
+      trigger: "BEFORE_BOOKING",
+      messageTemplate: "Reminder: You have an upcoming appointment tomorrow. Please arrive 15 minutes early.",
+      delayMinutes: 1440, // 24 hours before
       isActive: true,
     },
   });
@@ -393,8 +414,28 @@ async function main() {
     data: {
       workspaceId: workspace.id,
       name: "Form Reminder",
-      trigger: "FORM_SENT",
-      messageTemplate: "Please complete your intake form",
+      trigger: "FORM_PENDING", // Fixed: was incorrectly "FORM_SENT"
+      messageTemplate: "Please complete your intake form before your appointment.",
+      isActive: true,
+    },
+  });
+
+  await prisma.automationRule.create({
+    data: {
+      workspaceId: workspace.id,
+      name: "Low Inventory Alert",
+      trigger: "INVENTORY_LOW",
+      messageTemplate: "Alert: {{item_name}} is running low and needs to be restocked.",
+      isActive: true,
+    },
+  });
+
+  await prisma.automationRule.create({
+    data: {
+      workspaceId: workspace.id,
+      name: "Staff Reply — Automation Paused",
+      trigger: "STAFF_REPLY",
+      messageTemplate: "", // Informational rule — no message template needed
       isActive: true,
     },
   });
@@ -429,13 +470,14 @@ async function main() {
   await prisma.automationLog.create({
     data: {
       ruleId: formRule.id,
-      trigger: "FORM_SENT",
+      trigger: "FORM_PENDING",
       status: "FAILED",
       details: JSON.stringify({ error: "Twilio API rate limit exceeded", channel: "SMS" }),
       recipient: "+1-555-0101",
       createdAt: subHours(today, 1),
     },
   });
+  console.log(`   ✓ Automation Rules: 6 rules seeded (all PRD triggers covered)`);
   console.log(`   ✓ Failed Logs: 2 Email failures, 1 SMS failure`);
 
   // Also create Integration Logs for visibility (PRD Section 11)

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { resumeAutomation } from "@/lib/automation";
+import { resumeAutomation, triggerAutomation } from "@/lib/automation";
 
 /**
  *
@@ -110,10 +110,18 @@ export async function POST(
     },
   });
 
+  // Update conversation timestamp
   await prisma.conversation.update({
     where: { id },
     data: { lastMessageAt: new Date() },
   });
+
+  // PRD: "When staff replies → automation stops"
+  // triggerAutomation fires handleStaffReply which sets isActive=false,
+  // sets autoResumeAt (+24h), creates alert, and logs the pause.
+  triggerAutomation(user.workspaceId!, "STAFF_REPLY", { conversationId: id }).catch(
+    (err) => console.error("STAFF_REPLY automation trigger error:", err)
+  );
 
   return NextResponse.json({ message }, { status: 201 });
 }

@@ -21,6 +21,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -266,27 +267,11 @@ export function RuleList({
                                   ? This action cannot be undone.
                                 </DialogDescription>
                               </DialogHeader>
+                              {/* DialogClose wraps Cancel to close the uncontrolled Dialog */}
                               <DialogFooter className="gap-2">
-                                {/* Note: We handle closing in parent usually, or use state. 
-                                    Ideally we'd bubble up the intent to open dialog. 
-                                    For simplicity, we'll assume the parent handles `deletingId` state 
-                                    and we just trigger onDelete here directly or show confirmation.
-                                    Actually, the original implementation had a state for the dialog ID.
-                                    Here we are inside a map. A single dialog controlled by parent is better.
-                                    But to match the prop interface `onDelete`, we'll just fire it. 
-                                    The parent should show confirmation or we assume confirmation happened. 
-                                    
-                                    Wait, I put the Dialog INSIDE the map in the original code. 
-                                    Here I am putting DialogContent inside too. 
-                                    The issue is `open` control. 
-                                    I'll change this to just a Button that triggers `onDelete` (which should open a confirmation in parent) 
-                                    OR make this `RuleList` accept a `setDeleteId` prop to open a shared dialog.
-                                    
-                                    Let's stick to the pattern: `onDelete` triggers the action.
-                                    BUT `onDelete` in parent does the actual API call. 
-                                    So we need a confirmation step.
-                                    I will move the confirmation dialog logic to the parent (Page) and just have a delete button here.
-                                */}
+                                <DialogClose asChild>
+                                  <Button variant="outline">Cancel</Button>
+                                </DialogClose>
                                 <Button
                                   variant="destructive"
                                   onClick={() => onDelete(rule.id)}

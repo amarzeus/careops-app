@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { sendEmail, buildEmailTemplate } from "@/lib/email";
 import { sendSMS } from "@/lib/sms";
 import { sendTextMessage as sendWhatsAppMessage, isAvailable as isWhatsAppAvailable } from "@/lib/whatsapp";
+import { triggerAutomation } from "@/lib/automation";
 import type { Workspace } from "@prisma/client";
 
 /**
@@ -136,11 +137,17 @@ export async function POST(req: Request) {
             }
         });
 
-        // 2. Update Conversation timestamp
+        // 2. Update conversation timestamp
         await prisma.conversation.update({
             where: { id: conversationId },
             data: { lastMessageAt: new Date() }
         });
+
+        // PRD: "When staff replies → automation stops" — handleStaffReply sets isActive=false
+        // with autoResumeAt (+24h), creates alert, and logs the pause.
+        triggerAutomation(user.workspaceId, "STAFF_REPLY", { conversationId }).catch(
+            (err) => console.error("STAFF_REPLY automation trigger error:", err)
+        );
 
         // 3. Deliver via selected channel
         let delivered = false;
