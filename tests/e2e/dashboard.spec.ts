@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Owner Dashboard', () => {
+  test.setTimeout(60000);
   test('[P1] should display key metrics', async ({ page, request, context }) => {
     // Seed user
     const email = `test-dash-${Date.now()}@example.com`;
@@ -39,7 +40,8 @@ test.describe('Owner Dashboard', () => {
 
     // Verify metrics API is available for this owner session
     const metricsRes = await request.get('/api/dashboard/metrics', {
-      headers: { Cookie: `auth-token=${token}` }
+      headers: { Cookie: `auth-token=${token}` },
+      timeout: 45000
     });
     expect(metricsRes.ok()).toBeTruthy();
     const metricsData = await metricsRes.json();

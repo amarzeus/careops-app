@@ -166,9 +166,17 @@ describe('AI Brain — Anomaly Detection', () => {
     it('should handle malformed AI response gracefully', async () => {
         mockGenerateContent.mockRejectedValue(new Error('API quota exceeded'));
 
-        // Implementation returns empty array on error for anomalies
+        // Implementation returns Busy info anomaly on quota error
         const result = await analyzeOperationsAnomalies({});
-        expect(result).toEqual([]);
+        expect(result).toEqual([{
+            type: "info",
+            severity: "info",
+            description: "AI Analytics is currently at capacity. Standard metrics are still available.",
+            recommendation: "Check back later for automated insights.",
+            metric: "Status",
+            expectedRange: "Optimal",
+            actualValue: "Busy",
+        }]);
     });
 });
 

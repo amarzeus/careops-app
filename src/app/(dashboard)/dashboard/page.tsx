@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Calendar,
   Users,
@@ -96,6 +97,7 @@ interface DashboardData {
  *
  */
 export default function DashboardPage() {
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [data, setData] = useState<DashboardData | null>(null);
@@ -309,7 +311,7 @@ export default function DashboardPage() {
                 {data.keyAlerts.map((alert, i) => (
                   <button
                     key={i}
-                    onClick={() => alert.link && (window.location.href = alert.link)}
+                    onClick={() => alert.link && router.push(alert.link)}
                     className="group/item flex w-full items-start gap-3 rounded-lg border bg-background p-2.5 text-left transition-colors hover:bg-muted/30"
                   >
                     <div
@@ -468,7 +470,7 @@ export default function DashboardPage() {
                   <div
                     key={activity.id}
                     className="flex cursor-pointer items-center gap-3 rounded-lg p-2 text-xs transition-colors hover:bg-muted/30"
-                    onClick={() => activity.link && (window.location.href = activity.link)}
+                    onClick={() => activity.link && router.push(activity.link)}
                   >
                     <div
                       className={cn(

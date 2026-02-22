@@ -42,7 +42,7 @@ export type GeminiModelId = keyof typeof GEMINI_MODELS;
 /**
 * Default model to use.
 */
-export const DEFAULT_GEMINI_MODEL: GeminiModelId = 'gemini-2.5-flash';
+export const DEFAULT_GEMINI_MODEL: GeminiModelId = 'gemini-2.0-flash';
 
 /**
 * Gets the AI model preference for a workspace.

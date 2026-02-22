@@ -136,7 +136,7 @@ jobs:
       - name: Build Next.js application
         run: npm run build
         env:
-          NEXT_PUBLIC_APP_URL: http://localhost:3000
+          NEXT_PUBLIC_APP_URL: http://localhost:5000
           JWT_SECRET: test-secret-for-ci
           DATABASE_URL: postgresql://placeholder:placeholder@localhost:5432/placeholder
 

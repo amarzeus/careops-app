@@ -15,13 +15,13 @@ export async function GET(req: Request) {
     // Handle OAuth errors from Google
     if (errorParam) {
         console.error(`[Google Auth Callback] OAuth error from Google: ${errorParam}`);
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:10000";
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:5000";
         return NextResponse.redirect(new URL(`/login?error=google_auth_failed&message=${encodeURIComponent(`Google error: ${errorParam}`)}`, baseUrl));
     }
 
     if (!code) {
         console.error("[Google Auth Callback] No authorization code received");
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:10000";
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:5000";
         return NextResponse.redirect(new URL("/login?error=google_auth_failed&message=No authorization code", baseUrl));
     }
 
@@ -36,7 +36,7 @@ export async function GET(req: Request) {
 
         if (!googleUser.emailVerified && !googleUser.verified_email) {
             console.error("[Google Auth Callback] Email not verified");
-            const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:10000";
+            const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:5000";
             return NextResponse.redirect(new URL("/login?error=google_auth_failed&message=Email not verified", baseUrl));
         }
 
@@ -142,7 +142,7 @@ export async function GET(req: Request) {
         console.error("[Google Auth Callback] Error:", error);
         const errorMessage = error instanceof Error ? error.message : "Unknown error";
         console.error("[Google Auth Callback] Error details:", errorMessage);
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:10000";
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:5000";
         return NextResponse.redirect(new URL(`/login?error=google_auth_failed&message=${encodeURIComponent(errorMessage)}`, baseUrl));
     }
 }

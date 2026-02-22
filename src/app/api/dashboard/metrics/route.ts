@@ -279,15 +279,11 @@ export async function GET() {
     unreadMessages: unansweredMessages,
   };
 
-  let aiInsights: Array<{
-    priority: "high" | "medium" | "low";
-    category: string;
-    message: string;
-    action: string;
-  }> = [];
+  let aiInsights: any[] = [];
   try {
     aiInsights = await generateDashboardInsights(metricsForAI);
-  } catch {
+  } catch (error) {
+    console.warn("AI Insights failed (likely quota), using empty fallback:", error);
     aiInsights = [];
   }
 

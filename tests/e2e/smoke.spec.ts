@@ -9,10 +9,11 @@ test.describe('Production Smoke Tests', () => {
   const baseURL = process.env.BASE_URL || 'http://localhost:5000';
 
   test('[Smoke] Health check endpoint returns healthy', async ({ request }) => {
-    const response = await request.get(`${baseURL}/api/health`);
-    
+    // Increase timeout for health check as server/DB might be warming up
+    const response = await request.get(`${baseURL}/api/health`, { timeout: 30000 });
+
     expect(response.status()).toBe(200);
-    
+
     const body = await response.json();
     expect(body.status).toBe('healthy');
     expect(body.checks).toBeDefined();
@@ -20,10 +21,10 @@ test.describe('Production Smoke Tests', () => {
 
   test('[Smoke] Login page is accessible', async ({ page }) => {
     await page.goto(`${baseURL}/login`);
-    
+
     // Check page loaded
     await expect(page).toHaveTitle(/CareOps|Login/i);
-    
+
     // Check login form exists
     const loginForm = page.locator('form, [data-testid="login-form"]').first();
     await expect(loginForm).toBeVisible();
@@ -31,7 +32,7 @@ test.describe('Production Smoke Tests', () => {
 
   test('[Smoke] Public landing page is accessible', async ({ page }) => {
     await page.goto(`${baseURL}/`);
-    
+
     // Check page loaded - landing page title
     await expect(page).toHaveTitle(/CareOps/i);
   });
