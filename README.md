@@ -86,39 +86,41 @@ CareOps leverages industrial-grade providers to power its communication and inte
 
 ---
 
-### Pre-Seeded Data
+---
 
-#### Business: Zeus Wellness Center
+## 🧪 Test Environment & Demo Credentials
 
-- **Address:** 123 Health Avenue, Medical District
-- **Timezone:** America/New_York
+To experience the full power of CareOps without manual setup, you can seed a comprehensive test clinic with realistic data.
 
-#### Services
+### 🔐 Login Credentials
 
-| Service              | Duration | Price |
-| -------------------- | -------- | ----- |
-| General Consultation | 60 min   | $150  |
-| Therapy Session      | 45 min   | $120  |
-| Emergency Follow-up  | 30 min   | $75   |
+| Role | Email | Password |
+|------|-------|----------|
+| **OWNER** | `testowner@careops.test` | `Test@1234` |
+| STAFF | `jordan.smith@careops.test` | `Staff@1234` |
+| STAFF | `casey.lee@careops.test` | `Staff@1234` |
+| STAFF | `morgan.chen@careops.test` | `Staff@1234` |
+| STAFF | `riley.patel@careops.test` | `Staff@1234` |
+| STAFF | `drew.kim@careops.test` | `Staff@1234` |
 
-#### Bookings (Dashboard Metrics)
+### 📊 Seeded Workspace: "CareOps Test Clinic"
 
-- **Today:** 3 bookings (2 Confirmed, 1 Pending)
-- **Yesterday:** 2 Completed, 1 No-Show
+Run the following command to populate your local database:
+```bash
+npx dotenv -e .env -- npx ts-node --compiler-options '{"module":"commonjs"}' prisma/seed-test-account.ts
+```
 
-#### Forms Status
+**What’s inside:**
+- **Contacts:** 20 diverse contacts with message histories.
+- **Bookings:** 12 bookings across all statuses (Confirmed, Pending, Completed, etc.).
+- **Inventory:** 8 items, with 5 flagged as **Low Stock** (triggering alerts).
+- **Automation:** All 6 PRD-defined automation rules pre-configured and active.
+- **Forms:** 2 intake forms + 1 inquiry form with representative submissions.
+- **Alerts:** 8 active alerts on the dashboard (Inventory, Booking, and Automation).
 
-- Pending: 2
-- Overdue: 1
-
-#### Inventory Alerts
-
-- **Medical Kits:** 6 units (Threshold: 5) - **Critical**
-
-#### Integrations
-
-- **Google Calendar:** Test OAuth flow at Settings → Integrations
-- **Email/SMS:** Configured with Resend & Twilio
+### 🌐 Public Access (Local)
+- **Booking Page:** http://localhost:3000/book/cmlxxk4uf0000cvawxfjiqbkr
+- **Contact Form:** http://localhost:3000/contact/careops-clinic-cmlxxk4u
 
 ---
 

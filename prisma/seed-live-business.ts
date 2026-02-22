@@ -379,7 +379,7 @@ async function main() {
   console.log("\n🤖 Creating Automation Rules & Failed Logs...");
 
   // Create all 6 PRD automation rules
-  const welcomeRule = await prisma.automationRule.create({
+  await prisma.automationRule.create({
     data: {
       workspaceId: workspace.id,
       name: "Welcome New Contact",
