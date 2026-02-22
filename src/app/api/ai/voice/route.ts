@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Type } from "@google/genai";
-import { getClient } from "@/lib/gemini";
+import { getClient, isQuotaError } from "@/lib/gemini";
 
 
 
@@ -240,8 +240,17 @@ Returns a JSON object with:
       action: parsed.action || null,
     });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error("Voice AI Error:", error);
+
+    // Handle 429 Specifically
+    if (isQuotaError(error)) {
+      return NextResponse.json({
+        message: "The Voice AI is currently experiencing high volume. Please try again in a moment or proceed using the interface.",
+        action: null,
+      }, { status: 429 });
+    }
+
     return NextResponse.json({
       message:
         "Sorry, I had trouble processing that. Could you try rephrasing your question?",

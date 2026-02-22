@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { analyzeOperationsAnomalies } from "@/lib/gemini";
+import { analyzeOperationsAnomalies, isQuotaError } from "@/lib/gemini";
 import { subDays } from "date-fns";
 
 /** GET /api/ai/anomalies
@@ -64,6 +64,12 @@ export async function GET() {
         return NextResponse.json({ anomalies });
     } catch (error) {
         console.error("Anomaly detection error:", error);
+        if (isQuotaError(error)) {
+            return NextResponse.json({
+                error: "AI limit reached",
+                message: "Anomaly detection is temporarily unavailable."
+            }, { status: 429 });
+        }
         return NextResponse.json({ error: "Anomaly detection failed" }, { status: 500 });
     }
 }

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { generateOperationsSummary } from "@/lib/gemini";
+import { generateOperationsSummary, isQuotaError } from "@/lib/gemini";
 import { startOfDay, endOfDay } from "date-fns";
 
 /**
@@ -30,16 +30,26 @@ export async function GET() {
   const lowStockItems = allItems.filter(i => i.quantity <= i.threshold).length;
   const workspace = await prisma.workspace.findUnique({ where: { id: user.workspaceId } });
 
-  const summary = await generateOperationsSummary({
-    bookingsToday,
-    bookingsCompleted,
-    bookingsNoShow,
-    newContacts,
-    unansweredMessages,
-    pendingForms,
-    lowStockItems,
-    businessName: workspace?.name || "Your Business",
-  });
+  try {
+    const summary = await generateOperationsSummary({
+      bookingsToday,
+      bookingsCompleted,
+      bookingsNoShow,
+      newContacts,
+      unansweredMessages,
+      pendingForms,
+      lowStockItems,
+      businessName: workspace?.name || "Your Business",
+    });
 
-  return NextResponse.json({ summary });
+    return NextResponse.json({ summary });
+  } catch (error) {
+    if (isQuotaError(error)) {
+      return NextResponse.json({
+        error: "AI limit reached",
+        message: "Operations summary is temporarily unavailable."
+      }, { status: 429 });
+    }
+    return NextResponse.json({ error: "Summary generation failed" }, { status: 500 });
+  }
 }

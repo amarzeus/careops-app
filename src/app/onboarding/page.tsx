@@ -311,6 +311,14 @@ export default function OnboardingPage() {
           conversationHistory: updatedMessages.slice(-10), // Last 10 messages for focused context
         }),
       });
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        const errMsg = errorData.message || "The AI Assistant is currently busy. Please continue manually or try again in a moment.";
+        setChatMessages(prev => [...prev, { role: "assistant", content: errMsg }]);
+        return errMsg;
+      }
+
       const data = await res.json();
       const aiMessage = data.message || "I understand. Let me help you with that.";
       setChatMessages(prev => [...prev, { role: "assistant", content: aiMessage }]);

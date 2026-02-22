@@ -240,8 +240,9 @@ CareOps is configured via environment variables. Copy `.env.example` to `.env` a
   - Make sure Twilio and Vapi environment variables are configured.
   - Verify your workspace is marked as SMS/voice enabled in settings.
 
-- **AI features disabled**
+- **AI features disabled or "High Volume" messages**
   - Ensure `GEMINI_API_KEY` is present and valid.
+  - If using the **Free Tier**, you may hit rate limits (15 RPM). The app now handles this gracefully, but if problems persist, consider checking your quota at [Google AI Studio](https://aistudio.google.com/app/plan_pricing).
   - Restart the dev server after changing environment variables.
 
 - **Tests failing locally**

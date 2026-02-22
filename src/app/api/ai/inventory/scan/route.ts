@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { extractInventoryItemsFromImage } from "@/lib/gemini";
+import { extractInventoryItemsFromImage, isQuotaError } from "@/lib/gemini";
 import { getCurrentUser } from "@/lib/auth";
 
 /**
@@ -27,6 +27,12 @@ export async function POST(req: Request) {
         return NextResponse.json({ success: true, data: scannedData });
     } catch (error) {
         console.error("Inventory Scan API Error:", error);
+        if (isQuotaError(error)) {
+            return NextResponse.json({
+                error: "AI limit reached",
+                message: "Inventory scanning is temporarily unavailable due to high volume."
+            }, { status: 429 });
+        }
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }

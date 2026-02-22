@@ -421,7 +421,7 @@ export function useVoiceEngine(onTranscript: (text: string, context?: Record<str
     animateSpeakAmp();
   }, [isMuted]);
 
-  const processTranscript = useCallback(async (text: string) => {
+  const processTranscript = useCallback(async (text: string, isTextChat: boolean = false) => {
     if (!text.trim()) return;
 
     // Check for exit commands
@@ -434,8 +434,10 @@ export function useVoiceEngine(onTranscript: (text: string, context?: Record<str
     }
 
     setVoiceState("processing");
-    setTranscript(text);
-    setInterimTranscript("");
+    if (!isTextChat) {
+      setTranscript(text);
+      setInterimTranscript("");
+    }
 
     // Use the ref so we always get the freshest history even inside a stale closure
     const latestHistory = historyRef.current;
@@ -464,7 +466,17 @@ export function useVoiceEngine(onTranscript: (text: string, context?: Record<str
         title: document.title
       }, currentHistory);
       setHistory(prev => [...prev.slice(-19), { role: "assistant", content: response }]);
-      speak(response);
+
+      if (!isTextChat) {
+        speak(response);
+      } else {
+        setAiResponse(response);
+        if (continuousModeRef.current && !isMutedRef.current) {
+          startListeningRef.current();
+        } else {
+          setVoiceState("idle");
+        }
+      }
     } catch (err) {
       console.error("Voice processTranscript error:", err);
       setError("Failed to get AI response.");
@@ -677,7 +689,7 @@ export function InlineVoiceMode({ onTranscript, onClose, className, autoStart = 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (inputText.trim()) {
-      sendMessage(inputText.trim());
+      sendMessage(inputText.trim(), true);
       setInputText("");
     }
   };
@@ -908,7 +920,7 @@ interface GlobalVoiceOverlayProps {
   onClose: () => void;
   isMuted: boolean;
   toggleMute: () => void;
-  onSendMessage: (text: string) => void;
+  onSendMessage: (text: string, isTextChat?: boolean) => void;
   onMicClick: () => void;
   isChatOpen: boolean;
 }
@@ -958,7 +970,7 @@ export function GlobalVoiceOverlay({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (inputText.trim()) {
-      onSendMessage(inputText.trim());
+      onSendMessage(inputText.trim(), true);
       setInputText("");
     }
   };

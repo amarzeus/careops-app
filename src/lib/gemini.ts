@@ -31,6 +31,18 @@ export function getClient(): GoogleGenAI {
  * @param systemInstruction - Optional system instruction
  * @returns The parsed JSON response
  */
+// Helper to identify quota errors across the SDK
+export function isQuotaError(error: any): boolean {
+  if (!error) return false;
+  return (
+    error.status === 429 ||
+    error.statusCode === 429 ||
+    error.message?.toLowerCase().includes("quota") ||
+    error.message?.toLowerCase().includes("rate limit") ||
+    error.message?.toLowerCase().includes("429")
+  );
+}
+
 async function callGemini<T>(
   prompt: string,
   responseSchema?: unknown,
@@ -56,11 +68,14 @@ async function callGemini<T>(
     });
 
     const text = response.text;
-    // With structured outputs, the response is guaranteed to be valid JSON matching the schema
-    // However, the SDK returns it as a string, so we still parse it, but no regex cleanup is needed.
     return JSON.parse(text!) as T;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Gemini AI error:", error);
+    if (isQuotaError(error)) {
+      const quotaError = new Error("AI Quota Exceeded");
+      (quotaError as any).status = 429;
+      throw quotaError;
+    }
     throw new Error("AI processing failed");
   }
 }
@@ -70,7 +85,7 @@ async function callGemini<T>(
 // ──────────────────────────────────────────────
 
 /**
- * Generates a welcome message for a new contact.
+ * Generates a warm, professional welcome message for a new contact.
  * @param businessName - Name of the business
  * @param contactName - Name of the contact
  * @returns The generated welcome message
@@ -180,7 +195,15 @@ RULES:
       systemPrompt
     );
     return result.replies.slice(0, 3);
-  } catch {
+  } catch (error) {
+    if (isQuotaError(error)) {
+      // Return specific indicator or standard fallbacks
+      return [
+        "The AI is briefly busy. Please type your reply.",
+        "System at capacity. Manual reply recommended.",
+        "Check back in a moment for smart suggestions."
+      ];
+    }
     return [
       "Thank you for reaching out. I'd be happy to help with that.",
       "I appreciate your message. Let me look into this for you right away.",
@@ -249,7 +272,7 @@ RULES:
       schema,
       systemPrompt
     );
-    return result.insights.slice(0, 5);
+    return result.insights.slice(0, 3); // Ensure only 3 insights are returned as per prompt
   } catch {
     const insights: Array<{ priority: "high" | "medium" | "low"; category: string; message: string; action: string }> = [];
     if (data.unreadMessages > 0) insights.push({ priority: "high", category: "Communication", message: `${data.unreadMessages} messages need your attention`, action: "Open Inbox" });
@@ -286,7 +309,10 @@ Original: "${content}"`,
       schema
     );
     return result.refinedMessage;
-  } catch {
+  } catch (error) {
+    if (isQuotaError(error)) {
+      return `${content} (AI limit reached - refinement unavailable)`;
+    }
     return content;
   }
 }
@@ -331,12 +357,17 @@ Items: ${JSON.stringify(items)}`,
       schema
     );
     return result.forecasts;
-  } catch {
-    return items.map(i => ({
+  } catch (error) {
+    const fallback = items.map(i => ({
       name: i.name,
       daysRemaining: i.quantity === 0 ? "Critical" : Math.max(1, Math.floor(i.quantity / Math.max(1, i.threshold) * 5)),
-      confidence: "low",
+      confidence: "low" as const,
     }));
+
+    if (isQuotaError(error)) {
+      return fallback.map(f => ({ ...f, daysRemaining: `${f.daysRemaining} (Est.)` }));
+    }
+    return fallback;
   }
 }
 
@@ -381,7 +412,10 @@ Today's Data:
       schema
     );
     return result.summary;
-  } catch {
+  } catch (error) {
+    if (isQuotaError(error)) {
+      return `[AI BUSY] Today you have ${data.bookingsToday} bookings scheduled. ${data.unansweredMessages > 0 ? `${data.unansweredMessages} messages need attention. ` : ""}${data.lowStockItems > 0 ? `${data.lowStockItems} inventory items are running low. ` : ""}Please check your dashboard for full details.`;
+    }
     return `Today you have ${data.bookingsToday} bookings scheduled. ${data.unansweredMessages > 0 ? `${data.unansweredMessages} messages need attention. ` : ""}${data.lowStockItems > 0 ? `${data.lowStockItems} inventory items are running low. ` : ""}Keep operations running smoothly by staying on top of your inbox.`;
   }
 }
@@ -425,7 +459,10 @@ Keep it professional, warm, and under 4 sentences.`,
       schema
     );
     return result.message;
-  } catch {
+  } catch (error) {
+    if (isQuotaError(error)) {
+      return `Hi${context.contactName ? ` ${context.contactName}` : ""}, the AI is currently busy. Please type your message manually or try again in a moment.`;
+    }
     return `Hi${context.contactName ? ` ${context.contactName}` : ""}, regarding your ${intent.toLowerCase()} — our team at ${context.businessName} will follow up shortly.`;
   }
 }
@@ -690,10 +727,16 @@ BEHAVIOR RULES:
       navigationAction,
     };
 
-  } catch (err) {
+  } catch (err: any) {
     console.error("AI Onboarding Error:", err);
+
+    let message = "I had a small hiccup processing that. Could you try again?";
+    if (isQuotaError(err)) {
+      message = "The AI Assistant is currently experiencing high volume (quota reached). Please continue by filling out the form manually while I take a quick break!";
+    }
+
     return {
-      message: "I had a small hiccup processing that. Could you try again?",
+      message,
       extractedData: null,
       shouldAdvance: false,
       navigationAction: null,
@@ -745,7 +788,10 @@ ${historyContext}`,
       schema,
       "You are an NLP intent classifier. Be precise."
     );
-  } catch {
+  } catch (error: any) {
+    console.error("Intent classification error:", error);
+    // The calling route/function should handle the isQuotaError and return appropriate HTTP response
+    // This function should return a fallback object matching its interface
     return {
       intent: "general",
       confidence: 0.5,
@@ -808,7 +854,18 @@ Only flag genuine anomalies.`,
       "You are an operations intelligence analyst."
     );
     return result.anomalies;
-  } catch {
+  } catch (error) {
+    if (isQuotaError(error)) {
+      return [{
+        type: "info",
+        severity: "info",
+        description: "AI Analytics is currently at capacity. Standard metrics are still available.",
+        recommendation: "Check back later for automated insights.",
+        metric: "Status",
+        expectedRange: "Optimal",
+        actualValue: "Busy",
+      }];
+    }
     return [];
   }
 }
@@ -862,7 +919,16 @@ Data: ${JSON.stringify(contactData, null, 2)}`,
       schema,
       "You are a CRM lead scoring expert."
     );
-  } catch {
+  } catch (error) {
+    if (isQuotaError(error)) {
+      return {
+        score: 0,
+        grade: "F",
+        factors: [{ factor: "AI System at Capacity", impact: "neutral", weight: 0 }],
+        summary: "Lead scoring is temporarily at capacity. Please review manually.",
+        nextBestAction: "Review contact profiles directly.",
+      };
+    }
     return {
       score: 50,
       grade: "C",
@@ -948,8 +1014,13 @@ export async function extractInventoryItemsFromImage(
     if (!text) return null;
 
     return JSON.parse(text) as ScannedInvoice;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Multimodal Inventory Scan Error:", error);
+    if (isQuotaError(error)) {
+      const quotaError = new Error("AI Quota Exceeded");
+      (quotaError as any).status = 429;
+      throw quotaError;
+    }
     return null;
   }
 }

@@ -58,11 +58,31 @@ export function VoiceProvider({ children }: { children: React.ReactNode }) {
                 }),
             });
 
-            const data = await response.json();
+            // Prevent SyntaxError: Unexpected end of JSON input
+            const contentType = response.headers.get("content-type");
+            let data: any = {};
+
+            if (contentType && contentType.includes("application/json")) {
+                try {
+                    data = await response.json();
+                } catch (parseError) {
+                    console.warn("Failed to parse Voice API response:", parseError);
+                    return "I received an invalid response from the AI. Please try again.";
+                }
+            } else {
+                // Not JSON (e.g., 502 Bad Gateway text, or empty response)
+                const textResponse = await response.text();
+                console.warn("Voice API returned non-JSON response:", response.status, textResponse);
+                return "The AI service is temporarily unavailable. Please try again in a moment.";
+            }
 
             if (!response.ok) {
-                // API returned error status — still return the fallback message from the response body
-                console.error("Voice API non-ok response:", response.status, data);
+                // API returned error status
+                if (response.status === 429) {
+                    console.warn("Voice API non-ok response:", response.status, data);
+                    return data.message || "The AI is currently at capacity. Please try again in a moment.";
+                }
+                console.warn("Voice API non-ok response:", response.status, data);
                 return data.message || "I'm having trouble processing your request right now.";
             }
 
@@ -78,9 +98,9 @@ export function VoiceProvider({ children }: { children: React.ReactNode }) {
                 }
             }
 
-            return data.message;
+            return data.message || "I've processed your request.";
         } catch (error) {
-            console.error("Voice API Error:", error);
+            console.warn("Voice API Connectivity Error:", error);
             return "I'm having trouble connecting to the server. Please check your connection and try again.";
         }
     };

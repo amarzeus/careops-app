@@ -15,6 +15,7 @@ import {
   Settings,
   Bell,
   Search,
+  CheckCheck,
 } from "lucide-react";
 import { AreaChart, Area, ResponsiveContainer, Tooltip, XAxis } from "recharts";
 import { useState, useEffect, useRef, useCallback } from "react";
@@ -730,6 +731,100 @@ export default function LandingPage() {
               ))}
             </div>
           </div>
+        </section>
+
+        {/* ─── PRICING - Glass Layers ─── */}
+        <section id="pricing" className="py-32 relative z-10 bg-background overflow-hidden">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-24">
+              <motion.h2
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8 }}
+                className="text-4xl md:text-6xl font-black tracking-tight mb-6"
+              >
+                Simple, <span className="text-primary italic">powerful</span> pricing.
+              </motion.h2>
+              <p className="text-lg text-muted-foreground font-medium max-w-2xl mx-auto">
+                No hidden fees. No complicated tiers. One plan that grows with you.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+              {/* Starter Plan */}
+              <SpotlightCard className="p-10 flex flex-col justify-between border-border/40 bg-background/20">
+                <div>
+                  <h3 className="text-xl font-bold mb-2">Starter</h3>
+                  <p className="text-sm text-muted-foreground mb-6">Perfect for solo practitioners.</p>
+                  <div className="mb-8">
+                    <span className="text-4xl font-black">$0</span>
+                    <span className="text-muted-foreground ml-2">/month</span>
+                  </div>
+                  <ul className="space-y-4 mb-8">
+                    {["50 Bookings/mo", "Basic CRM", "Standard Forms", "Email Support"].map((feat, i) => (
+                      <li key={i} className="flex items-center gap-3 text-sm font-medium">
+                        <CheckCheck className="w-4 h-4 text-primary" />
+                        {feat}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <Link href="/register">
+                  <Button variant="outline" className="w-full rounded-full h-12 font-bold hover:bg-primary/5">Get Started</Button>
+                </Link>
+              </SpotlightCard>
+
+              {/* Pro Plan - Highlighted */}
+              <SpotlightCard className="p-10 flex flex-col justify-between border-primary/30 bg-primary/5 relative scale-105 shadow-2xl shadow-primary/10">
+                <div className="absolute top-0 right-0 px-4 py-1 bg-primary text-primary-foreground text-[10px] font-black uppercase tracking-widest rounded-bl-xl">Popular</div>
+                <div>
+                  <h3 className="text-xl font-bold mb-2">Pro</h3>
+                  <p className="text-sm text-muted-foreground mb-6">Full power for growing teams.</p>
+                  <div className="mb-8">
+                    <span className="text-4xl font-black">$49</span>
+                    <span className="text-muted-foreground ml-2">/month</span>
+                  </div>
+                  <ul className="space-y-4 mb-8">
+                    {["Unlimited Bookings", "AI Voice Receptionist", "Advanced Automation", "Priority Support"].map((feat, i) => (
+                      <li key={i} className="flex items-center gap-3 text-sm font-medium">
+                        <CheckCheck className="w-4 h-4 text-primary" />
+                        {feat}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <Link href="/register">
+                  <Button className="w-full rounded-full h-12 font-bold bg-primary text-primary-foreground hover:opacity-90">Start 14-Day Free Trial</Button>
+                </Link>
+              </SpotlightCard>
+
+              {/* Enterprise Plan */}
+              <SpotlightCard className="p-10 flex flex-col justify-between border-border/40 bg-background/20">
+                <div>
+                  <h3 className="text-xl font-bold mb-2">Enterprise</h3>
+                  <p className="text-sm text-muted-foreground mb-6">Custom scale and security.</p>
+                  <div className="mb-8">
+                    <span className="text-4xl font-black">Custom</span>
+                  </div>
+                  <ul className="space-y-4 mb-8">
+                    {["Multi-location", "Custom Integrations", "SLA Guarantee", "Dedicated Manager"].map((feat, i) => (
+                      <li key={i} className="flex items-center gap-3 text-sm font-medium">
+                        <CheckCheck className="w-4 h-4 text-primary" />
+                        {feat}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <Link href="/contact">
+                  <Button variant="outline" className="w-full rounded-full h-12 font-bold hover:bg-muted/50">Contact Sales</Button>
+                </Link>
+              </SpotlightCard>
+            </div>
+          </div>
+
+          {/* Background glow for pricing */}
+          <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-2/3 h-1/2 bg-primary/5 blur-[150px] -z-10 rounded-full" />
         </section>
 
         {/* ─── CTA - Fluid End ─── */}

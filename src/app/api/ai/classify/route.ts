@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
-import { classifyConversationIntent } from "@/lib/gemini";
+import { classifyConversationIntent, isQuotaError } from "@/lib/gemini";
 
 /** POST /api/ai/classify
  *  Classifies the intent of an incoming message for inbox triage
@@ -22,6 +22,12 @@ export async function POST(req: Request) {
         return NextResponse.json(result);
     } catch (error) {
         console.error("Intent classification error:", error);
+        if (isQuotaError(error)) {
+            return NextResponse.json({
+                error: "AI limit reached",
+                message: "Intent classification is temporarily unavailable due to high volume."
+            }, { status: 429 });
+        }
         return NextResponse.json({ error: "Classification failed" }, { status: 500 });
     }
 }

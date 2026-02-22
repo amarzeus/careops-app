@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { generateSmartReply } from "@/lib/gemini";
+import { generateSmartReply, isQuotaError } from "@/lib/gemini";
 
 /**
  *
@@ -54,11 +54,22 @@ export async function POST(req: Request) {
   const workspace = await prisma.workspace.findUnique({
     where: { id: user.workspaceId },
   });
-  const replies = await generateSmartReply(
-    workspace?.name || "Business",
-    history,
-    lastInbound?.content || "Hello"
-  );
+  try {
+    const replies = await generateSmartReply(
+      workspace?.name || "Business",
+      history,
+      lastInbound?.content || "Hello"
+    );
 
-  return NextResponse.json({ replies });
+    return NextResponse.json({ replies });
+  } catch (error) {
+    console.error("Smart reply error:", error);
+    if (isQuotaError(error)) {
+      return NextResponse.json({
+        error: "AI limit reached",
+        message: "Smart replies are temporarily unavailable."
+      }, { status: 429 });
+    }
+    return NextResponse.json({ error: "Failed to generate replies" }, { status: 500 });
+  }
 }
