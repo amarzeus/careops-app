@@ -92,7 +92,7 @@ export function CreateContactDialog({
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       const url = initialData
-        ? `/ api / contacts / ${initialData.id} ` // We'll need to make sure this route exists for PATCH
+        ? `/api/contacts/${initialData.id}` // We'll need to make sure this route exists for PATCH
         : "/api/contacts";
 
       const method = initialData ? "PATCH" : "POST";

@@ -51,7 +51,7 @@ export default function AutomationPage() {
     try {
       let res;
       if (selectedRule) {
-        res = await fetch(`/ api / automation / ${selectedRule.id} `, {
+        res = await fetch(`/api/automation/${selectedRule.id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(data),
@@ -75,7 +75,7 @@ export default function AutomationPage() {
 
   const handleToggle = async (id: string, isActive: boolean) => {
     try {
-      await fetch(`/ api / automation / ${id} `, {
+      await fetch(`/api/automation/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ isActive }),
@@ -89,7 +89,7 @@ export default function AutomationPage() {
   const handleDelete = async (id: string) => {
     setDeleting(true);
     try {
-      const res = await fetch(`/ api / automation / ${id} `, { method: "DELETE" });
+      const res = await fetch(`/api/automation/${id}`, { method: "DELETE" });
       if (!res.ok) throw new Error("Failed to delete rule");
       toast({ title: "Success", description: "Rule deleted", variant: "default" });
       fetchRules();
@@ -106,7 +106,7 @@ export default function AutomationPage() {
   const handleTest = async (id: string) => {
     setTestingId(id);
     try {
-      const res = await fetch(`/ api / automation / ${id}/test`, { method: "POST" });
+      const res = await fetch(`/api/automation/${id}/test`, { method: "POST" });
       if (!res.ok) throw new Error("Test failed");
       toast({ title: "Success", description: "Rule tested", variant: "default" });
     } catch (_error) {
