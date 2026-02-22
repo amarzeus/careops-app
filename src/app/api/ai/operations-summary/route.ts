@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { generateOperationsSummary, isQuotaError } from "@/lib/gemini";
+import { generateOperationsSummary, isQuotaError, getWorkspaceGeminiModel } from "@/lib/gemini";
 import { startOfDay, endOfDay } from "date-fns";
 
 /**
@@ -12,6 +12,9 @@ export async function GET() {
   if (!user || !user.workspaceId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  // Get the model preference for this workspace
+  const model = await getWorkspaceGeminiModel(user.workspaceId);
 
   const now = new Date();
   const dayStart = startOfDay(now);
@@ -40,7 +43,7 @@ export async function GET() {
       pendingForms,
       lowStockItems,
       businessName: workspace?.name || "Your Business",
-    });
+    }, model);
 
     return NextResponse.json({ summary });
   } catch (error) {

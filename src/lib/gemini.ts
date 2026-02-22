@@ -21,6 +21,49 @@ export function getClient(): GoogleGenAI {
 }
 
 // ──────────────────────────────────────────────
+// Model Selection Helper
+// ──────────────────────────────────────────────
+
+/**
+ * Available Gemini models with their display names.
+ * Note: Gemini 2.0 Flash is deprecated and will be shut down June 1, 2026.
+ */
+export const GEMINI_MODELS = {
+  'gemini-3.1-pro-preview': 'Gemini 3.1 Pro (Latest - Reasoning)',
+  'gemini-3-flash': 'Gemini 3 Flash (Latest - Multimodal)',
+  'gemini-2.5-pro': 'Gemini 2.5 Pro (Advanced)',
+  'gemini-2.5-flash': 'Gemini 2.5 Flash (Fast)',
+  'gemini-2.5-flash-lite': 'Gemini 2.5 Flash-Lite (Cheapest)',
+  'gemini-2.0-flash': 'Gemini 2.0 Flash (Deprecated)',
+} as const;
+
+export type GeminiModelId = keyof typeof GEMINI_MODELS;
+
+/**
+* Default model to use.
+*/
+export const DEFAULT_GEMINI_MODEL: GeminiModelId = 'gemini-2.5-flash';
+
+/**
+* Gets the AI model preference for a workspace.
+* @param workspaceId - The workspace ID
+* @returns The model ID to use
+*/
+export async function getWorkspaceGeminiModel(workspaceId: string): Promise<string> {
+  // Dynamic import to avoid circular dependency
+  const { prisma } = await import('./prisma');
+  try {
+    const prefs = await (prisma as any).aIPreferences.findUnique({
+      where: { workspaceId },
+      select: { geminiModel: true },
+    });
+    return prefs?.geminiModel || DEFAULT_GEMINI_MODEL;
+  } catch {
+    return DEFAULT_GEMINI_MODEL;
+  }
+}
+
+// ──────────────────────────────────────────────
 // Core AI Engine
 // ──────────────────────────────────────────────
 
@@ -29,6 +72,7 @@ export function getClient(): GoogleGenAI {
  * @param prompt - The prompt to send to the AI
  * @param responseSchema - Optional JSON schema for structured output
  * @param systemInstruction - Optional system instruction
+ * @param model - Optional model ID to use
  * @returns The parsed JSON response
  */
 // Helper to identify quota errors across the SDK
@@ -46,7 +90,8 @@ export function isQuotaError(error: any): boolean {
 async function callGemini<T>(
   prompt: string,
   responseSchema?: unknown,
-  systemInstruction?: string
+  systemInstruction?: string,
+  model?: string
 ): Promise<T> {
   try {
     const config: Record<string, unknown> = {
@@ -59,7 +104,7 @@ async function callGemini<T>(
 
     const client = getClient();
     const response = await client.models.generateContent({
-      model: "gemini-2.0-flash",
+      model: model || DEFAULT_GEMINI_MODEL,
       contents: prompt,
       config: {
         ...config,
@@ -76,44 +121,12 @@ async function callGemini<T>(
       (quotaError as any).status = 429;
       throw quotaError;
     }
-    throw new Error("AI processing failed");
+    throw error;
   }
 }
 
 // ──────────────────────────────────────────────
-// 1. Welcome Message Generation
-// ──────────────────────────────────────────────
-
-/**
- * Generates a warm, professional welcome message for a new contact.
- * @param businessName - Name of the business
- * @param contactName - Name of the contact
- * @returns The generated welcome message
- */
-export async function generateWelcomeMessage(businessName: string, contactName: string): Promise<string> {
-  // Simple text generation doesn't need structured output schema for the whole object, 
-  // but to keep consistency and reliability, we can ask for a simple object wrapper.
-  const schema = {
-    type: Type.OBJECT,
-    properties: {
-      message: { type: Type.STRING, description: "The welcome message text" },
-    },
-    required: ["message"],
-  };
-
-  try {
-    const result = await callGemini<{ message: string }>(
-      `Generate a warm, professional welcome message from "${businessName}" to a new contact named "${contactName}". Keep it under 3 sentences. Be friendly but professional. Don't use emojis.`,
-      schema
-    );
-    return result.message;
-  } catch {
-    return `Welcome to ${businessName}, ${contactName}! We're glad you reached out. Our team will be in touch shortly.`;
-  }
-}
-
-// ──────────────────────────────────────────────
-// 2. Booking Confirmation
+// 2. Booking Confirmation Message
 // ──────────────────────────────────────────────
 
 /**
@@ -165,7 +178,8 @@ export async function generateBookingConfirmation(
 export async function generateSmartReply(
   businessName: string,
   conversationHistory: string,
-  lastMessage: string
+  lastMessage: string,
+  model?: string
 ): Promise<string[]> {
   const schema = {
     type: Type.OBJECT,
@@ -192,7 +206,8 @@ RULES:
     const result = await callGemini<{ replies: string[] }>(
       `Conversation history:\n${conversationHistory}\n\nLatest message from customer: "${lastMessage}"\n\nGenerate 3 professional reply options.`,
       schema,
-      systemPrompt
+      systemPrompt,
+      model
     );
     return result.replies.slice(0, 3);
   } catch (error) {
@@ -228,8 +243,7 @@ export async function generateDashboardInsights(data: {
   pendingForms: number;
   lowStockItems: number;
   unreadMessages: number;
-}): Promise<Array<{ priority: "high" | "medium" | "low"; category: string; message: string; action: string }>> {
-
+}, model?: string): Promise<Array<{ priority: "high" | "medium" | "low"; category: string; message: string; action: string }>> {
   const schema = {
     type: Type.OBJECT,
     properties: {
@@ -254,7 +268,7 @@ export async function generateDashboardInsights(data: {
 RULES:
 - Provide exactly 3 insights.
 - Insights MUST be specific and actionable (e.g., "Call 3 leads", not "Follow up with leads").
-- Prioritize: 
+- Prioritize:
   1. Critical issues (unread messages, low stock, pending forms).
   2. Revenue opportunities (pending bookings, new leads).
   3. Operational optimizations.
@@ -270,7 +284,8 @@ RULES:
 - Low stock items: ${data.lowStockItems}
 - Unread messages: ${data.unreadMessages}`,
       schema,
-      systemPrompt
+      systemPrompt,
+      model
     );
     return result.insights.slice(0, 3); // Ensure only 3 insights are returned as per prompt
   } catch {
@@ -283,6 +298,7 @@ RULES:
   }
 }
 
+
 // ──────────────────────────────────────────────
 // 5. Message Refinement
 // ──────────────────────────────────────────────
@@ -293,7 +309,8 @@ RULES:
  * @param tone - The desired tone (default: professional)
  * @returns The refined message
  */
-export async function refineMessage(content: string, tone: string = "professional"): Promise<string> {
+export async function refineMessage(content: string, tone: string = "professional", model?: string
+): Promise<string> {
   const schema = {
     type: Type.OBJECT,
     properties: {
@@ -306,7 +323,8 @@ export async function refineMessage(content: string, tone: string = "professiona
     const result = await callGemini<{ refinedMessage: string }>(
       `Refine this message to be more ${tone}, polite, and professional. Keep the original meaning but make it sound world-class.
 Original: "${content}"`,
-      schema
+      schema,
+      model
     );
     return result.refinedMessage;
   } catch (error) {
@@ -328,6 +346,7 @@ Original: "${content}"`,
  */
 export async function generateInventoryForecast(
   items: Array<{ name: string; quantity: number; threshold: number; unit: string }>
+  , model?: string
 ): Promise<Array<{ name: string; daysRemaining: number | string; confidence: string }>> {
   if (items.length === 0) return [];
 
@@ -354,7 +373,9 @@ export async function generateInventoryForecast(
     const result = await callGemini<{ forecasts: Array<{ name: string; daysRemaining: string; confidence: "high" | "medium" | "low" }> }>(
       `You are an inventory specialist. Based on current stock and thresholds, estimate days of stock remaining for each item. Items at or below threshold typically have 3-5 days left. Zero quantity means "Critical".
 Items: ${JSON.stringify(items)}`,
-      schema
+      schema,
+      undefined,
+      model
     );
     return result.forecasts;
   } catch (error) {
@@ -389,7 +410,7 @@ export async function generateOperationsSummary(data: {
   pendingForms: number;
   lowStockItems: number;
   businessName: string;
-}): Promise<string> {
+}, model?: string): Promise<string> {
   const schema = {
     type: Type.OBJECT,
     properties: {
@@ -409,7 +430,8 @@ Today's Data:
 - Unanswered messages: ${data.unansweredMessages}
 - Pending forms: ${data.pendingForms}
 - Low stock items: ${data.lowStockItems}`,
-      schema
+      schema,
+      model
     );
     return result.summary;
   } catch (error) {
@@ -647,9 +669,9 @@ export async function aiOnboardingAssistant(
   userMessage: string,
   currentStep: number,
   businessInfo: Record<string, unknown>,
-  conversationHistory: Array<{ role: "user" | "assistant"; content: string }> = []
+  conversationHistory: Array<{ role: "user" | "assistant"; content: string }> = [],
+  model: string = DEFAULT_GEMINI_MODEL
 ): Promise<AIOnboardingResponse> {
-
   const stepStatus = buildStepStatus(currentStep, businessInfo);
 
   const systemPrompt = `You are CareOps AI — a proactive, agentic onboarding concierge.
@@ -675,7 +697,7 @@ BEHAVIOR RULES:
     // We do NOT use responseSchema when using tools, as the model needs flexibility to call tools or just talk.
     // Instead, we inspect the response for function calls.
     const response = await client.models.generateContent({
-      model: "gemini-2.0-flash",
+      model: model || DEFAULT_GEMINI_MODEL,
       config: {
         systemInstruction: systemPrompt,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -763,7 +785,8 @@ export interface ConversationIntent {
  */
 export async function classifyConversationIntent(
   messageContent: string,
-  conversationHistory?: string[]
+  conversationHistory?: string[],
+  model?: string
 ): Promise<ConversationIntent> {
   const schema = {
     type: Type.OBJECT,
@@ -786,7 +809,8 @@ export async function classifyConversationIntent(
 Message: "${messageContent}"
 ${historyContext}`,
       schema,
-      "You are an NLP intent classifier. Be precise."
+      "You are an NLP intent classifier. Be precise.",
+      model
     );
   } catch (error: any) {
     console.error("Intent classification error:", error);
@@ -821,7 +845,8 @@ export interface OperationsAnomaly {
  * @returns Array of detected anomalies
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function analyzeOperationsAnomalies(metrics: any): Promise<OperationsAnomaly[]> {
+export async function analyzeOperationsAnomalies(metrics: any, model?: string
+): Promise<OperationsAnomaly[]> {
   const schema = {
     type: Type.OBJECT,
     properties: {
@@ -851,7 +876,8 @@ export async function analyzeOperationsAnomalies(metrics: any): Promise<Operatio
 Metrics: ${JSON.stringify(metrics, null, 2)}
 Only flag genuine anomalies.`,
       schema,
-      "You are an operations intelligence analyst."
+      "You are an operations intelligence analyst.",
+      model
     );
     return result.anomalies;
   } catch (error) {
@@ -958,10 +984,10 @@ export interface ScannedInvoice {
  */
 export async function extractInventoryItemsFromImage(
   imageBase64: string,
-  mimeType: string = "image/jpeg"
+  mimeType: string = "image/jpeg",
+  model: string = DEFAULT_GEMINI_MODEL
 ): Promise<ScannedInvoice | null> {
   const schema = {
-    type: Type.OBJECT,
     properties: {
       invoiceNumber: { type: Type.STRING },
       vendor: { type: Type.STRING },
@@ -986,7 +1012,7 @@ export async function extractInventoryItemsFromImage(
   try {
     const client = getClient();
     const response = await client.models.generateContent({
-      model: "gemini-2.0-flash",
+      model: model || DEFAULT_GEMINI_MODEL,
       config: {
         responseMimeType: "application/json",
         responseSchema: schema,
@@ -1023,4 +1049,21 @@ export async function extractInventoryItemsFromImage(
     }
     return null;
   }
+}
+
+// ──────────────────────────────────────────────
+// Welcome Message Generator
+// ──────────────────────────────────────────────
+
+/**
+ * Generates a welcome message for a new contact.
+ * @param businessName - Name of the business
+ * @param contactName - Name of the contact
+ * @returns The generated welcome message
+ */
+export async function generateWelcomeMessage(
+  businessName: string,
+  contactName: string
+): Promise<string> {
+  return `Welcome to ${businessName}, ${contactName}! We're excited to have you. How can we help you today?`;
 }

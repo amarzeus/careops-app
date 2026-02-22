@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Type } from "@google/genai";
-import { getClient, isQuotaError } from "@/lib/gemini";
+import { getClient, isQuotaError, getWorkspaceGeminiModel, DEFAULT_GEMINI_MODEL } from "@/lib/gemini";
 
 
 
@@ -16,7 +16,7 @@ export async function POST(req: Request) {
     const { message, conversationHistory, clientContext } = await req.json();
 
     if (!message) {
-      console.error("Voice AI Error: Message is required");
+      console.error("CareOps AI Error: Message is required");
       return NextResponse.json({ error: "Message is required" }, { status: 400 });
     }
 
@@ -215,10 +215,15 @@ Returns a JSON object with:
       { role: "user", parts: [{ text: message }] }
     ];
 
-    console.log("Calling Gemini for Voice AI...");
+    console.log("Calling Gemini for CareOps AI...");
+
+    // Get the model preference for this workspace
+    const modelPreference = user?.workspaceId
+      ? await getWorkspaceGeminiModel(user.workspaceId)
+      : DEFAULT_GEMINI_MODEL;
 
     const response = await client.models.generateContent({
-      model: "gemini-2.0-flash",
+      model: modelPreference,
       config: {
         systemInstruction: finalPrompt,
         responseMimeType: "application/json",
@@ -241,12 +246,12 @@ Returns a JSON object with:
     });
 
   } catch (error: any) {
-    console.error("Voice AI Error:", error);
+    console.error("CareOps AI Error:", error);
 
     // Handle 429 Specifically
     if (isQuotaError(error)) {
       return NextResponse.json({
-        message: "The Voice AI is currently experiencing high volume. Please try again in a moment or proceed using the interface.",
+        message: "The CareOps AI is currently experiencing high volume. Please try again in a moment or proceed using the interface.",
         action: null,
       }, { status: 429 });
     }

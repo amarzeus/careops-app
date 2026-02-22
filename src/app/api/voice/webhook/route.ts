@@ -147,9 +147,9 @@ export async function POST(req: NextRequest) {
       const workspace =
         workspaceId !== "unknown"
           ? await prisma.workspace.findUnique({
-              where: { id: workspaceId },
-              select: { timezone: true },
-            })
+            where: { id: workspaceId },
+            select: { timezone: true },
+          })
           : null;
 
       const afterHours =
@@ -158,15 +158,15 @@ export async function POST(req: NextRequest) {
       const previousCall =
         workspaceId !== "unknown" && contactId
           ? await prisma.voiceCall.findFirst({
-              where: {
-                workspaceId,
-                contactId,
-                createdAt: { gte: subDays(new Date(), 7) },
-                callSid: { not: call_id },
-              },
-              orderBy: { createdAt: "desc" },
-              select: { id: true, summary: true },
-            })
+            where: {
+              workspaceId,
+              contactId,
+              createdAt: { gte: subDays(new Date(), 7) },
+              callSid: { not: call_id },
+            },
+            orderBy: { createdAt: "desc" },
+            select: { id: true, summary: true },
+          })
           : null;
 
       const mergedMetadata = {
@@ -216,7 +216,7 @@ export async function POST(req: NextRequest) {
           data: {
             type: "voice_call",
             title: "Returning caller detected",
-            message: "Voice AI matched this caller to a recent conversation.",
+            message: "CareOps AI matched this caller to a recent conversation.",
             actionUrl: `/voice/calls/${voiceCall.id}`,
             workspaceId,
             isRead: true,

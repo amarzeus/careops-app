@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
-import { generateInventoryForecast, isQuotaError } from "@/lib/gemini";
+import { generateInventoryForecast, isQuotaError, getWorkspaceGeminiModel } from "@/lib/gemini";
 import { prisma } from "@/lib/prisma";
 
 /**
@@ -11,13 +11,16 @@ export async function POST(_req: Request) {
     const user = await getCurrentUser();
     if (!user || !user.workspaceId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+    // Get the model preference for this workspace
+    const model = await getWorkspaceGeminiModel(user.workspaceId);
+
     const items = await prisma.inventoryItem.findMany({
         where: { workspaceId: user.workspaceId! },
         select: { name: true, quantity: true, threshold: true, unit: true }
     });
 
     try {
-        const forecast = await generateInventoryForecast(items);
+        const forecast = await generateInventoryForecast(items, model);
         return NextResponse.json({ forecast });
     } catch (error) {
         if (isQuotaError(error)) {

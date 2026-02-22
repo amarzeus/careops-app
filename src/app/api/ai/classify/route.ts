@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
-import { classifyConversationIntent, isQuotaError } from "@/lib/gemini";
+import { classifyConversationIntent, isQuotaError, getWorkspaceGeminiModel } from "@/lib/gemini";
 
 /** POST /api/ai/classify
  *  Classifies the intent of an incoming message for inbox triage
@@ -17,8 +17,11 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "Message is required" }, { status: 400 });
     }
 
+    // Get the model preference for this workspace
+    const model = await getWorkspaceGeminiModel(user.workspaceId);
+
     try {
-        const result = await classifyConversationIntent(message, history);
+        const result = await classifyConversationIntent(message, history, model);
         return NextResponse.json(result);
     } catch (error) {
         console.error("Intent classification error:", error);

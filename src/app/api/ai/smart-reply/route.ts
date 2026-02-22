@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { generateSmartReply, isQuotaError } from "@/lib/gemini";
+import { generateSmartReply, isQuotaError, getWorkspaceGeminiModel } from "@/lib/gemini";
 
 /**
  *
@@ -54,11 +54,16 @@ export async function POST(req: Request) {
   const workspace = await prisma.workspace.findUnique({
     where: { id: user.workspaceId },
   });
+  
+  // Get the model preference for this workspace
+  const model = await getWorkspaceGeminiModel(user.workspaceId);
+  
   try {
     const replies = await generateSmartReply(
       workspace?.name || "Business",
       history,
-      lastInbound?.content || "Hello"
+      lastInbound?.content || "Hello",
+      model
     );
 
     return NextResponse.json({ replies });

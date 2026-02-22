@@ -136,7 +136,7 @@ const handlers: Record<string, ToolHandler> = {
         date: startDate,
         endTime: endDate,
         status: "CONFIRMED",
-        notes: notes || "Booked via Voice AI",
+        notes: notes || "Booked via CareOps AI",
         serviceId: service.id,
         contactId: contact.id,
         workspaceId: service.workspaceId,
@@ -229,8 +229,8 @@ const handlers: Record<string, ToolHandler> = {
         endTime: endDate,
         status: "CONFIRMED",
         notes: booking.notes
-          ? `${booking.notes}\nRescheduled by Voice AI on ${new Date().toISOString()}`
-          : `Rescheduled by Voice AI on ${new Date().toISOString()}`,
+          ? `${booking.notes}\nRescheduled by CareOps AI on ${new Date().toISOString()}`
+          : `Rescheduled by CareOps AI on ${new Date().toISOString()}`,
       },
       include: { service: true, contact: true },
     });
@@ -349,12 +349,12 @@ export async function POST(req: Request) {
       const parsedArgs: ToolParams =
         typeof rawArgs === "string"
           ? (() => {
-              try {
-                return JSON.parse(rawArgs) as ToolParams;
-              } catch {
-                return {};
-              }
-            })()
+            try {
+              return JSON.parse(rawArgs) as ToolParams;
+            } catch {
+              return {};
+            }
+          })()
           : (rawArgs as ToolParams) || {};
 
       const handler = handlers[toolName];

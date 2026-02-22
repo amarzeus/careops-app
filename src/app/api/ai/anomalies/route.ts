@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { analyzeOperationsAnomalies, isQuotaError } from "@/lib/gemini";
+import { analyzeOperationsAnomalies, isQuotaError, getWorkspaceGeminiModel } from "@/lib/gemini";
 import { subDays } from "date-fns";
 
 /** GET /api/ai/anomalies
@@ -14,6 +14,10 @@ export async function GET() {
     }
 
     const workspaceId = user.workspaceId;
+    
+    // Get the model preference for this workspace
+    const model = await getWorkspaceGeminiModel(workspaceId);
+    
     const now = new Date();
     const thisWeekStart = subDays(now, 7);
     const lastWeekStart = subDays(now, 14);
@@ -59,7 +63,7 @@ export async function GET() {
             lowStockItems,
             totalItems,
             unansweredMessages,
-        });
+        }, model);
 
         return NextResponse.json({ anomalies });
     } catch (error) {

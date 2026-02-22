@@ -153,7 +153,7 @@ export function AIPreferencesTab({ _onSelectTab }: { _onSelectTab?: (tab: string
     },
     {
       key: "voiceEnabled",
-      title: "Voice AI",
+      title: "CareOps AI",
       description: "Enable AI voice assistant for phone calls",
       icon: Mic,
       color: "emerald",
@@ -255,8 +255,12 @@ export function AIPreferencesTab({ _onSelectTab }: { _onSelectTab?: (tab: string
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="gemini-2.0-flash">Gemini 2.0 Flash (Fast)</SelectItem>
-                <SelectItem value="gemini-1.5-pro">Gemini 1.5 Pro (Advanced)</SelectItem>
+                <SelectItem value="gemini-3.1-pro-preview">Gemini 3.1 Pro (Latest - Reasoning)</SelectItem>
+                <SelectItem value="gemini-3-flash">Gemini 3 Flash (Latest - Multimodal)</SelectItem>
+                <SelectItem value="gemini-2.5-pro">Gemini 2.5 Pro (Advanced)</SelectItem>
+                <SelectItem value="gemini-2.5-flash">Gemini 2.5 Flash (Recommended)</SelectItem>
+                <SelectItem value="gemini-2.5-flash-lite">Gemini 2.5 Flash-Lite (Cheapest)</SelectItem>
+                <SelectItem value="gemini-2.0-flash">Gemini 2.0 Flash (Deprecated)</SelectItem>
               </SelectContent>
             </Select>
           </div>

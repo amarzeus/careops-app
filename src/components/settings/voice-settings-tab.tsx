@@ -497,7 +497,7 @@ export function VoiceSettingsTab() {
       <div>
         <h2 className="text-lg font-semibold flex items-center gap-2">
           <Mic className="w-5 h-5 text-emerald-600" />
-          Voice AI Settings
+          CareOps AI Settings
         </h2>
         <p className="text-sm text-muted-foreground mt-1">
           Configure your AI voice assistant for handling phone calls

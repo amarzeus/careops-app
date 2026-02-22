@@ -148,7 +148,7 @@ async function handleVoiceCallCreated(
       data: {
         type: "voice_call",
         title: "Returning caller detected",
-        message: previousCallSummary || "Voice AI matched this caller to a recent conversation.",
+        message: previousCallSummary || "CareOps AI matched this caller to a recent conversation.",
         actionUrl: `/voice/calls?callSid=${callSid}`,
         workspaceId,
         isRead: true,
