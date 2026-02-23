@@ -264,7 +264,8 @@ jobs:
   smoke-tests:
     name: Production Smoke Tests
     runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch'
+    needs: [deployment-ready]
+    if: github.event_name == 'workflow_dispatch' || (github.ref == 'refs/heads/main' && github.event_name == 'push')
 
     steps:
       - name: Checkout code
