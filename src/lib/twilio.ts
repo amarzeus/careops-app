@@ -33,12 +33,20 @@ function sleep(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
- 
+
+interface TwilioError extends Error {
+    status?: number;
+    response?: {
+        status: number;
+    };
+}
+
 /**
  *
  */
-function categorizeError(error: any, statusCode?: number): { code: TwilioErrorCode; retryable: boolean } {
-    const message = error?.message?.toLowerCase() || "";
+function categorizeError(error: TwilioError | unknown, statusCode?: number): { code: TwilioErrorCode; retryable: boolean } {
+    const err = error as TwilioError;
+    const message = err?.message?.toLowerCase() || "";
 
     if (statusCode === 401 || statusCode === 403 || message.includes("auth")) {
         return { code: "AUTH_ERROR", retryable: false };
@@ -156,18 +164,18 @@ export async function sendSMS(to: string, body: string): Promise<TwilioResult> {
                 success: true,
                 requestId: message.sid,
             };
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } catch (error: any) {
-            lastError = error;
-            const statusCode = error?.status || error?.response?.status;
-            const { code, retryable } = categorizeError(error, statusCode);
+        } catch (error) {
+            const err = error as TwilioError;
+            lastError = err;
+            const statusCode = err?.status || err?.response?.status;
+            const { code, retryable } = categorizeError(err, statusCode);
 
-            console.error(`[Twilio:sendSMS] Attempt ${attempt} failed: ${error.message} (code: ${code})`);
+            console.error(`[Twilio:sendSMS] Attempt ${attempt} failed: ${err.message} (code: ${code})`);
 
             if (!retryable || attempt >= MAX_RETRIES) {
                 return {
                     success: false,
-                    error: error.message,
+                    error: err.message,
                     errorCode: code,
                     retryable: false
                 };
@@ -229,18 +237,18 @@ export async function sendWhatsApp(to: string, body: string): Promise<TwilioResu
                 success: true,
                 requestId: message.sid,
             };
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } catch (error: any) {
-            lastError = error;
-            const statusCode = error?.status || error?.response?.status;
-            const { code, retryable } = categorizeError(error, statusCode);
+        } catch (error) {
+            const err = error as TwilioError;
+            lastError = err;
+            const statusCode = err?.status || err?.response?.status;
+            const { code, retryable } = categorizeError(err, statusCode);
 
-            console.error(`[Twilio:sendWhatsApp] Attempt ${attempt} failed: ${error.message} (code: ${code})`);
+            console.error(`[Twilio:sendWhatsApp] Attempt ${attempt} failed: ${err.message} (code: ${code})`);
 
             if (!retryable || attempt >= MAX_RETRIES) {
                 return {
                     success: false,
-                    error: error.message,
+                    error: err.message,
                     errorCode: code,
                     retryable: false
                 };

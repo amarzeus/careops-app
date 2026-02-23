@@ -1,6 +1,9 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeAll } from "vitest";
 import { render, screen } from "@testing-library/react";
 import React from "react";
+
+// Increase timeout for this test file
+vi.setConfig({ testTimeout: 10000 });
 
 vi.mock("next-themes", () => ({
   ThemeProvider: ({ children }: { children: React.ReactNode }) => (

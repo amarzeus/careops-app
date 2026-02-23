@@ -30,6 +30,16 @@ export default function PublicContactPage({ params }: { params: Promise<{ slug: 
   const [successMessage, setSuccessMessage] = useState("");
   const [error, setError] = useState("");
 
+  const getFieldKey = (f: any, index: number) => {
+    if (f.name) return f.name;
+    const label = (f.label || "").toLowerCase();
+    if (label.includes("name")) return "name";
+    if (label.includes("email")) return "email";
+    if (label.includes("phone")) return "phone";
+    if (label.includes("message") || label.includes("reason")) return "message";
+    return `field_${index}`;
+  };
+
   const fetchForm = useCallback(async () => {
     try {
       const res = await fetch(`/api/public/contact-form/${slug}`);
@@ -39,7 +49,9 @@ export default function PublicContactPage({ params }: { params: Promise<{ slug: 
         const parsed = JSON.parse(data.form.fields || "[]");
         setFields(parsed);
         const initial: Record<string, string> = {};
-        parsed.forEach((f: FormField) => { initial[f.name] = ""; });
+        parsed.forEach((f: FormField, i: number) => {
+          initial[getFieldKey(f, i)] = "";
+        });
         setFormData(initial);
       }
     } catch { } finally { setLoading(false); }
@@ -95,27 +107,30 @@ export default function PublicContactPage({ params }: { params: Promise<{ slug: 
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && <div className="p-3 bg-red-50 text-red-700 text-sm rounded-lg">{error}</div>}
-            {fields.map(field => (
-              <div key={field.name} className="space-y-2">
-                <Label>{field.label} {field.required && "*"}</Label>
-                {field.type === "textarea" ? (
-                  <Textarea
-                    placeholder={`Enter ${field.label.toLowerCase()}`}
-                    value={formData[field.name] || ""}
-                    onChange={e => setFormData(p => ({ ...p, [field.name]: e.target.value }))}
-                    required={field.required}
-                  />
-                ) : (
-                  <Input
-                    type={field.type || "text"}
-                    placeholder={`Enter ${field.label.toLowerCase()}`}
-                    value={formData[field.name] || ""}
-                    onChange={e => setFormData(p => ({ ...p, [field.name]: e.target.value }))}
-                    required={field.required}
-                  />
-                )}
-              </div>
-            ))}
+            {fields.map((field, i) => {
+              const fieldKey = getFieldKey(field, i);
+              return (
+                <div key={i} className="space-y-2">
+                  <Label>{field.label} {field.required && "*"}</Label>
+                  {field.type === "textarea" ? (
+                    <Textarea
+                      placeholder={`Enter ${field.label.toLowerCase()}`}
+                      value={formData[fieldKey] || ""}
+                      onChange={e => setFormData(p => ({ ...p, [fieldKey]: e.target.value }))}
+                      required={field.required}
+                    />
+                  ) : (
+                    <Input
+                      type={field.type || "text"}
+                      placeholder={`Enter ${field.label.toLowerCase()}`}
+                      value={formData[fieldKey] || ""}
+                      onChange={e => setFormData(p => ({ ...p, [fieldKey]: e.target.value }))}
+                      required={field.required}
+                    />
+                  )}
+                </div>
+              );
+            })}
             <Button type="submit" className="w-full bg-primary hover:bg-primary/90" disabled={submitting}>
               {submitting ? "Submitting..." : <><Send className="w-4 h-4 mr-2" />Submit</>}
             </Button>

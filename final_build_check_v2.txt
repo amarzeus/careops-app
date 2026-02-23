@@ -1,0 +1,20 @@
+▲ Next.js 16.1.6 (Turbopack)
+- Environments: .env
+
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+  Creating an optimized production build ...
+✓ Compiled successfully in 3.1min
+  Running TypeScript ...
+Failed to compile.
+
+./src/lib/twilio.ts:178:28
+Type error: 'error' is of type 'unknown'.
+
+[0m [90m 176 |[39m                 [36mreturn[39m {
+ [90m 177 |[39m                     success[33m:[39m [36mfalse[39m[33m,[39m
+[31m[1m>[22m[39m[90m 178 |[39m                     error[33m:[39m error[33m.[39mmessage[33m,[39m
+ [90m     |[39m                            [31m[1m^[22m[39m
+ [90m 179 |[39m                     errorCode[33m:[39m code[33m,[39m
+ [90m 180 |[39m                     retryable[33m:[39m [36mfalse[39m
+ [90m 181 |[39m                 }[33m;[39m[0m
+Next.js build worker exited with code: 1 and signal: null

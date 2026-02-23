@@ -1,0 +1,52 @@
+
+> careops-app@0.1.0 prebuild
+> npm install --include=dev
+
+npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: '@renovatebot/pep440@4.2.1',
+npm warn EBADENGINE   required: { node: '^20.9.0 || ^22.11.0 || ^24', pnpm: '^10.0.0' },
+npm warn EBADENGINE   current: { node: 'v25.6.1', npm: '11.10.1' }
+npm warn EBADENGINE }
+
+> careops-app@0.1.0 postinstall
+> prisma generate || true
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v6.2.1) to ./node_modules/@prisma/client in 3.72s
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Interested in query caching in just a few lines of code? Try Accelerate today! https://pris.ly/tip-3-accelerate
+
+
+up to date, audited 1053 packages in 39s
+
+230 packages are looking for funding
+  run `npm fund` for details
+
+44 vulnerabilities (2 moderate, 42 high)
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+
+> careops-app@0.1.0 build
+> prisma generate && next build
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v6.2.1) to ./node_modules/@prisma/client in 4.45s
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Help us improve the Prisma ORM for everyone. Share your feedback in a short 2-min survey: https://pris.ly/orm/survey/release-5-22
+
+⨯ Unable to acquire lock at /home/amar/Desktop/Testing and Fixing/careops-app/.next/lock, is another instance of next build running?
+  Suggestion: If you intended to restart next build, terminate the other process, and then try again.
