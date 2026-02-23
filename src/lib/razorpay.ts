@@ -88,7 +88,7 @@ export async function createRazorpayPlan(
     interval: 1,
     item: {
       name: plan.name,
-      amount: plan.price,
+      amount: plan.price * 100,
       currency: "INR",
       description: `CareOps ${plan.name} Plan`,
     },
@@ -108,6 +108,17 @@ export async function createRazorpaySubscription(params: {
 }): Promise<{ subscriptionId: string; razorpayOrderId: string }> {
   const razorpay = getRazorpayInstance();
 
+  // 1. Resolve Plan ID (if planKey was passed instead of a real ID)
+  let realPlanId = params.planId;
+  let planKey: PlanKey = (params.planId as any) === "free" ? "free" : getPlanKeyFromPlanId(params.planId);
+
+  if (params.planId === "growth" || params.planId === "pro" || params.planId === "enterprise") {
+    planKey = params.planId as PlanKey;
+    const { id } = await createRazorpayPlan(planKey);
+    realPlanId = id;
+  }
+
+  // 2. Handle Customer
   const customer = await prisma.subscription.findUnique({
     where: { workspaceId: params.workspaceId },
     select: { razorpayCustomerId: true },
@@ -116,18 +127,35 @@ export async function createRazorpaySubscription(params: {
   let customerId = customer?.razorpayCustomerId;
 
   if (!customerId) {
-    const razorpayCustomer = await razorpay.customers.create({
-      name: params.customerName,
-      email: params.customerEmail,
-      notes: { workspaceId: params.workspaceId },
-    });
-    customerId = (razorpayCustomer as unknown as { id: string }).id;
+    try {
+      const razorpayCustomer = await razorpay.customers.create({
+        name: params.customerName,
+        email: params.customerEmail,
+        notes: { workspaceId: params.workspaceId },
+      });
+      customerId = (razorpayCustomer as unknown as { id: string }).id;
+    } catch (error: any) {
+      // If customer already exists, fetch them
+      if (error.error?.description === "Customer already exists for the merchant") {
+        const customers = await razorpay.customers.all({
+          email: params.customerEmail,
+        } as any);
+        if (customers.items && customers.items.length > 0) {
+          customerId = customers.items[0].id;
+        } else {
+          throw error;
+        }
+      } else {
+        throw error;
+      }
+    }
   }
 
+  // 3. Create Subscription
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const subscriptionsApi = razorpay.subscriptions as any;
   const subscription = await subscriptionsApi.create({
-    plan_id: params.planId,
+    plan_id: realPlanId,
     customer_id: customerId,
     total_count: 12,
     quantity: 1,
@@ -136,21 +164,21 @@ export async function createRazorpaySubscription(params: {
   });
   const subscriptionId = subscription?.id as string;
 
+  // 4. Update Database
   await prisma.subscription.upsert({
     where: { workspaceId: params.workspaceId },
     create: {
       workspaceId: params.workspaceId,
       razorpaySubscriptionId: subscriptionId,
-      razorpayPlanId: params.planId,
+      razorpayPlanId: realPlanId,
       razorpayCustomerId: customerId,
-      planKey: getPlanKeyFromPlanId(params.planId),
       status: "pending",
     },
     update: {
       razorpaySubscriptionId: subscriptionId,
-      razorpayPlanId: params.planId,
+      razorpayPlanId: realPlanId,
       razorpayCustomerId: customerId,
-      planKey: getPlanKeyFromPlanId(params.planId),
+      status: "pending",
     },
   });
 
