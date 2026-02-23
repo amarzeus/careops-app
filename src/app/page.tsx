@@ -954,8 +954,8 @@ export default function LandingPage() {
                   viewport={{ once: true }}
                   transition={{ duration: 0.8, delay: i * 0.1 }}
                   className={`relative rounded-2xl p-6 ${plan.highlight
-                      ? "bg-primary text-primary-foreground ring-2 ring-primary/20"
-                      : "bg-card border border-border/50"
+                    ? "bg-primary text-primary-foreground ring-2 ring-primary/20"
+                    : "bg-card border border-border/50"
                     }`}
                 >
                   {plan.highlight && (
@@ -973,7 +973,7 @@ export default function LandingPage() {
                   <ul className="space-y-2 mb-6 text-sm">
                     {plan.features.map((feature) => (
                       <li key={feature} className="flex items-center gap-2">
-                        <Check className="w-4 h-4 shrink-0" />
+                        <CheckCheck className="w-4 h-4 shrink-0" />
                         <span>{feature}</span>
                       </li>
                     ))}
