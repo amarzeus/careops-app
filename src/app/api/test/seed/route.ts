@@ -38,7 +38,7 @@ export async function POST(req: Request) {
             }
         });
 
-        const token = await createToken(user.id, workspace.id, user.role);
+        const token = createToken(user.id, workspace.id, user.role);
 
         return NextResponse.json({ token, user, workspace });
     } catch (error) {
