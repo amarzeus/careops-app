@@ -28,7 +28,7 @@ describe('SMS Utility (Strict Mode)', () => {
     });
 
     it('should send sms successfully and log success', async () => {
-        (mockTwilioSendSMS as any).mockResolvedValue({ success: true, sid: 'SM123' });
+        (mockTwilioSendSMS as unknown as ReturnType<typeof vi.fn>).mockResolvedValue({ success: true, sid: 'SM123' });
 
         const result = await sendSMS({
             to: '+15551234567',
@@ -50,7 +50,7 @@ describe('SMS Utility (Strict Mode)', () => {
     });
 
     it('should log failure and create alert on INVALID_NUMBER', async () => {
-        (mockTwilioSendSMS as any).mockResolvedValue({
+        (mockTwilioSendSMS as unknown as ReturnType<typeof vi.fn>).mockResolvedValue({
             success: false,
             error: 'Invalid number',
             errorCode: 'INVALID_NUMBER'
@@ -74,7 +74,7 @@ describe('SMS Utility (Strict Mode)', () => {
     });
 
     it('should log failure and create alert on Generic Failure', async () => {
-        (mockTwilioSendSMS as any).mockResolvedValue({
+        (mockTwilioSendSMS as unknown as ReturnType<typeof vi.fn>).mockResolvedValue({
             success: false,
             error: 'Twilio Error',
             errorCode: 'UNKNOWN'

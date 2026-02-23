@@ -36,7 +36,7 @@ describe('Email Utility (Strict Mode)', () => {
 
     it('should send email successfully on first attempt', async () => {
         // Mock successful fetch response
-        (global.fetch as any).mockResolvedValue({
+        (global.fetch as unknown as ReturnType<typeof vi.fn>).mockResolvedValue({
             ok: true,
             json: async () => ({ id: 'msg_123' }),
         });
@@ -64,7 +64,7 @@ describe('Email Utility (Strict Mode)', () => {
 
     it('should retry on failure and eventually succeed', async () => {
         // Mock 2 failures then 1 success
-        (global.fetch as any)
+        (global.fetch as unknown as ReturnType<typeof vi.fn>)
             .mockResolvedValueOnce({ ok: false, status: 500, json: async () => ({ message: 'Server Error' }) })
             .mockResolvedValueOnce({ ok: false, status: 500, json: async () => ({ message: 'Server Error' }) })
             .mockResolvedValueOnce({ ok: true, json: async () => ({ id: 'msg_123' }) });
@@ -86,7 +86,7 @@ describe('Email Utility (Strict Mode)', () => {
 
     it('should fail after max retries, log failure, and create alert', async () => {
         // Mock configured failures > MAX_RETRIES (3)
-        (global.fetch as any).mockResolvedValue({
+        (global.fetch as unknown as ReturnType<typeof vi.fn>).mockResolvedValue({
             ok: false,
             status: 500,
             json: async () => ({ message: 'Persistent Error' }),

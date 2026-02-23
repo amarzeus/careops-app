@@ -10,16 +10,11 @@ vi.mock('next/navigation', () => ({
 }));
 
 // Mock React.use for Next.js 15+ style params
-vi.mock('react', async (importOriginal) => {
-    const original: any = await importOriginal();
+vi.mock("react", async (importOriginal: () => Promise<any>) => {
+    const original = await importOriginal();
     return {
         ...original,
-        use: (promise: any) => {
-            if (promise && typeof promise.then === 'function') {
-                return (promise as any)._result || { workspaceId: 'ws-1', slug: 'contact-slug' };
-            }
-            return promise;
-        }
+        use: (_promise: unknown) => ({ workspaceId: "clzoq6z8w0000x2vclzoq6z8w" }),
     };
 });
 
@@ -45,7 +40,7 @@ describe('BookingPage Submission', () => {
         global.fetch = mockFetch;
 
         // 1. Mock Workspace Context Fetch
-        mockFetch.mockImplementation((url) => {
+        (global.fetch as unknown as ReturnType<typeof vi.fn>).mockImplementation((url: string) => {
             if (url.includes('/api/booking/context/')) {
                 return Promise.resolve({
                     ok: true,

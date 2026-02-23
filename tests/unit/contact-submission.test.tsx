@@ -9,14 +9,11 @@ vi.mock('next/navigation', () => ({
 }));
 
 // Mock React.use for Next.js 15+ style params
-vi.mock('react', async (importOriginal) => {
-    const original: any = await importOriginal();
+vi.mock('react', async (importOriginal: () => Promise<any>) => {
+    const original = await importOriginal();
     return {
         ...original,
-        use: (promise: any) => {
-            // Very simple mock for 'use'
-            return { slug: 'contact-slug' };
-        }
+        use: (_promise: unknown) => ({ slug: "cmlnhj36y000ecv2sbvckuul7" }),
     };
 });
 
@@ -31,7 +28,7 @@ describe('ContactPage Submission', () => {
         global.fetch = mockFetch;
 
         // 1. Mock Form Fetch
-        mockFetch.mockImplementation((url) => {
+        (global.fetch as unknown as ReturnType<typeof vi.fn>).mockImplementation((url: string) => {
             if (url.includes('/api/public/contact-form/')) {
                 return Promise.resolve({
                     ok: true,
