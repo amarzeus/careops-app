@@ -300,7 +300,7 @@ function CustomTooltip({ active, payload, label }: any) {
       <div className="bg-background/90 backdrop-blur-md border border-border/50 p-3 rounded-xl shadow-xl">
         <p className="text-sm font-medium text-muted-foreground mb-1">{label}</p>
         <p className="text-xl font-bold bg-gradient-to-r from-primary to-purple-500 bg-clip-text text-transparent">
-          ${payload[0].value.toLocaleString()}
+          ₹{payload[0].value.toLocaleString()}
         </p>
       </div>
     );
@@ -478,7 +478,7 @@ function Hero3D() {
                 {/* KPI Cards */}
                 <div className="grid grid-cols-3 gap-6">
                   {[
-                    { title: "Total Revenue", value: "$24,500", trend: "+12.5%", color: "from-blue-500/20 to-blue-500/5", ring: "ring-blue-500/20", trendColor: "text-green-500 bg-green-500/10" },
+                    { title: "Total Revenue", value: "₹24,500", trend: "+12.5%", color: "from-blue-500/20 to-blue-500/5", ring: "ring-blue-500/20", trendColor: "text-green-500 bg-green-500/10" },
                     { title: "New Bookings", value: "145", trend: "+5.2%", color: "from-purple-500/20 to-purple-500/5", ring: "ring-purple-500/20", trendColor: "text-green-500 bg-green-500/10" },
                     { title: "Cancellations", value: "3", trend: "-2.1%", color: "from-orange-500/20 to-orange-500/5", ring: "ring-orange-500/20", trendColor: "text-red-500 bg-red-500/10" },
                   ].map((stat, i) => (
@@ -757,7 +757,7 @@ export default function LandingPage() {
             {/* Double the logos to create the infinite loop effect smoothly */}
             {[1, 2].map((set) => (
               <div key={set} className="flex flex-1 justify-around items-center px-4">
-                {['Google Calendar', 'Stripe', 'Twilio', 'Mailchimp', 'Slack', 'Zoom', 'QuickBooks'].map((logo, i) => (
+                {['Google Calendar', 'Razorpay', 'Twilio', 'Mailchimp', 'Slack', 'Zoom', 'QuickBooks'].map((logo, i) => (
                   <div key={i} className="text-xl md:text-2xl font-black text-foreground/20 whitespace-nowrap px-8 hover:text-foreground/40 transition-colors cursor-default">
                     {logo}
                   </div>
@@ -794,202 +794,125 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ─── PRICING - Glass Layers ─── */}
-        <section id="pricing" className="py-32 relative z-10 bg-background overflow-hidden">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-24">
-              <motion.h2
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8 }}
-                className="text-4xl md:text-6xl font-black tracking-tight mb-6"
-              >
-                Simple, <span className="text-primary italic">powerful</span> pricing.
-              </motion.h2>
-              <p className="text-lg text-muted-foreground font-medium max-w-2xl mx-auto">
-                No hidden fees. No complicated tiers. One plan that grows with you.
-              </p>
-            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-              {/* Starter Plan */}
-              <SpotlightCard className="p-10 flex flex-col justify-between border-border/40 bg-background/20">
-                <div>
-                  <h3 className="text-xl font-bold mb-2">Starter</h3>
-                  <p className="text-sm text-muted-foreground mb-6">Perfect for solo practitioners.</p>
-                  <div className="mb-8">
-                    <span className="text-4xl font-black">$0</span>
-                    <span className="text-muted-foreground ml-2">/month</span>
-                  </div>
-                  <ul className="space-y-4 mb-8">
-                    {["50 Bookings/mo", "Basic CRM", "Standard Forms", "Email Support"].map((feat, i) => (
-                      <li key={i} className="flex items-center gap-3 text-sm font-medium">
-                        <CheckCheck className="w-4 h-4 text-primary" />
-                        {feat}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <Link href="/register">
-                  <Button variant="outline" className="w-full rounded-full h-12 font-bold hover:bg-primary/5">Get Started</Button>
-                </Link>
-              </SpotlightCard>
-
-              {/* Pro Plan - Highlighted */}
-              <SpotlightCard className="p-10 flex flex-col justify-between border-primary/30 bg-primary/5 relative scale-105 shadow-2xl shadow-primary/10">
-                <div className="absolute top-0 right-0 px-4 py-1 bg-primary text-primary-foreground text-[10px] font-black uppercase tracking-widest rounded-bl-xl">Popular</div>
-                <div>
-                  <h3 className="text-xl font-bold mb-2">Pro</h3>
-                  <p className="text-sm text-muted-foreground mb-6">Full power for growing teams.</p>
-                  <div className="mb-8">
-                    <span className="text-4xl font-black">$49</span>
-                    <span className="text-muted-foreground ml-2">/month</span>
-                  </div>
-                  <ul className="space-y-4 mb-8">
-                    {["Unlimited Bookings", "AI Voice Receptionist", "Advanced Automation", "Priority Support"].map((feat, i) => (
-                      <li key={i} className="flex items-center gap-3 text-sm font-medium">
-                        <CheckCheck className="w-4 h-4 text-primary" />
-                        {feat}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <Link href="/register">
-                  <Button className="w-full rounded-full h-12 font-bold bg-primary text-primary-foreground hover:opacity-90">Start 14-Day Free Trial</Button>
-                </Link>
-              </SpotlightCard>
-
-              {/* Enterprise Plan */}
-              <SpotlightCard className="p-10 flex flex-col justify-between border-border/40 bg-background/20">
-                <div>
-                  <h3 className="text-xl font-bold mb-2">Enterprise</h3>
-                  <p className="text-sm text-muted-foreground mb-6">Custom scale and security.</p>
-                  <div className="mb-8">
-                    <span className="text-4xl font-black">Custom</span>
-                  </div>
-                  <ul className="space-y-4 mb-8">
-                    {["Multi-location", "Custom Integrations", "SLA Guarantee", "Dedicated Manager"].map((feat, i) => (
-                      <li key={i} className="flex items-center gap-3 text-sm font-medium">
-                        <CheckCheck className="w-4 h-4 text-primary" />
-                        {feat}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <Link href="/contact">
-                  <Button variant="outline" className="w-full rounded-full h-12 font-bold hover:bg-muted/50">Contact Sales</Button>
-                </Link>
-              </SpotlightCard>
-            </div>
-          </div>
-
-          {/* Background glow for pricing */}
-          <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-2/3 h-1/2 bg-primary/5 blur-[150px] -z-10 rounded-full" />
-        </section>
-
-        {/* ─── CTA - Fluid End ─── */}
+        {/* ─── PRICING ─── */}
         <section id="pricing" className="py-40 lg:py-64 relative overflow-hidden bg-background">
           <div className="absolute inset-0 z-0">
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-r from-primary/10 via-purple-500/10 to-transparent rounded-full blur-[150px]" />
           </div>
 
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div className="text-center mb-16">
+            <div className="text-center mb-20">
               <motion.h2
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.8 }}
-                className="text-5xl md:text-6xl font-black tracking-tight mb-4"
+                className="text-5xl md:text-7xl font-black tracking-tight mb-6"
               >
-                Simple, transparent pricing
+                Simple, <span className="text-primary italic">transparent</span> pricing.
               </motion.h2>
               <motion.p
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.8, delay: 0.1 }}
-                className="text-xl text-muted-foreground"
+                className="text-xl text-muted-foreground font-medium max-w-2xl mx-auto"
               >
-                No hidden fees. No long-term contracts. Cancel anytime.
+                No hidden fees. No complicated tiers. Pick a plan that scales with your growth.
               </motion.p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {[
                 {
+                  id: "free",
                   name: "Starter",
                   price: "Free",
                   period: "forever",
                   features: ["Dashboard access", "50 SMS/month", "Contact forms", "1 staff member"],
                   highlight: false,
+                  description: "Perfect for solo practitioners.",
                 },
                 {
+                  id: "growth",
                   name: "Growth",
                   price: "₹1,999",
                   period: "month",
                   features: ["1 phone number", "200 voice minutes", "500 SMS/month", "Email support", "3 staff members"],
                   highlight: true,
+                  description: "Full power for growing teams.",
                 },
                 {
+                  id: "pro",
                   name: "Pro",
                   price: "₹4,999",
                   period: "month",
                   features: ["3 phone numbers", "1000 voice minutes", "2000 SMS/month", "Priority support", "Analytics", "10 staff members"],
                   highlight: false,
+                  description: "Professional grade operations.",
                 },
                 {
+                  id: "enterprise",
                   name: "Enterprise",
                   price: "₹14,999",
                   period: "month",
                   features: ["Unlimited numbers", "Unlimited voice", "Unlimited SMS", "SLA guarantee", "Dedicated support", "Custom integrations"],
                   highlight: false,
+                  description: "Custom scale and security.",
                 },
               ].map((plan, i) => (
-                <motion.div
+                <SpotlightCard
                   key={plan.name}
-                  initial={{ opacity: 0, y: 40 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.8, delay: i * 0.1 }}
-                  className={`relative rounded-2xl p-6 ${plan.highlight
-                    ? "bg-primary text-primary-foreground ring-2 ring-primary/20"
-                    : "bg-card border border-border/50"
+                  className={`p-8 flex flex-col justify-between overflow-hidden shadow-none ${plan.highlight
+                    ? "border-primary/40 bg-primary/5 scale-105 shadow-2xl shadow-primary/10"
+                    : "border-border/40 bg-background/20"
                     }`}
                 >
                   {plan.highlight && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                      <span className="px-3 py-1 rounded-full bg-primary text-primary-foreground text-xs font-bold">
-                        Popular
-                      </span>
+                    <div className="absolute top-0 right-0 px-4 py-1 bg-primary text-primary-foreground text-[10px] font-black uppercase tracking-widest rounded-bl-xl z-20">
+                      Popular
                     </div>
                   )}
-                  <h3 className="text-xl font-bold mb-2">{plan.name}</h3>
-                  <div className="mb-4">
-                    <span className="text-3xl font-black">{plan.price}</span>
-                    <span className="text-sm opacity-70">/{plan.period}</span>
+                  <div>
+                    <h3 className="text-xl font-bold mb-2">{plan.name}</h3>
+                    <p className="text-xs text-muted-foreground mb-6 font-medium">{plan.description}</p>
+                    <div className="mb-8">
+                      <span className="text-4xl font-black">{plan.price}</span>
+                      {plan.price !== "Free" && <span className="text-muted-foreground text-sm ml-2">/{plan.period}</span>}
+                    </div>
+                    <ul className="space-y-4 mb-8">
+                      {plan.features.map((feature) => (
+                        <li key={feature} className="flex items-start gap-3 text-sm font-medium leading-tight">
+                          <CheckCheck className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                          <span>{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                  <ul className="space-y-2 mb-6 text-sm">
-                    {plan.features.map((feature) => (
-                      <li key={feature} className="flex items-center gap-2">
-                        <CheckCheck className="w-4 h-4 shrink-0" />
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
                   <Link href="/register">
                     <Button
-                      className="w-full"
-                      variant={plan.highlight ? "secondary" : "outline"}
+                      className={`w-full rounded-full h-12 font-bold transition-all duration-300 ${plan.highlight
+                        ? "bg-primary text-primary-foreground hover:opacity-90 shadow-lg shadow-primary/20"
+                        : "variant-outline hover:bg-muted/50 border-border/40 text-foreground"
+                        }`}
+                      variant={plan.highlight ? "default" : "outline"}
                     >
-                      {plan.price === "Free" ? "Get Started Free" : "Get Started"}
+                      {plan.price === "Free" ? "Get Started Free" : "Subscribe Now"}
                     </Button>
                   </Link>
-                </motion.div>
+
+                  {/* Subtle design element for highlighted card */}
+                  {plan.highlight && (
+                    <div className="absolute -right-8 -bottom-8 w-24 h-24 bg-primary/10 rounded-full blur-2xl -z-10" />
+                  )}
+                </SpotlightCard>
               ))}
             </div>
           </div>
+
+          {/* Ambient base glow */}
+          <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-2/3 h-1/2 bg-primary/5 blur-[150px] -z-10 rounded-full" />
         </section>
 
         {/* ─── Final CTA ─── */}
