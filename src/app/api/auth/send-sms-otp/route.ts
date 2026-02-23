@@ -12,10 +12,7 @@ export async function POST(req: Request) {
     const { email, phone } = await req.json();
 
     if (!email || !phone) {
-      return NextResponse.json(
-        { error: "Email and phone number are required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Email and phone number are required" }, { status: 400 });
     }
 
     // Validate phone format (E.164)
@@ -38,7 +35,10 @@ export async function POST(req: Request) {
       const secondsSinceSent = (Date.now() - lastSent.getTime()) / 1000;
       if (secondsSinceSent < 60) {
         return NextResponse.json(
-          { error: "Please wait before requesting a new code", retryAfter: Math.ceil(60 - secondsSinceSent) },
+          {
+            error: "Please wait before requesting a new code",
+            retryAfter: Math.ceil(60 - secondsSinceSent),
+          },
           { status: 429 }
         );
       }
@@ -69,10 +69,7 @@ export async function POST(req: Request) {
       }
 
       console.error("[send-sms-otp] Twilio delivery failed:", result.error);
-      return NextResponse.json(
-        { error: `Failed to send SMS: ${result.error}` },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: `Failed to send SMS: ${result.error}` }, { status: 500 });
     }
 
     // In dev mode, if Twilio is not configured, still return the OTP for testing
@@ -85,9 +82,6 @@ export async function POST(req: Request) {
     });
   } catch (error) {
     console.error("Send SMS OTP error:", error);
-    return NextResponse.json(
-      { error: "Failed to send SMS OTP" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to send SMS OTP" }, { status: 500 });
   }
 }

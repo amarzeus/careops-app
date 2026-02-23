@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -195,4 +196,3 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Failed to process request" }, { status: 500 });
   }
 }
-

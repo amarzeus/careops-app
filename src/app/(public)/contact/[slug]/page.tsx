@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useCallback, useEffect, useState, use } from "react";
@@ -11,7 +12,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 
 interface FormField {
-  name: string; label: string; type: string; required: boolean;
+  name: string;
+  label: string;
+  type: string;
+  required: boolean;
 }
 
 /**
@@ -54,7 +58,10 @@ export default function PublicContactPage({ params }: { params: Promise<{ slug: 
         });
         setFormData(initial);
       }
-    } catch { } finally { setLoading(false); }
+    } catch {
+    } finally {
+      setLoading(false);
+    }
   }, [slug]);
 
   useEffect(() => {
@@ -63,7 +70,8 @@ export default function PublicContactPage({ params }: { params: Promise<{ slug: 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitting(true); setError("");
+    setSubmitting(true);
+    setError("");
     try {
       const res = await fetch("/api/public/contact", {
         method: "POST",
@@ -71,32 +79,51 @@ export default function PublicContactPage({ params }: { params: Promise<{ slug: 
         body: JSON.stringify({ formSlug: slug, data: formData }),
       });
       const data = await res.json();
-      if (res.ok) { setSuccess(true); setSuccessMessage(data.message); }
-      else { setError(data.error || "Submission failed"); }
-    } catch { setError("Something went wrong"); } finally { setSubmitting(false); }
+      if (res.ok) {
+        setSuccess(true);
+        setSuccessMessage(data.message);
+      } else {
+        setError(data.error || "Submission failed");
+      }
+    } catch {
+      setError("Something went wrong");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  if (loading) return <div className="min-h-screen bg-muted/30 flex items-center justify-center"><div className="animate-pulse text-muted-foreground">Loading...</div></div>;
+  if (loading)
+    return (
+      <div className="bg-muted/30 flex min-h-screen items-center justify-center">
+        <div className="text-muted-foreground animate-pulse">Loading...</div>
+      </div>
+    );
 
-  if (!form) return <div className="min-h-screen bg-muted/30 flex items-center justify-center"><p className="text-muted-foreground">Form not found</p></div>;
+  if (!form)
+    return (
+      <div className="bg-muted/30 flex min-h-screen items-center justify-center">
+        <p className="text-muted-foreground">Form not found</p>
+      </div>
+    );
 
-  if (success) return (
-    <div className="min-h-screen bg-muted/30 flex items-center justify-center px-4">
-      <Card className="w-full max-w-md text-center">
-        <CardContent className="pt-8 pb-8">
-          <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold mb-2">Thank You!</h2>
-          <p className="text-muted-foreground">{successMessage}</p>
-        </CardContent>
-      </Card>
-    </div>
-  );
+  if (success)
+    return (
+      <div className="bg-muted/30 flex min-h-screen items-center justify-center px-4">
+        <Card className="w-full max-w-md text-center">
+          <CardContent className="pt-8 pb-8">
+            <CheckCircle className="mx-auto mb-4 h-16 w-16 text-green-500" />
+            <h2 className="mb-2 text-2xl font-bold">Thank You!</h2>
+            <p className="text-muted-foreground">{successMessage}</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
 
   return (
-    <div className="min-h-screen bg-muted/30 flex items-center justify-center px-4 py-12">
+    <div className="bg-muted/30 flex min-h-screen items-center justify-center px-4 py-12">
       <Card className="w-full max-w-7xl">
         <CardHeader className="text-center">
-          <div className="flex justify-center mb-6">
+          <div className="mb-6 flex justify-center">
             <Link href="/">
               <Logo variant="full" size={42} />
             </Link>
@@ -106,17 +133,19 @@ export default function PublicContactPage({ params }: { params: Promise<{ slug: 
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            {error && <div className="p-3 bg-red-50 text-red-700 text-sm rounded-lg">{error}</div>}
+            {error && <div className="rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</div>}
             {fields.map((field, i) => {
               const fieldKey = getFieldKey(field, i);
               return (
                 <div key={i} className="space-y-2">
-                  <Label>{field.label} {field.required && "*"}</Label>
+                  <Label>
+                    {field.label} {field.required && "*"}
+                  </Label>
                   {field.type === "textarea" ? (
                     <Textarea
                       placeholder={`Enter ${field.label.toLowerCase()}`}
                       value={formData[fieldKey] || ""}
-                      onChange={e => setFormData(p => ({ ...p, [fieldKey]: e.target.value }))}
+                      onChange={(e) => setFormData((p) => ({ ...p, [fieldKey]: e.target.value }))}
                       required={field.required}
                     />
                   ) : (
@@ -124,15 +153,26 @@ export default function PublicContactPage({ params }: { params: Promise<{ slug: 
                       type={field.type || "text"}
                       placeholder={`Enter ${field.label.toLowerCase()}`}
                       value={formData[fieldKey] || ""}
-                      onChange={e => setFormData(p => ({ ...p, [fieldKey]: e.target.value }))}
+                      onChange={(e) => setFormData((p) => ({ ...p, [fieldKey]: e.target.value }))}
                       required={field.required}
                     />
                   )}
                 </div>
               );
             })}
-            <Button type="submit" className="w-full bg-primary hover:bg-primary/90" disabled={submitting}>
-              {submitting ? "Submitting..." : <><Send className="w-4 h-4 mr-2" />Submit</>}
+            <Button
+              type="submit"
+              className="bg-primary hover:bg-primary/90 w-full"
+              disabled={submitting}
+            >
+              {submitting ? (
+                "Submitting..."
+              ) : (
+                <>
+                  <Send className="mr-2 h-4 w-4" />
+                  Submit
+                </>
+              )}
             </Button>
           </form>
         </CardContent>

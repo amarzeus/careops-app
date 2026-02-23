@@ -104,7 +104,7 @@ export default function RootLayout({
           strategy="afterInteractive"
         />
       </head>
-      <body className={`${inter.variable} antialiased font-sans`}>
+      <body className={`${inter.variable} font-sans antialiased`}>
         {/* Schema.org: Organization + WebApplication structured data */}
         <Script
           id="schema-org"

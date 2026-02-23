@@ -75,10 +75,18 @@ function SettingsContent() {
       fetchWorkspace(); // Refresh to get updated state
       router.replace("/settings?tab=integrations");
     } else if (calendarStatus === "error") {
-      toast({ title: "Connection Failed", description: "Could not connect Google Calendar. Please try again.", variant: "destructive" });
+      toast({
+        title: "Connection Failed",
+        description: "Could not connect Google Calendar. Please try again.",
+        variant: "destructive",
+      });
       router.replace("/settings?tab=integrations");
     } else if (calendarStatus === "denied") {
-      toast({ title: "Access Denied", description: "Calendar access was denied. Please grant permission to connect.", variant: "destructive" });
+      toast({
+        title: "Access Denied",
+        description: "Calendar access was denied. Please grant permission to connect.",
+        variant: "destructive",
+      });
       router.replace("/settings?tab=integrations");
     }
   }, [searchParams, router]);
@@ -113,35 +121,49 @@ function SettingsContent() {
   };
 
   const handleUpdateWorkspace = (data: Partial<WorkspaceSettingsDTO>) => {
-    setWorkspace(prev => prev ? { ...prev, ...data } : null);
+    setWorkspace((prev) => (prev ? { ...prev, ...data } : null));
   };
 
   const handleSaveWorkspace = async () => {
     setSavingWorkspace(true);
     try {
-      const res = await fetch("/api/workspace", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(workspace) });
+      const res = await fetch("/api/workspace", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(workspace),
+      });
       if (!res.ok) throw new Error("Failed to save workspace");
       toast({ title: "Success", description: "Workspace settings saved", variant: "default" });
-      setSavedWorkspace(true); setTimeout(() => setSavedWorkspace(false), 2000);
+      setSavedWorkspace(true);
+      setTimeout(() => setSavedWorkspace(false), 2000);
     } catch (_error) {
       toast({ title: "Error", description: "Something went wrong", variant: "destructive" });
-    } finally { setSavingWorkspace(false); }
+    } finally {
+      setSavingWorkspace(false);
+    }
   };
 
   const handleUpdateProfile = (data: Partial<UserProfileDTO>) => {
-    setUser(prev => prev ? { ...prev, ...data } : null);
+    setUser((prev) => (prev ? { ...prev, ...data } : null));
   };
 
   const handleSaveProfile = async () => {
     setSavingProfile(true);
     try {
-      const res = await fetch("/api/user", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: user?.name, phone: user?.phone }) });
+      const res = await fetch("/api/user", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: user?.name, phone: user?.phone }),
+      });
       if (!res.ok) throw new Error("Failed to save profile");
       toast({ title: "Success", description: "Profile saved", variant: "default" });
-      setSavedProfile(true); setTimeout(() => setSavedProfile(false), 2000);
+      setSavedProfile(true);
+      setTimeout(() => setSavedProfile(false), 2000);
     } catch (_error) {
       toast({ title: "Error", description: "Something went wrong", variant: "destructive" });
-    } finally { setSavingProfile(false); }
+    } finally {
+      setSavingProfile(false);
+    }
   };
 
   const handleChangePassword = async () => {
@@ -151,7 +173,7 @@ function SettingsContent() {
       const res = await fetch("/api/auth/change-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ currentPassword, newPassword })
+        body: JSON.stringify({ currentPassword, newPassword }),
       });
       const data = await res.json();
       if (res.ok) {
@@ -188,14 +210,24 @@ function SettingsContent() {
     try {
       const res = await fetch("/api/settings/test-email", { method: "POST" });
       if (res.ok) {
-        toast({ title: "Success", description: "Email connection test passed", variant: "default" });
+        toast({
+          title: "Success",
+          description: "Email connection test passed",
+          variant: "default",
+        });
       } else {
         const data = await res.json();
-        toast({ title: "Email Test Failed", description: data.error || "Could not connect", variant: "destructive" });
+        toast({
+          title: "Email Test Failed",
+          description: data.error || "Could not connect",
+          variant: "destructive",
+        });
       }
     } catch (_error) {
       toast({ title: "Error", description: "Connection test failed", variant: "destructive" });
-    } finally { setTestingEmail(false); }
+    } finally {
+      setTestingEmail(false);
+    }
   };
 
   const handleTestSms = async () => {
@@ -206,13 +238,18 @@ function SettingsContent() {
         toast({ title: "Success", description: "SMS connection test passed", variant: "default" });
       } else {
         const data = await res.json();
-        toast({ title: "SMS Test Failed", description: data.error || "Could not connect", variant: "destructive" });
+        toast({
+          title: "SMS Test Failed",
+          description: data.error || "Could not connect",
+          variant: "destructive",
+        });
       }
     } catch (_error) {
       toast({ title: "Error", description: "Connection test failed", variant: "destructive" });
-    } finally { setTestingSms(false); }
+    } finally {
+      setTestingSms(false);
+    }
   };
-
 
   const handleConnectCalendar = async () => {
     setConnectingCalendar(true);
@@ -224,11 +261,19 @@ function SettingsContent() {
         window.location.href = data.url;
       } else {
         const data = await res.json();
-        toast({ title: "Error", description: data.error || "Could not initiate calendar connection", variant: "destructive" });
+        toast({
+          title: "Error",
+          description: data.error || "Could not initiate calendar connection",
+          variant: "destructive",
+        });
         setConnectingCalendar(false);
       }
     } catch (_error) {
-      toast({ title: "Error", description: "Failed to connect Google Calendar", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "Failed to connect Google Calendar",
+        variant: "destructive",
+      });
       setConnectingCalendar(false);
     }
   };
@@ -239,21 +284,39 @@ function SettingsContent() {
       const res = await fetch("/api/integrations/google-calendar", { method: "DELETE" });
       if (res.ok) {
         toast({ title: "Disconnected", description: "Google Calendar has been disconnected" });
-        setWorkspace(prev => prev ? { ...prev, googleCalendarConnected: false, googleCalendarEmail: null } : null);
+        setWorkspace((prev) =>
+          prev ? { ...prev, googleCalendarConnected: false, googleCalendarEmail: null } : null
+        );
       } else {
         toast({ title: "Error", description: "Failed to disconnect", variant: "destructive" });
       }
     } catch (_error) {
-      toast({ title: "Error", description: "Failed to disconnect Google Calendar", variant: "destructive" });
-    } finally { setDisconnectingCalendar(false); }
+      toast({
+        title: "Error",
+        description: "Failed to disconnect Google Calendar",
+        variant: "destructive",
+      });
+    } finally {
+      setDisconnectingCalendar(false);
+    }
   };
 
   const copyToClipboard = (text: string, key: string) => {
     navigator.clipboard.writeText(text);
-    setCopied(key); setTimeout(() => setCopied(""), 2000);
+    setCopied(key);
+    setTimeout(() => setCopied(""), 2000);
   };
 
-  if (loading) return <div className="p-8"><div className="animate-pulse space-y-4">{[...Array(3)].map((_, i) => <div key={i} className="h-40 bg-muted/30 rounded-xl" />)}</div></div>;
+  if (loading)
+    return (
+      <div className="p-8">
+        <div className="animate-pulse space-y-4">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="bg-muted/30 h-40 rounded-xl" />
+          ))}
+        </div>
+      </div>
+    );
 
   const bookingUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/book/${workspace?.id}`;
   const contactFormUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/contact/${workspace?.id}`;
@@ -263,15 +326,29 @@ function SettingsContent() {
       <Header title="Settings" subtitle="Manage your workspace and account" />
       <div className="mx-auto w-full max-w-7xl p-4 sm:p-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <div className="overflow-x-auto pb-1 -mb-1">
+          <div className="-mb-1 overflow-x-auto pb-1">
             <TabsList className="flex-nowrap whitespace-nowrap">
-              <TabsTrigger value="workspace" className="flex items-center gap-2"><Settings className="w-4 h-4" /> <span className="hidden sm:inline">Workspace</span></TabsTrigger>
-              <TabsTrigger value="billing" className="flex items-center gap-2"><CreditCard className="w-4 h-4" /> <span className="hidden sm:inline">Billing</span></TabsTrigger>
-              <TabsTrigger value="ai" className="flex items-center gap-2"><Sparkles className="w-4 h-4" /> <span className="hidden sm:inline">AI</span></TabsTrigger>
-              <TabsTrigger value="voice" className="flex items-center gap-2"><Sparkles className="w-4 h-4" /> <span className="hidden sm:inline">Voice</span></TabsTrigger>
-              <TabsTrigger value="integrations" className="flex items-center gap-2"><Link2 className="w-4 h-4" /> <span className="hidden sm:inline">Integrations</span></TabsTrigger>
-              <TabsTrigger value="profile" className="flex items-center gap-2"><User className="w-4 h-4" /> <span className="hidden sm:inline">Profile</span></TabsTrigger>
-              <TabsTrigger value="security" className="flex items-center gap-2"><Shield className="w-4 h-4" /> <span className="hidden sm:inline">Security</span></TabsTrigger>
+              <TabsTrigger value="workspace" className="flex items-center gap-2">
+                <Settings className="h-4 w-4" /> <span className="hidden sm:inline">Workspace</span>
+              </TabsTrigger>
+              <TabsTrigger value="billing" className="flex items-center gap-2">
+                <CreditCard className="h-4 w-4" /> <span className="hidden sm:inline">Billing</span>
+              </TabsTrigger>
+              <TabsTrigger value="ai" className="flex items-center gap-2">
+                <Sparkles className="h-4 w-4" /> <span className="hidden sm:inline">AI</span>
+              </TabsTrigger>
+              <TabsTrigger value="voice" className="flex items-center gap-2">
+                <Sparkles className="h-4 w-4" /> <span className="hidden sm:inline">Voice</span>
+              </TabsTrigger>
+              <TabsTrigger value="integrations" className="flex items-center gap-2">
+                <Link2 className="h-4 w-4" /> <span className="hidden sm:inline">Integrations</span>
+              </TabsTrigger>
+              <TabsTrigger value="profile" className="flex items-center gap-2">
+                <User className="h-4 w-4" /> <span className="hidden sm:inline">Profile</span>
+              </TabsTrigger>
+              <TabsTrigger value="security" className="flex items-center gap-2">
+                <Shield className="h-4 w-4" /> <span className="hidden sm:inline">Security</span>
+              </TabsTrigger>
             </TabsList>
           </div>
 

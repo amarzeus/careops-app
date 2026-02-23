@@ -39,20 +39,14 @@ export async function POST(req: Request) {
 
   const { url, event } = await req.json();
   if (!url || !event) {
-    return NextResponse.json(
-      { error: "Missing URL or Event trigger" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Missing URL or Event trigger" }, { status: 400 });
   }
 
   // Validate URL format
   try {
     new URL(url);
   } catch {
-    return NextResponse.json(
-      { error: "Invalid URL format" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Invalid URL format" }, { status: 400 });
   }
 
   try {
@@ -65,15 +59,16 @@ export async function POST(req: Request) {
       },
     });
 
-    return NextResponse.json({
-      webhook,
-      message: "Webhook created with security signature. Store the secret securely - it will not be shown again."
-    }, { status: 201 });
+    return NextResponse.json(
+      {
+        webhook,
+        message:
+          "Webhook created with security signature. Store the secret securely - it will not be shown again.",
+      },
+      { status: 201 }
+    );
   } catch (error) {
     console.error("Failed to create webhook:", error);
-    return NextResponse.json(
-      { error: "Failed to create webhook" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to create webhook" }, { status: 500 });
   }
 }

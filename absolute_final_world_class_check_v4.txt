@@ -1,0 +1,34 @@
+
+> careops-app@0.1.0 test
+> npm run test:maintenance
+
+
+> careops-app@0.1.0 test:maintenance
+> npm run lint && npm run type-check && npm run format:check && npm run test:unit && npm run test:e2e && npm run render:validate && npm run test:audit && npm run build
+
+
+> careops-app@0.1.0 lint
+> eslint
+
+
+/home/amar/Desktop/Testing and Fixing/careops-app/src/lib/gemini.ts
+  83:3  warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+
+✖ 1 problem (0 errors, 1 warning)
+  0 errors and 1 warning potentially fixable with the `--fix` option.
+
+
+> careops-app@0.1.0 type-check
+> tsc --noEmit
+
+
+> careops-app@0.1.0 format:check
+> prettier --check .
+
+Checking formatting...
+[warn] src/app/(dashboard)/inventory/page.tsx
+[warn] src/components/voice-assistant.tsx
+[warn] src/lib/gemini.ts
+[warn] src/lib/razorpay.ts
+[warn] tests/e2e/routing.spec.ts
+[warn] Code style issues found in 5 files. Run Prettier with --write to fix.

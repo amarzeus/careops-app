@@ -19,34 +19,28 @@ export async function POST(req: Request) {
         {
           error: "Rate limit exceeded",
           message: "Too many submissions. Please try again later.",
-          retryAfter: Math.ceil((rateLimit.resetTime - Date.now()) / 1000)
+          retryAfter: Math.ceil((rateLimit.resetTime - Date.now()) / 1000),
         },
         {
           status: 429,
           headers: {
-            'X-RateLimit-Limit': String(RATE_LIMITS.CONTACT_FORM.maxRequests),
-            'X-RateLimit-Remaining': String(rateLimit.remaining),
-            'X-RateLimit-Reset': String(rateLimit.resetTime),
-            'Retry-After': String(Math.ceil((rateLimit.resetTime - Date.now()) / 1000))
-          }
+            "X-RateLimit-Limit": String(RATE_LIMITS.CONTACT_FORM.maxRequests),
+            "X-RateLimit-Remaining": String(rateLimit.remaining),
+            "X-RateLimit-Reset": String(rateLimit.resetTime),
+            "Retry-After": String(Math.ceil((rateLimit.resetTime - Date.now()) / 1000)),
+          },
         }
       );
     }
 
     const { formSlug, data } = await req.json();
     if (!formSlug || !data?.name)
-      return NextResponse.json(
-        { error: "Missing required data" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Missing required data" }, { status: 400 });
 
     // Find form by slug or workspaceId
     const form = await prisma.contactForm.findFirst({
       where: {
-        OR: [
-          { slug: formSlug },
-          { workspaceId: formSlug, isActive: true }
-        ]
+        OR: [{ slug: formSlug }, { workspaceId: formSlug, isActive: true }],
       },
       include: { workspace: true },
     });
@@ -70,8 +64,8 @@ export async function POST(req: Request) {
     // Find or create contact
     let contact = data.email
       ? await prisma.contact.findFirst({
-        where: { email: data.email, workspaceId: workspaceId! },
-      })
+          where: { email: data.email, workspaceId: workspaceId! },
+        })
       : null;
 
     if (!contact) {
@@ -124,15 +118,10 @@ export async function POST(req: Request) {
 
     return NextResponse.json({
       success: true,
-      message:
-        welcomeMessage ||
-        "Thank you for contacting us! We will get back to you soon.",
+      message: welcomeMessage || "Thank you for contacting us! We will get back to you soon.",
     });
   } catch (error) {
     console.error("Public contact error:", error);
-    return NextResponse.json(
-      { error: "Submission failed" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Submission failed" }, { status: 500 });
   }
 }

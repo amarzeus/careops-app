@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { hashPassword } from "@/lib/auth";
@@ -11,18 +12,12 @@ export async function POST(req: Request) {
     const { email, password, name } = await req.json();
 
     if (!email || !password || !name) {
-      return NextResponse.json(
-        { error: "Missing required fields" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
-      return NextResponse.json(
-        { error: "Email already registered" },
-        { status: 409 }
-      );
+      return NextResponse.json({ error: "Email already registered" }, { status: 409 });
     }
 
     const passwordHash = await hashPassword(password);
@@ -67,14 +62,21 @@ export async function POST(req: Request) {
 
     return NextResponse.json({
       message: "Registration successful. Please check your email for the verification code.",
-      userId: user.id
+      userId: user.id,
     });
   } catch (error: any) {
     console.error("[Register API] Critical failure:", error);
 
     // Check for Prisma/Database connection errors
-    if (error.code?.startsWith('P') || error.message?.includes('prisma') || error.message?.includes('database')) {
-      return NextResponse.json({ error: "Database connection error. Please verify your DATABASE_URL." }, { status: 500 });
+    if (
+      error.code?.startsWith("P") ||
+      error.message?.includes("prisma") ||
+      error.message?.includes("database")
+    ) {
+      return NextResponse.json(
+        { error: "Database connection error. Please verify your DATABASE_URL." },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json(

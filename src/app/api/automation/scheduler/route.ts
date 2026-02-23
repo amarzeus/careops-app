@@ -5,10 +5,10 @@ import { startOfDay, endOfDay, addDays } from "date-fns";
 
 /**
  * BEFORE_BOOKING Scheduler
- * 
+ *
  * Called via cron job or manually to send reminders for bookings
  * happening within the next 24 hours.
- * 
+ *
  * Should be called periodically (e.g., every hour via cron).
  * Verifiable via: GET /api/automation/scheduler
  * @param req
@@ -75,7 +75,11 @@ export async function GET(req: Request) {
           phone: booking.contact.phone,
         },
         service: booking.service
-          ? { id: booking.service.id, name: booking.service.name, location: booking.service.location }
+          ? {
+              id: booking.service.id,
+              name: booking.service.name,
+              location: booking.service.location,
+            }
           : undefined,
       });
 

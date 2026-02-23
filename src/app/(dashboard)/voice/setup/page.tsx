@@ -15,7 +15,7 @@ import {
   ArrowRight,
   Loader2,
   CreditCard,
-  AlertCircle
+  AlertCircle,
 } from "lucide-react";
 import { EnhancedNumberSelector } from "@/components/voice/enhanced-number-selector";
 import { AgentCustomizer } from "@/components/voice/agent-customizer";
@@ -110,20 +110,18 @@ export default function VoiceSetupPage() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <CreditCard className="w-5 h-5" />
+                <CreditCard className="h-5 w-5" />
                 Plan Check
               </CardTitle>
-              <CardDescription>
-                Voice features require a paid subscription
-              </CardDescription>
+              <CardDescription>Voice features require a paid subscription</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {subscriptionStatus && (
                 <>
-                  <div className="flex items-center justify-between p-4 rounded-lg bg-muted">
+                  <div className="bg-muted flex items-center justify-between rounded-lg p-4">
                     <div>
                       <p className="font-medium">{subscriptionStatus.subscription.planName}</p>
-                      <p className="text-sm text-muted-foreground">Current Plan</p>
+                      <p className="text-muted-foreground text-sm">Current Plan</p>
                     </div>
                     <Badge variant={canProceedWithPlan() ? "default" : "secondary"}>
                       {subscriptionStatus.subscription.planKey.toUpperCase()}
@@ -134,17 +132,19 @@ export default function VoiceSetupPage() {
                     <Alert>
                       <CheckCircle className="h-4 w-4" />
                       <AlertDescription>
-                        Your plan includes {subscriptionStatus.limits.phoneNumbers === -1
+                        Your plan includes{" "}
+                        {subscriptionStatus.limits.phoneNumbers === -1
                           ? "unlimited"
-                          : subscriptionStatus.limits.phoneNumbers} phone number(s).
+                          : subscriptionStatus.limits.phoneNumbers}{" "}
+                        phone number(s).
                       </AlertDescription>
                     </Alert>
                   ) : (
                     <Alert variant="destructive">
                       <AlertCircle className="h-4 w-4" />
                       <AlertDescription>
-                        Your current plan doesn&apos;t include phone numbers.
-                        Please upgrade to Growth or higher to use voice features.
+                        Your current plan doesn&apos;t include phone numbers. Please upgrade to
+                        Growth or higher to use voice features.
                       </AlertDescription>
                     </Alert>
                   )}
@@ -156,7 +156,7 @@ export default function VoiceSetupPage() {
                     {canProceedWithPlan() && (
                       <Button onClick={() => setCurrentStep(1)}>
                         Continue
-                        <ArrowRight className="ml-2 w-4 h-4" />
+                        <ArrowRight className="ml-2 h-4 w-4" />
                       </Button>
                     )}
                   </div>
@@ -193,25 +193,23 @@ export default function VoiceSetupPage() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-green-600">
-                <CheckCircle className="w-5 h-5" />
+                <CheckCircle className="h-5 w-5" />
                 Setup Complete!
               </CardTitle>
-              <CardDescription>
-                Your voice agent is ready to receive calls
-              </CardDescription>
+              <CardDescription>Your voice agent is ready to receive calls</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid grid-cols-2 gap-4">
-                <div className="p-4 rounded-lg bg-muted">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Bot className="w-4 h-4" />
+                <div className="bg-muted rounded-lg p-4">
+                  <div className="mb-2 flex items-center gap-2">
+                    <Bot className="h-4 w-4" />
                     <span className="text-sm font-medium">Voice Agent</span>
                   </div>
-                  <p className="text-sm text-muted-foreground">AI-powered call handling</p>
+                  <p className="text-muted-foreground text-sm">AI-powered call handling</p>
                 </div>
-                <div className="p-4 rounded-lg bg-muted">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Phone className="w-4 h-4" />
+                <div className="bg-muted rounded-lg p-4">
+                  <div className="mb-2 flex items-center gap-2">
+                    <Phone className="h-4 w-4" />
                     <span className="text-sm font-medium">Phone Number</span>
                   </div>
                   <p className="font-mono">{provisionedNumber}</p>
@@ -221,8 +219,8 @@ export default function VoiceSetupPage() {
               <Alert>
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>
-                  Your voice agent will answer calls 24/7. You can customize its behavior
-                  in Voice Settings.
+                  Your voice agent will answer calls 24/7. You can customize its behavior in Voice
+                  Settings.
                 </AlertDescription>
               </Alert>
 
@@ -232,7 +230,7 @@ export default function VoiceSetupPage() {
                 </Button>
                 <Button onClick={handleFinish}>
                   Go to Voice Dashboard
-                  <ArrowRight className="ml-2 w-4 h-4" />
+                  <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </div>
             </CardContent>
@@ -246,19 +244,17 @@ export default function VoiceSetupPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="w-8 h-8 animate-spin" />
+      <div className="flex min-h-[400px] items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="max-w-3xl mx-auto p-6 space-y-6">
+    <div className="mx-auto max-w-3xl space-y-6 p-6">
       <div>
         <h1 className="text-2xl font-bold">Voice Setup</h1>
-        <p className="text-muted-foreground">
-          Set up your AI voice agent and phone number
-        </p>
+        <p className="text-muted-foreground">Set up your AI voice agent and phone number</p>
       </div>
 
       <div className="flex items-center justify-between">
@@ -266,26 +262,24 @@ export default function VoiceSetupPage() {
           <div key={step.id} className="flex items-center">
             <div className="flex flex-col items-center">
               <div
-                className={`w-10 h-10 rounded-full flex items-center justify-center ${index < currentStep
+                className={`flex h-10 w-10 items-center justify-center rounded-full ${
+                  index < currentStep
                     ? "bg-primary text-primary-foreground"
                     : index === currentStep
                       ? "bg-primary text-primary-foreground"
                       : "bg-muted text-muted-foreground"
-                  }`}
+                }`}
               >
                 {index < currentStep ? (
-                  <CheckCircle className="w-5 h-5" />
+                  <CheckCircle className="h-5 w-5" />
                 ) : (
-                  <Circle className="w-5 h-5" />
+                  <Circle className="h-5 w-5" />
                 )}
               </div>
-              <span className="text-xs mt-1 font-medium">{step.title}</span>
+              <span className="mt-1 text-xs font-medium">{step.title}</span>
             </div>
             {index < STEPS.length - 1 && (
-              <div
-                className={`w-16 h-1 mx-2 ${index < currentStep ? "bg-primary" : "bg-muted"
-                  }`}
-              />
+              <div className={`mx-2 h-1 w-16 ${index < currentStep ? "bg-primary" : "bg-muted"}`} />
             )}
           </div>
         ))}

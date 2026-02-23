@@ -48,12 +48,11 @@ export class ErrorBoundary extends Component<Props, State> {
       return (
         <div className="flex min-h-[400px] flex-col items-center justify-center p-8">
           <div className="w-full max-w-md rounded-lg border border-red-200 bg-red-50 p-6 text-center">
-            <AlertTriangle className="mx-auto h-12 w-12 text-red-500 mb-4" />
-            <h2 className="text-lg font-semibold text-red-800 mb-2">
-              Something went wrong
-            </h2>
-            <p className="text-sm text-red-600 mb-4">
-              An unexpected error occurred. Please try again or contact support if the problem persists.
+            <AlertTriangle className="mx-auto mb-4 h-12 w-12 text-red-500" />
+            <h2 className="mb-2 text-lg font-semibold text-red-800">Something went wrong</h2>
+            <p className="mb-4 text-sm text-red-600">
+              An unexpected error occurred. Please try again or contact support if the problem
+              persists.
             </p>
             {process.env.NODE_ENV === "development" && this.state.error && (
               <details className="mb-4 text-left">
@@ -67,17 +66,17 @@ export class ErrorBoundary extends Component<Props, State> {
                 </pre>
               </details>
             )}
-            <div className="flex gap-3 justify-center">
+            <div className="flex justify-center gap-3">
               <button
                 onClick={this.handleReset}
-                className="inline-flex items-center gap-2 rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 transition-colors"
+                className="inline-flex items-center gap-2 rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-700"
               >
                 <RefreshCw className="h-4 w-4" />
                 Try Again
               </button>
               <button
                 onClick={this.handleGoHome}
-                className="inline-flex items-center gap-2 rounded-md border border-red-300 bg-white px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-50 transition-colors"
+                className="inline-flex items-center gap-2 rounded-md border border-red-300 bg-white px-4 py-2 text-sm font-medium text-red-700 transition-colors hover:bg-red-50"
               >
                 <Home className="h-4 w-4" />
                 Go Home

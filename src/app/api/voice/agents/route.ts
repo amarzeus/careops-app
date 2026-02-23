@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getCurrentUser } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
-import { isVapiConfigured } from '@/lib/vapi';
+import { NextRequest, NextResponse } from "next/server";
+import { getCurrentUser } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { isVapiConfigured } from "@/lib/vapi";
 
 /**
  *
@@ -11,11 +11,11 @@ export async function GET(req: NextRequest) {
   try {
     const user = await getCurrentUser();
     if (!user?.workspaceId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(req.url);
-    const activeOnly = searchParams.get('active') === 'true';
+    const activeOnly = searchParams.get("active") === "true";
 
     const where: Record<string, unknown> = {
       workspaceId: user.workspaceId,
@@ -27,16 +27,13 @@ export async function GET(req: NextRequest) {
 
     const agents = await prisma.voiceAgent.findMany({
       where,
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
 
     return NextResponse.json(agents);
   } catch (error) {
-    console.error('[VoiceAgent:GET] Error:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch voice agents' },
-      { status: 500 }
-    );
+    console.error("[VoiceAgent:GET] Error:", error);
+    return NextResponse.json({ error: "Failed to fetch voice agents" }, { status: 500 });
   }
 }
 
@@ -48,12 +45,12 @@ export async function POST(req: NextRequest) {
   try {
     const user = await getCurrentUser();
     if (!user?.workspaceId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     if (!isVapiConfigured()) {
       return NextResponse.json(
-        { error: 'VAPI not configured. Please add VAPI_API_KEY to environment.' },
+        { error: "VAPI not configured. Please add VAPI_API_KEY to environment." },
         { status: 503 }
       );
     }
@@ -73,10 +70,7 @@ export async function POST(req: NextRequest) {
     } = body;
 
     if (!name) {
-      return NextResponse.json(
-        { error: 'Name is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Name is required" }, { status: 400 });
     }
 
     const agent = await prisma.voiceAgent.create({
@@ -97,10 +91,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(agent, { status: 201 });
   } catch (error) {
-    console.error('[VoiceAgent:POST] Error:', error);
-    return NextResponse.json(
-      { error: 'Failed to create voice agent' },
-      { status: 500 }
-    );
+    console.error("[VoiceAgent:POST] Error:", error);
+    return NextResponse.json({ error: "Failed to create voice agent" }, { status: 500 });
   }
 }

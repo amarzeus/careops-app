@@ -1,4 +1,3 @@
-
 import { Header } from "@/components/layout/header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -94,52 +93,45 @@ export default function PricingPage() {
       <Header title="Pricing" subtitle="Choose the plan that's right for your business" />
 
       <div className="mx-auto w-full max-w-7xl p-4 sm:p-6">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold tracking-tight">
-            Simple, transparent pricing
-          </h2>
-          <p className="text-xl text-muted-foreground mt-4">
+        <div className="mb-12 text-center">
+          <h2 className="text-3xl font-bold tracking-tight">Simple, transparent pricing</h2>
+          <p className="text-muted-foreground mt-4 text-xl">
             No hidden fees. No long-term contracts. Cancel anytime.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
           {PLANS.map((plan) => (
             <Card
               key={plan.key}
-              className={`relative ${plan.highlight ? "border-primary ring-2 ring-primary/20" : ""}`}
+              className={`relative ${plan.highlight ? "border-primary ring-primary/20 ring-2" : ""}`}
             >
               {plan.highlight && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                   <Badge className="bg-primary">Popular</Badge>
                 </div>
               )}
-              <CardHeader className="text-center pb-2">
+              <CardHeader className="pb-2 text-center">
                 <CardTitle className="text-2xl">{plan.name}</CardTitle>
                 <CardDescription>{plan.description}</CardDescription>
               </CardHeader>
               <CardContent className="text-center">
                 <div className="mb-6">
                   <span className="text-4xl font-bold">{formatPrice(plan.price)}</span>
-                  {plan.price > 0 && (
-                    <span className="text-muted-foreground">/{plan.period}</span>
-                  )}
+                  {plan.price > 0 && <span className="text-muted-foreground">/{plan.period}</span>}
                 </div>
 
-                <ul className="space-y-3 text-left mb-8">
+                <ul className="mb-8 space-y-3 text-left">
                   {plan.features.map((feature, i) => (
                     <li key={i} className="flex items-start gap-2">
-                      <Check className="w-5 h-5 text-green-500 mt-0.5 shrink-0" />
+                      <Check className="mt-0.5 h-5 w-5 shrink-0 text-green-500" />
                       <span>{feature}</span>
                     </li>
                   ))}
                 </ul>
 
                 <Link href="/register">
-                  <Button
-                    className="w-full"
-                    variant={plan.highlight ? "default" : "outline"}
-                  >
+                  <Button className="w-full" variant={plan.highlight ? "default" : "outline"}>
                     {plan.price === 0 ? "Get Started Free" : "Get Started"}
                   </Button>
                 </Link>

@@ -1,4 +1,3 @@
-
 import { prisma } from "./prisma";
 
 export interface EmailOptions {
@@ -16,7 +15,7 @@ const RETRY_DELAY = 1000; // 1 second
  * @param ms - Milliseconds to sleep
  */
 async function sleep(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 /**
@@ -28,7 +27,14 @@ async function sleep(ms: number) {
  * @param error - Error message if failed
  * @param workspaceId - Workspace ID
  */
-async function logIntegration(type: string, status: string, to: string, message: string, error?: string, workspaceId?: string) {
+async function logIntegration(
+  type: string,
+  status: string,
+  to: string,
+  message: string,
+  error?: string,
+  workspaceId?: string
+) {
   if (!workspaceId) return;
 
   try {
@@ -71,7 +77,7 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${apiKey}`,
+          Authorization: `Bearer ${apiKey}`,
         },
         body: JSON.stringify({
           from: from,
@@ -89,7 +95,14 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
 
       console.log(`✅ Email sent successfully! Message ID: ${data.id}`);
 
-      await logIntegration("email", "success", options.to, options.subject, undefined, options.workspaceId);
+      await logIntegration(
+        "email",
+        "success",
+        options.to,
+        options.subject,
+        undefined,
+        options.workspaceId
+      );
 
       return true;
     } catch (error: unknown) {
@@ -104,7 +117,14 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
 
         const errorMsg = `Failed to send "${options.subject}" to ${options.to} after ${MAX_RETRIES} attempts`;
 
-        await logIntegration("email", "failed", options.to, options.subject, message, options.workspaceId);
+        await logIntegration(
+          "email",
+          "failed",
+          options.to,
+          options.subject,
+          message,
+          options.workspaceId
+        );
 
         if (options.workspaceId) {
           try {

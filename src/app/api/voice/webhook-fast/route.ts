@@ -91,16 +91,28 @@ export async function POST(req: NextRequest) {
     const processed = processVapiWebhook({
       type: type || "",
       call_id,
-      status: status as "queued" | "ringing" | "in-progress" | "completed" | "failed" | "no-answer" | "busy" | "cancelled" | undefined,
+      status: status as
+        | "queued"
+        | "ringing"
+        | "in-progress"
+        | "completed"
+        | "failed"
+        | "no-answer"
+        | "busy"
+        | "cancelled"
+        | undefined,
       duration,
       transcript,
       metadata,
     });
 
     const normalizedStatus = normalizeVoiceStatus(processed.status || status);
-    const direction = typeof body.direction === "string"
-      ? normalizeVoiceStatus(body.direction)
-      : contactPhone ? "OUTBOUND" : "INBOUND";
+    const direction =
+      typeof body.direction === "string"
+        ? normalizeVoiceStatus(body.direction)
+        : contactPhone
+          ? "OUTBOUND"
+          : "INBOUND";
 
     const criticalWrite = await prisma.voiceCall.upsert({
       where: { callSid: call_id },

@@ -50,10 +50,7 @@ export async function GET(req: Request) {
     });
   } catch (error) {
     console.error("[Cron:ProcessWebhooks] Error:", error);
-    return NextResponse.json(
-      { error: "Failed to process webhook jobs" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to process webhook jobs" }, { status: 500 });
   }
 }
 

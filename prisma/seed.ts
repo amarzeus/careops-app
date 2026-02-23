@@ -2,7 +2,6 @@ import { prisma } from "../src/lib/prisma";
 import bcrypt from "bcryptjs";
 
 async function main() {
-
   console.log("Seeding database...");
 
   // Create demo workspace
@@ -95,7 +94,8 @@ async function main() {
         { name: "phone", label: "Phone", type: "tel", required: false },
         { name: "message", label: "Message", type: "textarea", required: false },
       ]),
-      welcomeMessage: "Thank you for contacting Acme Health Clinic! We'll get back to you within 24 hours.",
+      welcomeMessage:
+        "Thank you for contacting Acme Health Clinic! We'll get back to you within 24 hours.",
       workspaceId: workspace.id,
     },
   });
@@ -329,7 +329,8 @@ async function main() {
       data: {
         name: "Welcome New Contact",
         trigger: "NEW_CONTACT",
-        messageTemplate: "Welcome to Acme Health Clinic! We're glad you reached out. How can we help you today?",
+        messageTemplate:
+          "Welcome to Acme Health Clinic! We're glad you reached out. How can we help you today?",
         isActive: true,
         workspaceId: workspace.id,
       },
@@ -347,7 +348,8 @@ async function main() {
       data: {
         name: "Booking Reminder",
         trigger: "BEFORE_BOOKING",
-        messageTemplate: "Reminder: You have an upcoming appointment. Please arrive 15 minutes early.",
+        messageTemplate:
+          "Reminder: You have an upcoming appointment. Please arrive 15 minutes early.",
         delayMinutes: 1440,
         isActive: true,
         workspaceId: workspace.id,
@@ -357,7 +359,8 @@ async function main() {
       data: {
         name: "Form Reminder",
         trigger: "FORM_PENDING",
-        messageTemplate: "You have a pending form that needs to be completed before your appointment.",
+        messageTemplate:
+          "You have a pending form that needs to be completed before your appointment.",
         isActive: true,
         workspaceId: workspace.id,
       },

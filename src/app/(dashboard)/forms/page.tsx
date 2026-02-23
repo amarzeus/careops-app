@@ -8,8 +8,21 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Header } from "@/components/layout/header";
 import { toast } from "@/hooks/use-toast";
 import { FormList } from "@/components/forms/form-list";
@@ -40,15 +53,17 @@ export default function FormsPage() {
   const [copied, setCopied] = useState("");
   const [deleting, setDeleting] = useState("");
 
-  useEffect(() => { fetchAll(); }, []);
+  useEffect(() => {
+    fetchAll();
+  }, []);
 
   const fetchAll = async () => {
     try {
       const [cf, inf, sub, svc] = await Promise.all([
-        fetch("/api/forms/contact-forms").then(r => r.json()),
-        fetch("/api/forms/intake-forms").then(r => r.json()),
-        fetch("/api/forms/submissions").then(r => r.json()),
-        fetch("/api/services").then(r => r.json()),
+        fetch("/api/forms/contact-forms").then((r) => r.json()),
+        fetch("/api/forms/intake-forms").then((r) => r.json()),
+        fetch("/api/forms/submissions").then((r) => r.json()),
+        fetch("/api/services").then((r) => r.json()),
       ]);
       setContactForms(cf.forms || []);
       setIntakeForms(inf.forms || []);
@@ -62,10 +77,16 @@ export default function FormsPage() {
   const createContactForm = async () => {
     if (!newCF.name) return;
     try {
-      const res = await fetch("/api/forms/contact-forms", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(newCF) });
+      const res = await fetch("/api/forms/contact-forms", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newCF),
+      });
       if (!res.ok) throw new Error("Failed to create contact form");
       toast({ title: "Success", description: "Contact form created", variant: "default" });
-      setCfDialog(false); setNewCF({ name: "", welcomeMessage: "" }); fetchAll();
+      setCfDialog(false);
+      setNewCF({ name: "", welcomeMessage: "" });
+      fetchAll();
     } catch (_error) {
       toast({ title: "Error", description: "Something went wrong", variant: "destructive" });
     }
@@ -74,10 +95,16 @@ export default function FormsPage() {
   const createIntakeForm = async () => {
     if (!newIF.name) return;
     try {
-      const res = await fetch("/api/forms/intake-forms", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(newIF) });
+      const res = await fetch("/api/forms/intake-forms", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newIF),
+      });
       if (!res.ok) throw new Error("Failed to create intake form");
       toast({ title: "Success", description: "Intake form created", variant: "default" });
-      setIfDialog(false); setNewIF({ name: "", description: "", serviceId: "" }); fetchAll();
+      setIfDialog(false);
+      setNewIF({ name: "", description: "", serviceId: "" });
+      fetchAll();
     } catch (_error) {
       toast({ title: "Error", description: "Something went wrong", variant: "destructive" });
     }
@@ -115,11 +142,17 @@ export default function FormsPage() {
     try {
       const res = await fetch(`/api/forms/${endpoint}/${id}`, { method: "DELETE" });
       if (!res.ok) throw new Error("Failed to delete form");
-      toast({ title: "Success", description: `${type === "contact" ? "Contact" : "Intake"} form deleted`, variant: "default" });
+      toast({
+        title: "Success",
+        description: `${type === "contact" ? "Contact" : "Intake"} form deleted`,
+        variant: "default",
+      });
       fetchAll();
     } catch (_error) {
       toast({ title: "Error", description: "Failed to delete form", variant: "destructive" });
-    } finally { setDeleting(""); }
+    } finally {
+      setDeleting("");
+    }
   };
 
   const resendForm = async (submissionId: string) => {
@@ -128,32 +161,34 @@ export default function FormsPage() {
     fetchAll();
   };
 
-  const pendingCount = submissions.filter(s => s.status === "PENDING" || s.status === "SENT").length;
-  const completedCount = submissions.filter(s => s.status === "COMPLETED").length;
-  const overdueCount = submissions.filter(s => s.status === "OVERDUE").length;
+  const pendingCount = submissions.filter(
+    (s) => s.status === "PENDING" || s.status === "SENT"
+  ).length;
+  const completedCount = submissions.filter((s) => s.status === "COMPLETED").length;
+  const overdueCount = submissions.filter((s) => s.status === "OVERDUE").length;
 
   return (
     <div className="flex min-h-full flex-col">
       <Header title="Forms" subtitle="Manage contact forms, intake forms, and submissions" />
       <div className="mx-auto w-full max-w-7xl flex-1 p-4 sm:p-6">
         {/* Summary Stats */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
           <Card>
             <CardContent className="p-4 text-center">
               <p className="text-2xl font-bold">{contactForms.length}</p>
-              <p className="text-xs text-muted-foreground">Contact Forms</p>
+              <p className="text-muted-foreground text-xs">Contact Forms</p>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="p-4 text-center">
               <p className="text-2xl font-bold">{intakeForms.length}</p>
-              <p className="text-xs text-muted-foreground">Intake Forms</p>
+              <p className="text-muted-foreground text-xs">Intake Forms</p>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="p-4 text-center">
               <p className="text-2xl font-bold text-yellow-600">{pendingCount}</p>
-              <p className="text-xs text-muted-foreground">Pending / Sent</p>
+              <p className="text-muted-foreground text-xs">Pending / Sent</p>
             </CardContent>
           </Card>
           <Card>
@@ -161,12 +196,12 @@ export default function FormsPage() {
               <div className="flex items-center justify-center gap-4">
                 <div>
                   <p className="text-2xl font-bold text-green-600">{completedCount}</p>
-                  <p className="text-xs text-muted-foreground">Completed</p>
+                  <p className="text-muted-foreground text-xs">Completed</p>
                 </div>
                 {overdueCount > 0 && (
                   <div>
                     <p className="text-2xl font-bold text-red-600">{overdueCount}</p>
-                    <p className="text-xs text-muted-foreground">Overdue</p>
+                    <p className="text-muted-foreground text-xs">Overdue</p>
                   </div>
                 )}
               </div>
@@ -175,7 +210,7 @@ export default function FormsPage() {
         </div>
 
         <Tabs defaultValue="contact-forms">
-          <div className="overflow-x-auto pb-2 -mb-2">
+          <div className="-mb-2 overflow-x-auto pb-2">
             <TabsList className="whitespace-nowrap">
               <TabsTrigger value="contact-forms">Contact Forms ({contactForms.length})</TabsTrigger>
               <TabsTrigger value="intake-forms">Intake Forms ({intakeForms.length})</TabsTrigger>
@@ -185,15 +220,46 @@ export default function FormsPage() {
 
           {/* Contact Forms Tab */}
           <TabsContent value="contact-forms">
-            <div className="flex justify-end mb-4 mt-4">
+            <div className="mt-4 mb-4 flex justify-end">
               <Dialog open={cfDialog} onOpenChange={setCfDialog}>
-                <DialogTrigger asChild><Button className="bg-primary hover:bg-primary/90"><Plus className="w-4 h-4 mr-2" />New Contact Form</Button></DialogTrigger>
+                <DialogTrigger asChild>
+                  <Button className="bg-primary hover:bg-primary/90">
+                    <Plus className="mr-2 h-4 w-4" />
+                    New Contact Form
+                  </Button>
+                </DialogTrigger>
                 <DialogContent>
-                  <DialogHeader><DialogTitle>Create Contact Form</DialogTitle><DialogDescription>This form will be publicly accessible for lead capture.</DialogDescription></DialogHeader>
+                  <DialogHeader>
+                    <DialogTitle>Create Contact Form</DialogTitle>
+                    <DialogDescription>
+                      This form will be publicly accessible for lead capture.
+                    </DialogDescription>
+                  </DialogHeader>
                   <div className="space-y-4">
-                    <div className="space-y-2"><Label>Form Name</Label><Input placeholder="Contact Us" value={newCF.name} onChange={e => setNewCF(p => ({ ...p, name: e.target.value }))} /></div>
-                    <div className="space-y-2"><Label>Welcome Message</Label><Textarea placeholder="Thank you for reaching out..." value={newCF.welcomeMessage} onChange={e => setNewCF(p => ({ ...p, welcomeMessage: e.target.value }))} /></div>
-                    <Button onClick={createContactForm} className="w-full bg-primary hover:bg-primary/90">Create Form</Button>
+                    <div className="space-y-2">
+                      <Label>Form Name</Label>
+                      <Input
+                        placeholder="Contact Us"
+                        value={newCF.name}
+                        onChange={(e) => setNewCF((p) => ({ ...p, name: e.target.value }))}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Welcome Message</Label>
+                      <Textarea
+                        placeholder="Thank you for reaching out..."
+                        value={newCF.welcomeMessage}
+                        onChange={(e) =>
+                          setNewCF((p) => ({ ...p, welcomeMessage: e.target.value }))
+                        }
+                      />
+                    </div>
+                    <Button
+                      onClick={createContactForm}
+                      className="bg-primary hover:bg-primary/90 w-full"
+                    >
+                      Create Form
+                    </Button>
                   </div>
                 </DialogContent>
               </Dialog>
@@ -212,22 +278,62 @@ export default function FormsPage() {
 
           {/* Intake Forms Tab */}
           <TabsContent value="intake-forms">
-            <div className="flex justify-end mb-4 mt-4">
+            <div className="mt-4 mb-4 flex justify-end">
               <Dialog open={ifDialog} onOpenChange={setIfDialog}>
-                <DialogTrigger asChild><Button className="bg-primary hover:bg-primary/90"><Plus className="w-4 h-4 mr-2" />New Intake Form</Button></DialogTrigger>
+                <DialogTrigger asChild>
+                  <Button className="bg-primary hover:bg-primary/90">
+                    <Plus className="mr-2 h-4 w-4" />
+                    New Intake Form
+                  </Button>
+                </DialogTrigger>
                 <DialogContent>
-                  <DialogHeader><DialogTitle>Create Intake Form</DialogTitle><DialogDescription>This form is sent after a booking is made.</DialogDescription></DialogHeader>
+                  <DialogHeader>
+                    <DialogTitle>Create Intake Form</DialogTitle>
+                    <DialogDescription>
+                      This form is sent after a booking is made.
+                    </DialogDescription>
+                  </DialogHeader>
                   <div className="space-y-4">
-                    <div className="space-y-2"><Label>Form Name</Label><Input placeholder="Patient Intake" value={newIF.name} onChange={e => setNewIF(p => ({ ...p, name: e.target.value }))} /></div>
-                    <div className="space-y-2"><Label>Description</Label><Textarea placeholder="Please complete before your visit..." value={newIF.description} onChange={e => setNewIF(p => ({ ...p, description: e.target.value }))} /></div>
+                    <div className="space-y-2">
+                      <Label>Form Name</Label>
+                      <Input
+                        placeholder="Patient Intake"
+                        value={newIF.name}
+                        onChange={(e) => setNewIF((p) => ({ ...p, name: e.target.value }))}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Description</Label>
+                      <Textarea
+                        placeholder="Please complete before your visit..."
+                        value={newIF.description}
+                        onChange={(e) => setNewIF((p) => ({ ...p, description: e.target.value }))}
+                      />
+                    </div>
                     <div className="space-y-2">
                       <Label>Link to Service (optional)</Label>
-                      <Select value={newIF.serviceId} onValueChange={v => setNewIF(p => ({ ...p, serviceId: v }))}>
-                        <SelectTrigger><SelectValue placeholder="Select service" /></SelectTrigger>
-                        <SelectContent>{services.map(s => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}</SelectContent>
+                      <Select
+                        value={newIF.serviceId}
+                        onValueChange={(v) => setNewIF((p) => ({ ...p, serviceId: v }))}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select service" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {services.map((s) => (
+                            <SelectItem key={s.id} value={s.id}>
+                              {s.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
                       </Select>
                     </div>
-                    <Button onClick={createIntakeForm} className="w-full bg-primary hover:bg-primary/90">Create Form</Button>
+                    <Button
+                      onClick={createIntakeForm}
+                      className="bg-primary hover:bg-primary/90 w-full"
+                    >
+                      Create Form
+                    </Button>
                   </div>
                 </DialogContent>
               </Dialog>
@@ -248,7 +354,10 @@ export default function FormsPage() {
           <TabsContent value="submissions">
             <SubmissionList
               submissions={submissions}
-              onSelect={(sub) => { setSelectedSubmission(sub); setSubmissionDetailOpen(true); }}
+              onSelect={(sub) => {
+                setSelectedSubmission(sub);
+                setSubmissionDetailOpen(true);
+              }}
               onUpdateStatus={updateSubmissionStatus}
               onResend={resendForm}
             />

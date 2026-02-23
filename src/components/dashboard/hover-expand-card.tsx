@@ -6,15 +6,15 @@ import { LucideIcon } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface HoverExpandCardProps {
-    title: string;
-    icon: LucideIcon;
-    count?: number;
-    countLabel?: string;
-    children: React.ReactNode;
-    className?: string;
-    headerColorClass?: string;
-    iconColorClass?: string;
-    previewText?: string; // Text to show in collapsed state
+  title: string;
+  icon: LucideIcon;
+  count?: number;
+  countLabel?: string;
+  children: React.ReactNode;
+  className?: string;
+  headerColorClass?: string;
+  iconColorClass?: string;
+  previewText?: string; // Text to show in collapsed state
 }
 
 /**
@@ -31,88 +31,101 @@ interface HoverExpandCardProps {
  * @param root0.previewText
  */
 export function HoverExpandCard({
-    title,
-    icon: Icon,
-    count,
-    countLabel,
-    children,
-    className,
-    headerColorClass = "text-foreground",
-    iconColorClass = "text-muted-foreground",
-    previewText
+  title,
+  icon: Icon,
+  count,
+  countLabel,
+  children,
+  className,
+  headerColorClass = "text-foreground",
+  iconColorClass = "text-muted-foreground",
+  previewText,
 }: HoverExpandCardProps) {
-    const [isHovered, setIsHovered] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
-    return (
-        // Height placeholder to reserve space in the grid
-        <div
-            className={cn("relative h-[72px] z-10 hover:z-50", className)}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-        >
-            <motion.div
-                layout
-                initial={false}
-                animate={{
-                    height: isHovered ? "auto" : 72,
-                    boxShadow: isHovered ? "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)" : "0 1px 2px 0 rgb(0 0 0 / 0.05)"
-                }}
-                transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                className={cn(
-                    "absolute inset-x-0 top-0 border bg-background rounded-xl overflow-hidden",
-                    // We handle height and shadow via motion, but keep base styles
-                )}
+  return (
+    // Height placeholder to reserve space in the grid
+    <div
+      className={cn("relative z-10 h-[72px] hover:z-50", className)}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <motion.div
+        layout
+        initial={false}
+        animate={{
+          height: isHovered ? "auto" : 72,
+          boxShadow: isHovered
+            ? "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)"
+            : "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+        }}
+        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        className={cn(
+          "bg-background absolute inset-x-0 top-0 overflow-hidden rounded-xl border"
+          // We handle height and shadow via motion, but keep base styles
+        )}
+      >
+        <div className="flex h-[72px] flex-row items-center justify-between space-y-0 p-4">
+          <div className={cn("flex items-center gap-2 text-sm font-semibold", headerColorClass)}>
+            <div
+              className={cn(
+                "bg-opacity-10 rounded-md p-1.5",
+                iconColorClass.replace("text-", "bg-")
+              )}
             >
-                <div className="p-4 h-[72px] flex flex-row items-center justify-between space-y-0">
-                    <div className={cn("text-sm font-semibold flex items-center gap-2", headerColorClass)}>
-                        <div className={cn("p-1.5 rounded-md bg-opacity-10", iconColorClass.replace('text-', 'bg-'))}>
-                            <Icon className={cn("w-4 h-4", iconColorClass)} />
-                        </div>
-                        {title}
-                    </div>
+              <Icon className={cn("h-4 w-4", iconColorClass)} />
+            </div>
+            {title}
+          </div>
 
-                    {count !== undefined && (
-                        <div className="flex items-center gap-2">
-                            <AnimatePresence>
-                                {(!isHovered && previewText) && (
-                                    <motion.span
-                                        initial={{ opacity: 0, width: 0 }}
-                                        animate={{ opacity: 1, width: "auto" }}
-                                        exit={{ opacity: 0, width: 0 }}
-                                        className="text-xs text-muted-foreground hidden sm:inline-block font-normal truncate max-w-[100px] whitespace-nowrap overflow-hidden"
-                                    >
-                                        {previewText}
-                                    </motion.span>
-                                )}
-                            </AnimatePresence>
-                            <span className={cn(
-                                "text-xs font-bold px-2 py-0.5 rounded-full transition-colors",
-                                count > 0
-                                    ? (iconColorClass.includes('red') ? "bg-red-50 text-red-600" :
-                                        iconColorClass.includes('amber') ? "bg-amber-50 text-amber-600" :
-                                            iconColorClass.includes('violet') ? "bg-violet-50 text-violet-600" : "bg-muted/30 text-muted-foreground")
-                                    : "bg-emerald-50 text-emerald-600"
-                            )}>
-                                {countLabel || count}
-                            </span>
-                        </div>
-                    )}
-                </div>
-
-                <AnimatePresence>
-                    {isHovered && (
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            transition={{ duration: 0.2 }}
-                            className="px-4 pb-4"
-                        >
-                            {children}
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-            </motion.div>
+          {count !== undefined && (
+            <div className="flex items-center gap-2">
+              <AnimatePresence>
+                {!isHovered && previewText && (
+                  <motion.span
+                    initial={{ opacity: 0, width: 0 }}
+                    animate={{ opacity: 1, width: "auto" }}
+                    exit={{ opacity: 0, width: 0 }}
+                    className="text-muted-foreground hidden max-w-[100px] truncate overflow-hidden text-xs font-normal whitespace-nowrap sm:inline-block"
+                  >
+                    {previewText}
+                  </motion.span>
+                )}
+              </AnimatePresence>
+              <span
+                className={cn(
+                  "rounded-full px-2 py-0.5 text-xs font-bold transition-colors",
+                  count > 0
+                    ? iconColorClass.includes("red")
+                      ? "bg-red-50 text-red-600"
+                      : iconColorClass.includes("amber")
+                        ? "bg-amber-50 text-amber-600"
+                        : iconColorClass.includes("violet")
+                          ? "bg-violet-50 text-violet-600"
+                          : "bg-muted/30 text-muted-foreground"
+                    : "bg-emerald-50 text-emerald-600"
+                )}
+              >
+                {countLabel || count}
+              </span>
+            </div>
+          )}
         </div>
-    );
+
+        <AnimatePresence>
+          {isHovered && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="px-4 pb-4"
+            >
+              {children}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
+    </div>
+  );
 }

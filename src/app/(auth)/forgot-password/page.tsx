@@ -40,7 +40,7 @@ export default function ForgotPasswordPage() {
         body: JSON.stringify({
           method,
           email: method === "email" ? email : undefined,
-          phone: method === "sms" ? phone : undefined
+          phone: method === "sms" ? phone : undefined,
         }),
       });
 
@@ -83,7 +83,7 @@ export default function ForgotPasswordPage() {
           email: method === "email" ? email : undefined,
           phone: method === "sms" ? phone : undefined,
           otp,
-          newPassword
+          newPassword,
         }),
       });
 
@@ -101,10 +101,10 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-muted/30 px-4 py-12">
-      <Card className="w-full max-w-md shadow-lg border-blue-100">
-        <CardHeader className="text-center pb-2">
-          <div className="flex justify-center mb-6">
+    <div className="bg-muted/30 flex min-h-screen items-center justify-center px-4 py-12">
+      <Card className="w-full max-w-md border-blue-100 shadow-lg">
+        <CardHeader className="pb-2 text-center">
+          <div className="mb-6 flex justify-center">
             <Link href="/">
               <Logo variant="full" size={42} />
             </Link>
@@ -124,53 +124,57 @@ export default function ForgotPasswordPage() {
         </CardHeader>
         <CardContent className="pt-6">
           {error && (
-            <div className="mb-4 p-3 bg-red-50 text-red-700 text-sm rounded-lg border border-red-100 animate-in fade-in slide-in-from-top-1">
+            <div className="animate-in fade-in slide-in-from-top-1 mb-4 rounded-lg border border-red-100 bg-red-50 p-3 text-sm text-red-700">
               {error}
             </div>
           )}
 
           {step === "request" && (
             <Tabs defaultValue="email" onValueChange={(v) => setMethod(v as "email" | "sms")}>
-              <TabsList className="grid w-full grid-cols-2 mb-6">
+              <TabsList className="mb-6 grid w-full grid-cols-2">
                 <TabsTrigger value="email" className="flex items-center gap-2">
-                  <Mail className="w-4 h-4" /> Email
+                  <Mail className="h-4 w-4" /> Email
                 </TabsTrigger>
                 <TabsTrigger value="sms" className="flex items-center gap-2">
-                  <Phone className="w-4 h-4" /> SMS
+                  <Phone className="h-4 w-4" /> SMS
                 </TabsTrigger>
               </TabsList>
 
               <form onSubmit={handleRequest} className="space-y-4">
-                <TabsContent value="email" className="space-y-4 mt-0">
+                <TabsContent value="email" className="mt-0 space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="email" className="text-sm font-semibold">Email Address</Label>
+                    <Label htmlFor="email" className="text-sm font-semibold">
+                      Email Address
+                    </Label>
                     <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      <Mail className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
                       <Input
                         id="email"
                         type="email"
                         placeholder="name@company.com"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="pl-10 h-11 focus-visible:ring-blue-500"
+                        className="h-11 pl-10 focus-visible:ring-blue-500"
                         required={method === "email"}
                       />
                     </div>
                   </div>
                 </TabsContent>
 
-                <TabsContent value="sms" className="space-y-4 mt-0">
+                <TabsContent value="sms" className="mt-0 space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="phone" className="text-sm font-semibold">Phone Number</Label>
+                    <Label htmlFor="phone" className="text-sm font-semibold">
+                      Phone Number
+                    </Label>
                     <div className="relative">
-                      <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      <Phone className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
                       <Input
                         id="phone"
                         type="tel"
                         placeholder="+1 (555) 000-0000"
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
-                        className="pl-10 h-11 focus-visible:ring-blue-500"
+                        className="h-11 pl-10 focus-visible:ring-blue-500"
                         required={method === "sms"}
                       />
                     </div>
@@ -179,12 +183,12 @@ export default function ForgotPasswordPage() {
 
                 <Button
                   type="submit"
-                  className="w-full bg-primary hover:bg-primary/90 h-11 transition-all shadow-sm"
+                  className="bg-primary hover:bg-primary/90 h-11 w-full shadow-sm transition-all"
                   disabled={loading}
                 >
                   {loading ? (
                     <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
                       Sending...
                     </div>
                   ) : (
@@ -198,7 +202,9 @@ export default function ForgotPasswordPage() {
           {step === "verify" && (
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="otp" className="text-sm font-semibold text-center block">Verification Code</Label>
+                <Label htmlFor="otp" className="block text-center text-sm font-semibold">
+                  Verification Code
+                </Label>
                 <Input
                   id="otp"
                   type="text"
@@ -210,23 +216,23 @@ export default function ForgotPasswordPage() {
                     setOtp(val);
                     if (val.length === 6) setStep("reset");
                   }}
-                  className="text-center text-2xl tracking-[0.5em] font-bold h-14 border-2 focus-visible:border-blue-500 focus-visible:ring-blue-500"
+                  className="h-14 border-2 text-center text-2xl font-bold tracking-[0.5em] focus-visible:border-blue-500 focus-visible:ring-blue-500"
                 />
               </div>
               <div className="flex flex-col items-center gap-2">
-                <p className="text-center text-xs text-muted-foreground">
+                <p className="text-muted-foreground text-center text-xs">
                   Didn&apos;t get the code?{" "}
                   <button
                     type="button"
                     onClick={handleRequest}
                     disabled={loading}
-                    className="text-primary hover:underline font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="text-primary font-medium hover:underline disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {loading ? "Sending..." : "Resend"}
                   </button>
                 </p>
                 {message && (
-                  <p className="text-[10px] text-green-600 font-medium animate-in fade-in">
+                  <p className="animate-in fade-in text-[10px] font-medium text-green-600">
                     {message}
                   </p>
                 )}
@@ -234,7 +240,7 @@ export default function ForgotPasswordPage() {
               <Button
                 onClick={() => setStep("reset")}
                 disabled={otp.length !== 6}
-                className="w-full bg-primary hover:bg-primary/90 h-11 shadow-sm"
+                className="bg-primary hover:bg-primary/90 h-11 w-full shadow-sm"
               >
                 Verify Code
               </Button>
@@ -246,19 +252,19 @@ export default function ForgotPasswordPage() {
               <div className="space-y-2">
                 <Label htmlFor="newPassword">New Password</Label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Lock className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
                   <Input
                     id="newPassword"
                     type={showPassword ? "text" : "password"}
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    className="pl-10 pr-10"
+                    className="pr-10 pl-10"
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-muted-foreground"
+                    className="text-muted-foreground hover:text-muted-foreground absolute top-1/2 right-3 -translate-y-1/2"
                   >
                     {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
@@ -267,7 +273,7 @@ export default function ForgotPasswordPage() {
               <div className="space-y-2">
                 <Label htmlFor="confirmPassword">Confirm Password</Label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Lock className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
                   <Input
                     id="confirmPassword"
                     type={showPassword ? "text" : "password"}
@@ -280,7 +286,7 @@ export default function ForgotPasswordPage() {
               </div>
               <Button
                 type="submit"
-                className="w-full bg-primary hover:bg-primary/90 h-11 shadow-sm"
+                className="bg-primary hover:bg-primary/90 h-11 w-full shadow-sm"
                 disabled={loading}
               >
                 {loading ? "Resetting..." : "Reset Password"}
@@ -289,9 +295,9 @@ export default function ForgotPasswordPage() {
           )}
 
           {step === "success" && (
-            <div className="text-center space-y-6">
-              <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto border-2 border-green-100 shadow-sm">
-                <ShieldCheck className="w-10 h-10 text-green-600 animate-in zoom-in duration-300" />
+            <div className="space-y-6 text-center">
+              <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full border-2 border-green-100 bg-green-50 shadow-sm">
+                <ShieldCheck className="animate-in zoom-in h-10 w-10 text-green-600 duration-300" />
               </div>
               <div className="space-y-2">
                 <p className="text-muted-foreground">
@@ -299,7 +305,7 @@ export default function ForgotPasswordPage() {
                 </p>
               </div>
               <Link href="/login" className="block">
-                <Button className="w-full bg-primary hover:bg-primary/90 h-11 shadow-md">
+                <Button className="bg-primary hover:bg-primary/90 h-11 w-full shadow-md">
                   Sign In Now
                 </Button>
               </Link>
@@ -307,12 +313,12 @@ export default function ForgotPasswordPage() {
           )}
 
           {step !== "success" && (
-            <div className="mt-8 pt-6 border-t border-border/40 text-center">
+            <div className="border-border/40 mt-8 border-t pt-6 text-center">
               <Link
                 href="/login"
-                className="text-sm text-muted-foreground hover:text-primary inline-flex items-center font-medium transition-colors"
+                className="text-muted-foreground hover:text-primary inline-flex items-center text-sm font-medium transition-colors"
               >
-                <ArrowLeft className="w-4 h-4 mr-2" /> Back to Sign In
+                <ArrowLeft className="mr-2 h-4 w-4" /> Back to Sign In
               </Link>
             </div>
           )}

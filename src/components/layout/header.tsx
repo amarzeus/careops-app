@@ -1,7 +1,19 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { Bell, Search, X, Clock, Calendar, Package, MessageSquare, FileText, Zap, ExternalLink, CheckCheck } from "lucide-react";
+import {
+  Bell,
+  Search,
+  X,
+  Clock,
+  Calendar,
+  Package,
+  MessageSquare,
+  FileText,
+  Zap,
+  ExternalLink,
+  CheckCheck,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -62,7 +74,9 @@ export function Header({ title, subtitle, children }: HeaderProps) {
   const router = useRouter();
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState<{ type: string; label: string; href: string }[]>([]);
+  const [searchResults, setSearchResults] = useState<
+    { type: string; label: string; href: string }[]
+  >([]);
 
   const [bellOpen, setBellOpen] = useState(false);
   const [alerts, setAlerts] = useState<AlertItem[]>([]);
@@ -134,15 +148,60 @@ export function Header({ title, subtitle, children }: HeaderProps) {
 
     const q = searchQuery.toLowerCase();
     const pages = [
-      { type: "page", label: "Dashboard", href: "/dashboard", keywords: ["dashboard", "home", "overview", "metrics"] },
-      { type: "page", label: "Inbox", href: "/inbox", keywords: ["inbox", "messages", "conversations", "chat", "reply"] },
-      { type: "page", label: "Bookings", href: "/bookings", keywords: ["bookings", "appointments", "schedule", "calendar"] },
-      { type: "page", label: "Forms", href: "/forms", keywords: ["forms", "intake", "contact", "submissions"] },
-      { type: "page", label: "Inventory", href: "/inventory", keywords: ["inventory", "stock", "supplies", "items"] },
-      { type: "page", label: "Voice Calls", href: "/voice/calls", keywords: ["voice", "calls", "vapi", "escalation", "transcript"] },
-      { type: "page", label: "Staff", href: "/staff", keywords: ["staff", "team", "members", "permissions"] },
-      { type: "page", label: "Automation", href: "/automation", keywords: ["automation", "rules", "triggers", "workflows"] },
-      { type: "page", label: "Settings", href: "/settings", keywords: ["settings", "workspace", "profile", "security", "export"] },
+      {
+        type: "page",
+        label: "Dashboard",
+        href: "/dashboard",
+        keywords: ["dashboard", "home", "overview", "metrics"],
+      },
+      {
+        type: "page",
+        label: "Inbox",
+        href: "/inbox",
+        keywords: ["inbox", "messages", "conversations", "chat", "reply"],
+      },
+      {
+        type: "page",
+        label: "Bookings",
+        href: "/bookings",
+        keywords: ["bookings", "appointments", "schedule", "calendar"],
+      },
+      {
+        type: "page",
+        label: "Forms",
+        href: "/forms",
+        keywords: ["forms", "intake", "contact", "submissions"],
+      },
+      {
+        type: "page",
+        label: "Inventory",
+        href: "/inventory",
+        keywords: ["inventory", "stock", "supplies", "items"],
+      },
+      {
+        type: "page",
+        label: "Voice Calls",
+        href: "/voice/calls",
+        keywords: ["voice", "calls", "vapi", "escalation", "transcript"],
+      },
+      {
+        type: "page",
+        label: "Staff",
+        href: "/staff",
+        keywords: ["staff", "team", "members", "permissions"],
+      },
+      {
+        type: "page",
+        label: "Automation",
+        href: "/automation",
+        keywords: ["automation", "rules", "triggers", "workflows"],
+      },
+      {
+        type: "page",
+        label: "Settings",
+        href: "/settings",
+        keywords: ["settings", "workspace", "profile", "security", "export"],
+      },
     ];
 
     const matches = pages.filter(
@@ -171,10 +230,12 @@ export function Header({ title, subtitle, children }: HeaderProps) {
 
   return (
     <header className="sticky top-0 z-30 border-b border-[var(--border)] bg-[var(--background)]/80 backdrop-blur-md transition-all duration-200">
-      <div className="flex items-center justify-between py-3 pl-4 pr-4 sm:py-3.5 sm:pl-6 sm:pr-6 lg:pl-6">
-        <div className="flex-1 min-w-0 mr-4">
-          <h1 className="text-xl sm:text-2xl font-bold text-foreground truncate">{title}</h1>
-          {subtitle && <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 truncate">{subtitle}</p>}
+      <div className="flex items-center justify-between py-3 pr-4 pl-4 sm:py-3.5 sm:pr-6 sm:pl-6 lg:pl-6">
+        <div className="mr-4 min-w-0 flex-1">
+          <h1 className="text-foreground truncate text-xl font-bold sm:text-2xl">{title}</h1>
+          {subtitle && (
+            <p className="text-muted-foreground mt-0.5 truncate text-xs sm:text-sm">{subtitle}</p>
+          )}
         </div>
         <div className="flex items-center gap-3">
           {children}
@@ -182,9 +243,9 @@ export function Header({ title, subtitle, children }: HeaderProps) {
           {/* Global Search - Desktop & Mobile Toggle */}
           <div className="relative" ref={searchRef}>
             <div className="hidden md:block">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
               <Input
-                className="pl-9 w-64 bg-muted/30 h-9"
+                className="bg-muted/30 h-9 w-64 pl-9"
                 placeholder="Search..."
                 value={searchQuery}
                 onChange={(e) => {
@@ -195,10 +256,13 @@ export function Header({ title, subtitle, children }: HeaderProps) {
               />
               {searchQuery && (
                 <button
-                  onClick={() => { setSearchQuery(""); setSearchResults([]); }}
-                  className="absolute right-3 top-1/2 -translate-y-1/2"
+                  onClick={() => {
+                    setSearchQuery("");
+                    setSearchResults([]);
+                  }}
+                  className="absolute top-1/2 right-3 -translate-y-1/2"
                 >
-                  <X className="w-3 h-3 text-muted-foreground hover:text-muted-foreground" />
+                  <X className="text-muted-foreground hover:text-muted-foreground h-3 w-3" />
                 </button>
               )}
             </div>
@@ -209,31 +273,36 @@ export function Header({ title, subtitle, children }: HeaderProps) {
               className="md:hidden"
               onClick={() => setSearchOpen(!searchOpen)}
             >
-              <Search className="w-5 h-5 text-muted-foreground" />
+              <Search className="text-muted-foreground h-5 w-5" />
             </Button>
 
             {/* Search Results Dropdown / Mobile Search Bar */}
             {searchOpen && (
-              <div className={cn(
-                "absolute top-full mt-2 bg-background border border-border/40 rounded-lg shadow-lg overflow-hidden z-50",
-                "right-0 md:left-0 md:right-auto w-[calc(100vw-2rem)] md:w-80 max-w-sm"
-              )}>
-                <div className="p-2 md:hidden border-b">
+              <div
+                className={cn(
+                  "bg-background border-border/40 absolute top-full z-50 mt-2 overflow-hidden rounded-lg border shadow-lg",
+                  "right-0 w-[calc(100vw-2rem)] max-w-sm md:right-auto md:left-0 md:w-80"
+                )}
+              >
+                <div className="border-b p-2 md:hidden">
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
                     <Input
                       autoFocus
-                      className="pl-9 bg-muted/30 h-10"
+                      className="bg-muted/30 h-10 pl-9"
                       placeholder="Search..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                     />
                     {searchQuery && (
                       <button
-                        onClick={() => { setSearchQuery(""); setSearchResults([]); }}
-                        className="absolute right-3 top-1/2 -translate-y-1/2"
+                        onClick={() => {
+                          setSearchQuery("");
+                          setSearchResults([]);
+                        }}
+                        className="absolute top-1/2 right-3 -translate-y-1/2"
                       >
-                        <X className="w-4 h-4 text-muted-foreground hover:text-muted-foreground" />
+                        <X className="text-muted-foreground hover:text-muted-foreground h-4 w-4" />
                       </button>
                     )}
                   </div>
@@ -243,22 +312,22 @@ export function Header({ title, subtitle, children }: HeaderProps) {
                   {searchResults.map((result, i) => (
                     <button
                       key={i}
-                      className="w-full text-left px-4 py-3 hover:bg-muted/30 flex items-center gap-3 text-sm transition-colors border-b last:border-0"
+                      className="hover:bg-muted/30 flex w-full items-center gap-3 border-b px-4 py-3 text-left text-sm transition-colors last:border-0"
                       onClick={() => navigateTo(result.href)}
                     >
                       {result.type === "alert" ? (
-                        <Bell className="w-4 h-4 text-amber-500 shrink-0" />
+                        <Bell className="h-4 w-4 shrink-0 text-amber-500" />
                       ) : (
-                        <ExternalLink className="w-4 h-4 text-muted-foreground shrink-0" />
+                        <ExternalLink className="text-muted-foreground h-4 w-4 shrink-0" />
                       )}
                       <span className="truncate">{result.label}</span>
-                      <Badge variant="secondary" className="ml-auto text-[10px] shrink-0">
+                      <Badge variant="secondary" className="ml-auto shrink-0 text-[10px]">
                         {result.type}
                       </Badge>
                     </button>
                   ))}
                   {searchQuery && searchResults.length === 0 && (
-                    <div className="p-6 text-center text-sm text-muted-foreground">
+                    <div className="text-muted-foreground p-6 text-center text-sm">
                       No results for &quot;{searchQuery}&quot;
                     </div>
                   )}
@@ -278,9 +347,9 @@ export function Header({ title, subtitle, children }: HeaderProps) {
                 if (!bellOpen) fetchAlerts();
               }}
             >
-              <Bell className="w-5 h-5 text-muted-foreground" />
+              <Bell className="text-muted-foreground h-5 w-5" />
               {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center animate-pulse">
+                <span className="absolute -top-1 -right-1 flex h-5 w-5 animate-pulse items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
                   {unreadCount > 9 ? "9+" : unreadCount}
                 </span>
               )}
@@ -288,30 +357,30 @@ export function Header({ title, subtitle, children }: HeaderProps) {
 
             {/* Alerts Dropdown */}
             {bellOpen && (
-              <div className="absolute right-0 top-full mt-2 w-screen max-w-sm sm:w-96 bg-background border border-border/40 rounded-xl shadow-xl z-50 overflow-hidden">
-                <div className="flex items-center justify-between px-4 py-3 border-b bg-muted/30/50">
-                  <h3 className="font-semibold text-sm text-foreground">Notifications</h3>
+              <div className="bg-background border-border/40 absolute top-full right-0 z-50 mt-2 w-screen max-w-sm overflow-hidden rounded-xl border shadow-xl sm:w-96">
+                <div className="bg-muted/30/50 flex items-center justify-between border-b px-4 py-3">
+                  <h3 className="text-foreground text-sm font-semibold">Notifications</h3>
                   {unreadCount > 0 && (
                     <button
                       onClick={markAllRead}
-                      className="text-xs text-primary hover:text-primary/90 font-medium flex items-center gap-1"
+                      className="text-primary hover:text-primary/90 flex items-center gap-1 text-xs font-medium"
                     >
-                      <CheckCheck className="w-3 h-3" /> Mark all read
+                      <CheckCheck className="h-3 w-3" /> Mark all read
                     </button>
                   )}
                 </div>
 
                 <ScrollArea className="max-h-96">
                   {loadingAlerts ? (
-                    <div className="p-4 space-y-3">
+                    <div className="space-y-3 p-4">
                       {[...Array(3)].map((_, i) => (
-                        <div key={i} className="h-12 bg-muted/30 rounded animate-pulse" />
+                        <div key={i} className="bg-muted/30 h-12 animate-pulse rounded" />
                       ))}
                     </div>
                   ) : alerts.length === 0 ? (
                     <div className="p-8 text-center">
-                      <Bell className="w-8 h-8 text-gray-200 mx-auto mb-2" />
-                      <p className="text-sm text-muted-foreground">No notifications yet</p>
+                      <Bell className="mx-auto mb-2 h-8 w-8 text-gray-200" />
+                      <p className="text-muted-foreground text-sm">No notifications yet</p>
                     </div>
                   ) : (
                     <div className="divide-y divide-gray-100">
@@ -322,7 +391,7 @@ export function Header({ title, subtitle, children }: HeaderProps) {
                           <button
                             key={alert.id}
                             className={cn(
-                              "w-full text-left px-4 py-3 hover:bg-muted/30 transition-colors flex items-start gap-3",
+                              "hover:bg-muted/30 flex w-full items-start gap-3 px-4 py-3 text-left transition-colors",
                               !alert.isRead && "bg-blue-50/40"
                             )}
                             onClick={() => {
@@ -331,20 +400,27 @@ export function Header({ title, subtitle, children }: HeaderProps) {
                             }}
                           >
                             <div className={cn("mt-0.5 shrink-0", config.color)}>
-                              <Icon className="w-4 h-4" />
+                              <Icon className="h-4 w-4" />
                             </div>
-                            <div className="flex-1 min-w-0">
+                            <div className="min-w-0 flex-1">
                               <div className="flex items-center gap-2">
-                                <p className={cn("text-sm font-medium truncate", !alert.isRead ? "text-foreground" : "text-muted-foreground")}>
+                                <p
+                                  className={cn(
+                                    "truncate text-sm font-medium",
+                                    !alert.isRead ? "text-foreground" : "text-muted-foreground"
+                                  )}
+                                >
                                   {alert.title}
                                 </p>
                                 {!alert.isRead && (
-                                  <div className="w-2 h-2 bg-blue-500 rounded-full shrink-0" />
+                                  <div className="h-2 w-2 shrink-0 rounded-full bg-blue-500" />
                                 )}
                               </div>
-                              <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{alert.message}</p>
-                              <p className="text-[10px] text-muted-foreground mt-1 flex items-center gap-1">
-                                <Clock className="w-2.5 h-2.5" />
+                              <p className="text-muted-foreground mt-0.5 line-clamp-2 text-xs">
+                                {alert.message}
+                              </p>
+                              <p className="text-muted-foreground mt-1 flex items-center gap-1 text-[10px]">
+                                <Clock className="h-2.5 w-2.5" />
                                 {getRelativeTime(alert.createdAt)}
                               </p>
                             </div>

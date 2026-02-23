@@ -52,7 +52,7 @@ const handlers: Record<string, ToolHandler> = {
     }
 
     const service = await prisma.service.findFirst({
-      where: { id: serviceId, workspaceId }
+      where: { id: serviceId, workspaceId },
     });
     if (!service) {
       return { error: "Service not found" };
@@ -103,9 +103,9 @@ const handlers: Record<string, ToolHandler> = {
 
     const bookingLimit = await checkUsageLimit(workspaceId, "bookings");
     if (!bookingLimit.allowed) {
-      return { 
+      return {
         error: `Booking limit reached. Used: ${bookingLimit.used}/${bookingLimit.limit}. Please upgrade your plan.`,
-        action: "upgrade_required"
+        action: "upgrade_required",
       };
     }
 
@@ -306,8 +306,14 @@ const handlers: Record<string, ToolHandler> = {
       take: 20,
     });
 
-    const starts = services.map((service) => service.startTime).filter(Boolean).sort();
-    const ends = services.map((service) => service.endTime).filter(Boolean).sort();
+    const starts = services
+      .map((service) => service.startTime)
+      .filter(Boolean)
+      .sort();
+    const ends = services
+      .map((service) => service.endTime)
+      .filter(Boolean)
+      .sort();
 
     const openTime = starts[0] || "09:00";
     const closeTime = ends[ends.length - 1] || "17:00";
@@ -326,17 +332,20 @@ const handlers: Record<string, ToolHandler> = {
 export async function POST(req: Request) {
   try {
     const workspaceId = req.headers.get("X-Workspace-Id");
-    
+
     if (!workspaceId) {
       return NextResponse.json({ error: "Missing workspace context" }, { status: 400 });
     }
 
     const entitlement = await checkUsageLimit(workspaceId, "voice_minutes");
     if (!entitlement.allowed && entitlement.limit !== -1) {
-      return NextResponse.json({ 
-        error: `Voice minutes limit exceeded. Used: ${entitlement.used}/${entitlement.limit}. Please upgrade.`,
-        action: "upgrade_required"
-      }, { status: 402 });
+      return NextResponse.json(
+        {
+          error: `Voice minutes limit exceeded. Used: ${entitlement.used}/${entitlement.limit}. Please upgrade.`,
+          action: "upgrade_required",
+        },
+        { status: 402 }
+      );
     }
 
     const body = (await req.json()) as {
@@ -365,12 +374,12 @@ export async function POST(req: Request) {
       const parsedArgs: ToolParams =
         typeof rawArgs === "string"
           ? (() => {
-            try {
-              return JSON.parse(rawArgs) as ToolParams;
-            } catch {
-              return {};
-            }
-          })()
+              try {
+                return JSON.parse(rawArgs) as ToolParams;
+              } catch {
+                return {};
+              }
+            })()
           : (rawArgs as ToolParams) || {};
 
       const handler = handlers[toolName];

@@ -162,7 +162,7 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen space-y-6 bg-muted/30/50 p-4 lg:p-6">
+      <div className="bg-muted/30/50 min-h-screen space-y-6 p-4 lg:p-6">
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {[...Array(3)].map((_, i) => (
             <Skeleton key={i} className="h-40 rounded-xl sm:h-48" />
@@ -206,9 +206,9 @@ export default function DashboardPage() {
   return (
     <div className="flex min-h-full flex-col">
       <Header title="Dashboard" subtitle="Overview of your business performance">
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+        <div className="text-muted-foreground flex items-center gap-2 text-xs">
           {refreshing ? (
-            <Sparkles className="h-3.5 w-3.5 animate-pulse text-primary" />
+            <Sparkles className="text-primary h-3.5 w-3.5 animate-pulse" />
           ) : (
             <Clock className="h-3.5 w-3.5" />
           )}
@@ -223,7 +223,7 @@ export default function DashboardPage() {
           <Link href="/bookings">
             <Button
               size="sm"
-              className="h-8 gap-2 bg-primary text-xs text-white hover:bg-primary/90"
+              className="bg-primary hover:bg-primary/90 h-8 gap-2 text-xs text-white"
             >
               <Plus className="h-3.5 w-3.5" /> New Booking
             </Button>
@@ -312,7 +312,7 @@ export default function DashboardPage() {
                   <button
                     key={i}
                     onClick={() => alert.link && router.push(alert.link)}
-                    className="group/item flex w-full items-start gap-3 rounded-lg border bg-background p-2.5 text-left transition-colors hover:bg-muted/30"
+                    className="group/item bg-background hover:bg-muted/30 flex w-full items-start gap-3 rounded-lg border p-2.5 text-left transition-colors"
                   >
                     <div
                       className={cn(
@@ -325,19 +325,19 @@ export default function DashboardPage() {
                       )}
                     />
                     <div className="min-w-0 flex-1">
-                      <p className="group-hover/item:text-primary text-xs leading-tight font-medium text-foreground transition-colors">
+                      <p className="group-hover/item:text-primary text-foreground text-xs leading-tight font-medium transition-colors">
                         {alert.message}
                       </p>
-                      <p className="mt-0.5 text-[10px] tracking-wide text-muted-foreground uppercase">
+                      <p className="text-muted-foreground mt-0.5 text-[10px] tracking-wide uppercase">
                         {alert.category}
                       </p>
                     </div>
-                    <ArrowRight className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground group-hover/item:text-muted-foreground" />
+                    <ArrowRight className="text-muted-foreground group-hover/item:text-muted-foreground mt-0.5 h-3.5 w-3.5 shrink-0" />
                   </button>
                 ))}
               </div>
             ) : (
-              <div className="py-4 text-center text-xs text-muted-foreground">
+              <div className="text-muted-foreground py-4 text-center text-xs">
                 No alerts needing attention.
               </div>
             )}
@@ -360,7 +360,7 @@ export default function DashboardPage() {
                 {data.aiInsights.slice(0, 5).map((insight, i) => (
                   <div
                     key={i}
-                    className="flex items-start gap-2.5 rounded-md border border-violet-100 bg-background p-2.5 transition-colors hover:border-violet-200"
+                    className="bg-background flex items-start gap-2.5 rounded-md border border-violet-100 p-2.5 transition-colors hover:border-violet-200"
                   >
                     <div
                       className={cn(
@@ -373,7 +373,9 @@ export default function DashboardPage() {
                       )}
                     />
                     <div className="min-w-0 flex-1">
-                      <p className="mb-1 text-xs leading-snug text-muted-foreground">{insight.message}</p>
+                      <p className="text-muted-foreground mb-1 text-xs leading-snug">
+                        {insight.message}
+                      </p>
                       <Badge
                         variant="secondary"
                         className="h-4 border border-violet-100 bg-violet-50 px-1 text-[9px] text-violet-700 hover:bg-violet-100"
@@ -386,7 +388,7 @@ export default function DashboardPage() {
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-4 opacity-50">
-                <p className="text-xs text-muted-foreground">No suggestions right now</p>
+                <p className="text-muted-foreground text-xs">No suggestions right now</p>
               </div>
             )}
           </HoverExpandCard>
@@ -410,10 +412,10 @@ export default function DashboardPage() {
                 {data.lowStockDetails.slice(0, 5).map((item) => (
                   <div
                     key={item.id}
-                    className="flex items-center justify-between rounded border border-red-100 bg-background p-2.5 text-xs"
+                    className="bg-background flex items-center justify-between rounded border border-red-100 p-2.5 text-xs"
                   >
                     <span
-                      className="flex-1 truncate pr-2 font-medium text-foreground"
+                      className="text-foreground flex-1 truncate pr-2 font-medium"
                       title={item.name}
                     >
                       {item.name}
@@ -436,7 +438,7 @@ export default function DashboardPage() {
             ) : (
               <div className="flex flex-col items-center justify-center py-4 opacity-50">
                 <CheckCircle className="mb-2 h-6 w-6 text-emerald-300" />
-                <p className="text-xs text-muted-foreground">Inventory levels healthy</p>
+                <p className="text-muted-foreground text-xs">Inventory levels healthy</p>
               </div>
             )}
           </HoverExpandCard>
@@ -460,7 +462,7 @@ export default function DashboardPage() {
           <Card className="border-border/40/80">
             <CardHeader className="pb-2">
               <CardTitle className="flex items-center gap-2 text-sm font-semibold">
-                <Activity className="h-4 w-4 text-muted-foreground" />
+                <Activity className="text-muted-foreground h-4 w-4" />
                 Recent Activity
               </CardTitle>
             </CardHeader>
@@ -469,7 +471,7 @@ export default function DashboardPage() {
                 {data.recentActivity.slice(0, 8).map((activity) => (
                   <div
                     key={activity.id}
-                    className="flex cursor-pointer items-center gap-3 rounded-lg p-2 text-xs transition-colors hover:bg-muted/30"
+                    className="hover:bg-muted/30 flex cursor-pointer items-center gap-3 rounded-lg p-2 text-xs transition-colors"
                     onClick={() => activity.link && router.push(activity.link)}
                   >
                     <div
@@ -488,8 +490,8 @@ export default function DashboardPage() {
                                   : "bg-muted"
                       )}
                     />
-                    <span className="flex-1 text-muted-foreground">{activity.message}</span>
-                    <span className="text-[10px] whitespace-nowrap text-muted-foreground">
+                    <span className="text-muted-foreground flex-1">{activity.message}</span>
+                    <span className="text-muted-foreground text-[10px] whitespace-nowrap">
                       {new Date(activity.timestamp).toLocaleTimeString([], {
                         hour: "2-digit",
                         minute: "2-digit",

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useCallback, useEffect, useState, use, Suspense } from "react";
@@ -10,7 +11,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 
 interface FormField {
-  name: string; label: string; type: string; required: boolean;
+  name: string;
+  label: string;
+  type: string;
+  required: boolean;
 }
 
 /**
@@ -43,7 +47,7 @@ function FormContent({ slug }: { slug: string }) {
       if (res.ok) {
         const data = await res.json();
         setForm(data.form);
-        const parsed = JSON.parse(data.form.fields || '[]');
+        const parsed = JSON.parse(data.form.fields || "[]");
         if (parsed.length === 0) {
           // Default intake fields
           const defaults: FormField[] = [
@@ -51,12 +55,24 @@ function FormContent({ slug }: { slug: string }) {
             { name: "dateOfBirth", label: "Date of Birth", type: "date", required: true },
             { name: "medicalHistory", label: "Medical History", type: "textarea", required: false },
             { name: "allergies", label: "Allergies", type: "textarea", required: false },
-            { name: "medications", label: "Current Medications", type: "textarea", required: false },
-            { name: "additionalNotes", label: "Additional Notes", type: "textarea", required: false },
+            {
+              name: "medications",
+              label: "Current Medications",
+              type: "textarea",
+              required: false,
+            },
+            {
+              name: "additionalNotes",
+              label: "Additional Notes",
+              type: "textarea",
+              required: false,
+            },
           ];
           setFields(defaults);
           const initial: Record<string, string> = {};
-          defaults.forEach(f => { initial[f.name] = ""; });
+          defaults.forEach((f) => {
+            initial[f.name] = "";
+          });
           setFormData(initial);
         } else {
           setFields(parsed);
@@ -67,7 +83,10 @@ function FormContent({ slug }: { slug: string }) {
           setFormData(initial);
         }
       }
-    } catch { } finally { setLoading(false); }
+    } catch {
+    } finally {
+      setLoading(false);
+    }
   }, [slug]);
 
   useEffect(() => {
@@ -76,40 +95,62 @@ function FormContent({ slug }: { slug: string }) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitting(true); setError("");
+    setSubmitting(true);
+    setError("");
     try {
       const res = await fetch(`/api/public/form/${slug}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ data: formData, submissionId }),
       });
-      if (res.ok) { setSuccess(true); }
-      else { const d = await res.json(); setError(d.error || "Submission failed"); }
-    } catch { setError("Something went wrong"); } finally { setSubmitting(false); }
+      if (res.ok) {
+        setSuccess(true);
+      } else {
+        const d = await res.json();
+        setError(d.error || "Submission failed");
+      }
+    } catch {
+      setError("Something went wrong");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  if (loading) return <div className="min-h-screen bg-muted/30 flex items-center justify-center"><div className="animate-pulse text-muted-foreground">Loading...</div></div>;
-  if (!form) return <div className="min-h-screen bg-muted/30 flex items-center justify-center"><p className="text-muted-foreground">Form not found</p></div>;
+  if (loading)
+    return (
+      <div className="bg-muted/30 flex min-h-screen items-center justify-center">
+        <div className="text-muted-foreground animate-pulse">Loading...</div>
+      </div>
+    );
+  if (!form)
+    return (
+      <div className="bg-muted/30 flex min-h-screen items-center justify-center">
+        <p className="text-muted-foreground">Form not found</p>
+      </div>
+    );
 
-  if (success) return (
-    <div className="min-h-screen bg-muted/30 flex items-center justify-center px-4">
-      <Card className="w-full max-w-md text-center">
-        <CardContent className="pt-8 pb-8">
-          <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold mb-2">Form Submitted!</h2>
-          <p className="text-muted-foreground">Thank you for completing the form. Your information has been received.</p>
-        </CardContent>
-      </Card>
-    </div>
-  );
+  if (success)
+    return (
+      <div className="bg-muted/30 flex min-h-screen items-center justify-center px-4">
+        <Card className="w-full max-w-md text-center">
+          <CardContent className="pt-8 pb-8">
+            <CheckCircle className="mx-auto mb-4 h-16 w-16 text-green-500" />
+            <h2 className="mb-2 text-2xl font-bold">Form Submitted!</h2>
+            <p className="text-muted-foreground">
+              Thank you for completing the form. Your information has been received.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
 
   return (
-    <div className="min-h-screen bg-muted/30 py-12 px-4">
-      <Card className="w-full max-w-7xl mx-auto">
+    <div className="bg-muted/30 min-h-screen px-4 py-12">
+      <Card className="mx-auto w-full max-w-7xl">
         <CardHeader>
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-              <FileText className="w-5 h-5 text-primary" />
+          <div className="mb-2 flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100">
+              <FileText className="text-primary h-5 w-5" />
             </div>
             <div>
               <CardTitle>{form.name}</CardTitle>
@@ -119,22 +160,46 @@ function FormContent({ slug }: { slug: string }) {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            {error && <div className="p-3 bg-red-50 text-red-700 text-sm rounded-lg">{error}</div>}
+            {error && <div className="rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</div>}
             {fields.map((field, i) => {
               const fieldKey = getFieldKey(field, i);
               return (
                 <div key={i} className="space-y-2">
-                  <Label>{field.label} {field.required && <span className="text-red-500">*</span>}</Label>
+                  <Label>
+                    {field.label} {field.required && <span className="text-red-500">*</span>}
+                  </Label>
                   {field.type === "textarea" ? (
-                    <Textarea placeholder={`Enter ${field.label.toLowerCase()}`} value={formData[fieldKey] || ""} onChange={e => setFormData(p => ({ ...p, [fieldKey]: e.target.value }))} required={field.required} />
+                    <Textarea
+                      placeholder={`Enter ${field.label.toLowerCase()}`}
+                      value={formData[fieldKey] || ""}
+                      onChange={(e) => setFormData((p) => ({ ...p, [fieldKey]: e.target.value }))}
+                      required={field.required}
+                    />
                   ) : (
-                    <Input type={field.type || "text"} placeholder={`Enter ${field.label.toLowerCase()}`} value={formData[fieldKey] || ""} onChange={e => setFormData(p => ({ ...p, [fieldKey]: e.target.value }))} required={field.required} />
+                    <Input
+                      type={field.type || "text"}
+                      placeholder={`Enter ${field.label.toLowerCase()}`}
+                      value={formData[fieldKey] || ""}
+                      onChange={(e) => setFormData((p) => ({ ...p, [fieldKey]: e.target.value }))}
+                      required={field.required}
+                    />
                   )}
                 </div>
               );
             })}
-            <Button type="submit" className="w-full bg-primary hover:bg-primary/90 h-12" disabled={submitting}>
-              {submitting ? "Submitting..." : <><Send className="w-4 h-4 mr-2" />Submit Form</>}
+            <Button
+              type="submit"
+              className="bg-primary hover:bg-primary/90 h-12 w-full"
+              disabled={submitting}
+            >
+              {submitting ? (
+                "Submitting..."
+              ) : (
+                <>
+                  <Send className="mr-2 h-4 w-4" />
+                  Submit Form
+                </>
+              )}
             </Button>
           </form>
         </CardContent>
@@ -152,7 +217,13 @@ export default function PublicIntakeFormPage({ params }: { params: Promise<{ slu
   const { slug } = use(params);
 
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-muted/30 px-4">Loading form...</div>}>
+    <Suspense
+      fallback={
+        <div className="bg-muted/30 flex min-h-screen items-center justify-center px-4">
+          Loading form...
+        </div>
+      }
+    >
       <FormContent slug={slug} />
     </Suspense>
   );

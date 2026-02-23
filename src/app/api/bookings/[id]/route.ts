@@ -1,10 +1,7 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import {
-  updateBookingCalendarEvent,
-  cancelBookingCalendarEvent,
-} from "@/lib/google-calendar";
+import { updateBookingCalendarEvent, cancelBookingCalendarEvent } from "@/lib/google-calendar";
 import { triggerAutomation } from "@/lib/automation";
 import { logInventoryChange } from "@/lib/inventory-log";
 
@@ -69,10 +66,7 @@ async function decrementInventoryForBooking(bookingId: string, workspaceId: stri
  * @param root0
  * @param root0.params
  */
-export async function PUT(
-  req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const user = await getCurrentUser();
   if (!user || !user.workspaceId)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -118,10 +112,7 @@ export async function PUT(
  * @param root0
  * @param root0.params
  */
-export async function DELETE(
-  req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const user = await getCurrentUser();
   if (!user || !user.workspaceId)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

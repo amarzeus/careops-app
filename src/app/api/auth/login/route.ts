@@ -11,10 +11,7 @@ export async function POST(req: Request) {
     const { email, password } = await req.json();
 
     if (!email || !password) {
-      return NextResponse.json(
-        { error: "Missing credentials" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Missing credentials" }, { status: 400 });
     }
 
     const user = await prisma.user.findUnique({
@@ -22,18 +19,12 @@ export async function POST(req: Request) {
       include: { workspace: true },
     });
     if (!user) {
-      return NextResponse.json(
-        { error: "Invalid credentials" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
     }
 
     const isValid = await verifyPassword(password, user.passwordHash);
     if (!isValid) {
-      return NextResponse.json(
-        { error: "Invalid credentials" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
     }
 
     // Check if email is verified

@@ -1,7 +1,11 @@
 import { prisma } from "./prisma";
 import { sendEmail, buildEmailTemplate } from "./email";
 import { sendSMS } from "./sms";
-import { sendWelcomeMessage, sendBookingConfirmation, isAvailable as isWhatsAppAvailable } from "./whatsapp";
+import {
+  sendWelcomeMessage,
+  sendBookingConfirmation,
+  isAvailable as isWhatsAppAvailable,
+} from "./whatsapp";
 import { generateWelcomeMessage, generateBookingConfirmation } from "./gemini";
 import { generateWebhookSignature, serializePayload } from "./webhook-security";
 import { initiateOutboundCall, isVapiConfigured } from "./vapi";
@@ -132,11 +136,13 @@ export async function triggerAutomation(
       where: { workspaceId, trigger: trigger as AutomationTrigger, isActive: true },
     });
 
-    const maybeWebhookModel = (prisma as unknown as { webhook?: { findMany?: (args: unknown) => Promise<unknown[]> } }).webhook;
+    const maybeWebhookModel = (
+      prisma as unknown as { webhook?: { findMany?: (args: unknown) => Promise<unknown[]> } }
+    ).webhook;
     const webhooksPromise = maybeWebhookModel?.findMany
       ? maybeWebhookModel.findMany({
-        where: { workspaceId, event: trigger as AutomationTrigger, isActive: true },
-      })
+          where: { workspaceId, event: trigger as AutomationTrigger, isActive: true },
+        })
       : Promise.resolve([]);
 
     const [rules, rawWebhooks] = await Promise.all([rulesPromise, webhooksPromise]);
@@ -205,11 +211,14 @@ export async function triggerAutomation(
     for (const rule of rules) {
       // Support delayMinutes: schedule execution after delay
       if (rule.delayMinutes > 0) {
-        setTimeout(() => {
-          executeRule(rule, workspace, data).catch((err) =>
-            console.error(`Delayed automation error (rule ${rule.id}):`, err)
-          );
-        }, rule.delayMinutes * 60 * 1000);
+        setTimeout(
+          () => {
+            executeRule(rule, workspace, data).catch((err) =>
+              console.error(`Delayed automation error (rule ${rule.id}):`, err)
+            );
+          },
+          rule.delayMinutes * 60 * 1000
+        );
       } else {
         await executeRule(rule, workspace, data);
       }
@@ -266,13 +275,15 @@ async function handleNewContact(workspace: Workspace, data: Record<string, unkno
     where: { contactId: contact.id },
   });
 
-  const conversation = existingConversation ?? await prisma.conversation.create({
-    data: {
-      contactId: contact.id,
-      workspaceId: workspace.id,
-      subject: `Conversation with ${contact.name}`,
-    },
-  });
+  const conversation =
+    existingConversation ??
+    (await prisma.conversation.create({
+      data: {
+        contactId: contact.id,
+        workspaceId: workspace.id,
+        subject: `Conversation with ${contact.name}`,
+      },
+    }));
 
   // Check if automation is active for this conversation
   if (conversation.isActive === false) return;
@@ -295,10 +306,7 @@ async function handleNewContact(workspace: Workspace, data: Record<string, unkno
     await sendEmail({
       to: contact.email,
       subject: `Welcome to ${workspace.name}`,
-      html: buildEmailTemplate(
-        `Welcome to ${workspace.name}`,
-        `<p>${welcomeMsg}</p>`
-      ),
+      html: buildEmailTemplate(`Welcome to ${workspace.name}`, `<p>${welcomeMsg}</p>`),
       workspaceId: workspace.id,
     });
   }
@@ -359,13 +367,15 @@ async function handleBookingCreated(workspace: Workspace, data: Record<string, u
     where: { contactId: contact.id },
   });
 
-  const conversation = existingConversation ?? await prisma.conversation.create({
-    data: {
-      contactId: contact.id,
-      workspaceId: workspace.id,
-      subject: `Conversation with ${contact.name}`,
-    },
-  });
+  const conversation =
+    existingConversation ??
+    (await prisma.conversation.create({
+      data: {
+        contactId: contact.id,
+        workspaceId: workspace.id,
+        subject: `Conversation with ${contact.name}`,
+      },
+    }));
 
   // Check if automation is active for this conversation
   if (!conversation.isActive) return;
@@ -385,10 +395,7 @@ async function handleBookingCreated(workspace: Workspace, data: Record<string, u
     await sendEmail({
       to: contact.email,
       subject: `Booking Confirmation - ${workspace.name}`,
-      html: buildEmailTemplate(
-        "Booking Confirmed",
-        `<p>${confirmationMsg}</p>`
-      ),
+      html: buildEmailTemplate("Booking Confirmed", `<p>${confirmationMsg}</p>`),
       workspaceId: workspace.id,
     });
   }
@@ -590,7 +597,7 @@ async function handleStaffReply(workspace: Workspace, data: Record<string, unkno
     where: { id: conversationId },
     data: {
       isActive: false,
-      autoResumeAt: autoResumeAt
+      autoResumeAt: autoResumeAt,
     },
   });
 
@@ -682,36 +689,36 @@ export async function sendVoiceCallReminder(
   bookingId?: string
 ): Promise<{ success: boolean; callId?: string; error?: string }> {
   if (!isVapiConfigured()) {
-    console.log('[VoiceReminder] VAPI not configured, skipping voice call');
-    return { success: false, error: 'VAPI not configured' };
+    console.log("[VoiceReminder] VAPI not configured, skipping voice call");
+    return { success: false, error: "VAPI not configured" };
   }
 
   if (!contactPhone) {
-    return { success: false, error: 'No phone number available' };
+    return { success: false, error: "No phone number available" };
   }
 
   if (await isDoNotCall(workspaceId, contactPhone)) {
     await prisma.voiceCall.create({
       data: {
-        direction: 'OUTBOUND',
-        status: 'SKIPPED',
+        direction: "OUTBOUND",
+        status: "SKIPPED",
         workspaceId,
         contactId,
-        outcome: 'DNC_SKIP',
-        metadata: JSON.stringify({ purpose: 'reminder', serviceName, bookingId, reason: 'dnc' }),
+        outcome: "DNC_SKIP",
+        metadata: JSON.stringify({ purpose: "reminder", serviceName, bookingId, reason: "dnc" }),
       },
     });
-    return { success: false, error: 'Number is in Do Not Call registry' };
+    return { success: false, error: "Number is in Do Not Call registry" };
   }
 
-  const _message = `Hi ${contactName}, this is a reminder from ${workspaceName || 'our business'} about your upcoming ${serviceName} appointment on ${bookingDate.toLocaleDateString()} at ${bookingDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}. Please call us if you need to reschedule. Thank you.`;
+  const _message = `Hi ${contactName}, this is a reminder from ${workspaceName || "our business"} about your upcoming ${serviceName} appointment on ${bookingDate.toLocaleDateString()} at ${bookingDate.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}. Please call us if you need to reschedule. Thank you.`;
 
   const result = await initiateOutboundCall({
     phoneNumber: contactPhone,
     workspaceId,
     contactName,
     metadata: {
-      purpose: 'reminder',
+      purpose: "reminder",
       serviceName,
       bookingDate: bookingDate.toISOString(),
       bookingId,
@@ -725,12 +732,18 @@ export async function sendVoiceCallReminder(
     await prisma.voiceCall.create({
       data: {
         callSid: result.callId,
-        direction: 'OUTBOUND',
-        status: 'INITIATED',
+        direction: "OUTBOUND",
+        status: "INITIATED",
         workspaceId,
         contactId,
-        outcome: 'REMINDER_SENT',
-        metadata: JSON.stringify({ purpose: 'reminder', serviceName, bookingId, contactPhone, retryCount: 0 }),
+        outcome: "REMINDER_SENT",
+        metadata: JSON.stringify({
+          purpose: "reminder",
+          serviceName,
+          bookingId,
+          contactPhone,
+          retryCount: 0,
+        }),
       },
     });
   }
@@ -761,36 +774,41 @@ export async function sendVoiceCallConfirmation(
   bookingId?: string
 ): Promise<{ success: boolean; callId?: string; error?: string }> {
   if (!isVapiConfigured()) {
-    console.log('[VoiceConfirmation] VAPI not configured, skipping voice call');
-    return { success: false, error: 'VAPI not configured' };
+    console.log("[VoiceConfirmation] VAPI not configured, skipping voice call");
+    return { success: false, error: "VAPI not configured" };
   }
 
   if (!contactPhone) {
-    return { success: false, error: 'No phone number available' };
+    return { success: false, error: "No phone number available" };
   }
 
   if (await isDoNotCall(workspaceId, contactPhone)) {
     await prisma.voiceCall.create({
       data: {
-        direction: 'OUTBOUND',
-        status: 'SKIPPED',
+        direction: "OUTBOUND",
+        status: "SKIPPED",
         workspaceId,
         contactId,
-        outcome: 'DNC_SKIP',
-        metadata: JSON.stringify({ purpose: 'confirmation', serviceName, bookingId, reason: 'dnc' }),
+        outcome: "DNC_SKIP",
+        metadata: JSON.stringify({
+          purpose: "confirmation",
+          serviceName,
+          bookingId,
+          reason: "dnc",
+        }),
       },
     });
-    return { success: false, error: 'Number is in Do Not Call registry' };
+    return { success: false, error: "Number is in Do Not Call registry" };
   }
 
-  const _message = `Hi ${contactName}, this is a confirmation from ${workspaceName || 'our business'}. Your ${serviceName} appointment has been booked for ${bookingDate.toLocaleDateString()} at ${bookingDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}. We look forward to seeing you. Thank you.`;
+  const _message = `Hi ${contactName}, this is a confirmation from ${workspaceName || "our business"}. Your ${serviceName} appointment has been booked for ${bookingDate.toLocaleDateString()} at ${bookingDate.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}. We look forward to seeing you. Thank you.`;
 
   const result = await initiateOutboundCall({
     phoneNumber: contactPhone,
     workspaceId,
     contactName,
     metadata: {
-      purpose: 'confirmation',
+      purpose: "confirmation",
       serviceName,
       bookingDate: bookingDate.toISOString(),
       bookingId,
@@ -804,12 +822,18 @@ export async function sendVoiceCallConfirmation(
     await prisma.voiceCall.create({
       data: {
         callSid: result.callId,
-        direction: 'OUTBOUND',
-        status: 'INITIATED',
+        direction: "OUTBOUND",
+        status: "INITIATED",
         workspaceId,
         contactId,
-        outcome: 'CONFIRMATION_SENT',
-        metadata: JSON.stringify({ purpose: 'confirmation', serviceName, bookingId, contactPhone, retryCount: 0 }),
+        outcome: "CONFIRMATION_SENT",
+        metadata: JSON.stringify({
+          purpose: "confirmation",
+          serviceName,
+          bookingId,
+          contactPhone,
+          retryCount: 0,
+        }),
       },
     });
   }
@@ -834,36 +858,36 @@ export async function sendVoiceCallFollowUp(
   contactId?: string
 ): Promise<{ success: boolean; callId?: string; error?: string }> {
   if (!isVapiConfigured()) {
-    return { success: false, error: 'VAPI not configured' };
+    return { success: false, error: "VAPI not configured" };
   }
 
   if (!contactPhone) {
-    return { success: false, error: 'No phone number available' };
+    return { success: false, error: "No phone number available" };
   }
 
   if (await isDoNotCall(workspaceId, contactPhone)) {
     await prisma.voiceCall.create({
       data: {
-        direction: 'OUTBOUND',
-        status: 'SKIPPED',
+        direction: "OUTBOUND",
+        status: "SKIPPED",
         workspaceId,
         contactId,
-        outcome: 'DNC_SKIP',
-        metadata: JSON.stringify({ purpose: 'follow_up', serviceName, reason: 'dnc' }),
+        outcome: "DNC_SKIP",
+        metadata: JSON.stringify({ purpose: "follow_up", serviceName, reason: "dnc" }),
       },
     });
-    return { success: false, error: 'Number is in Do Not Call registry' };
+    return { success: false, error: "Number is in Do Not Call registry" };
   }
 
-  const servicePart = serviceName ? ` about your recent ${serviceName} visit` : '';
-  const _message = `Hi ${contactName}, this is a follow-up call from ${workspaceName || 'our business'}${servicePart}. We wanted to check if everything went well and if there's anything else we can help you with. Please call us back at your convenience. Thank you.`;
+  const servicePart = serviceName ? ` about your recent ${serviceName} visit` : "";
+  const _message = `Hi ${contactName}, this is a follow-up call from ${workspaceName || "our business"}${servicePart}. We wanted to check if everything went well and if there's anything else we can help you with. Please call us back at your convenience. Thank you.`;
 
   const result = await initiateOutboundCall({
     phoneNumber: contactPhone,
     workspaceId,
     contactName,
     metadata: {
-      purpose: 'follow_up',
+      purpose: "follow_up",
       serviceName,
       contactId,
       contactPhone,
@@ -875,12 +899,17 @@ export async function sendVoiceCallFollowUp(
     await prisma.voiceCall.create({
       data: {
         callSid: result.callId,
-        direction: 'OUTBOUND',
-        status: 'INITIATED',
+        direction: "OUTBOUND",
+        status: "INITIATED",
         workspaceId,
         contactId,
-        outcome: 'FOLLOW_UP_INITIATED',
-        metadata: JSON.stringify({ purpose: 'follow_up', serviceName, contactPhone, retryCount: 0 }),
+        outcome: "FOLLOW_UP_INITIATED",
+        metadata: JSON.stringify({
+          purpose: "follow_up",
+          serviceName,
+          contactPhone,
+          retryCount: 0,
+        }),
       },
     });
   }
@@ -901,7 +930,7 @@ export async function sendVoiceCallFollowUp(
  */
 export async function triggerVoiceAutomation(
   workspaceId: string,
-  trigger: 'VOICE_REMINDER' | 'VOICE_CONFIRMATION' | 'VOICE_FOLLOW_UP',
+  trigger: "VOICE_REMINDER" | "VOICE_CONFIRMATION" | "VOICE_FOLLOW_UP",
   data: {
     contactPhone?: string;
     contactName?: string;
@@ -913,15 +942,15 @@ export async function triggerVoiceAutomation(
   }
 ): Promise<{ success: boolean; error?: string }> {
   if (!data.contactPhone || !data.contactName) {
-    return { success: false, error: 'Missing contact information' };
+    return { success: false, error: "Missing contact information" };
   }
 
-  const workspaceName = data.workspaceName || 'Our Business';
+  const workspaceName = data.workspaceName || "Our Business";
 
   switch (trigger) {
-    case 'VOICE_REMINDER':
+    case "VOICE_REMINDER":
       if (!data.bookingDate || !data.serviceName) {
-        return { success: false, error: 'Missing booking information for reminder' };
+        return { success: false, error: "Missing booking information for reminder" };
       }
       return sendVoiceCallReminder(
         workspaceId,
@@ -934,9 +963,9 @@ export async function triggerVoiceAutomation(
         data.bookingId
       );
 
-    case 'VOICE_CONFIRMATION':
+    case "VOICE_CONFIRMATION":
       if (!data.bookingDate || !data.serviceName) {
-        return { success: false, error: 'Missing booking information for confirmation' };
+        return { success: false, error: "Missing booking information for confirmation" };
       }
       return sendVoiceCallConfirmation(
         workspaceId,
@@ -949,7 +978,7 @@ export async function triggerVoiceAutomation(
         data.bookingId
       );
 
-    case 'VOICE_FOLLOW_UP':
+    case "VOICE_FOLLOW_UP":
       return sendVoiceCallFollowUp(
         workspaceId,
         workspaceName,
@@ -960,6 +989,6 @@ export async function triggerVoiceAutomation(
       );
 
     default:
-      return { success: false, error: 'Unknown voice trigger' };
+      return { success: false, error: "Unknown voice trigger" };
   }
 }

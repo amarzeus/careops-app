@@ -34,7 +34,11 @@ export function SubmissionList({
       case "SENT":
         return <Badge variant="secondary">Sent</Badge>;
       case "COMPLETED":
-        return <Badge variant="default" className="bg-green-600">Completed</Badge>;
+        return (
+          <Badge variant="default" className="bg-green-600">
+            Completed
+          </Badge>
+        );
       case "OVERDUE":
         return <Badge variant="destructive">Overdue</Badge>;
       default:
@@ -43,25 +47,23 @@ export function SubmissionList({
   };
 
   return (
-    <div className="space-y-3 mt-4">
+    <div className="mt-4 space-y-3">
       {submissions.map((sub) => (
         <Card
           key={sub.id}
-          className="cursor-pointer hover:shadow-sm transition-shadow"
+          className="cursor-pointer transition-shadow hover:shadow-sm"
           onClick={() => onSelect(sub)}
         >
-          <CardContent className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 py-4">
+          <CardContent className="flex flex-col justify-between gap-3 py-4 sm:flex-row sm:items-center">
             <div className="min-w-0 flex-1">
-              <p className="font-medium text-sm truncate">
-                {sub.contact?.name || "Unknown"}
-              </p>
-              <p className="text-xs text-muted-foreground truncate">
+              <p className="truncate text-sm font-medium">{sub.contact?.name || "Unknown"}</p>
+              <p className="text-muted-foreground truncate text-xs">
                 {sub.intakeForm?.name || "Contact Form"} |{" "}
                 {new Date(sub.createdAt).toLocaleDateString()}
               </p>
             </div>
             <div
-              className="flex items-center gap-1 sm:gap-2 flex-wrap"
+              className="flex flex-wrap items-center gap-1 sm:gap-2"
               onClick={(e) => e.stopPropagation()}
             >
               {(sub.status === "PENDING" || sub.status === "SENT") && (
@@ -72,29 +74,29 @@ export function SubmissionList({
                   onClick={() => onResend(sub.id)}
                   title="Re-send form"
                 >
-                  <Send className="w-3 h-3 mr-1" /> <span className="hidden sm:inline">Resend</span>
+                  <Send className="mr-1 h-3 w-3" /> <span className="hidden sm:inline">Resend</span>
                 </Button>
               )}
               {sub.status !== "COMPLETED" && (
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-green-600 hover:text-green-700 h-8"
+                  className="h-8 text-green-600 hover:text-green-700"
                   onClick={() => onUpdateStatus(sub.id, "COMPLETED")}
                   title="Mark as completed"
                 >
-                  <CheckCircle className="w-3 h-3" />
+                  <CheckCircle className="h-3 w-3" />
                 </Button>
               )}
               {sub.status !== "OVERDUE" && sub.status !== "COMPLETED" && (
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-red-500 hover:text-red-700 h-8"
+                  className="h-8 text-red-500 hover:text-red-700"
                   onClick={() => onUpdateStatus(sub.id, "OVERDUE")}
                   title="Mark as overdue"
                 >
-                  <AlertTriangle className="w-3 h-3" />
+                  <AlertTriangle className="h-3 w-3" />
                 </Button>
               )}
               {statusBadge(sub.status)}

@@ -1,6 +1,14 @@
 "use client";
 
-import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
+import {
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+} from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp } from "lucide-react";
 
@@ -21,27 +29,27 @@ interface PerformanceChartProps {
  * @param root0.data
  */
 export function PerformanceChart({ data }: PerformanceChartProps) {
-  const hasData = data.some(d => d.bookings > 0 || d.leads > 0 || d.completed > 0);
+  const hasData = data.some((d) => d.bookings > 0 || d.leads > 0 || d.completed > 0);
 
   return (
-    <Card className="shadow-sm border-0 bg-background">
+    <Card className="bg-background border-0 shadow-sm">
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-base font-semibold text-foreground flex items-center gap-2">
-            <TrendingUp className="w-4 h-4 text-primary" />
+          <CardTitle className="text-foreground flex items-center gap-2 text-base font-semibold">
+            <TrendingUp className="text-primary h-4 w-4" />
             7-Day Performance
           </CardTitle>
           <div className="flex items-center gap-4 text-xs">
             <div className="flex items-center gap-1.5">
-              <div className="w-2.5 h-2.5 rounded-full bg-blue-500" />
+              <div className="h-2.5 w-2.5 rounded-full bg-blue-500" />
               <span className="text-muted-foreground">Bookings</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+              <div className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
               <span className="text-muted-foreground">Leads</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <div className="w-2.5 h-2.5 rounded-full bg-violet-500" />
+              <div className="h-2.5 w-2.5 rounded-full bg-violet-500" />
               <span className="text-muted-foreground">Completed</span>
             </div>
           </div>
@@ -49,9 +57,9 @@ export function PerformanceChart({ data }: PerformanceChartProps) {
       </CardHeader>
       <CardContent>
         {!hasData ? (
-          <div className="h-[260px] flex items-center justify-center text-muted-foreground text-sm">
+          <div className="text-muted-foreground flex h-[260px] items-center justify-center text-sm">
             <div className="text-center">
-              <TrendingUp className="w-10 h-10 mx-auto mb-2 opacity-30" />
+              <TrendingUp className="mx-auto mb-2 h-10 w-10 opacity-30" />
               <p>Performance data will appear as activity grows</p>
             </div>
           </div>
@@ -73,8 +81,18 @@ export function PerformanceChart({ data }: PerformanceChartProps) {
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-              <XAxis dataKey="name" tick={{ fontSize: 11, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} allowDecimals={false} />
+              <XAxis
+                dataKey="name"
+                tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <YAxis
+                tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
+                axisLine={false}
+                tickLine={false}
+                allowDecimals={false}
+              />
               <Tooltip
                 contentStyle={{
                   backgroundColor: "var(--background)",
@@ -86,9 +104,30 @@ export function PerformanceChart({ data }: PerformanceChartProps) {
                 }}
                 itemStyle={{ color: "var(--foreground)" }}
               />
-              <Area type="monotone" dataKey="bookings" stroke="#3b82f6" strokeWidth={2} fillOpacity={1} fill="url(#colorBookings)" />
-              <Area type="monotone" dataKey="leads" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#colorLeads)" />
-              <Area type="monotone" dataKey="completed" stroke="#8b5cf6" strokeWidth={2} fillOpacity={1} fill="url(#colorCompleted)" />
+              <Area
+                type="monotone"
+                dataKey="bookings"
+                stroke="#3b82f6"
+                strokeWidth={2}
+                fillOpacity={1}
+                fill="url(#colorBookings)"
+              />
+              <Area
+                type="monotone"
+                dataKey="leads"
+                stroke="#10b981"
+                strokeWidth={2}
+                fillOpacity={1}
+                fill="url(#colorLeads)"
+              />
+              <Area
+                type="monotone"
+                dataKey="completed"
+                stroke="#8b5cf6"
+                strokeWidth={2}
+                fillOpacity={1}
+                fill="url(#colorCompleted)"
+              />
             </AreaChart>
           </ResponsiveContainer>
         )}

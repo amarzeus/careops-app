@@ -22,15 +22,15 @@ export async function POST(req: Request) {
 
   const buffer = Buffer.from(await file.arrayBuffer());
   const filename = Date.now() + "-" + file.name.replace(/\s/g, "-");
-  
+
   try {
     const uploadDir = path.join(process.cwd(), "public/uploads");
     await mkdir(uploadDir, { recursive: true });
     await writeFile(path.join(uploadDir, filename), buffer);
-    
-    return NextResponse.json({ 
+
+    return NextResponse.json({
       url: `/uploads/${filename}`,
-      name: file.name 
+      name: file.name,
     });
   } catch (error) {
     console.error("Upload error:", error);

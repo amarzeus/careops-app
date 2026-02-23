@@ -1,0 +1,523 @@
+
+> careops-app@0.1.0 test
+> npm run test:maintenance
+
+
+> careops-app@0.1.0 test:maintenance
+> npm run lint && npm run type-check && npm run test:unit && npm run render:validate && npm run build
+
+
+> careops-app@0.1.0 lint
+> eslint
+
+
+/home/amar/Desktop/Testing and Fixing/careops-app/prisma/seed-test-account.ts
+  20:1  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+
+/home/amar/Desktop/Testing and Fixing/careops-app/src/app/(dashboard)/bookings/page.tsx
+   56:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  120:44  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Desktop/Testing and Fixing/careops-app/src/app/(dashboard)/inventory/page.tsx
+   48:48  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  119:47  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Desktop/Testing and Fixing/careops-app/src/app/(dashboard)/staff/page.tsx
+  37:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  55:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Desktop/Testing and Fixing/careops-app/src/app/(public)/contact/[slug]/page.tsx
+  24:36  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  33:27  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Desktop/Testing and Fixing/careops-app/src/app/(public)/contact/page.tsx
+  14:16  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+
+/home/amar/Desktop/Testing and Fixing/careops-app/src/app/(public)/form/[slug]/page.tsx
+  22:36  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  30:27  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Desktop/Testing and Fixing/careops-app/src/app/api/ai/insights/route.ts
+  47:12  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Desktop/Testing and Fixing/careops-app/src/app/api/ai/preferences/route.ts
+  16:34  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  22:32  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Desktop/Testing and Fixing/careops-app/src/app/api/ai/voice/route.ts
+   24:25   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   79:16   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   89:41   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   95:44   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  126:101  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  127:97   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  204:21   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  207:49   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  232:29   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  241:69   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  248:19   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Desktop/Testing and Fixing/careops-app/src/app/api/ai/voice/settings/route.ts
+  50:30  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Desktop/Testing and Fixing/careops-app/src/app/api/auth/register/route.ts
+  72:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Desktop/Testing and Fixing/careops-app/src/app/api/automation/[id]/test/route.ts
+  59:32  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Desktop/Testing and Fixing/careops-app/src/app/api/booking/create/route.ts
+  162:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Desktop/Testing and Fixing/careops-app/src/app/api/dashboard/metrics/route.ts
+  282:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Desktop/Testing and Fixing/careops-app/src/app/api/dashboard/route.ts
+  81:12  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Desktop/Testing and Fixing/careops-app/src/app/api/staff/route.ts
+  118:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Desktop/Testing and Fixing/careops-app/src/app/onboarding/page.tsx
+   36:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   37:15  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   68:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  352:52  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  385:23  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  386:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  402:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  445:23  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  446:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  459:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  501:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  502:23  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  516:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Desktop/Testing and Fixing/careops-app/src/app/page.tsx
+  297:52  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Desktop/Testing and Fixing/careops-app/src/components/providers/voice-provider.tsx
+  63:23  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Desktop/Testing and Fixing/careops-app/src/lib/gemini.ts
+    56:36  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+    79:37  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+    90:1   warning  Missing JSDoc comment                     jsdoc/require-jsdoc
+   117:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   121:22  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   752:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   815:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  1043:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  1047:22  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Desktop/Testing and Fixing/careops-app/src/lib/google-calendar.ts
+  264:12  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Desktop/Testing and Fixing/careops-app/src/lib/razorpay.ts
+  113:44  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  137:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  142:14  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Desktop/Testing and Fixing/careops-app/tests/unit/booking-submission.test.tsx
+   13:55  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   28:30  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   82:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  110:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Desktop/Testing and Fixing/careops-app/tests/unit/contact-submission.test.tsx
+  12:55  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+✖ 66 problems (0 errors, 66 warnings)
+  0 errors and 3 warnings potentially fixable with the `--fix` option.
+
+
+> careops-app@0.1.0 type-check
+> tsc --noEmit
+
+
+> careops-app@0.1.0 test:unit
+> vitest run
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/home/amar/Desktop/Testing and Fixing/careops-app[39m
+
+ [32m✓[39m tests/unit/contact-submission.test.tsx [2m([22m[2m1 test[22m[2m)[22m[33m 578[2mms[22m[39m
+     [33m[2m✓[22m[39m should render fields and submit successfully [33m 568[2mms[22m[39m
+ [32m✓[39m tests/unit/theme.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[33m 4147[2mms[22m[39m
+     [33m[2m✓[22m[39m should be importable [33m 2591[2mms[22m[39m
+     [33m[2m✓[22m[39m should render a button [33m 1170[2mms[22m[39m
+[90mstdout[2m | tests/unit/email.test.ts[2m > [22m[2mEmail Utility (Strict Mode)[2m > [22m[2mshould send email successfully on first attempt
+[22m[39mPreparing to send email to: test@example.com via Resend API
+Attempt 1/3 sending via Resend API...
+
+[90mstdout[2m | tests/unit/email.test.ts[2m > [22m[2mEmail Utility (Strict Mode)[2m > [22m[2mshould send email successfully on first attempt
+[22m[39m✅ Email sent successfully! Message ID: msg_123
+
+[90mstdout[2m | tests/unit/email.test.ts[2m > [22m[2mEmail Utility (Strict Mode)[2m > [22m[2mshould retry on failure and eventually succeed
+[22m[39mPreparing to send email to: test@example.com via Resend API
+Attempt 1/3 sending via Resend API...
+
+[90mstderr[2m | tests/unit/email.test.ts[2m > [22m[2mEmail Utility (Strict Mode)[2m > [22m[2mshould retry on failure and eventually succeed
+[22m[39mAttempt 1 failed: Server Error
+
+[90mstdout[2m | tests/unit/email.test.ts[2m > [22m[2mEmail Utility (Strict Mode)[2m > [22m[2mshould retry on failure and eventually succeed
+[22m[39mRetrying in 1000ms...
+
+[90mstdout[2m | tests/unit/email.test.ts[2m > [22m[2mEmail Utility (Strict Mode)[2m > [22m[2mshould retry on failure and eventually succeed
+[22m[39mAttempt 2/3 sending via Resend API...
+
+[90mstdout[2m | tests/unit/email.test.ts[2m > [22m[2mEmail Utility (Strict Mode)[2m > [22m[2mshould retry on failure and eventually succeed
+[22m[39mRetrying in 2000ms...
+
+[90mstderr[2m | tests/unit/email.test.ts[2m > [22m[2mEmail Utility (Strict Mode)[2m > [22m[2mshould retry on failure and eventually succeed
+[22m[39mAttempt 2 failed: Server Error
+
+[90mstdout[2m | tests/unit/email.test.ts[2m > [22m[2mEmail Utility (Strict Mode)[2m > [22m[2mshould retry on failure and eventually succeed
+[22m[39mAttempt 3/3 sending via Resend API...
+
+[90mstdout[2m | tests/unit/email.test.ts[2m > [22m[2mEmail Utility (Strict Mode)[2m > [22m[2mshould retry on failure and eventually succeed
+[22m[39m✅ Email sent successfully! Message ID: msg_123
+
+[90mstdout[2m | tests/unit/email.test.ts[2m > [22m[2mEmail Utility (Strict Mode)[2m > [22m[2mshould fail after max retries, log failure, and create alert
+[22m[39mPreparing to send email to: fail@example.com via Resend API
+Attempt 1/3 sending via Resend API...
+
+[90mstderr[2m | tests/unit/email.test.ts[2m > [22m[2mEmail Utility (Strict Mode)[2m > [22m[2mshould fail after max retries, log failure, and create alert
+[22m[39mAttempt 1 failed: Persistent Error
+
+[90mstdout[2m | tests/unit/email.test.ts[2m > [22m[2mEmail Utility (Strict Mode)[2m > [22m[2mshould fail after max retries, log failure, and create alert
+[22m[39mRetrying in 1000ms...
+
+[90mstdout[2m | tests/unit/email.test.ts[2m > [22m[2mEmail Utility (Strict Mode)[2m > [22m[2mshould fail after max retries, log failure, and create alert
+[22m[39mAttempt 2/3 sending via Resend API...
+
+[90mstdout[2m | tests/unit/email.test.ts[2m > [22m[2mEmail Utility (Strict Mode)[2m > [22m[2mshould fail after max retries, log failure, and create alert
+[22m[39mRetrying in 2000ms...
+
+[90mstderr[2m | tests/unit/email.test.ts[2m > [22m[2mEmail Utility (Strict Mode)[2m > [22m[2mshould fail after max retries, log failure, and create alert
+[22m[39mAttempt 2 failed: Persistent Error
+
+[90mstdout[2m | tests/unit/email.test.ts[2m > [22m[2mEmail Utility (Strict Mode)[2m > [22m[2mshould fail after max retries, log failure, and create alert
+[22m[39mAttempt 3/3 sending via Resend API...
+
+[90mstderr[2m | tests/unit/email.test.ts[2m > [22m[2mEmail Utility (Strict Mode)[2m > [22m[2mshould fail after max retries, log failure, and create alert
+[22m[39mAttempt 3 failed: Persistent Error
+All delivery attempts failed.
+
+[90mstdout[2m | tests/unit/email.test.ts[2m > [22m[2mEmail Utility (Strict Mode)[2m > [22m[2mshould fail immediately if API key is missing
+[22m[39mPreparing to send email to: test@example.com via Resend API
+
+[90mstderr[2m | tests/unit/email.test.ts[2m > [22m[2mEmail Utility (Strict Mode)[2m > [22m[2mshould fail immediately if API key is missing
+[22m[39mRESEND_API_KEY (EMAIL_PASS) is missing
+
+ [32m✓[39m tests/unit/email.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 100[2mms[22m[39m
+ [32m✓[39m tests/unit/rate-limiter.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 176[2mms[22m[39m
+[90mstderr[2m | tests/unit/ai-brain.test.ts[2m > [22m[2mAI Brain — Intent Classification[2m > [22m[2mshould return safe defaults on AI error
+[22m[39mGemini AI error: SyntaxError: Unexpected token 'o', "not valid J"... is not valid JSON
+    at JSON.parse (<anonymous>)
+    at callGemini [90m(/home/amar/Desktop/Testing and Fixing/careops-app/[39msrc/lib/gemini.ts:116:17[90m)[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:104:5)[39m
+    at Module.classifyConversationIntent [90m(/home/amar/Desktop/Testing and Fixing/careops-app/[39msrc/lib/gemini.ts:807:12[90m)[39m
+    at [90m/home/amar/Desktop/Testing and Fixing/careops-app/[39mtests/unit/ai-brain.test.ts:101:24
+    at [90mfile:///home/amar/Desktop/Testing%20and%20Fixing/careops-app/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:915:20
+
+[90mstderr[2m | tests/unit/ai-brain.test.ts[2m > [22m[2mAI Brain — Intent Classification[2m > [22m[2mshould return safe defaults on AI error
+[22m[39mIntent classification error: SyntaxError: Unexpected token 'o', "not valid J"... is not valid JSON
+    at JSON.parse (<anonymous>)
+    at callGemini [90m(/home/amar/Desktop/Testing and Fixing/careops-app/[39msrc/lib/gemini.ts:116:17[90m)[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:104:5)[39m
+    at Module.classifyConversationIntent [90m(/home/amar/Desktop/Testing and Fixing/careops-app/[39msrc/lib/gemini.ts:807:12[90m)[39m
+    at [90m/home/amar/Desktop/Testing and Fixing/careops-app/[39mtests/unit/ai-brain.test.ts:101:24
+    at [90mfile:///home/amar/Desktop/Testing%20and%20Fixing/careops-app/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:915:20
+
+[90mstderr[2m | tests/unit/ai-brain.test.ts[2m > [22m[2mAI Brain — Anomaly Detection[2m > [22m[2mshould handle malformed AI response gracefully
+[22m[39mGemini AI error: Error: API quota exceeded
+    at [90m/home/amar/Desktop/Testing and Fixing/careops-app/[39mtests/unit/ai-brain.test.ts:167:47
+    at [90mfile:///home/amar/Desktop/Testing%20and%20Fixing/careops-app/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:145:11
+    at [90mfile:///home/amar/Desktop/Testing%20and%20Fixing/careops-app/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:915:26
+    at [90mfile:///home/amar/Desktop/Testing%20and%20Fixing/careops-app/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1243:20
+    at new Promise (<anonymous>)
+    at runWithTimeout [90m(file:///home/amar/Desktop/Testing%20and%20Fixing/careops-app/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1209:10[90m)[39m
+    at [90mfile:///home/amar/Desktop/Testing%20and%20Fixing/careops-app/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1653:37
+    at Traces.$ [90m(file:///home/amar/Desktop/Testing%20and%20Fixing/careops-app/[39mnode_modules/[4mvitest[24m/dist/chunks/traces.CCmnQaNT.js:142:27[90m)[39m
+    at trace [90m(file:///home/amar/Desktop/Testing%20and%20Fixing/careops-app/[39mnode_modules/[4mvitest[24m/dist/chunks/test.B8ej_ZHS.js:239:21[90m)[39m
+    at runTest [90m(file:///home/amar/Desktop/Testing%20and%20Fixing/careops-app/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1653:12[90m)[39m
+
+[90mstderr[2m | tests/unit/ai-brain.test.ts[2m > [22m[2mAI Brain — Contact Scoring[2m > [22m[2mshould provide safe defaults when AI returns invalid JSON
+[22m[39mGemini AI error: SyntaxError: Unexpected token 'o', "totally not"... is not valid JSON
+    at JSON.parse (<anonymous>)
+    at callGemini [90m(/home/amar/Desktop/Testing and Fixing/careops-app/[39msrc/lib/gemini.ts:116:17[90m)[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:104:5)[39m
+    at Module.scoreContact [90m(/home/amar/Desktop/Testing and Fixing/careops-app/[39msrc/lib/gemini.ts:942:12[90m)[39m
+    at [90m/home/amar/Desktop/Testing and Fixing/careops-app/[39mtests/unit/ai-brain.test.ts:255:24
+    at [90mfile:///home/amar/Desktop/Testing%20and%20Fixing/careops-app/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:915:20
+
+ [32m✓[39m tests/unit/ai-brain.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 97[2mms[22m[39m
+ [32m✓[39m tests/unit/booking-submission.test.tsx [2m([22m[2m1 test[22m[2m)[22m[33m 793[2mms[22m[39m
+     [33m[2m✓[22m[39m should complete the booking flow successfully [33m 772[2mms[22m[39m
+[90mstderr[2m | tests/unit/gemini.test.ts[2m > [22m[2maiOnboardingAssistant (Function Calling)[2m > [22m[2mshould handle error gracefully
+[22m[39mAI Onboarding Error: Error: API Error
+    at [90m/home/amar/Desktop/Testing and Fixing/careops-app/[39mtests/unit/gemini.test.ts:101:47
+    at [90mfile:///home/amar/Desktop/Testing%20and%20Fixing/careops-app/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:145:11
+    at [90mfile:///home/amar/Desktop/Testing%20and%20Fixing/careops-app/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:915:26
+    at [90mfile:///home/amar/Desktop/Testing%20and%20Fixing/careops-app/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1243:20
+    at new Promise (<anonymous>)
+    at runWithTimeout [90m(file:///home/amar/Desktop/Testing%20and%20Fixing/careops-app/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1209:10[90m)[39m
+    at [90mfile:///home/amar/Desktop/Testing%20and%20Fixing/careops-app/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1653:37
+    at Traces.$ [90m(file:///home/amar/Desktop/Testing%20and%20Fixing/careops-app/[39mnode_modules/[4mvitest[24m/dist/chunks/traces.CCmnQaNT.js:142:27[90m)[39m
+    at trace [90m(file:///home/amar/Desktop/Testing%20and%20Fixing/careops-app/[39mnode_modules/[4mvitest[24m/dist/chunks/test.B8ej_ZHS.js:239:21[90m)[39m
+    at runTest [90m(file:///home/amar/Desktop/Testing%20and%20Fixing/careops-app/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1653:12[90m)[39m
+
+ [32m✓[39m tests/unit/gemini.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 77[2mms[22m[39m
+ [32m✓[39m tests/unit/inventory-log.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 116[2mms[22m[39m
+[90mstderr[2m | tests/unit/multimodal.test.ts[2m > [22m[2mMultimodal Inventory Scanner[2m > [22m[2mshould handle API errors gracefully
+[22m[39mMultimodal Inventory Scan Error: Error: API Error
+    at [90m/home/amar/Desktop/Testing and Fixing/careops-app/[39mtests/unit/multimodal.test.ts:56:47
+    at [90mfile:///home/amar/Desktop/Testing%20and%20Fixing/careops-app/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:145:11
+    at [90mfile:///home/amar/Desktop/Testing%20and%20Fixing/careops-app/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:915:26
+    at [90mfile:///home/amar/Desktop/Testing%20and%20Fixing/careops-app/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1243:20
+    at new Promise (<anonymous>)
+    at runWithTimeout [90m(file:///home/amar/Desktop/Testing%20and%20Fixing/careops-app/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1209:10[90m)[39m
+    at [90mfile:///home/amar/Desktop/Testing%20and%20Fixing/careops-app/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1653:37
+    at Traces.$ [90m(file:///home/amar/Desktop/Testing%20and%20Fixing/careops-app/[39mnode_modules/[4mvitest[24m/dist/chunks/traces.CCmnQaNT.js:142:27[90m)[39m
+    at trace [90m(file:///home/amar/Desktop/Testing%20and%20Fixing/careops-app/[39mnode_modules/[4mvitest[24m/dist/chunks/test.B8ej_ZHS.js:239:21[90m)[39m
+    at runTest [90m(file:///home/amar/Desktop/Testing%20and%20Fixing/careops-app/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1653:12[90m)[39m
+
+ [32m✓[39m tests/unit/multimodal.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 53[2mms[22m[39m
+ [32m✓[39m tests/unit/auth-change-password.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 134[2mms[22m[39m
+ [32m✓[39m tests/unit/webhook-queue.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 43[2mms[22m[39m
+[90mstderr[2m | tests/unit/sms.test.ts[2m > [22m[2mSMS Utility (Strict Mode)[2m > [22m[2mshould log failure and create alert on INVALID_NUMBER
+[22m[39m[SMS] Delivery failed: Invalid number (code: INVALID_NUMBER)
+
+[90mstderr[2m | tests/unit/sms.test.ts[2m > [22m[2mSMS Utility (Strict Mode)[2m > [22m[2mshould log failure and create alert on Generic Failure
+[22m[39m[SMS] Delivery failed: Twilio Error (code: UNKNOWN)
+
+ [32m✓[39m tests/unit/sms.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 60[2mms[22m[39m
+ [32m✓[39m tests/unit/voice-webhook.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 97[2mms[22m[39m
+ [32m✓[39m tests/unit/automation.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 25[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m14 passed[39m[22m[90m (14)[39m
+[2m      Tests [22m [1m[32m55 passed[39m[22m[90m (55)[39m
+[2m   Start at [22m 23:20:47
+[2m   Duration [22m 37.79s[2m (transform 4.19s, setup 5.73s, import 29.38s, tests 6.50s, environment 51.22s)[22m
+
+
+> careops-app@0.1.0 render:validate
+> bash ./scripts/render-cli.sh blueprints validate render.yaml --output json
+
+{
+  "plan": {
+    "totalActions": 0
+  },
+  "valid": true
+}
+> careops-app@0.1.0 prebuild
+> npm install --include=dev
+
+npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: '@renovatebot/pep440@4.2.1',
+npm warn EBADENGINE   required: { node: '^20.9.0 || ^22.11.0 || ^24', pnpm: '^10.0.0' },
+npm warn EBADENGINE   current: { node: 'v25.6.1', npm: '11.10.1' }
+npm warn EBADENGINE }
+
+> careops-app@0.1.0 postinstall
+> prisma generate || true
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v6.2.1) to ./node_modules/@prisma/client in 1.29s
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Curious about the SQL queries Prisma ORM generates? Optimize helps you enhance your visibility: https://pris.ly/tip-2-optimize
+
+
+up to date, audited 1053 packages in 3m
+
+230 packages are looking for funding
+  run `npm fund` for details
+
+44 vulnerabilities (2 moderate, 42 high)
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+
+> careops-app@0.1.0 build
+> prisma generate && next build
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v6.2.1) to ./node_modules/@prisma/client in 1.71s
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Want real-time updates to your database without manual polling? Discover how with Pulse: https://pris.ly/tip-0-pulse
+
+▲ Next.js 16.1.6 (Turbopack)
+- Environments: .env
+
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+  Creating an optimized production build ...
+✓ Compiled successfully in 2.3min
+  Running TypeScript ...
+  Collecting page data using 3 workers ...
+  Generating static pages using 3 workers (0/115) ...
+  Generating static pages using 3 workers (28/115) 
+  Generating static pages using 3 workers (57/115) 
+The width(-1) and height(-1) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+  Generating static pages using 3 workers (86/115) 
+✓ Generating static pages using 3 workers (115/115) in 5.1s
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ƒ /api/ai/anomalies
+├ ƒ /api/ai/chat
+├ ƒ /api/ai/classify
+├ ƒ /api/ai/insights
+├ ƒ /api/ai/inventory-forecast
+├ ƒ /api/ai/inventory/scan
+├ ƒ /api/ai/operations-summary
+├ ƒ /api/ai/preferences
+├ ƒ /api/ai/refine-message
+├ ƒ /api/ai/smart-reply
+├ ƒ /api/ai/voice
+├ ƒ /api/ai/voice/settings
+├ ƒ /api/alerts
+├ ƒ /api/auth/change-password
+├ ƒ /api/auth/forgot-password
+├ ƒ /api/auth/google
+├ ƒ /api/auth/google/callback
+├ ƒ /api/auth/login
+├ ƒ /api/auth/logout
+├ ƒ /api/auth/me
+├ ƒ /api/auth/register
+├ ƒ /api/auth/resend-otp
+├ ƒ /api/auth/reset-password
+├ ƒ /api/auth/send-sms-otp
+├ ƒ /api/auth/send-whatsapp-otp
+├ ƒ /api/auth/verify-otp
+├ ƒ /api/automation
+├ ƒ /api/automation/[id]
+├ ƒ /api/automation/[id]/test
+├ ƒ /api/automation/cron
+├ ƒ /api/automation/scheduler
+├ ƒ /api/automation/trigger
+├ ƒ /api/automation/vendor-alert
+├ ƒ /api/billing/checkout
+├ ƒ /api/billing/status
+├ ƒ /api/booking/availability
+├ ƒ /api/booking/context/[workspaceId]
+├ ƒ /api/booking/create
+├ ƒ /api/bookings
+├ ƒ /api/bookings/[id]
+├ ƒ /api/contacts
+├ ƒ /api/cron/process-webhooks
+├ ƒ /api/dashboard
+├ ƒ /api/dashboard/metrics
+├ ƒ /api/forms/contact-forms
+├ ƒ /api/forms/contact-forms/[id]
+├ ƒ /api/forms/intake-forms
+├ ƒ /api/forms/intake-forms/[id]
+├ ƒ /api/forms/submissions
+├ ƒ /api/forms/submissions/[id]
+├ ƒ /api/health
+├ ƒ /api/inbox
+├ ƒ /api/inbox/[id]
+├ ƒ /api/inbox/conversations
+├ ƒ /api/inbox/messages
+├ ƒ /api/integrations/google-calendar
+├ ƒ /api/integrations/google-calendar/callback
+├ ƒ /api/integrations/google-calendar/events
+├ ƒ /api/inventory
+├ ƒ /api/inventory/[id]
+├ ƒ /api/inventory/[id]/history
+├ ƒ /api/inventory/history
+├ ƒ /api/inventory/link
+├ ƒ /api/onboarding/context
+├ ƒ /api/public/book
+├ ƒ /api/public/contact
+├ ƒ /api/public/contact-form/[slug]
+├ ƒ /api/public/form/[slug]
+├ ƒ /api/public/workspaces
+├ ƒ /api/razorpay/webhook
+├ ƒ /api/services
+├ ƒ /api/settings/export
+├ ƒ /api/settings/test-email
+├ ƒ /api/settings/test-sms
+├ ƒ /api/settings/test-whatsapp
+├ ƒ /api/settings/voice
+├ ƒ /api/staff
+├ ƒ /api/staff/[id]
+├ ƒ /api/test/seed
+├ ƒ /api/upload
+├ ƒ /api/user
+├ ƒ /api/user/change-password
+├ ƒ /api/voice/agents
+├ ƒ /api/voice/agents/[id]
+├ ƒ /api/voice/agents/create
+├ ƒ /api/voice/agents/templates
+├ ƒ /api/voice/calls
+├ ƒ /api/voice/calls/[id]
+├ ƒ /api/voice/dnc
+├ ƒ /api/voice/numbers
+├ ƒ /api/voice/numbers/[id]
+├ ƒ /api/voice/numbers/provision
+├ ƒ /api/voice/numbers/search
+├ ƒ /api/voice/tools
+├ ƒ /api/voice/webhook
+├ ƒ /api/voice/webhook-fast
+├ ƒ /api/webhooks
+├ ƒ /api/webhooks/[id]
+├ ƒ /api/webhooks/delivery/[id]/retry
+├ ƒ /api/workspace
+├ ƒ /api/workspace/validate-activation
+├ ƒ /automation
+├ ƒ /book/[workspaceId]
+├ ƒ /bookings
+├ ○ /contact
+├ ƒ /contact/[slug]
+├ ƒ /contacts
+├ ○ /cookies
+├ ƒ /dashboard
+├ ○ /faq
+├ ○ /forgot-password
+├ ƒ /form/[slug]
+├ ƒ /forms
+├ ƒ /inbox
+├ ƒ /inventory
+├ ○ /login
+├ ○ /manifest.webmanifest
+├ ○ /onboarding
+├ ○ /pricing
+├ ○ /privacy
+├ ○ /register
+├ ○ /robots.txt
+├ ○ /search
+├ ƒ /settings
+├ ○ /sitemap.xml
+├ ƒ /staff
+├ ○ /terms
+├ ○ /verify-otp
+├ ƒ /voice/agents
+├ ƒ /voice/calls
+├ ƒ /voice/numbers
+└ ƒ /voice/setup
+
+
+ƒ Proxy (Middleware)
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

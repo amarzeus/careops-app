@@ -1,4 +1,6 @@
-import { GoogleGenAI, Type } from "@google/genai";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { GoogleGenAI, Type, type Part } from "@google/genai";
+export { type Part };
 
 const GEMINI_KEY = process.env.GEMINI_API_KEY || "";
 
@@ -29,31 +31,35 @@ export function getClient(): GoogleGenAI {
  * Note: Gemini 2.0 Flash is deprecated and will be shut down June 1, 2026.
  */
 export const GEMINI_MODELS = {
-  'gemini-3.1-pro-preview': 'Gemini 3.1 Pro (Latest - Reasoning)',
-  'gemini-3-flash': 'Gemini 3 Flash (Latest - Multimodal)',
-  'gemini-2.5-pro': 'Gemini 2.5 Pro (Advanced)',
-  'gemini-2.5-flash': 'Gemini 2.5 Flash (Fast)',
-  'gemini-2.5-flash-lite': 'Gemini 2.5 Flash-Lite (Cheapest)',
-  'gemini-2.0-flash': 'Gemini 2.0 Flash (Deprecated)',
+  "gemini-3.1-pro-preview": "Gemini 3.1 Pro (Latest - Reasoning)",
+  "gemini-3-flash": "Gemini 3 Flash (Latest - Multimodal)",
+  "gemini-2.5-pro": "Gemini 2.5 Pro (Advanced)",
+  "gemini-2.5-flash": "Gemini 2.5 Flash (Fast)",
+  "gemini-2.5-flash-lite": "Gemini 2.5 Flash-Lite (Cheapest)",
+  "gemini-2.0-flash": "Gemini 2.0 Flash (Deprecated)",
 } as const;
 
 export type GeminiModelId = keyof typeof GEMINI_MODELS;
 
 /**
-* Default model to use.
-*/
-export const DEFAULT_GEMINI_MODEL: GeminiModelId = 'gemini-2.0-flash';
+ * Default model to use.
+ */
+export const DEFAULT_GEMINI_MODEL: GeminiModelId = "gemini-2.0-flash";
 
 /**
-* Gets the AI model preference for a workspace.
-* @param workspaceId - The workspace ID
-* @returns The model ID to use
-*/
+ * Gets the AI model preference for a workspace.
+ * @param workspaceId - The workspace ID
+ * @returns The model ID to use
+ */
 export async function getWorkspaceGeminiModel(workspaceId: string): Promise<string> {
   // Dynamic import to avoid circular dependency
-  const { prisma } = await import('./prisma');
+  const { prisma } = await import("./prisma");
   try {
-    const prefs = await (prisma as any).aIPreferences.findUnique({
+    const prefs = await (
+      prisma as any as {
+        aIPreferences: { findUnique: (args: any) => Promise<{ geminiModel?: string }> };
+      }
+    ).aIPreferences.findUnique({
       where: { workspaceId },
       select: { geminiModel: true },
     });
@@ -78,18 +84,22 @@ export async function getWorkspaceGeminiModel(workspaceId: string): Promise<stri
 // Helper to identify quota errors across the SDK
 export function isQuotaError(error: any): boolean {
   if (!error) return false;
+  const err = error as Record<string, any>;
   return (
-    error.status === 429 ||
-    error.statusCode === 429 ||
-    error.message?.toLowerCase().includes("quota") ||
-    error.message?.toLowerCase().includes("rate limit") ||
-    error.message?.toLowerCase().includes("429")
+    err.status === 429 ||
+    err.statusCode === 429 ||
+    (typeof err.message === "string" && err.message.toLowerCase().includes("quota")) ||
+    (typeof err.message === "string" && err.message.toLowerCase().includes("rate limit")) ||
+    (typeof err.message === "string" && err.message.toLowerCase().includes("429"))
   );
 }
 
+/**
+ *
+ */
 async function callGemini<T>(
-  prompt: string,
-  responseSchema?: unknown,
+  prompt: string | (string | Part)[],
+  responseSchema?: any,
   systemInstruction?: string,
   model?: string
 ): Promise<T> {
@@ -109,16 +119,15 @@ async function callGemini<T>(
       config: {
         ...config,
         systemInstruction,
-      }
+      },
     });
 
     const text = response.text;
     return JSON.parse(text!) as T;
   } catch (error: any) {
-    console.error("Gemini AI error:", error);
     if (isQuotaError(error)) {
       const quotaError = new Error("AI Quota Exceeded");
-      (quotaError as any).status = 429;
+      (quotaError as { status?: number }).status = 429;
       throw quotaError;
     }
     throw error;
@@ -216,7 +225,7 @@ RULES:
       return [
         "The AI is briefly busy. Please type your reply.",
         "System at capacity. Manual reply recommended.",
-        "Check back in a moment for smart suggestions."
+        "Check back in a moment for smart suggestions.",
       ];
     }
     return [
@@ -236,14 +245,19 @@ RULES:
  * @param data - The business metrics data
  * @returns Array of prioritized insights
  */
-export async function generateDashboardInsights(data: {
-  totalBookings: number;
-  completedBookings: number;
-  newContacts: number;
-  pendingForms: number;
-  lowStockItems: number;
-  unreadMessages: number;
-}, model?: string): Promise<Array<{ priority: "high" | "medium" | "low"; category: string; message: string; action: string }>> {
+export async function generateDashboardInsights(
+  data: {
+    totalBookings: number;
+    completedBookings: number;
+    newContacts: number;
+    pendingForms: number;
+    lowStockItems: number;
+    unreadMessages: number;
+  },
+  model?: string
+): Promise<
+  Array<{ priority: "high" | "medium" | "low"; category: string; message: string; action: string }>
+> {
   const schema = {
     type: Type.OBJECT,
     properties: {
@@ -275,7 +289,14 @@ RULES:
 - Keep messages punchy and under 15 words.`;
 
   try {
-    const result = await callGemini<{ insights: Array<{ priority: "high" | "medium" | "low"; category: string; message: string; action: string }> }>(
+    const result = await callGemini<{
+      insights: Array<{
+        priority: "high" | "medium" | "low";
+        category: string;
+        message: string;
+        action: string;
+      }>;
+    }>(
       `Business metrics:
 - Total bookings: ${data.totalBookings}
 - Completed bookings: ${data.completedBookings}
@@ -289,15 +310,43 @@ RULES:
     );
     return result.insights.slice(0, 3); // Ensure only 3 insights are returned as per prompt
   } catch {
-    const insights: Array<{ priority: "high" | "medium" | "low"; category: string; message: string; action: string }> = [];
-    if (data.unreadMessages > 0) insights.push({ priority: "high", category: "Communication", message: `${data.unreadMessages} messages need your attention`, action: "Open Inbox" });
-    if (data.pendingForms > 0) insights.push({ priority: "medium", category: "Operations", message: `${data.pendingForms} forms waiting for completion`, action: "Review Forms" });
-    if (data.lowStockItems > 0) insights.push({ priority: "high", category: "Inventory", message: `${data.lowStockItems} items running low`, action: "Check Inventory" });
-    if (insights.length === 0) insights.push({ priority: "low", category: "System", message: "All operations running smoothly", action: "View Dashboard" });
+    const insights: Array<{
+      priority: "high" | "medium" | "low";
+      category: string;
+      message: string;
+      action: string;
+    }> = [];
+    if (data.unreadMessages > 0)
+      insights.push({
+        priority: "high",
+        category: "Communication",
+        message: `${data.unreadMessages} messages need your attention`,
+        action: "Open Inbox",
+      });
+    if (data.pendingForms > 0)
+      insights.push({
+        priority: "medium",
+        category: "Operations",
+        message: `${data.pendingForms} forms waiting for completion`,
+        action: "Review Forms",
+      });
+    if (data.lowStockItems > 0)
+      insights.push({
+        priority: "high",
+        category: "Inventory",
+        message: `${data.lowStockItems} items running low`,
+        action: "Check Inventory",
+      });
+    if (insights.length === 0)
+      insights.push({
+        priority: "low",
+        category: "System",
+        message: "All operations running smoothly",
+        action: "View Dashboard",
+      });
     return insights;
   }
 }
-
 
 // ──────────────────────────────────────────────
 // 5. Message Refinement
@@ -309,7 +358,10 @@ RULES:
  * @param tone - The desired tone (default: professional)
  * @returns The refined message
  */
-export async function refineMessage(content: string, tone: string = "professional", model?: string
+export async function refineMessage(
+  content: string,
+  tone: string = "professional",
+  model?: string
 ): Promise<string> {
   const schema = {
     type: Type.OBJECT,
@@ -345,8 +397,8 @@ Original: "${content}"`,
  * @returns Array of forecast objects
  */
 export async function generateInventoryForecast(
-  items: Array<{ name: string; quantity: number; threshold: number; unit: string }>
-  , model?: string
+  items: Array<{ name: string; quantity: number; threshold: number; unit: string }>,
+  model?: string
 ): Promise<Array<{ name: string; daysRemaining: number | string; confidence: string }>> {
   if (items.length === 0) return [];
 
@@ -359,7 +411,10 @@ export async function generateInventoryForecast(
           type: Type.OBJECT,
           properties: {
             name: { type: Type.STRING },
-            daysRemaining: { type: Type.STRING, description: "Estimated days remaining or 'Critical'" },
+            daysRemaining: {
+              type: Type.STRING,
+              description: "Estimated days remaining or 'Critical'",
+            },
             confidence: { type: Type.STRING, enum: ["high", "medium", "low"] },
           },
           required: ["name", "daysRemaining", "confidence"],
@@ -370,7 +425,13 @@ export async function generateInventoryForecast(
   };
 
   try {
-    const result = await callGemini<{ forecasts: Array<{ name: string; daysRemaining: string; confidence: "high" | "medium" | "low" }> }>(
+    const result = await callGemini<{
+      forecasts: Array<{
+        name: string;
+        daysRemaining: string;
+        confidence: "high" | "medium" | "low";
+      }>;
+    }>(
       `You are an inventory specialist. Based on current stock and thresholds, estimate days of stock remaining for each item. Items at or below threshold typically have 3-5 days left. Zero quantity means "Critical".
 Items: ${JSON.stringify(items)}`,
       schema,
@@ -379,14 +440,17 @@ Items: ${JSON.stringify(items)}`,
     );
     return result.forecasts;
   } catch (error) {
-    const fallback = items.map(i => ({
+    const fallback = items.map((i) => ({
       name: i.name,
-      daysRemaining: i.quantity === 0 ? "Critical" : Math.max(1, Math.floor(i.quantity / Math.max(1, i.threshold) * 5)),
+      daysRemaining:
+        i.quantity === 0
+          ? "Critical"
+          : Math.max(1, Math.floor((i.quantity / Math.max(1, i.threshold)) * 5)),
       confidence: "low" as const,
     }));
 
     if (isQuotaError(error)) {
-      return fallback.map(f => ({ ...f, daysRemaining: `${f.daysRemaining} (Est.)` }));
+      return fallback.map((f) => ({ ...f, daysRemaining: `${f.daysRemaining} (Est.)` }));
     }
     return fallback;
   }
@@ -401,16 +465,19 @@ Items: ${JSON.stringify(items)}`,
  * @param data - The daily operations data
  * @returns A concise summary string
  */
-export async function generateOperationsSummary(data: {
-  bookingsToday: number;
-  bookingsCompleted: number;
-  bookingsNoShow: number;
-  newContacts: number;
-  unansweredMessages: number;
-  pendingForms: number;
-  lowStockItems: number;
-  businessName: string;
-}, model?: string): Promise<string> {
+export async function generateOperationsSummary(
+  data: {
+    bookingsToday: number;
+    bookingsCompleted: number;
+    bookingsNoShow: number;
+    newContacts: number;
+    unansweredMessages: number;
+    pendingForms: number;
+    lowStockItems: number;
+    businessName: string;
+  },
+  model?: string
+): Promise<string> {
   const schema = {
     type: Type.OBJECT,
     properties: {
@@ -547,8 +614,24 @@ const onboardingTools = [
         parameters: {
           type: Type.OBJECT,
           properties: {
-            addServices: { type: Type.ARRAY, items: { type: Type.OBJECT, properties: { name: { type: Type.STRING }, duration: { type: Type.NUMBER }, price: { type: Type.NUMBER } } } },
-            updateServices: { type: Type.ARRAY, items: { type: Type.OBJECT, properties: { id: { type: Type.STRING }, name: { type: Type.STRING } } } },
+            addServices: {
+              type: Type.ARRAY,
+              items: {
+                type: Type.OBJECT,
+                properties: {
+                  name: { type: Type.STRING },
+                  duration: { type: Type.NUMBER },
+                  price: { type: Type.NUMBER },
+                },
+              },
+            },
+            updateServices: {
+              type: Type.ARRAY,
+              items: {
+                type: Type.OBJECT,
+                properties: { id: { type: Type.STRING }, name: { type: Type.STRING } },
+              },
+            },
             removeServices: { type: Type.ARRAY, items: { type: Type.STRING } },
           },
         },
@@ -559,8 +642,23 @@ const onboardingTools = [
         parameters: {
           type: Type.OBJECT,
           properties: {
-            addIntakeForms: { type: Type.ARRAY, items: { type: Type.OBJECT, properties: { name: { type: Type.STRING }, fields: { type: Type.ARRAY, items: { type: Type.STRING } } } } },
-            updateIntakeForms: { type: Type.ARRAY, items: { type: Type.OBJECT, properties: { id: { type: Type.STRING }, name: { type: Type.STRING } } } },
+            addIntakeForms: {
+              type: Type.ARRAY,
+              items: {
+                type: Type.OBJECT,
+                properties: {
+                  name: { type: Type.STRING },
+                  fields: { type: Type.ARRAY, items: { type: Type.STRING } },
+                },
+              },
+            },
+            updateIntakeForms: {
+              type: Type.ARRAY,
+              items: {
+                type: Type.OBJECT,
+                properties: { id: { type: Type.STRING }, name: { type: Type.STRING } },
+              },
+            },
             removeIntakeForms: { type: Type.ARRAY, items: { type: Type.STRING } },
           },
         },
@@ -571,8 +669,25 @@ const onboardingTools = [
         parameters: {
           type: Type.OBJECT,
           properties: {
-            addInventoryItems: { type: Type.ARRAY, items: { type: Type.OBJECT, properties: { name: { type: Type.STRING }, quantity: { type: Type.NUMBER }, unit: { type: Type.STRING }, threshold: { type: Type.NUMBER } } } },
-            updateInventoryItems: { type: Type.ARRAY, items: { type: Type.OBJECT, properties: { id: { type: Type.STRING }, quantity: { type: Type.NUMBER } } } },
+            addInventoryItems: {
+              type: Type.ARRAY,
+              items: {
+                type: Type.OBJECT,
+                properties: {
+                  name: { type: Type.STRING },
+                  quantity: { type: Type.NUMBER },
+                  unit: { type: Type.STRING },
+                  threshold: { type: Type.NUMBER },
+                },
+              },
+            },
+            updateInventoryItems: {
+              type: Type.ARRAY,
+              items: {
+                type: Type.OBJECT,
+                properties: { id: { type: Type.STRING }, quantity: { type: Type.NUMBER } },
+              },
+            },
             removeInventoryItems: { type: Type.ARRAY, items: { type: Type.STRING } },
           },
         },
@@ -583,8 +698,18 @@ const onboardingTools = [
         parameters: {
           type: Type.OBJECT,
           properties: {
-            addStaffMember: { type: Type.OBJECT, properties: { name: { type: Type.STRING }, role: { type: Type.STRING }, email: { type: Type.STRING } } },
-            updateStaffMember: { type: Type.OBJECT, properties: { id: { type: Type.STRING }, role: { type: Type.STRING } } },
+            addStaffMember: {
+              type: Type.OBJECT,
+              properties: {
+                name: { type: Type.STRING },
+                role: { type: Type.STRING },
+                email: { type: Type.STRING },
+              },
+            },
+            updateStaffMember: {
+              type: Type.OBJECT,
+              properties: { id: { type: Type.STRING }, role: { type: Type.STRING } },
+            },
             removeStaffMember: { type: Type.STRING },
           },
         },
@@ -616,28 +741,37 @@ function buildStepStatus(step: number, info: Record<string, unknown>): string {
   const ws = (info.workspace || {}) as Record<string, unknown>;
   const email = (info.emailConfig || {}) as Record<string, unknown>;
   const cf = (info.contactForm || {}) as Record<string, unknown>;
-  const svcs = (info.services || []) as Array<unknown>;
-  const forms = (info.intakeForms || []) as Array<unknown>;
-  const inv = (info.inventoryItems || []) as Array<unknown>;
-  const staff = (info.staffMembers || []) as Array<unknown>;
+  const svcs = (info.services || []) as Array<any>;
+  const forms = (info.intakeForms || []) as Array<any>;
+  const inv = (info.inventoryItems || []) as Array<any>;
+  const staff = (info.staffMembers || []) as Array<any>;
 
   // ... (Identical logic for business type detection) ...
-  const nameLower = (String(ws.name || "")).toLowerCase();
+  const nameLower = String(ws.name || "").toLowerCase();
   let businessType = "service business";
   if (/dent/i.test(nameLower)) businessType = "dental clinic";
   else if (/salon|barber|beauty|hair|spa/i.test(nameLower)) businessType = "salon/spa";
   // ... (rest of logic) ...
 
   switch (step) {
-    case 1: return `BUSINESS TYPE: ${businessType}\nTHIS STEP — Workspace fields:\n${JSON.stringify(ws, null, 2)}`;
-    case 2: return `BUSINESS TYPE: ${businessType}\nTHIS STEP — Email/SMS fields:\n${JSON.stringify(email, null, 2)}`;
-    case 3: return `BUSINESS TYPE: ${businessType}\nTHIS STEP — Contact Form:\n${JSON.stringify(cf, null, 2)}`;
-    case 4: return `BUSINESS TYPE: ${businessType}\nTHIS STEP — Services/Bookings:\nEXISTING SERVICES:\n${JSON.stringify(svcs, null, 2)}`;
-    case 5: return `BUSINESS TYPE: ${businessType}\nTHIS STEP — Intake Forms:\nEXISTING FORMS:\n${JSON.stringify(forms, null, 2)}`;
-    case 6: return `BUSINESS TYPE: ${businessType}\nTHIS STEP — Inventory:\nEXISTING ITEMS:\n${JSON.stringify(inv, null, 2)}`;
-    case 7: return `BUSINESS TYPE: ${businessType}\nTHIS STEP — Staff:\nEXISTING STAFF:\n${JSON.stringify(staff, null, 2)}`;
-    case 8: return `BUSINESS TYPE: ${businessType}\nACTIVATION CHECKLIST:\n${JSON.stringify({ ws, email, cf, serviceCount: svcs.length, formCount: forms.length, invCount: inv.length, staffCount: staff.length }, null, 2)}`;
-    default: return JSON.stringify(info, null, 2);
+    case 1:
+      return `BUSINESS TYPE: ${businessType}\nTHIS STEP — Workspace fields:\n${JSON.stringify(ws, null, 2)}`;
+    case 2:
+      return `BUSINESS TYPE: ${businessType}\nTHIS STEP — Email/SMS fields:\n${JSON.stringify(email, null, 2)}`;
+    case 3:
+      return `BUSINESS TYPE: ${businessType}\nTHIS STEP — Contact Form:\n${JSON.stringify(cf, null, 2)}`;
+    case 4:
+      return `BUSINESS TYPE: ${businessType}\nTHIS STEP — Services/Bookings:\nEXISTING SERVICES:\n${JSON.stringify(svcs, null, 2)}`;
+    case 5:
+      return `BUSINESS TYPE: ${businessType}\nTHIS STEP — Intake Forms:\nEXISTING FORMS:\n${JSON.stringify(forms, null, 2)}`;
+    case 6:
+      return `BUSINESS TYPE: ${businessType}\nTHIS STEP — Inventory:\nEXISTING ITEMS:\n${JSON.stringify(inv, null, 2)}`;
+    case 7:
+      return `BUSINESS TYPE: ${businessType}\nTHIS STEP — Staff:\nEXISTING STAFF:\n${JSON.stringify(staff, null, 2)}`;
+    case 8:
+      return `BUSINESS TYPE: ${businessType}\nACTIVATION CHECKLIST:\n${JSON.stringify({ ws, email, cf, serviceCount: svcs.length, formCount: forms.length, invCount: inv.length, staffCount: staff.length }, null, 2)}`;
+    default:
+      return JSON.stringify(info, null, 2);
   }
 }
 
@@ -651,9 +785,9 @@ function sanitizeGeminiHistory(
   history: Array<{ role: "user" | "assistant"; content: string }>
 ): Array<{ role: "user" | "model"; parts: [{ text: string }] }> {
   // Simple mapping for now, ensuring roles are correct
-  return history.map(msg => ({
+  return history.map((msg) => ({
     role: msg.role === "assistant" ? "model" : "user",
-    parts: [{ text: msg.content }]
+    parts: [{ text: msg.content }],
   }));
 }
 
@@ -688,10 +822,7 @@ BEHAVIOR RULES:
   try {
     const geminiHistory = sanitizeGeminiHistory(conversationHistory);
 
-    const contents = [
-      ...geminiHistory,
-      { role: "user", parts: [{ text: userMessage }] }
-    ];
+    const contents = [...geminiHistory, { role: "user", parts: [{ text: userMessage }] }];
 
     const client = getClient();
     // We do NOT use responseSchema when using tools, as the model needs flexibility to call tools or just talk.
@@ -700,10 +831,10 @@ BEHAVIOR RULES:
       model: model || DEFAULT_GEMINI_MODEL,
       config: {
         systemInstruction: systemPrompt,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
         tools: onboardingTools as any,
       },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
       contents: contents as any,
     });
 
@@ -748,13 +879,13 @@ BEHAVIOR RULES:
       shouldAdvance,
       navigationAction,
     };
-
   } catch (err: any) {
     console.error("AI Onboarding Error:", err);
 
     let message = "I had a small hiccup processing that. Could you try again?";
     if (isQuotaError(err)) {
-      message = "The AI Assistant is currently experiencing high volume (quota reached). Please continue by filling out the form manually while I take a quick break!";
+      message =
+        "The AI Assistant is currently experiencing high volume (quota reached). Please continue by filling out the form manually while I take a quick break!";
     }
 
     return {
@@ -771,7 +902,14 @@ BEHAVIOR RULES:
 // ──────────────────────────────────────────────
 
 export interface ConversationIntent {
-  intent: "inquiry" | "complaint" | "booking_request" | "urgent" | "general" | "follow_up" | "cancellation";
+  intent:
+    | "inquiry"
+    | "complaint"
+    | "booking_request"
+    | "urgent"
+    | "general"
+    | "follow_up"
+    | "cancellation";
   confidence: number;
   suggestedAction: string;
   priority: "high" | "medium" | "low";
@@ -791,7 +929,18 @@ export async function classifyConversationIntent(
   const schema = {
     type: Type.OBJECT,
     properties: {
-      intent: { type: Type.STRING, enum: ["inquiry", "complaint", "booking_request", "urgent", "general", "follow_up", "cancellation"] },
+      intent: {
+        type: Type.STRING,
+        enum: [
+          "inquiry",
+          "complaint",
+          "booking_request",
+          "urgent",
+          "general",
+          "follow_up",
+          "cancellation",
+        ],
+      },
       confidence: { type: Type.NUMBER },
       suggestedAction: { type: Type.STRING },
       priority: { type: Type.STRING, enum: ["high", "medium", "low"] },
@@ -844,8 +993,13 @@ export interface OperationsAnomaly {
  * @param metrics - The metrics data object
  * @returns Array of detected anomalies
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function analyzeOperationsAnomalies(metrics: any, model?: string
+
+/**
+ *
+ */
+export async function analyzeOperationsAnomalies(
+  metrics: any,
+  model?: string
 ): Promise<OperationsAnomaly[]> {
   const schema = {
     type: Type.OBJECT,
@@ -863,7 +1017,15 @@ export async function analyzeOperationsAnomalies(metrics: any, model?: string
             expectedRange: { type: Type.STRING },
             actualValue: { type: Type.STRING },
           },
-          required: ["type", "severity", "description", "recommendation", "metric", "expectedRange", "actualValue"],
+          required: [
+            "type",
+            "severity",
+            "description",
+            "recommendation",
+            "metric",
+            "expectedRange",
+            "actualValue",
+          ],
         },
       },
     },
@@ -882,15 +1044,18 @@ Only flag genuine anomalies.`,
     return result.anomalies;
   } catch (error) {
     if (isQuotaError(error)) {
-      return [{
-        type: "info",
-        severity: "info",
-        description: "AI Analytics is currently at capacity. Standard metrics are still available.",
-        recommendation: "Check back later for automated insights.",
-        metric: "Status",
-        expectedRange: "Optimal",
-        actualValue: "Busy",
-      }];
+      return [
+        {
+          type: "info",
+          severity: "info",
+          description:
+            "AI Analytics is currently at capacity. Standard metrics are still available.",
+          recommendation: "Check back later for automated insights.",
+          metric: "Status",
+          expectedRange: "Optimal",
+          actualValue: "Busy",
+        },
+      ];
     }
     return [];
   }
@@ -913,7 +1078,10 @@ export interface ContactScore {
  * @param contactData - The contact's data
  * @returns Detailed contact score object
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
+/**
+ *
+ */
 export async function scoreContact(contactData: any): Promise<ContactScore> {
   const schema = {
     type: Type.OBJECT,
@@ -1016,7 +1184,8 @@ export async function extractInventoryItemsFromImage(
       config: {
         responseMimeType: "application/json",
         responseSchema: schema,
-        systemInstruction: "You are an expert data extraction AI. Extract inventory items from the invoice image.",
+        systemInstruction:
+          "You are an expert data extraction AI. Extract inventory items from the invoice image.",
       },
       contents: [
         {

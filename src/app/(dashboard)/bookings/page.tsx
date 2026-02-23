@@ -53,12 +53,12 @@ export default function BookingsPage() {
       if (bookingsRes.ok) {
         const data = await bookingsRes.json();
         setBookings(
-          (data.bookings || []).map((b: any) => ({
+          (data.bookings || []).map((b: Record<string, unknown>) => ({
             ...b,
-            date: new Date(b.date),
-            endTime: new Date(b.endTime),
-            createdAt: new Date(b.createdAt),
-            updatedAt: new Date(b.updatedAt),
+            date: new Date(b.date as string),
+            endTime: new Date(b.endTime as string),
+            createdAt: new Date(b.createdAt as string),
+            updatedAt: new Date(b.updatedAt as string),
           }))
         );
       }
@@ -117,7 +117,7 @@ export default function BookingsPage() {
     }
   };
 
-  const handleBookingSubmit = async (data: any) => {
+  const handleBookingSubmit = async (data: unknown) => {
     const url = selectedBooking ? `/api/bookings/${selectedBooking.id}` : "/api/bookings";
     const method = selectedBooking ? "PATCH" : "POST";
 
@@ -207,12 +207,12 @@ export default function BookingsPage() {
   };
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-muted/30">
+    <div className="bg-muted/30 flex h-screen flex-col overflow-hidden">
       {/* Fixed Sticky Header */}
       <Header title="Bookings" subtitle="Manage appointments and schedules">
         <div className="flex items-center gap-2 sm:gap-4">
           {/* List/Calendar Switcher */}
-          <div className="xs:flex flex hidden rounded-lg border border-border/40 bg-muted/50 p-0.5">
+          <div className="xs:flex border-border/40 bg-muted/50 flex hidden rounded-lg border p-0.5">
             <Button
               variant={viewMode === "list" ? "secondary" : "ghost"}
               size="sm"
@@ -269,22 +269,22 @@ export default function BookingsPage() {
             ].map((s) => (
               <Card
                 key={s.label}
-                className="border-border/40 group overflow-hidden border bg-background shadow-sm"
+                className="border-border/40 group bg-background overflow-hidden border shadow-sm"
               >
                 <CardContent className="relative p-3 sm:p-4">
                   <div className="flex items-center justify-between">
                     <div className="min-w-0 flex-1">
-                      <p className="mb-0.5 truncate text-[10px] font-bold tracking-widest text-muted-foreground uppercase sm:text-xs">
+                      <p className="text-muted-foreground mb-0.5 truncate text-[10px] font-bold tracking-widest uppercase sm:text-xs">
                         {s.label}
                       </p>
-                      <h3 className="text-xl leading-none font-black tracking-tight text-foreground sm:text-2xl">
+                      <h3 className="text-foreground text-xl leading-none font-black tracking-tight sm:text-2xl">
                         {s.val}
                       </h3>
                     </div>
                     <div
                       className={cn(
                         "shrink-0 rounded-xl border border-black/5 p-2 shadow-sm transition-transform group-hover:scale-110 sm:p-3",
-                        s.color === "blue" && "bg-blue-50 text-primary",
+                        s.color === "blue" && "text-primary bg-blue-50",
                         s.color === "amber" && "bg-amber-50 text-amber-600",
                         s.color === "emerald" && "bg-emerald-50 text-emerald-600",
                         s.color === "rose" && "bg-rose-50 text-rose-600"
@@ -298,26 +298,26 @@ export default function BookingsPage() {
             ))}
           </div>
 
-          <div className="border-border/40 flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border bg-background shadow-sm">
+          <div className="border-border/40 bg-background flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border shadow-sm">
             {viewMode === "list" ? (
               <div className="flex h-full flex-col">
                 {/* Inline Filters for List View */}
-                <div className="border-border/40 flex flex-col items-center gap-2 border-b bg-muted/30 p-3 md:flex-row">
+                <div className="border-border/40 bg-muted/30 flex flex-col items-center gap-2 border-b p-3 md:flex-row">
                   <div className="relative flex-1">
                     <Search className="text-muted-foreground/60 absolute top-1/2 left-2.5 h-3 w-3 -translate-y-1/2" />
                     <Input
                       placeholder="Search bookings..."
-                      className="h-8 rounded-lg border-border/40 bg-background pl-8 text-[11px]"
+                      className="border-border/40 bg-background h-8 rounded-lg pl-8 text-[11px]"
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                     />
                   </div>
-                  <div className="flex items-center gap-1.5 rounded-lg border border-border/40 bg-background p-0.5">
+                  <div className="border-border/40 bg-background flex items-center gap-1.5 rounded-lg border p-0.5">
                     <Popover>
                       <PopoverTrigger asChild>
                         <Button
                           variant="ghost"
-                          className="h-7 px-2 text-[10px] font-medium text-muted-foreground"
+                          className="text-muted-foreground h-7 px-2 text-[10px] font-medium"
                         >
                           <CalendarIcon className="mr-1.5 h-3 w-3 opacity-60" />
                           {dateFrom ? format(parseISO(dateFrom), "MMM d") : "Start Date"}
@@ -337,7 +337,7 @@ export default function BookingsPage() {
                       <PopoverTrigger asChild>
                         <Button
                           variant="ghost"
-                          className="h-7 px-2 text-[10px] font-medium text-muted-foreground"
+                          className="text-muted-foreground h-7 px-2 text-[10px] font-medium"
                         >
                           <CalendarIcon className="mr-1.5 h-3 w-3 opacity-60" />
                           {dateTo ? format(parseISO(dateTo), "MMM d") : "End Date"}

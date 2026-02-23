@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+
 - Google AdSense readiness: `ads.txt`, AdSense script, cookie policy page
 - FAQ page with structured content for SEO
 - Full Open Graph + Twitter Card metadata across all pages
@@ -25,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.0] — 2026-02-14
 
 ### Added
+
 - Initial public hackathon release of CareOps
 - Unified dashboard: bookings, leads, forms, inventory, inbox, automation
 - Google Gemini 2.0 AI integration (onboarding assistant, inventory forecast, smart reply)

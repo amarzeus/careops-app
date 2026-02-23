@@ -24,7 +24,12 @@ interface NumberSelectorProps {
 /**
  *
  */
-export function NumberSelector({ workspaceId: _workspaceId, agentId, onNumberSelected, onCancel }: NumberSelectorProps) {
+export function NumberSelector({
+  workspaceId: _workspaceId,
+  agentId,
+  onNumberSelected,
+  onCancel,
+}: NumberSelectorProps) {
   const [numbers, setNumbers] = useState<PhoneNumberOption[]>([]);
   const [loading, setLoading] = useState(false);
   const [selecting, setSelecting] = useState<string | null>(null);
@@ -113,7 +118,7 @@ export function NumberSelector({ workspaceId: _workspaceId, agentId, onNumberSel
     <Card className="w-full">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Phone className="w-5 h-5" />
+          <Phone className="h-5 w-5" />
           Select a Phone Number
         </CardTitle>
         <CardDescription>
@@ -135,33 +140,36 @@ export function NumberSelector({ workspaceId: _workspaceId, agentId, onNumberSel
             className="w-32"
           />
           <Button onClick={searchNumbers} disabled={loading}>
-            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+            {loading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Search className="h-4 w-4" />
+            )}
             Search
           </Button>
         </div>
 
         {numbers.length === 0 && !loading && (
-          <div className="text-center py-8 text-muted-foreground">
-            <AlertCircle className="w-8 h-8 mx-auto mb-2 opacity-50" />
+          <div className="text-muted-foreground py-8 text-center">
+            <AlertCircle className="mx-auto mb-2 h-8 w-8 opacity-50" />
             <p>No numbers available. Try a different search.</p>
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
           {numbers.map((num) => (
             <div
               key={num.phoneNumber}
-              className={`border rounded-lg p-4 cursor-pointer transition-all ${selectedNumber === num.phoneNumber
-                ? "border-primary bg-primary/5"
-                : "hover:border-primary/50"
-                }`}
+              className={`cursor-pointer rounded-lg border p-4 transition-all ${
+                selectedNumber === num.phoneNumber
+                  ? "border-primary bg-primary/5"
+                  : "hover:border-primary/50"
+              }`}
               onClick={() => !selecting && handleSelectNumber(num.phoneNumber)}
             >
-              <div className="flex items-center justify-between mb-2">
+              <div className="mb-2 flex items-center justify-between">
                 <span className="font-mono font-semibold">{num.phoneNumber}</span>
-                {selectedNumber === num.phoneNumber && (
-                  <Check className="w-5 h-5 text-primary" />
-                )}
+                {selectedNumber === num.phoneNumber && <Check className="text-primary h-5 w-5" />}
               </div>
               <div className="flex items-center gap-2">
                 <Badge variant="outline" className="text-xs">
@@ -174,8 +182,8 @@ export function NumberSelector({ workspaceId: _workspaceId, agentId, onNumberSel
                 ))}
               </div>
               {selecting === num.phoneNumber && (
-                <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                <div className="text-muted-foreground mt-2 flex items-center gap-2 text-sm">
+                  <Loader2 className="h-4 w-4 animate-spin" />
                   Provisioning...
                 </div>
               )}

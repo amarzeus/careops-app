@@ -27,7 +27,8 @@ const eslintConfig = defineConfig([
           patterns: [
             {
               group: ["./../*", "../../*"],
-              message: "Please use absolute imports (e.g. @/...) instead of relative parent imports.",
+              message:
+                "Please use absolute imports (e.g. @/...) instead of relative parent imports.",
             },
           ],
         },
@@ -60,11 +61,14 @@ const eslintConfig = defineConfig([
       "jsdoc/require-returns": "off",
       "@typescript-eslint/no-explicit-any": "warn",
       "@typescript-eslint/no-empty-object-type": "error",
-      "@typescript-eslint/no-unused-vars": ["error", {
-        "argsIgnorePattern": "^_",
-        "varsIgnorePattern": "^_",
-        "caughtErrorsIgnorePattern": "^_"
-      }],
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          caughtErrorsIgnorePattern: "^_",
+        },
+      ],
       "no-unused-vars": "off", // Handled by @typescript-eslint/no-unused-vars
     },
   },

@@ -1,12 +1,29 @@
 "use client";
 
 import React, { useCallback, useState, useEffect } from "react";
-import { Sparkles, Brain, MessageSquare, Mic, AlertTriangle, Package, Settings, Loader2, Check, Zap } from "lucide-react";
+import {
+  Sparkles,
+  Brain,
+  MessageSquare,
+  Mic,
+  AlertTriangle,
+  Package,
+  Settings,
+  Loader2,
+  Check,
+  Zap,
+} from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -79,7 +96,9 @@ export function AIPreferencesTab({ _onSelectTab }: { _onSelectTab?: (tab: string
   }, [fetchPreferences]);
 
   const updatePreference = (key: keyof AIPreferences, value: boolean | string) => {
-    setPreferences((prev) => prev ? { ...prev, [key]: value } : { ...DEFAULT_AI_PREFERENCES, [key]: value });
+    setPreferences((prev) =>
+      prev ? { ...prev, [key]: value } : { ...DEFAULT_AI_PREFERENCES, [key]: value }
+    );
   };
 
   const handleSave = async () => {
@@ -118,8 +137,8 @@ export function AIPreferencesTab({ _onSelectTab }: { _onSelectTab?: (tab: string
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
-        <Loader2 className="animate-spin text-primary w-6 h-6" />
-        <span className="ml-2 text-muted-foreground">Loading AI settings...</span>
+        <Loader2 className="text-primary h-6 w-6 animate-spin" />
+        <span className="text-muted-foreground ml-2">Loading AI settings...</span>
       </div>
     );
   }
@@ -180,40 +199,47 @@ export function AIPreferencesTab({ _onSelectTab }: { _onSelectTab?: (tab: string
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-lg font-semibold flex items-center gap-2">
-          <Sparkles className="w-5 h-5 text-violet-600" />
+        <h2 className="flex items-center gap-2 text-lg font-semibold">
+          <Sparkles className="h-5 w-5 text-violet-600" />
           AI Features
         </h2>
-        <p className="text-sm text-muted-foreground mt-1">
+        <p className="text-muted-foreground mt-1 text-sm">
           Configure which AI features are enabled for your workspace
         </p>
       </div>
 
       <div className="grid gap-4">
         {features.map((feature) => (
-          <Card key={feature.key} className={cn(
-            "transition-all",
-            feature.enabled && `border-${feature.color}-200 bg-${feature.color}-50/30`
-          )}>
+          <Card
+            key={feature.key}
+            className={cn(
+              "transition-all",
+              feature.enabled && `border-${feature.color}-200 bg-${feature.color}-50/30`
+            )}
+          >
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className={cn(
-                    "w-10 h-10 rounded-lg flex items-center justify-center",
-                    feature.enabled
-                      ? `bg-${feature.color}-100 text-${feature.color}-600`
-                      : "bg-muted/30 text-muted-foreground"
-                  )}>
-                    <feature.icon className="w-5 h-5" />
+                  <div
+                    className={cn(
+                      "flex h-10 w-10 items-center justify-center rounded-lg",
+                      feature.enabled
+                        ? `bg-${feature.color}-100 text-${feature.color}-600`
+                        : "bg-muted/30 text-muted-foreground"
+                    )}
+                  >
+                    <feature.icon className="h-5 w-5" />
                   </div>
                   <div>
-                    <p className="font-medium text-sm">{feature.title}</p>
-                    <p className="text-xs text-muted-foreground">{feature.description}</p>
+                    <p className="text-sm font-medium">{feature.title}</p>
+                    <p className="text-muted-foreground text-xs">{feature.description}</p>
                   </div>
                 </div>
                 <Switch
                   checked={feature.enabled}
-                  onCheckedChange={(checked) => updatePreference(feature.key as keyof AIPreferences, checked)}
+                  onCheckedChange={(checked) =>
+                    updatePreference(feature.key as keyof AIPreferences, checked)
+                  }
                 />
               </div>
             </CardContent>
@@ -222,12 +248,12 @@ export function AIPreferencesTab({ _onSelectTab }: { _onSelectTab?: (tab: string
       </div>
 
       <div className="border-t pt-6">
-        <h3 className="font-medium mb-4 flex items-center gap-2">
-          <Settings className="w-4 h-4" />
+        <h3 className="mb-4 flex items-center gap-2 font-medium">
+          <Settings className="h-4 w-4" />
           Advanced Settings
         </h3>
 
-        <div className="grid sm:grid-cols-2 gap-4">
+        <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <Label className="text-sm">Default Reply Tone</Label>
             <Select
@@ -255,11 +281,15 @@ export function AIPreferencesTab({ _onSelectTab }: { _onSelectTab?: (tab: string
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="gemini-3.1-pro-preview">Gemini 3.1 Pro (Latest - Reasoning)</SelectItem>
+                <SelectItem value="gemini-3.1-pro-preview">
+                  Gemini 3.1 Pro (Latest - Reasoning)
+                </SelectItem>
                 <SelectItem value="gemini-3-flash">Gemini 3 Flash (Latest - Multimodal)</SelectItem>
                 <SelectItem value="gemini-2.5-pro">Gemini 2.5 Pro (Advanced)</SelectItem>
                 <SelectItem value="gemini-2.5-flash">Gemini 2.5 Flash (Recommended)</SelectItem>
-                <SelectItem value="gemini-2.5-flash-lite">Gemini 2.5 Flash-Lite (Cheapest)</SelectItem>
+                <SelectItem value="gemini-2.5-flash-lite">
+                  Gemini 2.5 Flash-Lite (Cheapest)
+                </SelectItem>
                 <SelectItem value="gemini-2.0-flash">Gemini 2.0 Flash (Deprecated)</SelectItem>
               </SelectContent>
             </Select>
@@ -283,7 +313,7 @@ export function AIPreferencesTab({ _onSelectTab }: { _onSelectTab?: (tab: string
             </Select>
           </div>
 
-          <div className="flex items-center gap-3 p-3 border rounded-lg bg-muted/30">
+          <div className="bg-muted/30 flex items-center gap-3 rounded-lg border p-3">
             <Switch
               checked={prefs.alertOnAnomaly}
               onCheckedChange={(checked) => updatePreference("alertOnAnomaly", checked)}
@@ -291,37 +321,40 @@ export function AIPreferencesTab({ _onSelectTab }: { _onSelectTab?: (tab: string
             />
             <Label htmlFor="alertOnAnomaly" className="cursor-pointer">
               <p className="text-sm font-medium">Alert on Anomaly</p>
-              <p className="text-xs text-muted-foreground">Get notified when operations anomalies are detected</p>
+              <p className="text-muted-foreground text-xs">
+                Get notified when operations anomalies are detected
+              </p>
             </Label>
           </div>
         </div>
       </div>
 
-      <div className="flex items-center gap-3 pt-4 border-t">
+      <div className="flex items-center gap-3 border-t pt-4">
         <Button
           onClick={handleSave}
           disabled={saving}
           className="bg-violet-600 hover:bg-violet-700"
         >
           {saving ? (
-            <Loader2 className="w-4 h-4 animate-spin mr-2" />
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
           ) : saved ? (
-            <Check className="w-4 h-4 mr-2" />
+            <Check className="mr-2 h-4 w-4" />
           ) : null}
           {saving ? "Saving..." : saved ? "Saved!" : "Save Preferences"}
         </Button>
 
         {!prefs.insightsEnabled && (
-          <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">
-            <Zap className="w-3 h-3 mr-1" />
+          <Badge variant="outline" className="border-amber-200 bg-amber-50 text-amber-700">
+            <Zap className="mr-1 h-3 w-3" />
             Insights disabled
           </Badge>
         )}
       </div>
 
-      <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 mt-4">
+      <div className="mt-4 rounded-lg border border-blue-100 bg-blue-50 p-4">
         <p className="text-xs text-blue-800">
-          <strong>Note:</strong> Some features require API configuration. Make sure Gemini and VAPI keys are set in your environment variables.
+          <strong>Note:</strong> Some features require API configuration. Make sure Gemini and VAPI
+          keys are set in your environment variables.
         </p>
       </div>
     </div>

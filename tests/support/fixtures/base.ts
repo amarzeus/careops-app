@@ -1,4 +1,4 @@
-import { test as base } from '@playwright/test';
+import { test as base } from "@playwright/test";
 
 type BaseFixtures = {
   // Add common fixtures here (db, auth, etc.)
@@ -9,10 +9,10 @@ export const test = base.extend<BaseFixtures>({
   seedData: async ({ request: _request }, runFixture) => {
     // Placeholder for seeding logic
     await runFixture(async (data) => {
-      console.log('Seeding data:', data);
+      console.log("Seeding data:", data);
       return data;
     });
   },
 });
 
-export { expect } from '@playwright/test';
+export { expect } from "@playwright/test";

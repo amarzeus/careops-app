@@ -1,9 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import {
-  enqueueWebhookJob,
-  processWebhookJob,
-  getPendingJobs,
-} from "@/lib/webhook-queue";
+import { enqueueWebhookJob, processWebhookJob, getPendingJobs } from "@/lib/webhook-queue";
 
 const { mockPrisma } = vi.hoisted(() => ({
   mockPrisma: {

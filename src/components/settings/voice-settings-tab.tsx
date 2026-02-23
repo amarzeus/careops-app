@@ -3,8 +3,20 @@
 import React, { useState, useEffect } from "react";
 
 import {
-  Loader2, Check, Phone, Plus, Trash2, Edit2, Play, Pause,
-  Volume2, CheckCircle2, XCircle, Mic, AlertTriangle, PhoneCall
+  Loader2,
+  Check,
+  Phone,
+  Plus,
+  Trash2,
+  Edit2,
+  Play,
+  Pause,
+  Volume2,
+  CheckCircle2,
+  XCircle,
+  Mic,
+  AlertTriangle,
+  PhoneCall,
 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,9 +24,21 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { VOICE_TOOLS } from "@/lib/vapi";
@@ -100,7 +124,8 @@ export function VoiceSettingsTab() {
   const [savingDnc, setSavingDnc] = useState(false);
   const [resolvingCallId, setResolvingCallId] = useState<string | null>(null);
   const [selectedEscalationId, setSelectedEscalationId] = useState<string | null>(null);
-  const [selectedEscalationDetail, setSelectedEscalationDetail] = useState<EscalationCallDetail | null>(null);
+  const [selectedEscalationDetail, setSelectedEscalationDetail] =
+    useState<EscalationCallDetail | null>(null);
   const [loadingEscalationDetail, setLoadingEscalationDetail] = useState(false);
   const [newDncPhone, setNewDncPhone] = useState("");
   const [newDncSource, setNewDncSource] = useState("customer_request");
@@ -185,14 +210,17 @@ export function VoiceSettingsTab() {
               if (i === 2) return agentForm.canCheckStatus;
               if (i === 3) return agentForm.canTransfer;
               return true;
-            }).map(t => t.name),
+            }).map((t) => t.name),
           },
         }),
       });
 
       if (!res.ok) throw new Error("Failed to save agent");
 
-      toast({ title: "Success", description: `Voice agent ${editingAgent ? "updated" : "created"} ` });
+      toast({
+        title: "Success",
+        description: `Voice agent ${editingAgent ? "updated" : "created"} `,
+      });
       setShowAgentForm(false);
       setEditingAgent(null);
       setAgentForm({
@@ -261,7 +289,11 @@ export function VoiceSettingsTab() {
 
   const handleAddDnc = async () => {
     if (!newDncPhone.trim()) {
-      toast({ title: "Phone required", description: "Enter a phone number to block", variant: "destructive" });
+      toast({
+        title: "Phone required",
+        description: "Enter a phone number to block",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -352,7 +384,10 @@ export function VoiceSettingsTab() {
 
       if (!res.ok) throw new Error("Failed to save phone number");
 
-      toast({ title: "Success", description: `Phone number ${editingPhone ? "updated" : "added"} ` });
+      toast({
+        title: "Success",
+        description: `Phone number ${editingPhone ? "updated" : "added"} `,
+      });
       setShowPhoneForm(false);
       setEditingPhone(null);
       setPhoneForm({
@@ -381,7 +416,11 @@ export function VoiceSettingsTab() {
       toast({ title: "Deleted", description: "Phone number deleted" });
       fetchVoiceData();
     } catch (_error) {
-      toast({ title: "Error", description: "Failed to delete phone number", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "Failed to delete phone number",
+        variant: "destructive",
+      });
     }
   };
 
@@ -397,7 +436,11 @@ export function VoiceSettingsTab() {
       });
       fetchVoiceData();
     } catch (_error) {
-      toast({ title: "Error", description: "Failed to update phone number", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "Failed to update phone number",
+        variant: "destructive",
+      });
     }
   };
 
@@ -495,22 +538,22 @@ export function VoiceSettingsTab() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-lg font-semibold flex items-center gap-2">
-          <Mic className="w-5 h-5 text-emerald-600" />
+        <h2 className="flex items-center gap-2 text-lg font-semibold">
+          <Mic className="h-5 w-5 text-emerald-600" />
           CareOps AI Settings
         </h2>
-        <p className="text-sm text-muted-foreground mt-1">
+        <p className="text-muted-foreground mt-1 text-sm">
           Configure your AI voice assistant for handling phone calls
         </p>
       </div>
 
       {!vapiStatus.apiKeyPresent && (
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+        <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
           <div className="flex items-start gap-3">
-            <AlertTriangle className="w-5 h-5 text-amber-600 mt-0.5" />
+            <AlertTriangle className="mt-0.5 h-5 w-5 text-amber-600" />
             <div>
               <p className="font-medium text-amber-800">VAPI API Key Not Configured</p>
-              <p className="text-sm text-amber-700 mt-1">
+              <p className="mt-1 text-sm text-amber-700">
                 To enable voice AI, add VAPI_API_KEY to your environment variables.
               </p>
             </div>
@@ -520,53 +563,57 @@ export function VoiceSettingsTab() {
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Card className="border-emerald-100 bg-emerald-50/30">
-          <CardContent className="p-4 flex items-center gap-3">
-            <div className={cn(
-              "w-10 h-10 rounded-full flex items-center justify-center",
-              vapiStatus.configured ? "bg-emerald-100 text-emerald-600" : "bg-muted/30 text-muted-foreground"
-            )}>
-              <Phone className="w-5 h-5" />
+          <CardContent className="flex items-center gap-3 p-4">
+            <div
+              className={cn(
+                "flex h-10 w-10 items-center justify-center rounded-full",
+                vapiStatus.configured
+                  ? "bg-emerald-100 text-emerald-600"
+                  : "bg-muted/30 text-muted-foreground"
+              )}
+            >
+              <Phone className="h-5 w-5" />
             </div>
             <div>
-              <p className="font-medium text-sm">VAPI Status</p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-sm font-medium">VAPI Status</p>
+              <p className="text-muted-foreground text-xs">
                 {vapiStatus.configured ? "Connected" : "Not configured"}
               </p>
             </div>
             {vapiStatus.configured ? (
-              <CheckCircle2 className="w-5 h-5 text-emerald-500 ml-auto" />
+              <CheckCircle2 className="ml-auto h-5 w-5 text-emerald-500" />
             ) : (
-              <XCircle className="w-5 h-5 text-muted-foreground ml-auto" />
+              <XCircle className="text-muted-foreground ml-auto h-5 w-5" />
             )}
           </CardContent>
         </Card>
 
         <Card className="border-emerald-100 bg-emerald-50/30">
-          <CardContent className="p-4 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center">
-              <Volume2 className="w-5 h-5" />
+          <CardContent className="flex items-center gap-3 p-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+              <Volume2 className="h-5 w-5" />
             </div>
             <div>
-              <p className="font-medium text-sm">Voice Agents</p>
-              <p className="text-xs text-muted-foreground">{voiceAgents.length} configured</p>
+              <p className="text-sm font-medium">Voice Agents</p>
+              <p className="text-muted-foreground text-xs">{voiceAgents.length} configured</p>
             </div>
-            <Badge variant="outline" className="ml-auto bg-background">
-              {voiceAgents.filter(a => a.isActive).length} active
+            <Badge variant="outline" className="bg-background ml-auto">
+              {voiceAgents.filter((a) => a.isActive).length} active
             </Badge>
           </CardContent>
         </Card>
 
         <Card className="border-emerald-100 bg-emerald-50/30">
-          <CardContent className="p-4 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center">
-              <PhoneCall className="w-5 h-5" />
+          <CardContent className="flex items-center gap-3 p-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+              <PhoneCall className="h-5 w-5" />
             </div>
             <div>
-              <p className="font-medium text-sm">Phone Numbers</p>
-              <p className="text-xs text-muted-foreground">{phoneNumbers.length} numbers</p>
+              <p className="text-sm font-medium">Phone Numbers</p>
+              <p className="text-muted-foreground text-xs">{phoneNumbers.length} numbers</p>
             </div>
-            <Badge variant="outline" className="ml-auto bg-background">
-              {phoneNumbers.filter(p => p.isActive).length} active
+            <Badge variant="outline" className="bg-background ml-auto">
+              {phoneNumbers.filter((p) => p.isActive).length} active
             </Badge>
           </CardContent>
         </Card>
@@ -582,7 +629,7 @@ export function VoiceSettingsTab() {
             setShowAgentForm(true);
           }}
         >
-          <Plus className="w-4 h-4 mr-1" /> Add Agent
+          <Plus className="mr-1 h-4 w-4" /> Add Agent
         </Button>
       </div>
 
@@ -594,12 +641,12 @@ export function VoiceSettingsTab() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid sm:grid-cols-2 gap-4">
+            <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label className="text-sm">Agent Name</Label>
                 <Input
                   value={agentForm.name}
-                  onChange={(e) => setAgentForm(prev => ({ ...prev, name: e.target.value }))}
+                  onChange={(e) => setAgentForm((prev) => ({ ...prev, name: e.target.value }))}
                   placeholder="Receptionist"
                 />
               </div>
@@ -607,7 +654,9 @@ export function VoiceSettingsTab() {
                 <Label className="text-sm">Description</Label>
                 <Input
                   value={agentForm.description}
-                  onChange={(e) => setAgentForm(prev => ({ ...prev, description: e.target.value }))}
+                  onChange={(e) =>
+                    setAgentForm((prev) => ({ ...prev, description: e.target.value }))
+                  }
                   placeholder="Main booking assistant"
                 />
               </div>
@@ -617,7 +666,7 @@ export function VoiceSettingsTab() {
               <Label className="text-sm">Greeting Message</Label>
               <Textarea
                 value={agentForm.greeting}
-                onChange={(e) => setAgentForm(prev => ({ ...prev, greeting: e.target.value }))}
+                onChange={(e) => setAgentForm((prev) => ({ ...prev, greeting: e.target.value }))}
                 placeholder="Hello! Thanks for calling..."
                 rows={2}
               />
@@ -627,59 +676,74 @@ export function VoiceSettingsTab() {
               <Label className="text-sm">System Prompt (Optional)</Label>
               <Textarea
                 value={agentForm.prompt}
-                onChange={(e) => setAgentForm(prev => ({ ...prev, prompt: e.target.value }))}
+                onChange={(e) => setAgentForm((prev) => ({ ...prev, prompt: e.target.value }))}
                 placeholder="You are a professional receptionist for..."
                 rows={3}
               />
-              <p className="text-xs text-muted-foreground">
+              <p className="text-muted-foreground text-xs">
                 Customize how the AI behaves during calls. Leave empty for default behavior.
               </p>
             </div>
 
             <div className="space-y-3">
               <Label className="text-sm">Capabilities</Label>
-              <div className="grid sm:grid-cols-2 gap-3">
+              <div className="grid gap-3 sm:grid-cols-2">
                 <div className="flex items-center gap-2">
                   <Switch
                     checked={agentForm.canBook}
-                    onCheckedChange={(checked) => setAgentForm(prev => ({ ...prev, canBook: checked }))}
+                    onCheckedChange={(checked) =>
+                      setAgentForm((prev) => ({ ...prev, canBook: checked }))
+                    }
                   />
-                  <Label className="text-sm cursor-pointer">Can Create Bookings</Label>
+                  <Label className="cursor-pointer text-sm">Can Create Bookings</Label>
                 </div>
                 <div className="flex items-center gap-2">
                   <Switch
                     checked={agentForm.canCheckStatus}
-                    onCheckedChange={(checked) => setAgentForm(prev => ({ ...prev, canCheckStatus: checked }))}
+                    onCheckedChange={(checked) =>
+                      setAgentForm((prev) => ({ ...prev, canCheckStatus: checked }))
+                    }
                   />
-                  <Label className="text-sm cursor-pointer">Can Check Status</Label>
+                  <Label className="cursor-pointer text-sm">Can Check Status</Label>
                 </div>
 
                 <div className="flex items-center gap-2">
                   <Switch
                     checked={agentForm.canTransfer}
-                    onCheckedChange={(checked) => setAgentForm(prev => ({ ...prev, canTransfer: checked }))}
+                    onCheckedChange={(checked) =>
+                      setAgentForm((prev) => ({ ...prev, canTransfer: checked }))
+                    }
                   />
-                  <Label className="text-sm cursor-pointer">Can Transfer Calls</Label>
+                  <Label className="cursor-pointer text-sm">Can Transfer Calls</Label>
                 </div>
                 <div className="flex items-center gap-2">
                   <Switch
                     checked={agentForm.canHandleInquiry}
-                    onCheckedChange={(checked) => setAgentForm(prev => ({ ...prev, canHandleInquiry: checked }))}
+                    onCheckedChange={(checked) =>
+                      setAgentForm((prev) => ({ ...prev, canHandleInquiry: checked }))
+                    }
                   />
-                  <Label className="text-sm cursor-pointer">Handle Inquiries</Label>
+                  <Label className="cursor-pointer text-sm">Handle Inquiries</Label>
                 </div>
               </div>
             </div>
 
             <div className="flex gap-2 pt-2">
-              <Button onClick={handleSaveAgent} disabled={saving || !agentForm.name} className="bg-emerald-600 hover:bg-emerald-700">
-                {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+              <Button
+                onClick={handleSaveAgent}
+                disabled={saving || !agentForm.name}
+                className="bg-emerald-600 hover:bg-emerald-700"
+              >
+                {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 {editingAgent ? "Update Agent" : "Create Agent"}
               </Button>
-              <Button variant="outline" onClick={() => {
-                setShowAgentForm(false);
-                setEditingAgent(null);
-              }}>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowAgentForm(false);
+                  setEditingAgent(null);
+                }}
+              >
                 Cancel
               </Button>
             </div>
@@ -690,9 +754,9 @@ export function VoiceSettingsTab() {
       {voiceAgents.length === 0 && !showAgentForm && (
         <Card className="border-dashed">
           <CardContent className="p-8 text-center">
-            <Mic className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+            <Mic className="text-muted-foreground mx-auto mb-3 h-10 w-10" />
             <p className="text-muted-foreground text-sm">No voice agents configured</p>
-            <p className="text-muted-foreground text-xs mt-1">
+            <p className="text-muted-foreground mt-1 text-xs">
               Create a voice agent to handle incoming calls
             </p>
           </CardContent>
@@ -708,35 +772,54 @@ export function VoiceSettingsTab() {
                   <button
                     onClick={() => handleToggleAgent(agent)}
                     className={cn(
-                      "w-8 h-8 rounded-full flex items-center justify-center transition-colors",
+                      "flex h-8 w-8 items-center justify-center rounded-full transition-colors",
                       agent.isActive
                         ? "bg-emerald-100 text-emerald-600 hover:bg-emerald-200"
                         : "bg-muted/30 text-muted-foreground hover:bg-muted/50"
                     )}
                   >
-                    {agent.isActive ? <Play className="w-3.5 h-3.5" /> : <Pause className="w-3.5 h-3.5" />}
+                    {agent.isActive ? (
+                      <Play className="h-3.5 w-3.5" />
+                    ) : (
+                      <Pause className="h-3.5 w-3.5" />
+                    )}
                   </button>
                   <div>
-                    <p className="font-medium text-sm">{agent.name}</p>
-                    <p className="text-xs text-muted-foreground">{agent.description || "No description"}</p>
+                    <p className="text-sm font-medium">{agent.name}</p>
+                    <p className="text-muted-foreground text-xs">
+                      {agent.description || "No description"}
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200">
+                  <Badge
+                    variant="outline"
+                    className="border-emerald-200 bg-emerald-50 text-emerald-700"
+                  >
                     {agent.phoneNumbers?.length || 0} numbers
                   </Badge>
-                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => editAgent(agent)}>
-                    <Edit2 className="w-3.5 h-3.5" />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => editAgent(agent)}
+                  >
+                    <Edit2 className="h-3.5 w-3.5" />
                   </Button>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50" onClick={() => handleDeleteAgent(agent.id)}>
-                    <Trash2 className="w-3.5 h-3.5" />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-red-500 hover:bg-red-50 hover:text-red-600"
+                    onClick={() => handleDeleteAgent(agent.id)}
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
                   </Button>
                 </div>
               </div>
               {agent.greeting && (
-                <div className="mt-3 pt-3 border-t border-border/40">
-                  <p className="text-xs text-muted-foreground">Greeting:</p>
-                  <p className="text-sm text-muted-foreground mt-1">&quot;{agent.greeting}&quot;</p>
+                <div className="border-border/40 mt-3 border-t pt-3">
+                  <p className="text-muted-foreground text-xs">Greeting:</p>
+                  <p className="text-muted-foreground mt-1 text-sm">&quot;{agent.greeting}&quot;</p>
                 </div>
               )}
             </CardContent>
@@ -744,8 +827,8 @@ export function VoiceSettingsTab() {
         ))}
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-3 mt-8">
-        <h3 className="font-semibold text-lg">Phone Numbers</h3>
+      <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
+        <h3 className="text-lg font-semibold">Phone Numbers</h3>
         <Button
           size="sm"
           className="bg-emerald-600 hover:bg-emerald-700"
@@ -761,25 +844,27 @@ export function VoiceSettingsTab() {
             });
           }}
         >
-          <Plus className="w-4 h-4 mr-1" /> Add Number
+          <Plus className="mr-1 h-4 w-4" /> Add Number
         </Button>
       </div>
 
       {showPhoneForm && (
-        <Card className="border-emerald-200 mt-4">
+        <Card className="mt-4 border-emerald-200">
           <CardHeader className="pb-3">
             <CardTitle className="text-base font-medium">
               {editingPhone ? "Edit Phone Number" : "Add Phone Number"}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid sm:grid-cols-2 gap-4">
+            <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label className="text-sm font-medium">Phone Number</Label>
                 <Input
                   value={phoneForm.phoneNumber}
                   disabled={!!editingPhone}
-                  onChange={(e) => setPhoneForm(prev => ({ ...prev, phoneNumber: e.target.value }))}
+                  onChange={(e) =>
+                    setPhoneForm((prev) => ({ ...prev, phoneNumber: e.target.value }))
+                  }
                   placeholder="+15551234567"
                 />
               </div>
@@ -787,26 +872,33 @@ export function VoiceSettingsTab() {
                 <Label className="text-sm font-medium">Label (Optional)</Label>
                 <Input
                   value={phoneForm.label}
-                  onChange={(e) => setPhoneForm(prev => ({ ...prev, label: e.target.value }))}
+                  onChange={(e) => setPhoneForm((prev) => ({ ...prev, label: e.target.value }))}
                   placeholder="Main Office"
                 />
               </div>
             </div>
 
-            <div className="grid sm:grid-cols-2 gap-4">
+            <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label className="text-sm font-medium">Assigned Agent</Label>
                 <Select
                   value={phoneForm.voiceAgentId || "none"}
-                  onValueChange={(value) => setPhoneForm(prev => ({ ...prev, voiceAgentId: value === "none" ? "" : value }))}
+                  onValueChange={(value) =>
+                    setPhoneForm((prev) => ({
+                      ...prev,
+                      voiceAgentId: value === "none" ? "" : value,
+                    }))
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select an agent" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">No Agent</SelectItem>
-                    {voiceAgents.map(agent => (
-                      <SelectItem key={agent.id} value={agent.id}>{agent.name}</SelectItem>
+                    {voiceAgents.map((agent) => (
+                      <SelectItem key={agent.id} value={agent.id}>
+                        {agent.name}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -815,7 +907,9 @@ export function VoiceSettingsTab() {
                 <Label className="text-sm font-medium">Forward to Staff Number (Optional)</Label>
                 <Input
                   value={phoneForm.forwardNumber}
-                  onChange={(e) => setPhoneForm(prev => ({ ...prev, forwardNumber: e.target.value }))}
+                  onChange={(e) =>
+                    setPhoneForm((prev) => ({ ...prev, forwardNumber: e.target.value }))
+                  }
                   placeholder="+15550009999"
                 />
               </div>
@@ -825,20 +919,31 @@ export function VoiceSettingsTab() {
               <Switch
                 id="forward-to-staff"
                 checked={phoneForm.forwardToStaff}
-                onCheckedChange={(checked) => setPhoneForm(prev => ({ ...prev, forwardToStaff: checked }))}
+                onCheckedChange={(checked) =>
+                  setPhoneForm((prev) => ({ ...prev, forwardToStaff: checked }))
+                }
               />
-              <Label htmlFor="forward-to-staff" className="text-sm cursor-pointer">Forward calls to staff</Label>
+              <Label htmlFor="forward-to-staff" className="cursor-pointer text-sm">
+                Forward calls to staff
+              </Label>
             </div>
 
             <div className="flex gap-2 pt-2">
-              <Button onClick={handleSavePhone} disabled={saving || !phoneForm.phoneNumber} className="bg-emerald-600 hover:bg-emerald-700">
-                {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+              <Button
+                onClick={handleSavePhone}
+                disabled={saving || !phoneForm.phoneNumber}
+                className="bg-emerald-600 hover:bg-emerald-700"
+              >
+                {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 {editingPhone ? "Update Number" : "Add Number"}
               </Button>
-              <Button variant="outline" onClick={() => {
-                setShowPhoneForm(false);
-                setEditingPhone(null);
-              }}>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowPhoneForm(false);
+                  setEditingPhone(null);
+                }}
+              >
                 Cancel
               </Button>
             </div>
@@ -847,18 +952,18 @@ export function VoiceSettingsTab() {
       )}
 
       {!showPhoneForm && phoneNumbers.length === 0 && (
-        <Card className="border-dashed mt-4">
+        <Card className="mt-4 border-dashed">
           <CardContent className="p-8 text-center">
-            <Phone className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+            <Phone className="text-muted-foreground mx-auto mb-3 h-10 w-10" />
             <p className="text-muted-foreground text-sm">No phone numbers added</p>
-            <p className="text-muted-foreground text-xs mt-1">
+            <p className="text-muted-foreground mt-1 text-xs">
               Add a provisioned Vapi number to link with an agent
             </p>
           </CardContent>
         </Card>
       )}
 
-      <div className="space-y-3 mt-4">
+      <div className="mt-4 space-y-3">
         {phoneNumbers.map((number) => (
           <Card key={number.id} className={cn(!number.isActive && "opacity-60")}>
             <CardContent className="p-4">
@@ -867,17 +972,21 @@ export function VoiceSettingsTab() {
                   <button
                     onClick={() => handleTogglePhone(number)}
                     className={cn(
-                      "w-8 h-8 rounded-full flex items-center justify-center transition-colors",
+                      "flex h-8 w-8 items-center justify-center rounded-full transition-colors",
                       number.isActive
                         ? "bg-emerald-100 text-emerald-600 hover:bg-emerald-200"
                         : "bg-muted/30 text-muted-foreground hover:bg-muted/50"
                     )}
                   >
-                    {number.isActive ? <Check className="w-3.5 h-3.5" /> : <Pause className="w-3.5 h-3.5" />}
+                    {number.isActive ? (
+                      <Check className="h-3.5 w-3.5" />
+                    ) : (
+                      <Pause className="h-3.5 w-3.5" />
+                    )}
                   </button>
                   <div>
-                    <p className="font-medium text-sm">{number.phoneNumber}</p>
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <p className="text-sm font-medium">{number.phoneNumber}</p>
+                    <div className="text-muted-foreground flex items-center gap-2 text-xs">
                       <span>{number.label || "No label"}</span>
                       {number.voiceAgent && (
                         <>
@@ -891,11 +1000,21 @@ export function VoiceSettingsTab() {
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => editPhone(number)}>
-                    <Edit2 className="w-3.5 h-3.5" />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => editPhone(number)}
+                  >
+                    <Edit2 className="h-3.5 w-3.5" />
                   </Button>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50" onClick={() => handleDeletePhone(number.id)}>
-                    <Trash2 className="w-3.5 h-3.5" />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-red-500 hover:bg-red-50 hover:text-red-600"
+                    onClick={() => handleDeletePhone(number.id)}
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
                   </Button>
                 </div>
               </div>
@@ -906,8 +1025,8 @@ export function VoiceSettingsTab() {
 
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-base flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 text-amber-600" />
+          <CardTitle className="flex items-center gap-2 text-base">
+            <AlertTriangle className="h-4 w-4 text-amber-600" />
             Voice Escalation Inbox
           </CardTitle>
           <CardDescription>
@@ -916,7 +1035,7 @@ export function VoiceSettingsTab() {
         </CardHeader>
         <CardContent className="space-y-3">
           {escalationCalls.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No escalated calls right now.</p>
+            <p className="text-muted-foreground text-sm">No escalated calls right now.</p>
           ) : (
             escalationCalls.map((call) => (
               <div
@@ -924,17 +1043,21 @@ export function VoiceSettingsTab() {
                 className="flex flex-col gap-2 rounded-lg border border-amber-200 bg-amber-50/40 p-3 sm:flex-row sm:items-start sm:justify-between"
               >
                 <div className="space-y-1">
-                  <p className="text-sm font-medium text-foreground">
+                  <p className="text-foreground text-sm font-medium">
                     {call.contact?.name || "Unknown Caller"}
                     {call.contact?.phone ? ` (${call.contact.phone})` : ""}
                   </p>
-                  <p className="text-xs text-muted-foreground">
-                    {call.escalationReason || "Escalation flagged"} · {new Date(call.createdAt).toLocaleString()}
+                  <p className="text-muted-foreground text-xs">
+                    {call.escalationReason || "Escalation flagged"} ·{" "}
+                    {new Date(call.createdAt).toLocaleString()}
                   </p>
-                  {call.summary && <p className="text-xs text-muted-foreground">Summary: {call.summary}</p>}
+                  {call.summary && (
+                    <p className="text-muted-foreground text-xs">Summary: {call.summary}</p>
+                  )}
                   {!call.summary && call.transcript && (
-                    <p className="text-xs text-muted-foreground">
-                      Transcript: {call.transcript.slice(0, 180)}{call.transcript.length > 180 ? "..." : ""}
+                    <p className="text-muted-foreground text-xs">
+                      Transcript: {call.transcript.slice(0, 180)}
+                      {call.transcript.length > 180 ? "..." : ""}
                     </p>
                   )}
                 </div>
@@ -946,7 +1069,7 @@ export function VoiceSettingsTab() {
                     disabled={loadingEscalationDetail && selectedEscalationId === call.id}
                   >
                     {loadingEscalationDetail && selectedEscalationId === call.id ? (
-                      <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                      <Loader2 className="mr-1 h-4 w-4 animate-spin" />
                     ) : null}
                     Details
                   </Button>
@@ -957,9 +1080,9 @@ export function VoiceSettingsTab() {
                     onClick={() => handleResolveEscalation(call.id)}
                   >
                     {resolvingCallId === call.id ? (
-                      <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                      <Loader2 className="mr-1 h-4 w-4 animate-spin" />
                     ) : (
-                      <Check className="w-4 h-4 mr-1" />
+                      <Check className="mr-1 h-4 w-4" />
                     )}
                     Mark Reviewed
                   </Button>
@@ -970,7 +1093,10 @@ export function VoiceSettingsTab() {
         </CardContent>
       </Card>
 
-      <Dialog open={!!selectedEscalationId} onOpenChange={(open) => !open && closeEscalationDetails()}>
+      <Dialog
+        open={!!selectedEscalationId}
+        onOpenChange={(open) => !open && closeEscalationDetails()}
+      >
         <DialogContent className="max-w-7xl">
           <DialogHeader>
             <DialogTitle>Escalated Call Details</DialogTitle>
@@ -983,7 +1109,7 @@ export function VoiceSettingsTab() {
 
           {loadingEscalationDetail ? (
             <div className="flex items-center justify-center py-10">
-              <Loader2 className="w-5 h-5 animate-spin text-emerald-600" />
+              <Loader2 className="h-5 w-5 animate-spin text-emerald-600" />
             </div>
           ) : selectedEscalationDetail ? (
             <div className="grid gap-4 sm:grid-cols-2">
@@ -992,17 +1118,28 @@ export function VoiceSettingsTab() {
                   <CardTitle className="text-sm">Summary</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2 text-sm">
-                  <p><span className="text-muted-foreground">Status:</span> {selectedEscalationDetail.status}</p>
-                  <p><span className="text-muted-foreground">Outcome:</span> {selectedEscalationDetail.outcome || "-"}</p>
+                  <p>
+                    <span className="text-muted-foreground">Status:</span>{" "}
+                    {selectedEscalationDetail.status}
+                  </p>
+                  <p>
+                    <span className="text-muted-foreground">Outcome:</span>{" "}
+                    {selectedEscalationDetail.outcome || "-"}
+                  </p>
                   <p>
                     <span className="text-muted-foreground">Duration:</span>{" "}
                     {selectedEscalationDetail.duration != null
                       ? `${Math.floor(selectedEscalationDetail.duration / 60)}:${String(selectedEscalationDetail.duration % 60).padStart(2, "0")} `
                       : "-"}
                   </p>
-                  <p><span className="text-muted-foreground">Escalation reason:</span> {selectedEscalationDetail.escalationReason || "Flagged"}</p>
+                  <p>
+                    <span className="text-muted-foreground">Escalation reason:</span>{" "}
+                    {selectedEscalationDetail.escalationReason || "Flagged"}
+                  </p>
                   {selectedEscalationDetail.summary ? (
-                    <p className="rounded-md bg-muted/30 p-2 text-xs text-muted-foreground">{selectedEscalationDetail.summary}</p>
+                    <p className="bg-muted/30 text-muted-foreground rounded-md p-2 text-xs">
+                      {selectedEscalationDetail.summary}
+                    </p>
                   ) : null}
                 </CardContent>
               </Card>
@@ -1018,9 +1155,13 @@ export function VoiceSettingsTab() {
                         <span className="text-muted-foreground">Consent:</span>{" "}
                         {selectedEscalationDetail.consent.consentResponse ? "Granted" : "Denied"}
                       </p>
-                      <p><span className="text-muted-foreground">Prompt:</span> {selectedEscalationDetail.consent.consentText}</p>
-                      <p className="text-xs text-muted-foreground">
-                        Captured at {new Date(selectedEscalationDetail.consent.capturedAt).toLocaleString()}
+                      <p>
+                        <span className="text-muted-foreground">Prompt:</span>{" "}
+                        {selectedEscalationDetail.consent.consentText}
+                      </p>
+                      <p className="text-muted-foreground text-xs">
+                        Captured at{" "}
+                        {new Date(selectedEscalationDetail.consent.capturedAt).toLocaleString()}
                       </p>
                     </>
                   ) : (
@@ -1034,9 +1175,11 @@ export function VoiceSettingsTab() {
                     const smsFallbackRequired = metadata.smsFallbackRequired as boolean | undefined;
 
                     return (
-                      <div className="rounded-md bg-muted/30 p-2 text-xs text-muted-foreground">
+                      <div className="bg-muted/30 text-muted-foreground rounded-md p-2 text-xs">
                         <p>Retry count: {typeof retryCount === "number" ? retryCount : 0}</p>
-                        <p>Next retry: {nextRetryAt ? new Date(nextRetryAt).toLocaleString() : "-"}</p>
+                        <p>
+                          Next retry: {nextRetryAt ? new Date(nextRetryAt).toLocaleString() : "-"}
+                        </p>
                         <p>SMS fallback required: {smsFallbackRequired ? "Yes" : "No"}</p>
                       </div>
                     );
@@ -1049,14 +1192,14 @@ export function VoiceSettingsTab() {
                   <CardTitle className="text-sm">Transcript</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="max-h-64 overflow-auto rounded-md bg-muted/30 p-3 text-sm text-muted-foreground whitespace-pre-wrap">
+                  <div className="bg-muted/30 text-muted-foreground max-h-64 overflow-auto rounded-md p-3 text-sm whitespace-pre-wrap">
                     {selectedEscalationDetail.transcript || "No transcript available."}
                   </div>
                 </CardContent>
               </Card>
             </div>
           ) : (
-            <p className="text-sm text-muted-foreground">No escalation details available.</p>
+            <p className="text-muted-foreground text-sm">No escalation details available.</p>
           )}
         </DialogContent>
       </Dialog>
@@ -1091,7 +1234,7 @@ export function VoiceSettingsTab() {
               disabled={savingDnc || !newDncPhone.trim()}
               className="bg-emerald-600 hover:bg-emerald-700"
             >
-              {savingDnc ? <Loader2 className="w-4 h-4 animate-spin" /> : "Add"}
+              {savingDnc ? <Loader2 className="h-4 w-4 animate-spin" /> : "Add"}
             </Button>
           </div>
 
@@ -1103,7 +1246,7 @@ export function VoiceSettingsTab() {
           />
 
           {dncEntries.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No DNC entries yet.</p>
+            <p className="text-muted-foreground text-sm">No DNC entries yet.</p>
           ) : (
             <div className="space-y-2">
               {dncEntries.map((entry) => (
@@ -1113,8 +1256,9 @@ export function VoiceSettingsTab() {
                 >
                   <div>
                     <p className="text-sm font-medium">{entry.phoneNumber}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {entry.source} · {entry.reason || "No reason"} · {new Date(entry.createdAt).toLocaleDateString()}
+                    <p className="text-muted-foreground text-xs">
+                      {entry.source} · {entry.reason || "No reason"} ·{" "}
+                      {new Date(entry.createdAt).toLocaleDateString()}
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
@@ -1122,7 +1266,9 @@ export function VoiceSettingsTab() {
                       variant="outline"
                       className={cn(
                         "bg-background",
-                        entry.isActive ? "text-red-700 border-red-200" : "text-muted-foreground border-border/40"
+                        entry.isActive
+                          ? "border-red-200 text-red-700"
+                          : "text-muted-foreground border-border/40"
                       )}
                     >
                       {entry.isActive ? "Blocked" : "Inactive"}

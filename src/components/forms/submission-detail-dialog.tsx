@@ -45,7 +45,11 @@ export function SubmissionDetailDialog({
       case "SENT":
         return <Badge variant="secondary">Sent</Badge>;
       case "COMPLETED":
-        return <Badge variant="default" className="bg-green-600">Completed</Badge>;
+        return (
+          <Badge variant="default" className="bg-green-600">
+            Completed
+          </Badge>
+        );
       case "OVERDUE":
         return <Badge variant="destructive">Overdue</Badge>;
       default:
@@ -58,50 +62,40 @@ export function SubmissionDetailDialog({
       <DialogContent className="max-w-7xl">
         <DialogHeader>
           <DialogTitle>Submission Details</DialogTitle>
-          <DialogDescription>
-            View submission information and manage its status.
-          </DialogDescription>
+          <DialogDescription>View submission information and manage its status.</DialogDescription>
         </DialogHeader>
         <div className="space-y-5">
           <div className="flex items-center justify-between">
             {statusBadge(submission.status)}
-            <p className="text-xs text-muted-foreground">
+            <p className="text-muted-foreground text-xs">
               Submitted {new Date(submission.createdAt).toLocaleString()}
             </p>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <p className="text-xs text-muted-foreground mb-1">Contact</p>
-              <p className="font-medium text-sm">
-                {submission.contact?.name || "Unknown"}
-              </p>
+              <p className="text-muted-foreground mb-1 text-xs">Contact</p>
+              <p className="text-sm font-medium">{submission.contact?.name || "Unknown"}</p>
               {submission.contact?.email && (
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  {submission.contact.email}
-                </p>
+                <p className="text-muted-foreground mt-0.5 text-xs">{submission.contact.email}</p>
               )}
               {submission.contact?.phone && (
-                <p className="text-xs text-muted-foreground">
-                  {submission.contact.phone}
-                </p>
+                <p className="text-muted-foreground text-xs">{submission.contact.phone}</p>
               )}
             </div>
             <div>
-              <p className="text-xs text-muted-foreground mb-1">Form</p>
-              <p className="font-medium text-sm">
-                {submission.intakeForm?.name || "Contact Form"}
-              </p>
+              <p className="text-muted-foreground mb-1 text-xs">Form</p>
+              <p className="text-sm font-medium">{submission.intakeForm?.name || "Contact Form"}</p>
             </div>
           </div>
 
           {submission.data && Object.keys(submission.data).length > 0 && (
             <div>
-              <p className="text-xs text-muted-foreground mb-2">Submission Data</p>
-              <div className="bg-muted/30 rounded-md p-3 space-y-2 max-h-60 overflow-y-auto">
+              <p className="text-muted-foreground mb-2 text-xs">Submission Data</p>
+              <div className="bg-muted/30 max-h-60 space-y-2 overflow-y-auto rounded-md p-3">
                 {Object.entries(submission.data).map(([key, value]) => (
                   <div key={key}>
-                    <p className="text-xs font-medium text-muted-foreground capitalize">
+                    <p className="text-muted-foreground text-xs font-medium capitalize">
                       {key.replace(/([A-Z])/g, " $1").replace(/_/g, " ")}
                     </p>
                     <p className="text-sm">{String(value)}</p>
@@ -111,44 +105,42 @@ export function SubmissionDetailDialog({
             </div>
           )}
 
-          <div className="flex gap-2 pt-2 border-t">
-            {(submission.status === "PENDING" ||
-              submission.status === "SENT") && (
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="text-primary"
-                  onClick={() => onResend(submission.id)}
-                >
-                  <Send className="w-3 h-3 mr-1" /> Re-send Form
-                </Button>
-              )}
+          <div className="flex gap-2 border-t pt-2">
+            {(submission.status === "PENDING" || submission.status === "SENT") && (
+              <Button
+                size="sm"
+                variant="outline"
+                className="text-primary"
+                onClick={() => onResend(submission.id)}
+              >
+                <Send className="mr-1 h-3 w-3" /> Re-send Form
+              </Button>
+            )}
             {submission.status !== "COMPLETED" && (
               <Button
                 size="sm"
-                className="bg-green-600 hover:bg-green-700 text-white"
+                className="bg-green-600 text-white hover:bg-green-700"
                 onClick={() => {
                   onUpdateStatus(submission.id, "COMPLETED");
                   onOpenChange(false);
                 }}
               >
-                <CheckCircle className="w-3 h-3 mr-1" /> Mark Completed
+                <CheckCircle className="mr-1 h-3 w-3" /> Mark Completed
               </Button>
             )}
-            {submission.status !== "OVERDUE" &&
-              submission.status !== "COMPLETED" && (
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="text-red-600"
-                  onClick={() => {
-                    onUpdateStatus(submission.id, "OVERDUE");
-                    onOpenChange(false);
-                  }}
-                >
-                  <AlertTriangle className="w-3 h-3 mr-1" /> Mark Overdue
-                </Button>
-              )}
+            {submission.status !== "OVERDUE" && submission.status !== "COMPLETED" && (
+              <Button
+                size="sm"
+                variant="outline"
+                className="text-red-600"
+                onClick={() => {
+                  onUpdateStatus(submission.id, "OVERDUE");
+                  onOpenChange(false);
+                }}
+              >
+                <AlertTriangle className="mr-1 h-3 w-3" /> Mark Overdue
+              </Button>
+            )}
           </div>
         </div>
       </DialogContent>

@@ -59,10 +59,10 @@ export function ChatInput({
   };
 
   return (
-    <div className="p-3 sm:p-4 bg-background border-t border-border/40">
+    <div className="bg-background border-border/40 border-t p-3 sm:p-4">
       {/* Channel selector dropdown */}
       {showChannelPicker && (
-        <div className="mb-2 flex gap-1 p-1 bg-muted/30 rounded-lg border border-border/40">
+        <div className="bg-muted/30 border-border/40 mb-2 flex gap-1 rounded-lg border p-1">
           {availableChannels.map(({ key }) => {
             const cfg = channelConfig[key];
             const Icon = cfg.icon;
@@ -74,12 +74,13 @@ export function ChatInput({
                   setChannel(key);
                   setShowChannelPicker(false);
                 }}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium transition-all ${isActive
-                  ? "bg-background shadow-sm border border-border/40"
-                  : "hover:bg-muted/30 text-muted-foreground"
-                  }`}
+                className={`flex items-center gap-1.5 rounded px-3 py-1.5 text-xs font-medium transition-all ${
+                  isActive
+                    ? "bg-background border-border/40 border shadow-sm"
+                    : "hover:bg-muted/30 text-muted-foreground"
+                }`}
               >
-                <Icon className={`w-3.5 h-3.5 ${isActive ? cfg.color : ""}`} />
+                <Icon className={`h-3.5 w-3.5 ${isActive ? cfg.color : ""}`} />
                 {cfg.label}
               </button>
             );
@@ -87,16 +88,16 @@ export function ChatInput({
         </div>
       )}
 
-      <div className="flex items-end gap-2 bg-background rounded-xl border border-border/40 p-2 focus-within:ring-2 focus-within:ring-blue-100 focus-within:border-blue-400 transition-all">
+      <div className="bg-background border-border/40 flex items-end gap-2 rounded-xl border p-2 transition-all focus-within:border-blue-400 focus-within:ring-2 focus-within:ring-blue-100">
         {/* Channel indicator button */}
         {availableChannels.length > 1 && (
           <button
             onClick={() => setShowChannelPicker(!showChannelPicker)}
-            className="flex items-center gap-0.5 px-2 py-1.5 rounded-md hover:bg-muted/30 transition-colors mb-1 shrink-0"
+            className="hover:bg-muted/30 mb-1 flex shrink-0 items-center gap-0.5 rounded-md px-2 py-1.5 transition-colors"
             title={`Sending via ${config.label}`}
           >
-            <ChannelIcon className={`w-4 h-4 ${config.color}`} />
-            <ChevronDown className="w-3 h-3 text-muted-foreground" />
+            <ChannelIcon className={`h-4 w-4 ${config.color}`} />
+            <ChevronDown className="text-muted-foreground h-3 w-3" />
           </button>
         )}
 
@@ -104,7 +105,7 @@ export function ChatInput({
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
           placeholder={`Type a message (via ${config.label})...`}
-          className="min-h-[40px] max-h-[140px] border-none focus-visible:ring-0 px-2 py-2 resize-none shadow-none"
+          className="max-h-[140px] min-h-[40px] resize-none border-none px-2 py-2 shadow-none focus-visible:ring-0"
           onKeyDown={(e) => {
             if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault();
@@ -115,15 +116,11 @@ export function ChatInput({
         />
         <Button
           size="icon"
-          className="h-8 w-8 mb-1 shrink-0 bg-primary hover:bg-primary/90"
+          className="bg-primary hover:bg-primary/90 mb-1 h-8 w-8 shrink-0"
           onClick={handleSend}
           disabled={!inputText.trim() || sending || disabled}
         >
-          {sending ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
-          ) : (
-            <Send className="w-4 h-4" />
-          )}
+          {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
         </Button>
       </div>
     </div>

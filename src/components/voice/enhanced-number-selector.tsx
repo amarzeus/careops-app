@@ -10,7 +10,7 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
+  SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -23,7 +23,7 @@ import {
   MapPin,
   DollarSign,
   Globe,
-  Building
+  Building,
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
@@ -47,7 +47,7 @@ interface AvailableNumber {
     mms: boolean;
   };
   monthlyCost: number;
-  numberType: 'local' | 'tollfree' | 'mobile';
+  numberType: "local" | "tollfree" | "mobile";
 }
 
 interface RegulatoryInfo {
@@ -67,9 +67,9 @@ interface NumberSelectorProps {
 }
 
 const DOCUMENT_LABELS: Record<string, string> = {
-  business_registration: 'Business Registration',
-  identity_proof: 'Identity Proof (ID/Passport)',
-  address_proof: 'Address Proof',
+  business_registration: "Business Registration",
+  identity_proof: "Identity Proof (ID/Passport)",
+  address_proof: "Address Proof",
 };
 
 /**
@@ -78,7 +78,7 @@ const DOCUMENT_LABELS: Record<string, string> = {
 export function EnhancedNumberSelector({
   agentId,
   onNumberSelected,
-  onCancel
+  onCancel,
 }: NumberSelectorProps) {
   const [countries, setCountries] = useState<Country[]>([]);
   const [numbers, setNumbers] = useState<AvailableNumber[]>([]);
@@ -86,7 +86,7 @@ export function EnhancedNumberSelector({
   const [provisioning, setProvisioning] = useState<string | null>(null);
 
   const [selectedCountry, setSelectedCountry] = useState("US");
-  const [selectedType, setSelectedType] = useState<'local' | 'tollfree' | 'mobile'>('local');
+  const [selectedType, setSelectedType] = useState<"local" | "tollfree" | "mobile">("local");
   const [areaCode, setAreaCode] = useState("");
   const [pattern, setPattern] = useState("");
 
@@ -152,7 +152,6 @@ export function EnhancedNumberSelector({
     }
   };
 
-
   const handleSelectNumber = async (number: AvailableNumber) => {
     if (regulatory && !regulatory.complianceMet) {
       toast({
@@ -189,13 +188,13 @@ export function EnhancedNumberSelector({
       const data = await res.json();
 
       if (!res.ok) {
-        if (data.code === 'COMPLIANCE_REQUIRED') {
+        if (data.code === "COMPLIANCE_REQUIRED") {
           toast({
             title: "Compliance Required",
             description: "Please upload required documents before provisioning",
             variant: "destructive",
           });
-        } else if (data.code === 'LIMIT_EXCEEDED') {
+        } else if (data.code === "LIMIT_EXCEEDED") {
           toast({
             title: "Limit Exceeded",
             description: data.error,
@@ -233,17 +232,18 @@ export function EnhancedNumberSelector({
     }).format(cost * 75);
   };
 
-  const selectedCountryInfo = countries.find(c => c.code === selectedCountry);
+  const selectedCountryInfo = countries.find((c) => c.code === selectedCountry);
 
   return (
     <Card className="w-full">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Phone className="w-5 h-5" />
+          <Phone className="h-5 w-5" />
           Select a Phone Number
         </CardTitle>
         <CardDescription>
-          Choose a phone number for your voice agent. Numbers are provisioned automatically via Twilio.
+          Choose a phone number for your voice agent. Numbers are provisioned automatically via
+          Twilio.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -252,12 +252,13 @@ export function EnhancedNumberSelector({
             <AlertCircle className="h-4 w-4" />
             <AlertTitle>Twilio Not Configured</AlertTitle>
             <AlertDescription>
-              Phone number provisioning requires Twilio credentials. Contact support to enable this feature.
+              Phone number provisioning requires Twilio credentials. Contact support to enable this
+              feature.
             </AlertDescription>
           </Alert>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <div className="space-y-2">
             <label className="text-sm font-medium">Country</label>
             <Select value={selectedCountry} onValueChange={setSelectedCountry}>
@@ -276,14 +277,23 @@ export function EnhancedNumberSelector({
 
           <div className="space-y-2">
             <label className="text-sm font-medium">Number Type</label>
-            <Tabs value={selectedType} onValueChange={(v) => setSelectedType(v as typeof selectedType)}>
+            <Tabs
+              value={selectedType}
+              onValueChange={(v) => setSelectedType(v as typeof selectedType)}
+            >
               <TabsList className="w-full">
-                <TabsTrigger value="local" className="flex-1">Local</TabsTrigger>
+                <TabsTrigger value="local" className="flex-1">
+                  Local
+                </TabsTrigger>
                 {selectedCountryInfo?.hasMobile && (
-                  <TabsTrigger value="mobile" className="flex-1">Mobile</TabsTrigger>
+                  <TabsTrigger value="mobile" className="flex-1">
+                    Mobile
+                  </TabsTrigger>
                 )}
                 {selectedCountryInfo?.hasTollfree && (
-                  <TabsTrigger value="tollfree" className="flex-1">Toll-Free</TabsTrigger>
+                  <TabsTrigger value="tollfree" className="flex-1">
+                    Toll-Free
+                  </TabsTrigger>
                 )}
               </TabsList>
             </Tabs>
@@ -309,9 +319,9 @@ export function EnhancedNumberSelector({
           />
           <Button onClick={searchNumbers} disabled={loading || !twilioConfigured}>
             {loading ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
+              <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
-              <Search className="w-4 h-4" />
+              <Search className="h-4 w-4" />
             )}
           </Button>
         </div>
@@ -322,9 +332,16 @@ export function EnhancedNumberSelector({
             <AlertTitle>Compliance Documents Required</AlertTitle>
             <AlertDescription>
               <p className="mb-2">This number type requires the following documents:</p>
-              <ul className="list-disc list-inside space-y-1">
+              <ul className="list-inside list-disc space-y-1">
                 {regulatory.documents.map((doc) => (
-                  <li key={doc} className={regulatory.verifiedDocuments.includes(doc) ? "line-through text-green-600" : ""}>
+                  <li
+                    key={doc}
+                    className={
+                      regulatory.verifiedDocuments.includes(doc)
+                        ? "text-green-600 line-through"
+                        : ""
+                    }
+                  >
                     {DOCUMENT_LABELS[doc] || doc}
                   </li>
                 ))}
@@ -333,9 +350,14 @@ export function EnhancedNumberSelector({
                 variant="outline"
                 size="sm"
                 className="mt-3"
-                onClick={() => toast({ title: "Coming Soon", description: "Document upload will be available soon" })}
+                onClick={() =>
+                  toast({
+                    title: "Coming Soon",
+                    description: "Document upload will be available soon",
+                  })
+                }
               >
-                <Building className="w-4 h-4 mr-2" />
+                <Building className="mr-2 h-4 w-4" />
                 Upload Documents
               </Button>
             </AlertDescription>
@@ -344,59 +366,70 @@ export function EnhancedNumberSelector({
 
         {loading ? (
           <div className="flex justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
           </div>
         ) : numbers.length === 0 ? (
-          <div className="text-center py-12 text-muted-foreground">
-            <Phone className="w-12 h-12 mx-auto mb-4 opacity-50" />
+          <div className="text-muted-foreground py-12 text-center">
+            <Phone className="mx-auto mb-4 h-12 w-12 opacity-50" />
             <p className="font-medium">No numbers available</p>
             <p className="text-sm">Try a different country, area code, or search pattern</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
             {numbers.map((num) => (
               <div
                 key={num.phoneNumber}
-                className={`border rounded-lg p-4 cursor-pointer transition-all ${selectedNumber === num.phoneNumber
-                  ? "border-primary bg-primary/5 ring-2 ring-primary/20"
-                  : "hover:border-primary/50"
-                  } ${provisioning === num.phoneNumber ? "opacity-70 pointer-events-none" : ""}`}
+                className={`cursor-pointer rounded-lg border p-4 transition-all ${
+                  selectedNumber === num.phoneNumber
+                    ? "border-primary bg-primary/5 ring-primary/20 ring-2"
+                    : "hover:border-primary/50"
+                } ${provisioning === num.phoneNumber ? "pointer-events-none opacity-70" : ""}`}
                 onClick={() => !provisioning && handleSelectNumber(num)}
               >
-                <div className="flex items-start justify-between mb-3">
+                <div className="mb-3 flex items-start justify-between">
                   <div>
-                    <span className="font-mono font-semibold text-lg">{num.phoneNumber}</span>
+                    <span className="font-mono text-lg font-semibold">{num.phoneNumber}</span>
                     {selectedNumber === num.phoneNumber && (
-                      <Check className="inline-block ml-2 w-5 h-5 text-primary" />
+                      <Check className="text-primary ml-2 inline-block h-5 w-5" />
                     )}
                   </div>
-                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                    <DollarSign className="w-4 h-4" />
+                  <div className="text-muted-foreground flex items-center gap-1 text-sm">
+                    <DollarSign className="h-4 w-4" />
                     <span>{formatCost(num.monthlyCost)}/mo</span>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
-                  <MapPin className="w-4 h-4" />
-                  <span>{num.locality}, {num.region}</span>
+                <div className="text-muted-foreground mb-3 flex items-center gap-2 text-sm">
+                  <MapPin className="h-4 w-4" />
+                  <span>
+                    {num.locality}, {num.region}
+                  </span>
                 </div>
 
                 <div className="flex flex-wrap gap-1">
                   {num.capabilities.voice && (
-                    <Badge variant="outline" className="text-xs">Voice</Badge>
+                    <Badge variant="outline" className="text-xs">
+                      Voice
+                    </Badge>
                   )}
                   {num.capabilities.sms && (
-                    <Badge variant="outline" className="text-xs">SMS</Badge>
+                    <Badge variant="outline" className="text-xs">
+                      SMS
+                    </Badge>
                   )}
                   {num.capabilities.mms && (
-                    <Badge variant="outline" className="text-xs">MMS</Badge>
+                    <Badge variant="outline" className="text-xs">
+                      MMS
+                    </Badge>
                   )}
-                  <Badge variant="secondary" className="text-xs capitalize">{num.numberType}</Badge>
+                  <Badge variant="secondary" className="text-xs capitalize">
+                    {num.numberType}
+                  </Badge>
                 </div>
 
                 {provisioning === num.phoneNumber && (
-                  <div className="mt-3 flex items-center gap-2 text-sm text-primary">
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                  <div className="text-primary mt-3 flex items-center gap-2 text-sm">
+                    <Loader2 className="h-4 w-4 animate-spin" />
                     <span>Provisioning...</span>
                   </div>
                 )}
@@ -405,9 +438,9 @@ export function EnhancedNumberSelector({
           </div>
         )}
 
-        <div className="flex items-center justify-between pt-4 border-t">
-          <p className="text-sm text-muted-foreground">
-            <Globe className="inline w-4 h-4 mr-1" />
+        <div className="flex items-center justify-between border-t pt-4">
+          <p className="text-muted-foreground text-sm">
+            <Globe className="mr-1 inline h-4 w-4" />
             Powered by Twilio • Numbers provisioned instantly
           </p>
           {onCancel && (

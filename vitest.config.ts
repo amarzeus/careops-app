@@ -1,17 +1,17 @@
-import { defineConfig } from 'vitest/config';
-import path from 'path';
+import { defineConfig } from "vitest/config";
+import path from "path";
 
 export default defineConfig({
-    test: {
-        globals: true,
-        environment: 'jsdom',
-        setupFiles: ['./tests/unit/setup.ts'],
-        // Only run unit tests
-        include: ['tests/unit/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
+  test: {
+    globals: true,
+    environment: "jsdom",
+    setupFiles: ["./tests/unit/setup.ts"],
+    // Only run unit tests
+    include: ["tests/unit/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
+  },
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
     },
-    resolve: {
-        alias: {
-            '@': path.resolve(__dirname, './src'),
-        },
-    },
+  },
 });

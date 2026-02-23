@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from "next/server";
 import { getCurrentUser, hashPassword } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -38,10 +39,7 @@ export async function POST(req: Request) {
   if (!user || !user.workspaceId)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   if (user.role !== "OWNER")
-    return NextResponse.json(
-      { error: "Only owners can add staff" },
-      { status: 403 }
-    );
+    return NextResponse.json({ error: "Only owners can add staff" }, { status: 403 });
 
   const {
     email,
@@ -53,17 +51,10 @@ export async function POST(req: Request) {
     canAccessInventory,
   } = await req.json();
   if (!email || !name || !password)
-    return NextResponse.json(
-      { error: "Email, name, and password are required" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Email, name, and password are required" }, { status: 400 });
 
   const existing = await prisma.user.findUnique({ where: { email } });
-  if (existing)
-    return NextResponse.json(
-      { error: "Email already in use" },
-      { status: 409 }
-    );
+  if (existing) return NextResponse.json({ error: "Email already in use" }, { status: 409 });
 
   const passwordHash = await hashPassword(password);
   const staffUser = await prisma.user.create({
@@ -101,10 +92,18 @@ export async function PUT(req: Request) {
   const user = await getCurrentUser();
   if (!user || !user.workspaceId)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  if (user.role !== "OWNER")
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (user.role !== "OWNER") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-  const { id, name, email, password, canAccessInbox, canAccessBookings, canAccessForms, canAccessInventory } = await req.json();
+  const {
+    id,
+    name,
+    email,
+    password,
+    canAccessInbox,
+    canAccessBookings,
+    canAccessForms,
+    canAccessInventory,
+  } = await req.json();
   if (!id) return NextResponse.json({ error: "User ID is required" }, { status: 400 });
 
   const existingUser = await prisma.user.findUnique({

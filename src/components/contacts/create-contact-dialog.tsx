@@ -131,9 +131,7 @@ export function CreateContactDialog({
         <DialogHeader>
           <DialogTitle>{initialData ? "Edit Contact" : "Create Contact"}</DialogTitle>
           <DialogDescription>
-            {initialData
-              ? "Update contact details below."
-              : "Add a new contact to your workspace."}
+            {initialData ? "Update contact details below." : "Add a new contact to your workspace."}
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -194,9 +192,7 @@ export function CreateContactDialog({
             />
             <DialogFooter>
               <Button type="submit" disabled={form.formState.isSubmitting}>
-                {form.formState.isSubmitting && (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                )}
+                {form.formState.isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 {initialData ? "Save Changes" : "Create Contact"}
               </Button>
             </DialogFooter>

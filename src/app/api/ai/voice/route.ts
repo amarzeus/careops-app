@@ -1,10 +1,15 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import {
+  getClient,
+  isQuotaError,
+  getWorkspaceGeminiModel,
+  DEFAULT_GEMINI_MODEL,
+  type Part,
+} from "@/lib/gemini";
 import { Type } from "@google/genai";
-import { getClient, isQuotaError, getWorkspaceGeminiModel, DEFAULT_GEMINI_MODEL } from "@/lib/gemini";
-
-
 
 /**
  *
@@ -13,7 +18,14 @@ import { getClient, isQuotaError, getWorkspaceGeminiModel, DEFAULT_GEMINI_MODEL 
 export async function POST(req: Request) {
   try {
     const user = await getCurrentUser();
-    const { message, conversationHistory, clientContext } = await req.json();
+    const {
+      message,
+      currentStep: _currentStep,
+      businessInfo: _businessInfo,
+      conversationHistory,
+      model: _model,
+      clientContext,
+    } = await req.json();
 
     if (!message) {
       console.error("CareOps AI Error: Message is required");
@@ -75,9 +87,7 @@ export async function POST(req: Request) {
         prisma.user.count({ where: { workspaceId: wid, role: "STAFF" } }),
       ]);
 
-      const lowStock = lowStockItems.filter(
-        (item: any) => item.quantity <= item.threshold
-      );
+      const lowStock = lowStockItems.filter((item) => item.quantity <= item.threshold);
 
       contextSummary = {
         workspaceName: workspace?.name || "Unknown",
@@ -86,13 +96,13 @@ export async function POST(req: Request) {
         totalContacts: contactsCount,
         unreadMessages: unreadConversations,
         pendingForms: pendingForms,
-        lowStockItems: lowStock.map((i: any) => ({
+        lowStockItems: lowStock.map((i) => ({
           name: i.name,
           qty: i.quantity,
           threshold: i.threshold,
           unit: i.unit,
         })),
-        unreadAlerts: recentAlerts.map((a: any) => ({
+        unreadAlerts: recentAlerts.map((a) => ({
           type: a.type,
           title: a.title,
           message: a.message,
@@ -101,7 +111,7 @@ export async function POST(req: Request) {
         totalStaff: staffCount,
         userName: user.name,
         userRole: user.role,
-      };
+      } as any;
 
       systemPrompt = `You are CareOps AI — a voice-first operations assistant for "${contextSummary.workspaceName}".
 You are speaking to ${contextSummary.userName} (${contextSummary.userRole}).
@@ -123,7 +133,19 @@ You are speaking to ${contextSummary.userName} (${contextSummary.userRole}).
 - Total contacts: ${contextSummary.totalContacts}
 - Unread messages: ${contextSummary.unreadMessages}
 - Pending forms: ${contextSummary.pendingForms}
-- Low stock items: ${contextSummary.lowStockItems.length > 0 ? contextSummary.lowStockItems.map((i: any) => `${i.name}: ${i.qty} ${i.unit}`).join(", ") : "None"}
+- Low stock items: ${
+        contextSummary.lowStockItems.length > 0
+          ? (
+              contextSummary.lowStockItems as {
+                name: string;
+                qty: number;
+                unit: string;
+              }[]
+            )
+              .map((i) => `${i.name}: ${i.qty} ${i.unit}`)
+              .join(", ")
+          : "None"
+      }
 - Active alerts: ${contextSummary.unreadAlerts.length > 0 ? contextSummary.unreadAlerts.map((a: any) => a.title).join(", ") : "None"}
 - Total services: ${contextSummary.totalServices}
 - Staff members: ${contextSummary.totalStaff}
@@ -200,20 +222,18 @@ Returns a JSON object with:
     const client = getClient();
 
     // Strip trailing user messages from history since sendMessage() adds the current one
-    const historyMsgs = (conversationHistory || [])
-      .filter((msg: any) => msg.content && msg.content.trim());
+    const historyMsgs = (conversationHistory || []).filter(
+      (msg: { content: string }) => msg.content && msg.content.trim()
+    );
 
     // Simple history sanitization
-    const geminiHistory = historyMsgs.map((msg: any) => ({
+    const geminiHistory = historyMsgs.map((msg: { role: string; content: string }) => ({
       role: msg.role === "assistant" ? "model" : "user",
       parts: [{ text: msg.content }],
     }));
 
     // Build contents with history context
-    const contents = [
-      ...geminiHistory,
-      { role: "user", parts: [{ text: message }] }
-    ];
+    const contents = [...geminiHistory, { role: "user", parts: [{ text: message }] }];
 
     console.log("Calling Gemini for CareOps AI...");
 
@@ -229,7 +249,7 @@ Returns a JSON object with:
         responseMimeType: "application/json",
         responseSchema: schema,
       },
-      contents: contents as any,
+      contents: contents as (string | Part)[],
     });
 
     const text = response.text;
@@ -238,28 +258,36 @@ Returns a JSON object with:
       throw new Error("Empty response from Gemini");
     }
 
-    const parsed = JSON.parse(text!) as { message: string, action?: any };
+    const parsed = JSON.parse(text!) as {
+      message: string;
+      action?: { type: string; path: string };
+    };
 
     return NextResponse.json({
       message: parsed.message,
       action: parsed.action || null,
     });
-
   } catch (error: any) {
     console.error("CareOps AI Error:", error);
 
     // Handle 429 Specifically
     if (isQuotaError(error)) {
-      return NextResponse.json({
-        message: "The CareOps AI is currently experiencing high volume. Please try again in a moment or proceed using the interface.",
-        action: null,
-      }, { status: 429 });
+      return NextResponse.json(
+        {
+          message:
+            "The CareOps AI is currently experiencing high volume. Please try again in a moment or proceed using the interface.",
+          action: null,
+        },
+        { status: 429 }
+      );
     }
 
-    return NextResponse.json({
-      message:
-        "Sorry, I had trouble processing that. Could you try rephrasing your question?",
-      action: null,
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        message: "Sorry, I had trouble processing that. Could you try rephrasing your question?",
+        action: null,
+      },
+      { status: 500 }
+    );
   }
 }

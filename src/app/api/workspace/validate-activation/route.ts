@@ -48,16 +48,16 @@ export async function GET() {
     const workspace = await prisma.workspace.findUnique({
       where: { id: user.workspaceId },
     });
-    if (!workspace)
-      return NextResponse.json({ error: "Not found" }, { status: 404 });
+    if (!workspace) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
     const errors: string[] = [];
 
     // Check 1: At least one communication channel configured
-    const hasChannel =
-      isEmailAvailable(workspace) || isSMSAvailable(workspace);
+    const hasChannel = isEmailAvailable(workspace) || isSMSAvailable(workspace);
     if (!hasChannel) {
-      errors.push("At least one communication channel (Email, SMS, or WhatsApp) must be configured");
+      errors.push(
+        "At least one communication channel (Email, SMS, or WhatsApp) must be configured"
+      );
     }
 
     // Check 2: At least one active service exists
@@ -72,28 +72,29 @@ export async function GET() {
     const services = await prisma.service.findMany({
       where: {
         workspaceId: user.workspaceId,
-        isActive: true
+        isActive: true,
       },
       select: {
         id: true,
         name: true,
         availableDays: true,
         startTime: true,
-        endTime: true
-      }
+        endTime: true,
+      },
     });
 
-    const servicesWithoutAvailability = services.filter(service =>
-      !service.availableDays ||
-      service.availableDays === "" ||
-      !service.startTime ||
-      service.startTime === "" ||
-      !service.endTime ||
-      service.endTime === ""
+    const servicesWithoutAvailability = services.filter(
+      (service) =>
+        !service.availableDays ||
+        service.availableDays === "" ||
+        !service.startTime ||
+        service.startTime === "" ||
+        !service.endTime ||
+        service.endTime === ""
     );
 
     if (servicesWithoutAvailability.length > 0) {
-      const serviceNames = servicesWithoutAvailability.map(s => s.name).join(", ");
+      const serviceNames = servicesWithoutAvailability.map((s) => s.name).join(", ");
       errors.push(`All active services must have availability defined. Missing: ${serviceNames}`);
     }
 
@@ -102,6 +103,9 @@ export async function GET() {
       errors,
     });
   } catch (error) {
-    return NextResponse.json({ error: "Validation failed", details: String(error) }, { status: 500 });
+    return NextResponse.json(
+      { error: "Validation failed", details: String(error) },
+      { status: 500 }
+    );
   }
 }

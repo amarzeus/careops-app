@@ -2,8 +2,8 @@
 import React from "react";
 
 interface GradientOrbProps {
-    className?: string;
-    delay?: number;
+  className?: string;
+  delay?: number;
 }
 
 /**
@@ -13,10 +13,10 @@ interface GradientOrbProps {
  * @param props.delay delay
  */
 export function GradientOrb({ className = "", delay = 0 }: GradientOrbProps) {
-    return (
-        <div
-            className={`absolute rounded-full blur-3xl opacity-30 animate-pulse ${className}`}
-            style={{ animationDuration: "8s", animationDelay: `${delay}s` }}
-        />
-    );
+  return (
+    <div
+      className={`absolute animate-pulse rounded-full opacity-30 blur-3xl ${className}`}
+      style={{ animationDuration: "8s", animationDelay: `${delay}s` }}
+    />
+  );
 }

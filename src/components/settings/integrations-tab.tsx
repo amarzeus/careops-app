@@ -3,13 +3,7 @@
 import { Mail, MessageSquare, Calendar, ExternalLink, Unplug } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { WorkspaceSettingsDTO } from "@/types/dto";
 import { WebhooksSection } from "@/components/settings/webhooks-section";
 
@@ -57,17 +51,15 @@ export function IntegrationsTab({
       <Card>
         <CardHeader>
           <CardTitle>Email Configuration</CardTitle>
-          <CardDescription>
-            Configure your email service for sending notifications
-          </CardDescription>
+          <CardDescription>Configure your email service for sending notifications</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg">
+          <div className="bg-muted/30 flex items-center justify-between rounded-lg p-4">
             <div className="flex items-center gap-3">
-              <Mail className="w-5 h-5 text-primary" />
+              <Mail className="text-primary h-5 w-5" />
               <div>
                 <p className="font-medium">Email Service</p>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-muted-foreground text-xs">
                   {workspace?.emailConfigured ? "Connected" : "Not configured"}
                 </p>
               </div>
@@ -95,17 +87,15 @@ export function IntegrationsTab({
       <Card>
         <CardHeader>
           <CardTitle>SMS Configuration (Twilio)</CardTitle>
-          <CardDescription>
-            Configure Twilio for SMS OTP and notifications
-          </CardDescription>
+          <CardDescription>Configure Twilio for SMS OTP and notifications</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg">
+          <div className="bg-muted/30 flex items-center justify-between rounded-lg p-4">
             <div className="flex items-center gap-3">
-              <MessageSquare className="w-5 h-5 text-primary" />
+              <MessageSquare className="text-primary h-5 w-5" />
               <div>
                 <p className="font-medium">Twilio SMS</p>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-muted-foreground text-xs">
                   {workspace?.smsConfigured ? "Connected" : "Not configured"}
                 </p>
               </div>
@@ -129,13 +119,12 @@ export function IntegrationsTab({
         </CardContent>
       </Card>
 
-
       {/* Google Calendar Integration */}
       <Card className="border-blue-200">
         <CardHeader>
           <div className="flex items-center gap-2">
             <CardTitle>Google Calendar</CardTitle>
-            <Badge variant="secondary" className="bg-blue-100 text-primary/90 text-[10px]">
+            <Badge variant="secondary" className="text-primary/90 bg-blue-100 text-[10px]">
               NEW
             </Badge>
           </div>
@@ -144,14 +133,14 @@ export function IntegrationsTab({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg border border-blue-100">
+          <div className="flex items-center justify-between rounded-lg border border-blue-100 bg-blue-50 p-4">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Calendar className="w-5 h-5 text-primary" />
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-100">
+                <Calendar className="text-primary h-5 w-5" />
               </div>
               <div>
                 <p className="font-medium text-blue-900">Google Calendar</p>
-                <p className="text-xs text-primary">
+                <p className="text-primary text-xs">
                   {calendarConnected
                     ? `Connected as ${workspace?.googleCalendarEmail || "Google Account"}`
                     : "Not connected — click below to link your Google Calendar"}
@@ -167,21 +156,29 @@ export function IntegrationsTab({
           </div>
 
           {/* Calendar capabilities */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-muted-foreground">
-            <div className="flex items-center gap-1.5 p-2 bg-muted/30 rounded">
-              <span className={`w-1.5 h-1.5 rounded-full ${calendarConnected ? "bg-blue-500" : "bg-muted/50"}`} />
+          <div className="text-muted-foreground grid grid-cols-1 gap-2 text-xs sm:grid-cols-2">
+            <div className="bg-muted/30 flex items-center gap-1.5 rounded p-2">
+              <span
+                className={`h-1.5 w-1.5 rounded-full ${calendarConnected ? "bg-blue-500" : "bg-muted/50"}`}
+              />
               Auto-sync new bookings
             </div>
-            <div className="flex items-center gap-1.5 p-2 bg-muted/30 rounded">
-              <span className={`w-1.5 h-1.5 rounded-full ${calendarConnected ? "bg-blue-500" : "bg-muted/50"}`} />
+            <div className="bg-muted/30 flex items-center gap-1.5 rounded p-2">
+              <span
+                className={`h-1.5 w-1.5 rounded-full ${calendarConnected ? "bg-blue-500" : "bg-muted/50"}`}
+              />
               Update on reschedule
             </div>
-            <div className="flex items-center gap-1.5 p-2 bg-muted/30 rounded">
-              <span className={`w-1.5 h-1.5 rounded-full ${calendarConnected ? "bg-blue-500" : "bg-muted/50"}`} />
+            <div className="bg-muted/30 flex items-center gap-1.5 rounded p-2">
+              <span
+                className={`h-1.5 w-1.5 rounded-full ${calendarConnected ? "bg-blue-500" : "bg-muted/50"}`}
+              />
               Cancel on booking cancel
             </div>
-            <div className="flex items-center gap-1.5 p-2 bg-muted/30 rounded">
-              <span className={`w-1.5 h-1.5 rounded-full ${calendarConnected ? "bg-blue-500" : "bg-muted/50"}`} />
+            <div className="bg-muted/30 flex items-center gap-1.5 rounded p-2">
+              <span
+                className={`h-1.5 w-1.5 rounded-full ${calendarConnected ? "bg-blue-500" : "bg-muted/50"}`}
+              />
               Calendar reminders
             </div>
           </div>
@@ -194,18 +191,18 @@ export function IntegrationsTab({
               onClick={onDisconnectCalendar}
               disabled={disconnectingCalendar}
             >
-              <Unplug className="w-4 h-4 mr-2" />
+              <Unplug className="mr-2 h-4 w-4" />
               {disconnectingCalendar ? "Disconnecting..." : "Disconnect Google Calendar"}
             </Button>
           ) : (
             <Button
               variant="outline"
               size="sm"
-              className="w-full border-blue-200 hover:bg-blue-50 hover:text-primary/90"
+              className="hover:text-primary/90 w-full border-blue-200 hover:bg-blue-50"
               onClick={onConnectCalendar}
               disabled={connectingCalendar}
             >
-              <ExternalLink className="w-4 h-4 mr-2" />
+              <ExternalLink className="mr-2 h-4 w-4" />
               {connectingCalendar ? "Connecting..." : "Connect Google Calendar"}
             </Button>
           )}

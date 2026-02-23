@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getCurrentUser } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+import { NextRequest, NextResponse } from "next/server";
+import { getCurrentUser } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -16,7 +16,7 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
   try {
     const user = await getCurrentUser();
     if (!user?.workspaceId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { id } = await params;
@@ -29,16 +29,13 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
     });
 
     if (!agent) {
-      return NextResponse.json({ error: 'Voice agent not found' }, { status: 404 });
+      return NextResponse.json({ error: "Voice agent not found" }, { status: 404 });
     }
 
     return NextResponse.json(agent);
   } catch (error) {
-    console.error('[VoiceAgent:GET:Id] Error:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch voice agent' },
-      { status: 500 }
-    );
+    console.error("[VoiceAgent:GET:Id] Error:", error);
+    return NextResponse.json({ error: "Failed to fetch voice agent" }, { status: 500 });
   }
 }
 
@@ -52,7 +49,7 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
   try {
     const user = await getCurrentUser();
     if (!user?.workspaceId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { id } = await params;
@@ -66,7 +63,7 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
     });
 
     if (!existing) {
-      return NextResponse.json({ error: 'Voice agent not found' }, { status: 404 });
+      return NextResponse.json({ error: "Voice agent not found" }, { status: 404 });
     }
 
     const {
@@ -102,11 +99,8 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json(agent);
   } catch (error) {
-    console.error('[VoiceAgent:PATCH] Error:', error);
-    return NextResponse.json(
-      { error: 'Failed to update voice agent' },
-      { status: 500 }
-    );
+    console.error("[VoiceAgent:PATCH] Error:", error);
+    return NextResponse.json({ error: "Failed to update voice agent" }, { status: 500 });
   }
 }
 
@@ -120,7 +114,7 @@ export async function DELETE(req: NextRequest, { params }: RouteParams) {
   try {
     const user = await getCurrentUser();
     if (!user?.workspaceId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { id } = await params;
@@ -133,7 +127,7 @@ export async function DELETE(req: NextRequest, { params }: RouteParams) {
     });
 
     if (!existing) {
-      return NextResponse.json({ error: 'Voice agent not found' }, { status: 404 });
+      return NextResponse.json({ error: "Voice agent not found" }, { status: 404 });
     }
 
     await prisma.voiceAgent.delete({
@@ -142,10 +136,7 @@ export async function DELETE(req: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('[VoiceAgent:DELETE] Error:', error);
-    return NextResponse.json(
-      { error: 'Failed to delete voice agent' },
-      { status: 500 }
-    );
+    console.error("[VoiceAgent:DELETE] Error:", error);
+    return NextResponse.json({ error: "Failed to delete voice agent" }, { status: 500 });
   }
 }

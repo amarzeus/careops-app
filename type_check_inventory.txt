@@ -1,0 +1,106 @@
+
+> careops-app@0.1.0 type-check
+> tsc --noEmit
+
+src/app/(dashboard)/staff/page.tsx(62,22): error TS18046: 'error' is of type 'unknown'.
+src/app/(public)/contact/[slug]/page.tsx(37,9): error TS18046: 'f' is of type 'unknown'.
+src/app/(public)/contact/[slug]/page.tsx(37,24): error TS18046: 'f' is of type 'unknown'.
+src/app/(public)/contact/[slug]/page.tsx(38,20): error TS18046: 'f' is of type 'unknown'.
+src/app/(public)/form/[slug]/page.tsx(34,9): error TS18046: 'f' is of type 'unknown'.
+src/app/(public)/form/[slug]/page.tsx(34,24): error TS18046: 'f' is of type 'unknown'.
+src/app/(public)/form/[slug]/page.tsx(35,20): error TS18046: 'f' is of type 'unknown'.
+src/app/api/ai/insights/route.ts(46,64): error TS18046: 'item' is of type 'unknown'.
+src/app/api/ai/insights/route.ts(46,81): error TS18046: 'item' is of type 'unknown'.
+src/app/api/ai/preferences/route.ts(16,23): error TS2571: Object is of type 'unknown'.
+src/app/api/ai/preferences/route.ts(22,21): error TS2571: Object is of type 'unknown'.
+src/app/api/ai/voice/route.ts(115,86): error TS18046: 'contextSummary' is of type 'unknown'.
+src/app/api/ai/voice/route.ts(116,23): error TS18046: 'contextSummary' is of type 'unknown'.
+src/app/api/ai/voice/route.ts(116,51): error TS18046: 'contextSummary' is of type 'unknown'.
+src/app/api/ai/voice/route.ts(130,23): error TS18046: 'contextSummary' is of type 'unknown'.
+src/app/api/ai/voice/route.ts(131,24): error TS18046: 'contextSummary' is of type 'unknown'.
+src/app/api/ai/voice/route.ts(132,21): error TS18046: 'contextSummary' is of type 'unknown'.
+src/app/api/ai/voice/route.ts(133,22): error TS18046: 'contextSummary' is of type 'unknown'.
+src/app/api/ai/voice/route.ts(134,20): error TS18046: 'contextSummary' is of type 'unknown'.
+src/app/api/ai/voice/route.ts(136,9): error TS18046: 'contextSummary' is of type 'unknown'.
+src/app/api/ai/voice/route.ts(138,15): error TS18046: 'contextSummary' is of type 'unknown'.
+src/app/api/ai/voice/route.ts(148,20): error TS18046: 'contextSummary' is of type 'unknown'.
+src/app/api/ai/voice/route.ts(148,61): error TS18046: 'contextSummary' is of type 'unknown'.
+src/app/api/ai/voice/route.ts(148,109): error TS18046: 'a' is of type 'unknown'.
+src/app/api/ai/voice/route.ts(149,21): error TS18046: 'contextSummary' is of type 'unknown'.
+src/app/api/ai/voice/route.ts(150,20): error TS18046: 'contextSummary' is of type 'unknown'.
+src/app/api/ai/voice/settings/route.ts(52,11): error TS18046: 'data' is of type 'unknown'.
+src/app/api/ai/voice/settings/route.ts(56,21): error TS18046: 'data' is of type 'unknown'.
+src/app/api/ai/voice/settings/route.ts(69,12): error TS18046: 'data' is of type 'unknown'.
+src/app/api/ai/voice/settings/route.ts(69,51): error TS18046: 'data' is of type 'unknown'.
+src/app/api/auth/register/route.ts(71,7): error TS18046: 'error' is of type 'unknown'.
+src/app/api/auth/register/route.ts(72,7): error TS18046: 'error' is of type 'unknown'.
+src/app/api/auth/register/route.ts(73,7): error TS18046: 'error' is of type 'unknown'.
+src/app/api/auth/register/route.ts(82,43): error TS18046: 'error' is of type 'unknown'.
+src/app/api/booking/create/route.ts(172,9): error TS18046: 'error' is of type 'unknown'.
+src/app/api/booking/create/route.ts(176,9): error TS18046: 'error' is of type 'unknown'.
+src/app/api/booking/create/route.ts(180,20): error TS18046: 'error' is of type 'unknown'.
+src/app/api/dashboard/route.ts(80,64): error TS18046: 'item' is of type 'unknown'.
+src/app/api/dashboard/route.ts(80,81): error TS18046: 'item' is of type 'unknown'.
+src/app/api/staff/route.ts(126,5): error TS18046: 'updateData' is of type 'unknown'.
+src/app/api/staff/route.ts(131,5): error TS2322: Type 'unknown' is not assignable to type '(Without<UserUpdateInput, UserUncheckedUpdateInput> & UserUncheckedUpdateInput) | (Without<...> & UserUpdateInput)'.
+src/app/onboarding/page.tsx(507,35): error TS18046: 's' is of type 'unknown'.
+src/app/onboarding/page.tsx(507,92): error TS18046: 's' is of type 'unknown'.
+src/app/onboarding/page.tsx(509,19): error TS18046: 's' is of type 'unknown'.
+src/app/onboarding/page.tsx(510,30): error TS18046: 's' is of type 'unknown'.
+src/app/onboarding/page.tsx(511,23): error TS18046: 's' is of type 'unknown'.
+src/app/onboarding/page.tsx(513,24): error TS18046: 's' is of type 'unknown'.
+src/app/onboarding/page.tsx(514,22): error TS18046: 's' is of type 'unknown'.
+src/app/onboarding/page.tsx(526,31): error TS18046: 'u' is of type 'unknown'.
+src/app/onboarding/page.tsx(526,41): error TS18046: 'u' is of type 'unknown'.
+src/app/onboarding/page.tsx(574,35): error TS18046: 'f' is of type 'unknown'.
+src/app/onboarding/page.tsx(574,95): error TS18046: 'f' is of type 'unknown'.
+src/app/onboarding/page.tsx(576,19): error TS18046: 'f' is of type 'unknown'.
+src/app/onboarding/page.tsx(577,26): error TS18046: 'f' is of type 'unknown'.
+src/app/onboarding/page.tsx(578,21): error TS18046: 'f' is of type 'unknown'.
+src/app/onboarding/page.tsx(578,50): error TS18046: 'f' is of type 'unknown'.
+src/app/onboarding/page.tsx(590,31): error TS18046: 'u' is of type 'unknown'.
+src/app/onboarding/page.tsx(590,41): error TS18046: 'u' is of type 'unknown'.
+src/app/onboarding/page.tsx(642,15): error TS18046: 'item' is of type 'unknown'.
+src/app/onboarding/page.tsx(642,81): error TS18046: 'item' is of type 'unknown'.
+src/app/onboarding/page.tsx(645,19): error TS18046: 'item' is of type 'unknown'.
+src/app/onboarding/page.tsx(646,30): error TS18046: 'item' is of type 'unknown'.
+src/app/onboarding/page.tsx(647,31): error TS18046: 'item' is of type 'unknown'.
+src/app/onboarding/page.tsx(648,19): error TS18046: 'item' is of type 'unknown'.
+src/app/onboarding/page.tsx(660,31): error TS18046: 'u' is of type 'unknown'.
+src/app/onboarding/page.tsx(660,41): error TS18046: 'u' is of type 'unknown'.
+src/app/page.tsx(324,26): error TS2339: Property 'active' does not exist on type 'unknown'.
+src/app/page.tsx(324,34): error TS2339: Property 'payload' does not exist on type 'unknown'.
+src/app/page.tsx(324,43): error TS2339: Property 'label' does not exist on type 'unknown'.
+src/components/providers/voice-provider.tsx(92,18): error TS18046: 'data' is of type 'unknown'.
+src/components/providers/voice-provider.tsx(95,16): error TS18046: 'data' is of type 'unknown'.
+src/components/providers/voice-provider.tsx(99,11): error TS18046: 'data' is of type 'unknown'.
+src/components/providers/voice-provider.tsx(101,13): error TS18046: 'data' is of type 'unknown'.
+src/components/providers/voice-provider.tsx(101,48): error TS18046: 'data' is of type 'unknown'.
+src/components/providers/voice-provider.tsx(102,23): error TS18046: 'data' is of type 'unknown'.
+src/components/providers/voice-provider.tsx(106,38): error TS18046: 'data' is of type 'unknown'.
+src/components/providers/voice-provider.tsx(110,14): error TS18046: 'data' is of type 'unknown'.
+src/components/voice-assistant.tsx(285,32): error TS2339: Property 'stop' does not exist on type '{}'.
+src/components/voice-assistant.tsx(321,32): error TS2339: Property 'stop' does not exist on type '{}'.
+src/components/voice-assistant.tsx(563,27): error TS18046: 'event' is of type 'unknown'.
+src/components/voice-assistant.tsx(564,13): error TS18046: 'event' is of type 'unknown'.
+src/components/voice-assistant.tsx(565,31): error TS18046: 'event' is of type 'unknown'.
+src/components/voice-assistant.tsx(567,22): error TS18046: 'event' is of type 'unknown'.
+src/components/voice-assistant.tsx(587,11): error TS18046: 'event' is of type 'unknown'.
+src/components/voice-assistant.tsx(597,11): error TS18046: 'event' is of type 'unknown'.
+src/components/voice-assistant.tsx(599,30): error TS18046: 'event' is of type 'unknown'.
+src/lib/gemini.ts(86,18): error TS2339: Property 'toLowerCase' does not exist on type '{}'.
+src/lib/gemini.ts(87,18): error TS2339: Property 'toLowerCase' does not exist on type '{}'.
+src/lib/gemini.ts(88,18): error TS2339: Property 'toLowerCase' does not exist on type '{}'.
+src/lib/gemini.ts(830,9): error TS2322: Type 'unknown' is not assignable to type 'ToolListUnion | undefined'.
+src/lib/gemini.ts(833,7): error TS2322: Type 'unknown' is not assignable to type 'ContentListUnion'.
+src/lib/gemini.ts(1211,7): error TS2571: Object is of type 'unknown'.
+src/lib/razorpay.ts(144,11): error TS18046: 'error' is of type 'unknown'.
+src/lib/razorpay.ts(145,56): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'RazorpayPaginationOptions | undefined'.
+src/lib/razorpay.ts(148,23): error TS2339: Property 'items' does not exist on type 'Promise<{ entity: string; count: number; items: RazorpayCustomer[]; }> & void'.
+src/lib/razorpay.ts(148,42): error TS2339: Property 'items' does not exist on type 'Promise<{ entity: string; count: number; items: RazorpayCustomer[]; }> & void'.
+src/lib/razorpay.ts(149,34): error TS2339: Property 'items' does not exist on type 'Promise<{ entity: string; count: number; items: RazorpayCustomer[]; }> & void'.
+src/lib/razorpay.ts(162,30): error TS18046: 'subscriptionsApi' is of type 'unknown'.
+tests/e2e/routing.spec.ts(36,35): error TS2345: Argument of type 'unknown' is not assignable to parameter of type '"list" | "log" | "status" | "form" | "search" | "alert" | "link" | "time" | "button" | "checkbox" | "radio" | "img" | "article" | "blockquote" | "caption" | "code" | "dialog" | "figure" | ... 63 more ... | "superscript"'.
+tests/e2e/routing.spec.ts(73,25): error TS18046: 'e' is of type 'unknown'.
+tests/unit/booking-submission.test.tsx(82,5): error TS2571: Object is of type 'unknown'.
+tests/unit/booking-submission.test.tsx(110,5): error TS2571: Object is of type 'unknown'.

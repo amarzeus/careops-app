@@ -1,4 +1,4 @@
-import crypto from 'crypto';
+import crypto from "crypto";
 
 /**
  * Webhook Security Utilities
@@ -12,10 +12,7 @@ import crypto from 'crypto';
  * @returns Hex-encoded signature
  */
 export function generateWebhookSignature(payload: string, secret: string): string {
-  return crypto
-    .createHmac('sha256', secret)
-    .update(payload)
-    .digest('hex');
+  return crypto.createHmac("sha256", secret).update(payload).digest("hex");
 }
 
 /**
@@ -33,18 +30,18 @@ export function verifyWebhookSignature(
 ): boolean {
   try {
     const expected = generateWebhookSignature(payload, secret);
-    
+
     // Timing-safe comparison to prevent timing attacks
     const sigBuf = Buffer.from(signature);
     const expectedBuf = Buffer.from(expected);
-    
+
     if (sigBuf.length !== expectedBuf.length) {
       return false;
     }
-    
+
     return crypto.timingSafeEqual(sigBuf, expectedBuf);
   } catch (error) {
-    console.error('[Webhook Security] Signature verification error:', error);
+    console.error("[Webhook Security] Signature verification error:", error);
     return false;
   }
 }
@@ -54,7 +51,7 @@ export function verifyWebhookSignature(
  * @returns Random hex string
  */
 export function generateWebhookSecret(): string {
-  return crypto.randomBytes(32).toString('hex');
+  return crypto.randomBytes(32).toString("hex");
 }
 
 /**

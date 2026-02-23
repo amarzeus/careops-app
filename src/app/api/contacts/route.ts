@@ -36,13 +36,14 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { name, email, phone, source, notes } = await req.json();
-  if (!name)
-    return NextResponse.json({ error: "Name is required" }, { status: 400 });
+  if (!name) return NextResponse.json({ error: "Name is required" }, { status: 400 });
 
   const limitCheck = await checkUsageLimit(user.workspaceId, "contacts");
   if (!limitCheck.allowed) {
     return NextResponse.json(
-      { error: `Contact limit exceeded. Used: ${limitCheck.used}/${limitCheck.limit}. Please upgrade your plan.` },
+      {
+        error: `Contact limit exceeded. Used: ${limitCheck.used}/${limitCheck.limit}. Please upgrade your plan.`,
+      },
       { status: 402 }
     );
   }
@@ -51,11 +52,8 @@ export async function POST(req: Request) {
   const existingContact = await prisma.contact.findFirst({
     where: {
       workspaceId: user.workspaceId,
-      OR: [
-        { email: email || undefined },
-        { phone: phone || undefined }
-      ]
-    }
+      OR: [{ email: email || undefined }, { phone: phone || undefined }],
+    },
   });
 
   if (existingContact) {
@@ -66,13 +64,15 @@ export async function POST(req: Request) {
       where: { id: existingContact.id },
       data: {
         name: name, // User might be correcting the name
-        notes: notes ? (existingContact.notes ? `${existingContact.notes}\n${notes}` : notes) : undefined
-      }
+        notes: notes
+          ? existingContact.notes
+            ? `${existingContact.notes}\n${notes}`
+            : notes
+          : undefined,
+      },
     });
     return NextResponse.json({ contact: updatedContact }, { status: 200 });
   }
-
-
 
   const contact = await prisma.contact.create({
     data: {

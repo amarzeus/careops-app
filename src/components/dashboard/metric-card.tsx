@@ -52,7 +52,7 @@ export function MetricCard({
   const content = (
     <div
       className={cn(
-        "relative overflow-hidden rounded-xl bg-background p-4 shadow-sm border transition-all",
+        "bg-background relative overflow-hidden rounded-xl border p-4 shadow-sm transition-all",
         href && "cursor-pointer hover:shadow-md",
         alert && "border-red-200 ring-1 ring-red-100"
       )}
@@ -61,14 +61,21 @@ export function MetricCard({
       tabIndex={href ? 0 : undefined}
     >
       <div className="flex items-center justify-between gap-4">
-        <div className="space-y-1 min-w-0">
-          <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider truncate">{title}</p>
+        <div className="min-w-0 space-y-1">
+          <p className="text-muted-foreground truncate text-[11px] font-semibold tracking-wider uppercase">
+            {title}
+          </p>
           <div className="flex items-baseline gap-2">
-            <p className={cn("text-2xl font-bold tracking-tight", alert ? "text-red-700" : "text-foreground")}>
+            <p
+              className={cn(
+                "text-2xl font-bold tracking-tight",
+                alert ? "text-red-700" : "text-foreground"
+              )}
+            >
               {value}
             </p>
             {trend && (
-              <div className="flex items-center gap-0.5 transform translate-y-[2px]">
+              <div className="flex translate-y-[2px] transform items-center gap-0.5">
                 <span
                   className={cn(
                     "text-[10px] font-bold",
@@ -78,16 +85,18 @@ export function MetricCard({
                   {trend.value >= 0 ? "+" : ""}
                   {trend.value}
                 </span>
-                <span className="text-[10px] text-muted-foreground hidden xl:inline">{trend.label}</span>
+                <span className="text-muted-foreground hidden text-[10px] xl:inline">
+                  {trend.label}
+                </span>
               </div>
             )}
           </div>
           {description && (
-            <p className="text-[11px] text-muted-foreground truncate">{description}</p>
+            <p className="text-muted-foreground truncate text-[11px]">{description}</p>
           )}
         </div>
-        <div className={cn("p-2 rounded-lg shrink-0", colors.bg)}>
-          <Icon className={cn("w-4 h-4", colors.icon)} />
+        <div className={cn("shrink-0 rounded-lg p-2", colors.bg)}>
+          <Icon className={cn("h-4 w-4", colors.icon)} />
         </div>
       </div>
     </div>

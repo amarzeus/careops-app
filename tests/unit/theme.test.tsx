@@ -17,16 +17,12 @@ vi.mock("next-themes", () => ({
 
 describe("ThemeProvider", () => {
   it("should be importable", async () => {
-    const { ThemeProvider } = await import(
-      "@/components/providers/theme-provider"
-    );
+    const { ThemeProvider } = await import("@/components/providers/theme-provider");
     expect(ThemeProvider).toBeDefined();
   });
 
   it("should render children", async () => {
-    const { ThemeProvider } = await import(
-      "@/components/providers/theme-provider"
-    );
+    const { ThemeProvider } = await import("@/components/providers/theme-provider");
     render(
       <ThemeProvider>
         <div data-testid="child">Test Child</div>

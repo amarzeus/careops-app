@@ -33,9 +33,14 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
         name: body.name ?? staff.name,
       },
       select: {
-        id: true, name: true, email: true, role: true,
-        canAccessInbox: true, canAccessBookings: true,
-        canAccessForms: true, canAccessInventory: true,
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        canAccessInbox: true,
+        canAccessBookings: true,
+        canAccessForms: true,
+        canAccessInventory: true,
       },
     });
 

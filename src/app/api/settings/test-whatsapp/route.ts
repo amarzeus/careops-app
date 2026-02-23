@@ -43,9 +43,6 @@ export async function POST() {
     );
   } catch (error) {
     const message = error instanceof Error ? error.message : "Connection failed";
-    return NextResponse.json(
-      { error: `WhatsApp connection failed: ${message}` },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: `WhatsApp connection failed: ${message}` }, { status: 500 });
   }
 }

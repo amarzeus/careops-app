@@ -5,10 +5,10 @@
 
 import { prisma } from "./prisma";
 
-export type InventoryChangeReason = 
-  | "booking_completed" 
-  | "manual_adjustment" 
-  | "restock" 
+export type InventoryChangeReason =
+  | "booking_completed"
+  | "manual_adjustment"
+  | "restock"
   | "initial"
   | "booking_cancelled";
 
@@ -52,10 +52,7 @@ export async function logInventoryChange(data: InventoryLogData): Promise<void> 
  * @param limit - Number of records to return
  * @returns Array of inventory log entries
  */
-export async function getInventoryHistory(
-  itemId: string, 
-  limit: number = 50
-) {
+export async function getInventoryHistory(itemId: string, limit: number = 50) {
   return prisma.inventoryLog.findMany({
     where: { itemId },
     orderBy: { createdAt: "desc" },
@@ -69,10 +66,7 @@ export async function getInventoryHistory(
  * @param limit - Number of records to return
  * @returns Array of inventory log entries with item details
  */
-export async function getWorkspaceInventoryHistory(
-  workspaceId: string,
-  limit: number = 50
-) {
+export async function getWorkspaceInventoryHistory(workspaceId: string, limit: number = 50) {
   return prisma.inventoryLog.findMany({
     where: { workspaceId },
     orderBy: { createdAt: "desc" },

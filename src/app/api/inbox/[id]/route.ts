@@ -9,10 +9,7 @@ import { resumeAutomation, triggerAutomation } from "@/lib/automation";
  * @param root0
  * @param root0.params
  */
-export async function GET(
-  req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const user = await getCurrentUser();
   if (!user || !user.workspaceId)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -29,11 +26,7 @@ export async function GET(
     },
   });
 
-  if (!conversation)
-    return NextResponse.json(
-      { error: "Conversation not found" },
-      { status: 404 }
-    );
+  if (!conversation) return NextResponse.json({ error: "Conversation not found" }, { status: 404 });
 
   // Mark as read
   await prisma.conversation.update({
@@ -50,10 +43,7 @@ export async function GET(
  * @param root0
  * @param root0.params
  */
-export async function PUT(
-  req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const user = await getCurrentUser();
   if (!user || !user.workspaceId)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -83,21 +73,14 @@ export async function PUT(
  * @param root0
  * @param root0.params
  */
-export async function POST(
-  req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const user = await getCurrentUser();
   if (!user || !user.workspaceId)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id } = await params;
   const { content, channel } = await req.json();
-  if (!content)
-    return NextResponse.json(
-      { error: "Message content is required" },
-      { status: 400 }
-    );
+  if (!content) return NextResponse.json({ error: "Message content is required" }, { status: 400 });
 
   const message = await prisma.message.create({
     data: {
@@ -119,8 +102,8 @@ export async function POST(
   // PRD: "When staff replies → automation stops"
   // triggerAutomation fires handleStaffReply which sets isActive=false,
   // sets autoResumeAt (+24h), creates alert, and logs the pause.
-  triggerAutomation(user.workspaceId!, "STAFF_REPLY", { conversationId: id }).catch(
-    (err) => console.error("STAFF_REPLY automation trigger error:", err)
+  triggerAutomation(user.workspaceId!, "STAFF_REPLY", { conversationId: id }).catch((err) =>
+    console.error("STAFF_REPLY automation trigger error:", err)
   );
 
   return NextResponse.json({ message }, { status: 201 });

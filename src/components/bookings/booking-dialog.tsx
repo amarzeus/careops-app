@@ -20,11 +20,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -94,9 +90,7 @@ export function BookingDialog({
         : initialDate
           ? format(initialDate, "HH:mm")
           : "09:00",
-      date: initialData
-        ? new Date(initialData.date)
-        : initialDate || new Date(),
+      date: initialData ? new Date(initialData.date) : initialDate || new Date(),
     },
   });
 
@@ -112,9 +106,7 @@ export function BookingDialog({
           : initialDate
             ? format(initialDate, "HH:mm")
             : "09:00",
-        date: initialData
-          ? new Date(initialData.date)
-          : initialDate || new Date(),
+        date: initialData ? new Date(initialData.date) : initialDate || new Date(),
       });
     }
   }, [open, initialData, initialDate, reset]);
@@ -142,15 +134,12 @@ export function BookingDialog({
           <DialogHeader>
             <DialogTitle>{initialData ? "Edit Booking" : "New Booking"}</DialogTitle>
             <DialogDescription>
-              {initialData
-                ? "Update booking details below."
-                : "Create a new booking manually."}
+              {initialData ? "Update booking details below." : "Create a new booking manually."}
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-4">
-
             <div className="grid gap-2">
-              <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              <label className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                 Contact
               </label>
               <div className="flex gap-2">
@@ -181,12 +170,12 @@ export function BookingDialog({
                 </Button>
               </div>
               {errors.contactId && (
-                <p className="text-sm font-medium text-destructive">{errors.contactId.message}</p>
+                <p className="text-destructive text-sm font-medium">{errors.contactId.message}</p>
               )}
             </div>
 
             <div className="grid gap-2">
-              <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              <label className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                 Service
               </label>
               <Select
@@ -205,13 +194,13 @@ export function BookingDialog({
                 </SelectContent>
               </Select>
               {errors.serviceId && (
-                <p className="text-sm font-medium text-destructive">{errors.serviceId.message}</p>
+                <p className="text-destructive text-sm font-medium">{errors.serviceId.message}</p>
               )}
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
-                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                <label className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                   Date
                 </label>
                 <Popover>
@@ -237,32 +226,26 @@ export function BookingDialog({
                   </PopoverContent>
                 </Popover>
                 {errors.date && (
-                  <p className="text-sm font-medium text-destructive">{errors.date.message}</p>
+                  <p className="text-destructive text-sm font-medium">{errors.date.message}</p>
                 )}
               </div>
 
               <div className="grid gap-2">
-                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                <label className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                   Time
                 </label>
-                <Input
-                  type="time"
-                  {...register("time")}
-                />
+                <Input type="time" {...register("time")} />
                 {errors.time && (
-                  <p className="text-sm font-medium text-destructive">{errors.time.message}</p>
+                  <p className="text-destructive text-sm font-medium">{errors.time.message}</p>
                 )}
               </div>
             </div>
 
             <div className="grid gap-2">
-              <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              <label className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                 Notes
               </label>
-              <Textarea
-                placeholder="Any special requests or notes..."
-                {...register("notes")}
-              />
+              <Textarea placeholder="Any special requests or notes..." {...register("notes")} />
             </div>
 
             <DialogFooter>

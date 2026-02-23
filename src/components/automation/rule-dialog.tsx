@@ -54,12 +54,7 @@ const triggerDescriptions: Record<string, string> = {
  * @param root0.rule
  * @param root0.onSave
  */
-export function RuleDialog({
-  open,
-  onOpenChange,
-  rule,
-  onSave,
-}: RuleDialogProps) {
+export function RuleDialog({ open, onOpenChange, rule, onSave }: RuleDialogProps) {
   const [form, setForm] = useState({
     name: "",
     trigger: "",
@@ -106,36 +101,28 @@ export function RuleDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>
-            {rule ? "Edit Automation Rule" : "Create Automation Rule"}
-          </DialogTitle>
-          <DialogDescription>
-            Set up event-based automated actions.
-          </DialogDescription>
+          <DialogTitle>{rule ? "Edit Automation Rule" : "Create Automation Rule"}</DialogTitle>
+          <DialogDescription>Set up event-based automated actions.</DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
           <div className="space-y-2">
             <Label>Rule Name *</Label>
             <Input
               value={form.name}
-              onChange={(e) =>
-                setForm((p) => ({ ...p, name: e.target.value }))
-              }
+              onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
               placeholder="Welcome New Contact"
             />
           </div>
           <div className="space-y-2">
             <Label>Trigger Event *</Label>
             {rule ? (
-              <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground bg-muted/30 p-2 rounded border">
+              <div className="text-muted-foreground bg-muted/30 flex items-center gap-2 rounded border p-2 text-sm font-medium">
                 {triggerConfig[rule.trigger]?.label || rule.trigger}
               </div>
             ) : (
               <Select
                 value={form.trigger}
-                onValueChange={(v) =>
-                  setForm((p) => ({ ...p, trigger: v }))
-                }
+                onValueChange={(v) => setForm((p) => ({ ...p, trigger: v }))}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select trigger" />
@@ -150,7 +137,7 @@ export function RuleDialog({
               </Select>
             )}
             {form.trigger && (
-              <p className="text-xs text-muted-foreground bg-muted/30 p-2 rounded">
+              <p className="text-muted-foreground bg-muted/30 rounded p-2 text-xs">
                 {triggerDescriptions[form.trigger]}
               </p>
             )}
@@ -159,9 +146,7 @@ export function RuleDialog({
             <Label>Message Template</Label>
             <Textarea
               value={form.messageTemplate}
-              onChange={(e) =>
-                setForm((p) => ({ ...p, messageTemplate: e.target.value }))
-              }
+              onChange={(e) => setForm((p) => ({ ...p, messageTemplate: e.target.value }))}
               placeholder="Thank you for..."
               rows={4}
             />
@@ -171,14 +156,12 @@ export function RuleDialog({
             <Input
               type="number"
               value={form.delayMinutes}
-              onChange={(e) =>
-                setForm((p) => ({ ...p, delayMinutes: e.target.value }))
-              }
+              onChange={(e) => setForm((p) => ({ ...p, delayMinutes: e.target.value }))}
             />
           </div>
           <Button
             onClick={handleSave}
-            className="w-full bg-primary hover:bg-primary/90"
+            className="bg-primary hover:bg-primary/90 w-full"
             disabled={saving}
           >
             {saving ? "Saving..." : rule ? "Save Changes" : "Create Rule"}

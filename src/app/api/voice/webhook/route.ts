@@ -148,9 +148,9 @@ export async function POST(req: NextRequest) {
       const workspace =
         workspaceId !== "unknown"
           ? await prisma.workspace.findUnique({
-            where: { id: workspaceId },
-            select: { timezone: true },
-          })
+              where: { id: workspaceId },
+              select: { timezone: true },
+            })
           : null;
 
       const afterHours =
@@ -159,15 +159,15 @@ export async function POST(req: NextRequest) {
       const previousCall =
         workspaceId !== "unknown" && contactId
           ? await prisma.voiceCall.findFirst({
-            where: {
-              workspaceId,
-              contactId,
-              createdAt: { gte: subDays(new Date(), 7) },
-              callSid: { not: call_id },
-            },
-            orderBy: { createdAt: "desc" },
-            select: { id: true, summary: true },
-          })
+              where: {
+                workspaceId,
+                contactId,
+                createdAt: { gte: subDays(new Date(), 7) },
+                callSid: { not: call_id },
+              },
+              orderBy: { createdAt: "desc" },
+              select: { id: true, summary: true },
+            })
           : null;
 
       const mergedMetadata = {
@@ -241,7 +241,8 @@ export async function POST(req: NextRequest) {
         where: { callSid: call_id },
         select: { id: true, metadata: true, workspaceId: true, direction: true },
       });
-      const alertWorkspaceId = workspaceId !== "unknown" ? workspaceId : existing?.workspaceId || "unknown";
+      const alertWorkspaceId =
+        workspaceId !== "unknown" ? workspaceId : existing?.workspaceId || "unknown";
 
       const existingMetadata = parseVoiceMetadata(existing?.metadata || {});
       const mergedMetadata: Record<string, unknown> = {
@@ -264,7 +265,10 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      const consentDecision = extractConsentDecision(body as Record<string, unknown>, mergedMetadata);
+      const consentDecision = extractConsentDecision(
+        body as Record<string, unknown>,
+        mergedMetadata
+      );
       const frustrationDetected = detectFrustration(transcript);
 
       await prisma.voiceCall.updateMany({
@@ -273,7 +277,8 @@ export async function POST(req: NextRequest) {
           status: normalizedStatus,
           endedAt: new Date(),
           duration: duration || null,
-          recordingUrl: consentDecision.provided && !consentDecision.granted ? null : recording_url || null,
+          recordingUrl:
+            consentDecision.provided && !consentDecision.granted ? null : recording_url || null,
           transcript: transcript || null,
           ...(summary ? { summary } : {}),
           escalated: frustrationDetected,

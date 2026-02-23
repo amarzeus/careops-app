@@ -39,12 +39,27 @@ function SkeletonRows() {
     <>
       {[...Array(5)].map((_, i) => (
         <TableRow key={i}>
-          <TableCell><div className="flex items-center gap-3"><Skeleton className="h-8 w-8 rounded-full" /><Skeleton className="h-4 w-32" /></div></TableCell>
-          <TableCell><Skeleton className="h-4 w-40" /></TableCell>
-          <TableCell><Skeleton className="h-5 w-16 rounded-full" /></TableCell>
-          <TableCell><Skeleton className="h-4 w-10" /></TableCell>
-          <TableCell><Skeleton className="h-4 w-20" /></TableCell>
-          <TableCell className="text-right"><Skeleton className="h-8 w-12 ml-auto" /></TableCell>
+          <TableCell>
+            <div className="flex items-center gap-3">
+              <Skeleton className="h-8 w-8 rounded-full" />
+              <Skeleton className="h-4 w-32" />
+            </div>
+          </TableCell>
+          <TableCell>
+            <Skeleton className="h-4 w-40" />
+          </TableCell>
+          <TableCell>
+            <Skeleton className="h-5 w-16 rounded-full" />
+          </TableCell>
+          <TableCell>
+            <Skeleton className="h-4 w-10" />
+          </TableCell>
+          <TableCell>
+            <Skeleton className="h-4 w-20" />
+          </TableCell>
+          <TableCell className="text-right">
+            <Skeleton className="ml-auto h-8 w-12" />
+          </TableCell>
         </TableRow>
       ))}
     </>
@@ -67,14 +82,14 @@ function ContactsTable({ contacts, searchQuery }: { contacts: Contact[]; searchQ
 
   if (filtered.length === 0) {
     return (
-      <div className="flex h-64 flex-col items-center justify-center rounded-xl border border-dashed border-border bg-muted/30 text-center">
-        <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-muted">
-          <Users className="h-5 w-5 text-muted-foreground" />
+      <div className="border-border bg-muted/30 flex h-64 flex-col items-center justify-center rounded-xl border border-dashed text-center">
+        <div className="bg-muted mb-3 flex h-12 w-12 items-center justify-center rounded-full">
+          <Users className="text-muted-foreground h-5 w-5" />
         </div>
-        <h3 className="text-sm font-medium text-foreground">
+        <h3 className="text-foreground text-sm font-medium">
           {searchQuery ? "No contacts found" : "No contacts yet"}
         </h3>
-        <p className="mt-1 max-w-7xl text-sm text-muted-foreground">
+        <p className="text-muted-foreground mt-1 max-w-7xl text-sm">
           {searchQuery
             ? `No results for "${searchQuery}"`
             : "Contacts appear here when they book or fill out a form. You can also add them manually."}
@@ -95,62 +110,78 @@ function ContactsTable({ contacts, searchQuery }: { contacts: Contact[]; searchQ
   }
 
   return (
-    <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+    <div className="border-border bg-card overflow-hidden rounded-xl border shadow-sm">
       <Table>
         <TableHeader>
           <TableRow className="bg-muted/40 hover:bg-muted/40">
-            <TableHead className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Name</TableHead>
-            <TableHead className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Contact Info</TableHead>
-            <TableHead className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Source</TableHead>
-            <TableHead className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Bookings</TableHead>
-            <TableHead className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Joined</TableHead>
-            <TableHead className="text-right text-xs font-semibold uppercase tracking-wide text-muted-foreground">Actions</TableHead>
+            <TableHead className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
+              Name
+            </TableHead>
+            <TableHead className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
+              Contact Info
+            </TableHead>
+            <TableHead className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
+              Source
+            </TableHead>
+            <TableHead className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
+              Bookings
+            </TableHead>
+            <TableHead className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
+              Joined
+            </TableHead>
+            <TableHead className="text-muted-foreground text-right text-xs font-semibold tracking-wide uppercase">
+              Actions
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {filtered.map((contact) => (
-            <TableRow key={contact.id} className="group transition-colors hover:bg-muted/30">
+            <TableRow key={contact.id} className="group hover:bg-muted/30 transition-colors">
               <TableCell className="font-medium">
                 <div className="flex items-center gap-3">
                   <Avatar className="h-8 w-8 shrink-0">
-                    <AvatarFallback className="bg-blue-50 text-xs font-semibold text-primary/90">
+                    <AvatarFallback className="text-primary/90 bg-blue-50 text-xs font-semibold">
                       {contact.name.charAt(0).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-medium text-foreground">{contact.name}</p>
+                    <p className="text-foreground truncate text-sm font-medium">{contact.name}</p>
                     {contact.notes && (
-                      <p className="truncate text-xs text-muted-foreground max-w-[160px]">{contact.notes}</p>
+                      <p className="text-muted-foreground max-w-[160px] truncate text-xs">
+                        {contact.notes}
+                      </p>
                     )}
                   </div>
                 </div>
               </TableCell>
               <TableCell>
-                <div className="flex flex-col gap-0.5 text-sm text-muted-foreground">
+                <div className="text-muted-foreground flex flex-col gap-0.5 text-sm">
                   {contact.email && (
                     <div className="flex items-center gap-1.5">
-                      <Mail className="h-3 w-3 shrink-0 text-muted-foreground/60" />
-                      <span className="truncate max-w-[200px]">{contact.email}</span>
+                      <Mail className="text-muted-foreground/60 h-3 w-3 shrink-0" />
+                      <span className="max-w-[200px] truncate">{contact.email}</span>
                     </div>
                   )}
                   {contact.phone && (
                     <div className="flex items-center gap-1.5">
-                      <Phone className="h-3 w-3 shrink-0 text-muted-foreground/60" />
+                      <Phone className="text-muted-foreground/60 h-3 w-3 shrink-0" />
                       <span>{contact.phone}</span>
                     </div>
                   )}
                 </div>
               </TableCell>
               <TableCell>
-                <Badge variant="secondary" className="capitalize font-medium text-xs">
+                <Badge variant="secondary" className="text-xs font-medium capitalize">
                   {contact.source.toLowerCase()}
                 </Badge>
               </TableCell>
               <TableCell>
-                <span className="text-sm font-semibold text-foreground">{contact._count.bookings}</span>
-                <span className="ml-1 text-xs text-muted-foreground">bookings</span>
+                <span className="text-foreground text-sm font-semibold">
+                  {contact._count.bookings}
+                </span>
+                <span className="text-muted-foreground ml-1 text-xs">bookings</span>
               </TableCell>
-              <TableCell className="text-sm text-muted-foreground">
+              <TableCell className="text-muted-foreground text-sm">
                 {format(new Date(contact.createdAt), "MMM d, yyyy")}
               </TableCell>
               <TableCell className="text-right">
@@ -158,7 +189,11 @@ function ContactsTable({ contacts, searchQuery }: { contacts: Contact[]; searchQ
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   initialData={contact as any}
                   trigger={
-                    <Button variant="ghost" size="sm" className="h-7 px-2 text-xs opacity-0 group-hover:opacity-100">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 px-2 text-xs opacity-0 group-hover:opacity-100"
+                    >
                       Edit
                     </Button>
                   }
@@ -202,7 +237,7 @@ export default function ContactsPage() {
       <Header title="Contacts" subtitle="Manage your customer database and history">
         <CreateContactDialog
           trigger={
-            <Button size="sm" className="h-9 gap-2 bg-primary text-white hover:bg-primary/90">
+            <Button size="sm" className="bg-primary hover:bg-primary/90 h-9 gap-2 text-white">
               <Plus className="h-4 w-4" />
               <span className="hidden sm:inline">Add Contact</span>
             </Button>
@@ -214,24 +249,25 @@ export default function ContactsPage() {
         {/* Search bar + stats summary */}
         <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="relative max-w-7xl flex-1">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
             <Input
-              className="h-9 bg-background pl-9 text-sm"
+              className="bg-background h-9 pl-9 text-sm"
               placeholder="Search by name, email, phone…"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
           {!loading && (
-            <p className="shrink-0 text-sm text-muted-foreground">
-              <span className="font-semibold text-foreground">{contacts.length}</span> total contacts
+            <p className="text-muted-foreground shrink-0 text-sm">
+              <span className="text-foreground font-semibold">{contacts.length}</span> total
+              contacts
             </p>
           )}
         </div>
 
         {/* Table */}
         {loading ? (
-          <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+          <div className="border-border bg-card overflow-hidden rounded-xl border shadow-sm">
             <Table>
               <TableHeader>
                 <TableRow className="bg-muted/40 hover:bg-muted/40">
@@ -249,7 +285,9 @@ export default function ContactsPage() {
             </Table>
           </div>
         ) : (
-          <Suspense fallback={<div className="text-sm text-muted-foreground">Loading contacts...</div>}>
+          <Suspense
+            fallback={<div className="text-muted-foreground text-sm">Loading contacts...</div>}
+          >
             <ContactsTable contacts={contacts} searchQuery={searchQuery} />
           </Suspense>
         )}

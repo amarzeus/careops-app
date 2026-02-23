@@ -75,9 +75,7 @@ export function getCalendarAuthURL(workspaceId: string): string {
  * Exchange an authorization code for access + refresh tokens.
  * @param code
  */
-export async function exchangeCalendarCode(
-  code: string
-): Promise<GoogleTokenResponse> {
+export async function exchangeCalendarCode(code: string): Promise<GoogleTokenResponse> {
   const redirectUri = `${process.env.NEXT_PUBLIC_APP_URL}/api/integrations/google-calendar/callback`;
 
   const res = await fetch(GOOGLE_TOKEN_URL, {
@@ -105,9 +103,7 @@ export async function exchangeCalendarCode(
  * Refresh an expired access token using the refresh token.
  * @param refreshToken
  */
-async function refreshAccessToken(
-  refreshToken: string
-): Promise<GoogleTokenResponse> {
+async function refreshAccessToken(refreshToken: string): Promise<GoogleTokenResponse> {
   const res = await fetch(GOOGLE_TOKEN_URL, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -135,9 +131,7 @@ async function refreshAccessToken(
  * Returns null if calendar is not connected.
  * @param workspaceId
  */
-export async function getValidAccessToken(
-  workspaceId: string
-): Promise<string | null> {
+export async function getValidAccessToken(workspaceId: string): Promise<string | null> {
   const workspace = await prisma.workspace.findUnique({
     where: { id: workspaceId },
     select: {
@@ -166,13 +160,9 @@ export async function getValidAccessToken(
   if (now.getTime() + bufferMs >= expiry.getTime()) {
     // Token expired or about to expire — refresh it
     try {
-      const tokens = await refreshAccessToken(
-        workspace.googleCalendarRefreshToken
-      );
+      const tokens = await refreshAccessToken(workspace.googleCalendarRefreshToken);
 
-      const newExpiry = new Date(
-        Date.now() + tokens.expires_in * 1000
-      );
+      const newExpiry = new Date(Date.now() + tokens.expires_in * 1000);
 
       await prisma.workspace.update({
         where: { id: workspaceId },
@@ -229,9 +219,7 @@ async function calendarFetch(
  * Get the authenticated user's email from the calendar API.
  * @param accessToken
  */
-export async function getCalendarUserEmail(
-  accessToken: string
-): Promise<string | null> {
+export async function getCalendarUserEmail(accessToken: string): Promise<string | null> {
   const res = await calendarFetch(accessToken, "/calendars/primary");
   if (!res.ok) return null;
   const data = await res.json();
@@ -242,9 +230,7 @@ export async function getCalendarUserEmail(
  * List the user's calendars.
  * @param accessToken
  */
-export async function listCalendars(
-  accessToken: string
-): Promise<CalendarListEntry[]> {
+export async function listCalendars(accessToken: string): Promise<CalendarListEntry[]> {
   const res = await calendarFetch(accessToken, "/users/me/calendarList");
   if (!res.ok) return [];
   const data = await res.json();
@@ -261,6 +247,7 @@ export async function listCalendarEvents(
   workspaceId: string,
   timeMin: Date,
   timeMax: Date
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): Promise<any[]> {
   const accessToken = await getValidAccessToken(workspaceId);
   if (!accessToken) return [];
@@ -478,10 +465,7 @@ export async function updateCalendarEvent(
  * @param workspaceId
  * @param eventId
  */
-export async function cancelCalendarEvent(
-  workspaceId: string,
-  eventId: string
-): Promise<boolean> {
+export async function cancelCalendarEvent(workspaceId: string, eventId: string): Promise<boolean> {
   const accessToken = await getValidAccessToken(workspaceId);
   if (!accessToken) return false;
 
@@ -523,10 +507,7 @@ export async function cancelCalendarEvent(
  * @param bookingId
  * @param workspaceId
  */
-export async function syncBookingToCalendar(
-  bookingId: string,
-  workspaceId: string
-): Promise<void> {
+export async function syncBookingToCalendar(bookingId: string, workspaceId: string): Promise<void> {
   try {
     const booking = await prisma.booking.findUnique({
       where: { id: bookingId },
@@ -601,11 +582,7 @@ export async function updateBookingCalendarEvent(
       },
     });
 
-    if (
-      !booking ||
-      !booking.googleCalendarEventId ||
-      !booking.workspace.googleCalendarConnected
-    ) {
+    if (!booking || !booking.googleCalendarEventId || !booking.workspace.googleCalendarConnected) {
       return;
     }
 
@@ -641,10 +618,7 @@ export async function cancelBookingCalendarEvent(
       },
     });
 
-    if (
-      !booking?.googleCalendarEventId ||
-      !booking.workspace.googleCalendarConnected
-    ) {
+    if (!booking?.googleCalendarEventId || !booking.workspace.googleCalendarConnected) {
       return;
     }
 
@@ -664,9 +638,7 @@ export async function cancelBookingCalendarEvent(
  * Check if Google Calendar is connected for a workspace.
  * @param workspaceId
  */
-export async function isCalendarConnected(
-  workspaceId: string
-): Promise<boolean> {
+export async function isCalendarConnected(workspaceId: string): Promise<boolean> {
   const workspace = await prisma.workspace.findUnique({
     where: { id: workspaceId },
     select: { googleCalendarConnected: true },

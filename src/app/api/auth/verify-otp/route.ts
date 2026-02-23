@@ -11,10 +11,7 @@ export async function POST(req: Request) {
     const { identifier, otp, method = "email" } = await req.json();
 
     if (!identifier || !otp) {
-      return NextResponse.json(
-        { error: "Missing required fields" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
     const user = await prisma.user.findFirst({
@@ -99,9 +96,6 @@ export async function POST(req: Request) {
     });
   } catch (error) {
     console.error("Verify OTP error:", error);
-    return NextResponse.json(
-      { error: "Verification failed" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Verification failed" }, { status: 500 });
   }
 }

@@ -2,7 +2,11 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { generateOTP, storeOTP } from "@/lib/otp";
 import { sendEmail, buildEmailTemplate } from "@/lib/email";
-import { sendOTP as twilioSendOTP, sendWhatsAppOTP as twilioSendWhatsAppOTP, isConfigured as isTwilioConfigured } from "@/lib/twilio";
+import {
+  sendOTP as twilioSendOTP,
+  sendWhatsAppOTP as twilioSendWhatsAppOTP,
+  isConfigured as isTwilioConfigured,
+} from "@/lib/twilio";
 import { isAvailable as isWhatsAppAvailable } from "@/lib/whatsapp";
 
 /**
@@ -14,10 +18,7 @@ export async function POST(req: Request) {
     const { email, channel, phone } = await req.json();
 
     if (!email) {
-      return NextResponse.json(
-        { error: "Email is required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Email is required" }, { status: 400 });
     }
 
     const user = await prisma.user.findUnique({ where: { email } });
@@ -30,10 +31,7 @@ export async function POST(req: Request) {
     }
 
     if (user.emailVerified) {
-      return NextResponse.json(
-        { error: "Email is already verified" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Email is already verified" }, { status: 400 });
     }
 
     // Rate limit: don't resend if last OTP was less than 60 seconds ago
@@ -42,7 +40,10 @@ export async function POST(req: Request) {
       const secondsSinceSent = (Date.now() - lastSent.getTime()) / 1000;
       if (secondsSinceSent < 60) {
         return NextResponse.json(
-          { error: "Please wait before requesting a new code", retryAfter: Math.ceil(60 - secondsSinceSent) },
+          {
+            error: "Please wait before requesting a new code",
+            retryAfter: Math.ceil(60 - secondsSinceSent),
+          },
           { status: 429 }
         );
       }
@@ -135,9 +136,6 @@ export async function POST(req: Request) {
     }
   } catch (error) {
     console.error("Resend OTP error:", error);
-    return NextResponse.json(
-      { error: "Failed to resend code" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to resend code" }, { status: 500 });
   }
 }

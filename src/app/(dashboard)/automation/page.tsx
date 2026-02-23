@@ -31,7 +31,6 @@ export default function AutomationPage() {
   const [deleting, setDeleting] = useState(false);
   const [testingId, setTestingId] = useState<string | null>(null);
 
-
   useEffect(() => {
     fetchRules();
   }, []);
@@ -97,8 +96,7 @@ export default function AutomationPage() {
     } catch (error) {
       console.error("Delete rule error:", error);
       toast({ title: "Error", description: "Failed to delete rule", variant: "destructive" });
-    }
-    finally {
+    } finally {
       setDeleting(false);
     }
   };
@@ -116,7 +114,7 @@ export default function AutomationPage() {
     }
   };
 
-  const activeCount = rules.filter(r => r.isActive).length;
+  const activeCount = rules.filter((r) => r.isActive).length;
   const inactiveCount = rules.length - activeCount;
 
   return (
@@ -124,39 +122,53 @@ export default function AutomationPage() {
       <Header title="Automation" subtitle="Event-based rules that work for you">
         <Button
           size="sm"
-          className="h-9 gap-2 bg-primary text-white hover:bg-primary/90"
-          onClick={() => { setSelectedRule(null); setDialogOpen(true); }}
+          className="bg-primary hover:bg-primary/90 h-9 gap-2 text-white"
+          onClick={() => {
+            setSelectedRule(null);
+            setDialogOpen(true);
+          }}
         >
-          <Plus className="w-4 h-4 mr-2" /> New Rule
+          <Plus className="mr-2 h-4 w-4" /> New Rule
         </Button>
       </Header>
 
       <div className="mx-auto w-full max-w-7xl flex-1 p-4 sm:p-6">
         {!loading && rules.length > 0 && (
           <div className="mb-6 flex flex-wrap items-center gap-2 sm:gap-4">
-            <div className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-muted/30 border rounded-lg">
-              <Zap className="w-4 h-4 text-muted-foreground" />
-              <span className="text-sm font-medium text-muted-foreground">{rules.length} rule{rules.length !== 1 ? "s" : ""}</span>
+            <div className="bg-muted/30 flex items-center gap-2 rounded-lg border px-3 py-2 sm:px-4">
+              <Zap className="text-muted-foreground h-4 w-4" />
+              <span className="text-muted-foreground text-sm font-medium">
+                {rules.length} rule{rules.length !== 1 ? "s" : ""}
+              </span>
             </div>
-            <div className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-green-50 border border-green-200 rounded-lg">
-              <div className="w-2 h-2 bg-green-500 rounded-full" />
+            <div className="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-3 py-2 sm:px-4">
+              <div className="h-2 w-2 rounded-full bg-green-500" />
               <span className="text-sm font-medium text-green-700">{activeCount} active</span>
             </div>
-            <div className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-muted/30 border rounded-lg">
-              <div className="w-2 h-2 bg-muted rounded-full" />
-              <span className="text-sm font-medium text-muted-foreground">{inactiveCount} inactive</span>
+            <div className="bg-muted/30 flex items-center gap-2 rounded-lg border px-3 py-2 sm:px-4">
+              <div className="bg-muted h-2 w-2 rounded-full" />
+              <span className="text-muted-foreground text-sm font-medium">
+                {inactiveCount} inactive
+              </span>
             </div>
           </div>
         )}
 
         {loading ? (
-          <div className="space-y-3">{[...Array(4)].map((_, i) => <div key={i} className="h-20 bg-muted/30 rounded-lg animate-pulse" />)}</div>
+          <div className="space-y-3">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="bg-muted/30 h-20 animate-pulse rounded-lg" />
+            ))}
+          </div>
         ) : (
           <RuleList
             rules={rules}
             onToggle={handleToggle}
             onDelete={(id) => setDeleteConfirmId(id)}
-            onEdit={(rule) => { setSelectedRule(rule); setDialogOpen(true); }}
+            onEdit={(rule) => {
+              setSelectedRule(rule);
+              setDialogOpen(true);
+            }}
             onTest={handleTest}
             deletingId={deleting ? deleteConfirmId : null}
             testingId={testingId}
@@ -175,10 +187,14 @@ export default function AutomationPage() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Delete Rule</DialogTitle>
-            <DialogDescription>Are you sure you want to delete this rule? This cannot be undone.</DialogDescription>
+            <DialogDescription>
+              Are you sure you want to delete this rule? This cannot be undone.
+            </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteConfirmId(null)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setDeleteConfirmId(null)}>
+              Cancel
+            </Button>
             <Button
               variant="destructive"
               onClick={() => deleteConfirmId && handleDelete(deleteConfirmId)}

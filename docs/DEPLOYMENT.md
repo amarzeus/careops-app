@@ -50,23 +50,23 @@ CareOps ships with a `render.yaml` Blueprint for one-click deployment.
 
 ### Required Environment Variables
 
-| Variable | Description |
-|---|---|
-| `DATABASE_URL` | PostgreSQL connection string (auto-set by Render if using managed DB) |
-| `JWT_SECRET` | Random secret for signing JWT tokens |
-| `GEMINI_API_KEY` | Google Gemini API key |
-| `GOOGLE_CLIENT_ID` | Google OAuth client ID |
-| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret |
-| `TWILIO_ACCOUNT_SID` | Twilio account SID |
-| `TWILIO_AUTH_TOKEN` | Twilio auth token |
-| `TWILIO_PHONE_NUMBER` | Twilio phone number |
-| `VAPI_API_KEY` | Vapi.ai API key |
-| `EMAIL_HOST` | SMTP host |
-| `EMAIL_PORT` | SMTP port (587) |
-| `EMAIL_USER` | SMTP username |
-| `EMAIL_PASS` | SMTP password |
-| `EMAIL_FROM` | From address for outbound emails |
-| `NEXT_PUBLIC_APP_URL` | Production URL (e.g. `https://careops-app.onrender.com`) |
+| Variable               | Description                                                           |
+| ---------------------- | --------------------------------------------------------------------- |
+| `DATABASE_URL`         | PostgreSQL connection string (auto-set by Render if using managed DB) |
+| `JWT_SECRET`           | Random secret for signing JWT tokens                                  |
+| `GEMINI_API_KEY`       | Google Gemini API key                                                 |
+| `GOOGLE_CLIENT_ID`     | Google OAuth client ID                                                |
+| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret                                            |
+| `TWILIO_ACCOUNT_SID`   | Twilio account SID                                                    |
+| `TWILIO_AUTH_TOKEN`    | Twilio auth token                                                     |
+| `TWILIO_PHONE_NUMBER`  | Twilio phone number                                                   |
+| `VAPI_API_KEY`         | Vapi.ai API key                                                       |
+| `EMAIL_HOST`           | SMTP host                                                             |
+| `EMAIL_PORT`           | SMTP port (587)                                                       |
+| `EMAIL_USER`           | SMTP username                                                         |
+| `EMAIL_PASS`           | SMTP password                                                         |
+| `EMAIL_FROM`           | From address for outbound emails                                      |
+| `NEXT_PUBLIC_APP_URL`  | Production URL (e.g. `https://careops-app.onrender.com`)              |
 
 ---
 
@@ -80,6 +80,7 @@ docker-compose up --build
 ```
 
 The compose file starts:
+
 - `app` — the Next.js application
 - `db` — a PostgreSQL container
 

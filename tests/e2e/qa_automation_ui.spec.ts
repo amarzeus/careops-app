@@ -1,37 +1,39 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from "@playwright/test";
 
-test.describe('Feature UI Tests', () => {
+test.describe("Feature UI Tests", () => {
   test.setTimeout(60000);
 
-  test('AI Wiring: Should chat with onboarding assistant', async ({ page, request, context }) => {
+  test("AI Wiring: Should chat with onboarding assistant", async ({ page, request, context }) => {
     // Skip test if no Gemini API key is configured (CI environments)
-    test.skip(!process.env.GEMINI_API_KEY, 'GEMINI_API_KEY not configured - skipping AI test');
+    test.skip(!process.env.GEMINI_API_KEY, "GEMINI_API_KEY not configured - skipping AI test");
 
     // 1. Seed user in onboarding
     const email = `test-ai-${Date.now()}@example.com`;
-    const seedRes = await request.post('/api/test/seed', {
+    const seedRes = await request.post("/api/test/seed", {
       data: {
         email,
-        name: 'AI Test User',
-        password: 'password123',
-        status: 'ONBOARDING',
-        onboardingStep: 1
-      }
+        name: "AI Test User",
+        password: "password123",
+        status: "ONBOARDING",
+        onboardingStep: 1,
+      },
     });
     expect(seedRes.ok(), await seedRes.text()).toBeTruthy();
     const { token } = await seedRes.json();
 
     // 2. Set Auth Cookie
-    await context.addCookies([{
-      name: 'auth-token',
-      value: token,
-      url: 'http://localhost:5000',
-    }]);
+    await context.addCookies([
+      {
+        name: "auth-token",
+        value: token,
+        url: "http://localhost:5000",
+      },
+    ]);
 
     // 3. Go to Onboarding
-    await page.goto('/onboarding');
+    await page.goto("/onboarding");
     // Wait for loading to finish if any
-    await expect(page.locator('.animate-pulse')).toBeHidden();
+    await expect(page.locator(".animate-pulse")).toBeHidden();
 
     await expect(page).toHaveURL(/onboarding/);
 
@@ -40,58 +42,67 @@ test.describe('Feature UI Tests', () => {
     const chatInput = page.getByPlaceholder(/Ask me anything/i);
     await expect(chatInput).toBeVisible();
 
-    await chatInput.fill('My business is a dental clinic called Smile Bright.');
-    await page.keyboard.press('Enter');
+    await chatInput.fill("My business is a dental clinic called Smile Bright.");
+    await page.keyboard.press("Enter");
 
     // 5. Expect AI Response - allow for either actual response or "at capacity" fallback
-    await expect(page.locator('.bg-muted\\/30').filter({
-      hasText: /dental|smile|great|help|capacity|moment/i
-    }).first()).toBeVisible({ timeout: 20000 });
+    await expect(
+      page
+        .locator(".bg-muted\\/30")
+        .filter({
+          hasText: /dental|smile|great|help|capacity|moment/i,
+        })
+        .first()
+    ).toBeVisible({ timeout: 20000 });
   });
 
-  test('Webhooks: Should add a new webhook', async ({ page, request, context }) => {
+  test("Webhooks: Should add a new webhook", async ({ page, request, context }) => {
     // 1. Seed user in active state
     const email = `test-hooks-${Date.now()}@example.com`;
-    const seedRes = await request.post('/api/test/seed', {
+    const seedRes = await request.post("/api/test/seed", {
       data: {
         email,
-        name: 'Webhook User',
-        password: 'password123',
-        status: 'ACTIVE',
-        onboardingStep: 8
-      }
+        name: "Webhook User",
+        password: "password123",
+        status: "ACTIVE",
+        onboardingStep: 8,
+      },
     });
     expect(seedRes.ok(), await seedRes.text()).toBeTruthy();
     const { token } = await seedRes.json();
 
     // 2. Set Auth Cookie
-    await context.addCookies([{
-      name: 'auth-token',
-      value: token,
-      url: 'http://localhost:5000',
-    }]);
+    await context.addCookies([
+      {
+        name: "auth-token",
+        value: token,
+        url: "http://localhost:5000",
+      },
+    ]);
 
     // 3. Go to Settings
-    await page.goto('/settings');
-    await expect(page.locator('.animate-pulse')).toBeHidden({ timeout: 30000 });
+    await page.goto("/settings");
+    await expect(page.locator(".animate-pulse")).toBeHidden({ timeout: 30000 });
 
     // 4. Find Webhooks Section in Integrations Tab
-    const integrationsTab = page.getByRole('tab', { name: /integrations/i });
+    const integrationsTab = page.getByRole("tab", { name: /integrations/i });
     await integrationsTab.click();
 
     // 5. Add Webhook
     // Locate the Webhooks card by heading
-    await expect(page.getByRole('heading', { name: 'Webhooks' })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Webhooks" })).toBeVisible();
 
     // Fill inputs FIRST
     const urlInput = page.getByPlaceholder(/hooks\.zapier\.com/i);
-    await urlInput.fill('https://example.com/hook');
+    await urlInput.fill("https://example.com/hook");
 
     // Click Add Button
-    await page.getByRole('button').filter({ has: page.locator('.lucide-plus') }).click();
+    await page
+      .getByRole("button")
+      .filter({ has: page.locator(".lucide-plus") })
+      .click();
 
     // 6. Verify
-    await expect(page.getByText('https://example.com/hook')).toBeVisible();
+    await expect(page.getByText("https://example.com/hook")).toBeVisible();
   });
-
 });

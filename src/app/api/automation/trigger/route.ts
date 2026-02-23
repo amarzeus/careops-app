@@ -14,13 +14,13 @@ export async function POST(req: Request) {
 
   try {
     const { trigger, data } = await req.json();
-    
+
     if (!trigger) {
       return NextResponse.json({ error: "Trigger is required" }, { status: 400 });
     }
 
     await triggerAutomation(user.workspaceId, trigger, data || {});
-    
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Automation trigger error:", error);

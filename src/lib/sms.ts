@@ -2,7 +2,7 @@
  * SMS module — delegates to Twilio.
  * This wrapper keeps the existing import API (`sendSMS`, `buildOTPMessage`)
  * so that callers don't need to change.
- * 
+ *
  * PRD Requirements:
  * - Step 2: Set Up Email & SMS - "The business owner connects: SMS service (reminders, short updates)"
  * - "Failures must be logged and visible"
@@ -38,13 +38,13 @@ export async function sendSMS(options: SMSOptions): Promise<boolean> {
         },
       });
 
-      const alertTitle = result.errorCode === "INVALID_NUMBER" 
-        ? "Invalid Phone Number" 
-        : "SMS Delivery Failed";
-      
-      const alertMessage = result.errorCode === "INVALID_NUMBER"
-        ? `Failed to send SMS to ${options.to}: Invalid phone number format`
-        : `Failed to send SMS to ${options.to}: ${result.error}`;
+      const alertTitle =
+        result.errorCode === "INVALID_NUMBER" ? "Invalid Phone Number" : "SMS Delivery Failed";
+
+      const alertMessage =
+        result.errorCode === "INVALID_NUMBER"
+          ? `Failed to send SMS to ${options.to}: Invalid phone number format`
+          : `Failed to send SMS to ${options.to}: ${result.error}`;
 
       await prisma.alert.create({
         data: {

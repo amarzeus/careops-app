@@ -16,7 +16,7 @@ const getVapiClient = () => {
       const response = await fetch("https://api.vapi.ai/assistant", {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${apiKey}`,
+          Authorization: `Bearer ${apiKey}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -53,15 +53,11 @@ const getVapiClient = () => {
       return response.json();
     },
 
-    async createPhoneNumber(config: {
-      number: string;
-      assistantId: string;
-      workspaceId: string;
-    }) {
+    async createPhoneNumber(config: { number: string; assistantId: string; workspaceId: string }) {
       const response = await fetch("https://api.vapi.ai/phone-number", {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${apiKey}`,
+          Authorization: `Bearer ${apiKey}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -86,7 +82,7 @@ const getVapiClient = () => {
     async listPhoneNumbers() {
       const response = await fetch("https://api.vapi.ai/phone-number", {
         headers: {
-          "Authorization": `Bearer ${apiKey}`,
+          Authorization: `Bearer ${apiKey}`,
         },
       });
 
@@ -105,7 +101,7 @@ const getVapiClient = () => {
       const response = await fetch("https://api.vapi.ai/phone-number/import/twilio", {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${apiKey}`,
+          Authorization: `Bearer ${apiKey}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -130,7 +126,7 @@ const getVapiClient = () => {
       const response = await fetch(`https://api.vapi.ai/assistant/${assistantId}`, {
         method: "DELETE",
         headers: {
-          "Authorization": `Bearer ${apiKey}`,
+          Authorization: `Bearer ${apiKey}`,
         },
       });
 
@@ -141,7 +137,7 @@ const getVapiClient = () => {
       const response = await fetch(`https://api.vapi.ai/phone-number/${phoneNumberId}`, {
         method: "DELETE",
         headers: {
-          "Authorization": `Bearer ${apiKey}`,
+          Authorization: `Bearer ${apiKey}`,
         },
       });
 
@@ -302,10 +298,13 @@ export async function createWorkspaceVoiceAgent(
     .replace("{businessName}", customization.businessName)
     .replace("{services}", servicesList)
     .replace("{businessHours}", businessHoursStr)
-    .replace("{pricing}", customization.services
-      .filter((s) => s.price)
-      .map((s) => `${s.name}: ₹${s.price}`)
-      .join("\n") || "Contact for pricing");
+    .replace(
+      "{pricing}",
+      customization.services
+        .filter((s) => s.price)
+        .map((s) => `${s.name}: ₹${s.price}`)
+        .join("\n") || "Contact for pricing"
+    );
 
   if (customization.additionalInstructions) {
     systemPrompt += `\n\nADDITIONAL INSTRUCTIONS:\n${customization.additionalInstructions}`;
@@ -328,7 +327,9 @@ export async function createWorkspaceVoiceAgent(
       voiceId: customization.voiceId || template.defaultVoiceId,
       isActive: true,
       canBook: (template.tools as readonly string[]).includes("bookAppointment"),
-      canCheckStatus: (template.tools as readonly string[]).includes("checkAvailability") || (template.tools as readonly string[]).includes("checkStatus"),
+      canCheckStatus:
+        (template.tools as readonly string[]).includes("checkAvailability") ||
+        (template.tools as readonly string[]).includes("checkStatus"),
       canTransfer: (template.tools as readonly string[]).includes("transferCall"),
       canHandleInquiry: true,
     },
@@ -425,7 +426,9 @@ export async function searchAvailablePhoneNumbers(
   }
 
   const auth = Buffer.from(`${twilioAccountSid}:${twilioAuthToken}`).toString("base64");
-  const url = new URL(`https://api.twilio.com/2010-04-01/Accounts/${twilioAccountSid}/AvailablePhoneNumbers/${countryCode}/Local.json`);
+  const url = new URL(
+    `https://api.twilio.com/2010-04-01/Accounts/${twilioAccountSid}/AvailablePhoneNumbers/${countryCode}/Local.json`
+  );
 
   if (areaCode) {
     url.searchParams.set("AreaCode", areaCode);
@@ -434,7 +437,7 @@ export async function searchAvailablePhoneNumbers(
 
   const response = await fetch(url.toString(), {
     headers: {
-      "Authorization": `Basic ${auth}`,
+      Authorization: `Basic ${auth}`,
     },
   });
 
@@ -444,11 +447,13 @@ export async function searchAvailablePhoneNumbers(
 
   const data = await response.json();
 
-  return data.available_phone_numbers.map((n: { phone_number: string; region: string; capabilities: string[] }) => ({
-    phoneNumber: n.phone_number,
-    region: n.region || "Unknown",
-    capabilities: n.capabilities || ["voice"],
-  }));
+  return data.available_phone_numbers.map(
+    (n: { phone_number: string; region: string; capabilities: string[] }) => ({
+      phoneNumber: n.phone_number,
+      region: n.region || "Unknown",
+      capabilities: n.capabilities || ["voice"],
+    })
+  );
 }
 
 export { getVapiClient };

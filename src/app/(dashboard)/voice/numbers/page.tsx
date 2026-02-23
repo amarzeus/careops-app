@@ -46,7 +46,7 @@ import {
   Loader2,
   ArrowRight,
   Link2,
-  Unlink
+  Unlink,
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { EnhancedNumberSelector } from "@/components/voice/enhanced-number-selector";
@@ -235,18 +235,13 @@ export default function PhoneNumbersPage() {
 
   return (
     <div className="flex flex-col gap-6 p-6">
-      <Header
-        title="Phone Numbers"
-        subtitle="Manage your voice phone numbers"
-      />
+      <Header title="Phone Numbers" subtitle="Manage your voice phone numbers" />
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
             <CardTitle>Assigned Numbers</CardTitle>
-            <CardDescription>
-              Phone numbers linked to your voice agents
-            </CardDescription>
+            <CardDescription>Phone numbers linked to your voice agents</CardDescription>
           </div>
           <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
             <DialogTrigger asChild>
@@ -255,7 +250,7 @@ export default function PhoneNumbersPage() {
                 Add Number
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Add Phone Number</DialogTitle>
                 <DialogDescription>
@@ -276,8 +271,8 @@ export default function PhoneNumbersPage() {
               <Loader2 className="h-8 w-8 animate-spin" />
             </div>
           ) : numbers.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground">
-              <Phone className="mx-auto h-12 w-12 mb-4 opacity-50" />
+            <div className="text-muted-foreground py-12 text-center">
+              <Phone className="mx-auto mb-4 h-12 w-12 opacity-50" />
               <p className="font-medium">No phone numbers yet</p>
               <p className="text-sm">Add a phone number to start receiving calls</p>
               <Button className="mt-4" onClick={() => router.push("/voice/setup")}>
@@ -302,7 +297,7 @@ export default function PhoneNumbersPage() {
                   <TableRow key={number.id}>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <Phone className="h-4 w-4 text-muted-foreground" />
+                        <Phone className="text-muted-foreground h-4 w-4" />
                         <span className="font-mono font-medium">{number.phoneNumber}</span>
                       </div>
                     </TableCell>
@@ -312,10 +307,12 @@ export default function PhoneNumbersPage() {
                     <TableCell>
                       {number.voiceAgent ? (
                         <div className="flex items-center gap-2">
-                          <Bot className="h-4 w-4 text-muted-foreground" />
+                          <Bot className="text-muted-foreground h-4 w-4" />
                           <span>{number.voiceAgent.name}</span>
                           {!number.voiceAgent.isActive && (
-                            <Badge variant="secondary" className="text-xs">Inactive</Badge>
+                            <Badge variant="secondary" className="text-xs">
+                              Inactive
+                            </Badge>
                           )}
                         </div>
                       ) : (
@@ -327,7 +324,7 @@ export default function PhoneNumbersPage() {
                         {number.isActive ? "Active" : "Inactive"}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
+                    <TableCell className="text-muted-foreground text-sm">
                       {new Date(number.createdAt).toLocaleDateString()}
                     </TableCell>
                     <TableCell className="text-right">
@@ -345,7 +342,7 @@ export default function PhoneNumbersPage() {
                             onOpenChange={(open) => setReassignDialogOpen(open ? number.id : null)}
                           >
                             <DropdownMenuItem asChild onSelect={(e) => e.preventDefault()}>
-                              <button className="w-full flex items-center px-2 py-1.5 text-sm">
+                              <button className="flex w-full items-center px-2 py-1.5 text-sm">
                                 <Link2 className="mr-2 h-4 w-4" />
                                 Assign to Agent
                               </button>
@@ -404,11 +401,13 @@ export default function PhoneNumbersPage() {
                 <SelectValue placeholder="Select an agent" />
               </SelectTrigger>
               <SelectContent>
-                {agents.filter(a => a.isActive).map((agent) => (
-                  <SelectItem key={agent.id} value={agent.id}>
-                    {agent.name}
-                  </SelectItem>
-                ))}
+                {agents
+                  .filter((a) => a.isActive)
+                  .map((agent) => (
+                    <SelectItem key={agent.id} value={agent.id}>
+                      {agent.name}
+                    </SelectItem>
+                  ))}
               </SelectContent>
             </Select>
 

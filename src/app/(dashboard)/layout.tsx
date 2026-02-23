@@ -31,14 +31,12 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const showFooter = !fullScreenPages.some((page) => pathname.startsWith(page));
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="bg-background flex min-h-screen">
       <Sidebar userName={user.name} userRole={user.role} workspaceName={user.workspace?.name} />
 
       <div className="flex min-h-screen flex-1 flex-col pl-16 lg:pl-64">
         <main className="flex-1 overflow-y-auto">
-          <DashboardErrorBoundary>
-            {children}
-          </DashboardErrorBoundary>
+          <DashboardErrorBoundary>{children}</DashboardErrorBoundary>
         </main>
         {showFooter && <Footer />}
       </div>

@@ -1,0 +1,13 @@
+
+> careops-app@0.1.0 lint
+> eslint
+
+
+/home/amar/Desktop/Testing and Fixing/careops-app/src/app/api/automation/[id]/test/route.ts
+  56:32  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Desktop/Testing and Fixing/careops-app/src/lib/google-calendar.ts
+  250:12  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+✖ 2 problems (0 errors, 2 warnings)
+

@@ -34,21 +34,9 @@ export async function POST(req: Request) {
   if (user.role !== "OWNER" && !user.canAccessInventory)
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-  const {
-    name,
-    description,
-    quantity,
-    threshold,
-    unit,
-    vendorName,
-    vendorEmail,
-    vendorPhone,
-  } = await req.json();
-  if (!name)
-    return NextResponse.json(
-      { error: "Item name is required" },
-      { status: 400 }
-    );
+  const { name, description, quantity, threshold, unit, vendorName, vendorEmail, vendorPhone } =
+    await req.json();
+  if (!name) return NextResponse.json({ error: "Item name is required" }, { status: 400 });
 
   const item = await prisma.inventoryItem.create({
     data: {

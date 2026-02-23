@@ -8,10 +8,7 @@ import { prisma } from "@/lib/prisma";
  * @param root0
  * @param root0.params
  */
-export async function DELETE(
-  req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const user = await getCurrentUser();
   if (!user || user.role !== "OWNER" || !user.workspaceId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
@@ -29,9 +26,6 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (_error) {
-    return NextResponse.json(
-      { error: "Failed to delete webhook" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to delete webhook" }, { status: 500 });
   }
 }

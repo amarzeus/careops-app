@@ -27,16 +27,12 @@ export async function POST(req: Request) {
   const user = await getCurrentUser();
   if (!user || !user.workspaceId)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  if (user.role !== "OWNER")
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (user.role !== "OWNER") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const { name, description, duration, location, availableDays, startTime, endTime } =
     await req.json();
   if (!name || !duration)
-    return NextResponse.json(
-      { error: "Name and duration are required" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Name and duration are required" }, { status: 400 });
 
   const service = await prisma.service.create({
     data: {
@@ -62,10 +58,10 @@ export async function PUT(req: Request) {
   const user = await getCurrentUser();
   if (!user || !user.workspaceId)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  if (user.role !== "OWNER")
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (user.role !== "OWNER") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-  const { id, name, description, duration, location, availableDays, startTime, endTime } = await req.json();
+  const { id, name, description, duration, location, availableDays, startTime, endTime } =
+    await req.json();
   if (!id) return NextResponse.json({ error: "ID is required" }, { status: 400 });
 
   // Verify ownership

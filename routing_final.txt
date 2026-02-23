@@ -1,0 +1,8 @@
+[dotenv@17.3.1] injecting env (19) from .env -- tip: 🛡️ auth for agents: https://vestauth.com
+Error: Timed out waiting 120000ms from config.webServer.
+
+[1A[2K
+To open last HTML report run:
+[36m[39m
+[36m  npx playwright show-report[39m
+[36m[39m

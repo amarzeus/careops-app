@@ -34,16 +34,16 @@ export function TodaysSchedule({ bookings }: TodaysScheduleProps) {
   const router = useRouter();
 
   return (
-    <Card className="shadow-sm border-0 bg-background">
+    <Card className="bg-background border-0 shadow-sm">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-base font-semibold text-foreground flex items-center gap-2">
-            <Clock className="w-4 h-4 text-primary" />
+          <CardTitle className="text-foreground flex items-center gap-2 text-base font-semibold">
+            <Clock className="text-primary h-4 w-4" />
             Today&apos;s Schedule
           </CardTitle>
           <button
             onClick={() => router.push("/bookings")}
-            className="text-xs text-primary hover:text-primary/90 font-medium"
+            className="text-primary hover:text-primary/90 text-xs font-medium"
           >
             View all
           </button>
@@ -51,8 +51,8 @@ export function TodaysSchedule({ bookings }: TodaysScheduleProps) {
       </CardHeader>
       <CardContent>
         {bookings.length === 0 ? (
-          <div className="text-center py-6 text-muted-foreground text-sm">
-            <Clock className="w-8 h-8 mx-auto mb-2 opacity-30" />
+          <div className="text-muted-foreground py-6 text-center text-sm">
+            <Clock className="mx-auto mb-2 h-8 w-8 opacity-30" />
             <p>No bookings scheduled for today</p>
           </div>
         ) : (
@@ -61,25 +61,30 @@ export function TodaysSchedule({ bookings }: TodaysScheduleProps) {
               <button
                 key={booking.id}
                 onClick={() => router.push("/bookings")}
-                className="w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-muted/30 transition-colors text-left group"
+                className="hover:bg-muted/30 group flex w-full items-center gap-3 rounded-lg p-2.5 text-left transition-colors"
               >
-                <div className="w-14 text-center shrink-0">
-                  <p className="text-sm font-bold text-foreground">{booking.time}</p>
+                <div className="w-14 shrink-0 text-center">
+                  <p className="text-foreground text-sm font-bold">{booking.time}</p>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-muted-foreground truncate">{booking.contact}</p>
-                  <p className="text-xs text-muted-foreground truncate">{booking.service}</p>
+                <div className="min-w-0 flex-1">
+                  <p className="text-muted-foreground truncate text-sm font-medium">
+                    {booking.contact}
+                  </p>
+                  <p className="text-muted-foreground truncate text-xs">{booking.service}</p>
                 </div>
                 <Badge
                   variant="outline"
-                  className={cn("text-[10px] font-semibold shrink-0", statusColors[booking.status] || statusColors.PENDING)}
+                  className={cn(
+                    "shrink-0 text-[10px] font-semibold",
+                    statusColors[booking.status] || statusColors.PENDING
+                  )}
                 >
                   {booking.status.replace("_", " ")}
                 </Badge>
               </button>
             ))}
             {bookings.length > 6 && (
-              <p className="text-xs text-center text-muted-foreground pt-1">
+              <p className="text-muted-foreground pt-1 text-center text-xs">
                 +{bookings.length - 6} more bookings
               </p>
             )}

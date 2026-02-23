@@ -82,13 +82,13 @@ CareOps uses a custom JWT-based authentication system:
 
 All AI calls go through dedicated API routes:
 
-| Route | Model | Purpose |
-|---|---|---|
-| `/api/ai/onboarding` | `gemini-2.0-flash` | Interactive onboarding assistant |
-| `/api/ai/inventory-forecast` | `gemini-2.0-flash` | Predict stock depletion |
-| `/api/ai/inventory/scan` | `gemini-2.0-flash` (vision) | Extract items from invoice images |
-| `/api/ai/smart-reply` | `gemini-2.0-flash` | Generate contextual message replies |
-| `/api/voice` | Vapi.ai | Outbound call webhooks |
+| Route                        | Model                       | Purpose                             |
+| ---------------------------- | --------------------------- | ----------------------------------- |
+| `/api/ai/onboarding`         | `gemini-2.0-flash`          | Interactive onboarding assistant    |
+| `/api/ai/inventory-forecast` | `gemini-2.0-flash`          | Predict stock depletion             |
+| `/api/ai/inventory/scan`     | `gemini-2.0-flash` (vision) | Extract items from invoice images   |
+| `/api/ai/smart-reply`        | `gemini-2.0-flash`          | Generate contextual message replies |
+| `/api/voice`                 | Vapi.ai                     | Outbound call webhooks              |
 
 ## Data Flow: Booking Created
 

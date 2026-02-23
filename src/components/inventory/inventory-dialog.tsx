@@ -28,12 +28,7 @@ interface InventoryDialogProps {
  * @param root0.item
  * @param root0.onSave
  */
-export function InventoryDialog({
-  open,
-  onOpenChange,
-  item,
-  onSave,
-}: InventoryDialogProps) {
+export function InventoryDialog({ open, onOpenChange, item, onSave }: InventoryDialogProps) {
   const [form, setForm] = useState({
     name: "",
     description: "",
@@ -93,25 +88,19 @@ export function InventoryDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>
-            {item ? "Edit Inventory Item" : "Add Inventory Item"}
-          </DialogTitle>
+          <DialogTitle>{item ? "Edit Inventory Item" : "Add Inventory Item"}</DialogTitle>
           <DialogDescription>
-            {item
-              ? "Update item details below."
-              : "Track new resources used in your business."}
+            {item ? "Update item details below." : "Track new resources used in your business."}
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2 col-span-2">
+            <div className="col-span-2 space-y-2">
               <Label>Item Name *</Label>
               <Input
                 placeholder="Surgical Gloves"
                 value={form.name}
-                onChange={(e) =>
-                  setForm((p) => ({ ...p, name: e.target.value }))
-                }
+                onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
               />
             </div>
             <div className="space-y-2">
@@ -119,9 +108,7 @@ export function InventoryDialog({
               <Input
                 type="number"
                 value={form.quantity}
-                onChange={(e) =>
-                  setForm((p) => ({ ...p, quantity: e.target.value }))
-                }
+                onChange={(e) => setForm((p) => ({ ...p, quantity: e.target.value }))}
               />
             </div>
             <div className="space-y-2">
@@ -129,9 +116,7 @@ export function InventoryDialog({
               <Input
                 type="number"
                 value={form.threshold}
-                onChange={(e) =>
-                  setForm((p) => ({ ...p, threshold: e.target.value }))
-                }
+                onChange={(e) => setForm((p) => ({ ...p, threshold: e.target.value }))}
               />
             </div>
             <div className="space-y-2">
@@ -139,9 +124,7 @@ export function InventoryDialog({
               <Input
                 placeholder="boxes"
                 value={form.unit}
-                onChange={(e) =>
-                  setForm((p) => ({ ...p, unit: e.target.value }))
-                }
+                onChange={(e) => setForm((p) => ({ ...p, unit: e.target.value }))}
               />
             </div>
             <div className="space-y-2">
@@ -149,24 +132,18 @@ export function InventoryDialog({
               <Input
                 placeholder="Size L, latex-free"
                 value={form.description}
-                onChange={(e) =>
-                  setForm((p) => ({ ...p, description: e.target.value }))
-                }
+                onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))}
               />
             </div>
           </div>
-          <div className="border-t pt-4 space-y-3">
-            <p className="text-sm font-medium text-muted-foreground">
-              Vendor (optional)
-            </p>
+          <div className="space-y-3 border-t pt-4">
+            <p className="text-muted-foreground text-sm font-medium">Vendor (optional)</p>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Vendor Name</Label>
                 <Input
                   value={form.vendorName}
-                  onChange={(e) =>
-                    setForm((p) => ({ ...p, vendorName: e.target.value }))
-                  }
+                  onChange={(e) => setForm((p) => ({ ...p, vendorName: e.target.value }))}
                 />
               </div>
               <div className="space-y-2">
@@ -174,25 +151,21 @@ export function InventoryDialog({
                 <Input
                   type="email"
                   value={form.vendorEmail}
-                  onChange={(e) =>
-                    setForm((p) => ({ ...p, vendorEmail: e.target.value }))
-                  }
+                  onChange={(e) => setForm((p) => ({ ...p, vendorEmail: e.target.value }))}
                 />
               </div>
-              <div className="space-y-2 col-span-2">
+              <div className="col-span-2 space-y-2">
                 <Label>Vendor Phone</Label>
                 <Input
                   value={form.vendorPhone}
-                  onChange={(e) =>
-                    setForm((p) => ({ ...p, vendorPhone: e.target.value }))
-                  }
+                  onChange={(e) => setForm((p) => ({ ...p, vendorPhone: e.target.value }))}
                 />
               </div>
             </div>
           </div>
           <Button
             onClick={handleSave}
-            className="w-full bg-primary hover:bg-primary/90 font-bold"
+            className="bg-primary hover:bg-primary/90 w-full font-bold"
             disabled={saving}
           >
             {saving ? "Saving..." : item ? "Save Changes" : "Create Item"}

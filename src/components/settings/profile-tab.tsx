@@ -115,19 +115,12 @@ export function ProfileTab({
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label>Full Name</Label>
-            <Input
-              value={user?.name || ""}
-              onChange={(e) => onUpdate({ name: e.target.value })}
-            />
+            <Input value={user?.name || ""} onChange={(e) => onUpdate({ name: e.target.value })} />
           </div>
           <div className="space-y-2">
             <Label>Email Address</Label>
-            <Input
-              value={user?.email || ""}
-              disabled
-              className="bg-muted/30"
-            />
-            <p className="text-[10px] text-muted-foreground">
+            <Input value={user?.email || ""} disabled className="bg-muted/30" />
+            <p className="text-muted-foreground text-[10px]">
               Email cannot be changed securely at this time.
             </p>
           </div>
@@ -139,18 +132,18 @@ export function ProfileTab({
             />
           </div>
         </CardContent>
-        <CardFooter className="bg-muted/30 border-t flex flex-col sm:flex-row justify-end gap-3 px-4 sm:px-6 py-4">
+        <CardFooter className="bg-muted/30 flex flex-col justify-end gap-3 border-t px-4 py-4 sm:flex-row sm:px-6">
           <Button onClick={onSave} disabled={saving} className="w-full sm:w-auto">
             {saved ? (
               <>
-                <CheckCircle className="w-4 h-4 mr-2" />
+                <CheckCircle className="mr-2 h-4 w-4" />
                 Saved!
               </>
             ) : saving ? (
               "Saving..."
             ) : (
               <>
-                <Save className="w-4 h-4 mr-2" />
+                <Save className="mr-2 h-4 w-4" />
                 Save Profile
               </>
             )}
@@ -166,19 +159,17 @@ export function ProfileTab({
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+            <div className="bg-muted/30 flex items-center justify-between rounded-lg p-3">
               <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-green-500 rounded-full" />
+                <div className="h-2 w-2 rounded-full bg-green-500" />
                 <div>
                   <p className="text-sm font-medium">Active Session</p>
-                  <p className="text-xs text-muted-foreground">{user?.email}</p>
+                  <p className="text-muted-foreground text-xs">{user?.email}</p>
                 </div>
               </div>
               <div className="text-right">
-                <p className="text-xs text-muted-foreground">
-                  Role: {user?.role || "OWNER"}
-                </p>
-                <p className="text-xs text-muted-foreground">Logged in now</p>
+                <p className="text-muted-foreground text-xs">Role: {user?.role || "OWNER"}</p>
+                <p className="text-muted-foreground text-xs">Logged in now</p>
               </div>
             </div>
           </div>

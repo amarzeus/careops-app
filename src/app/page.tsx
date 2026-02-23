@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import Link from "next/link";
@@ -22,7 +23,14 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/layout/logo";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { motion, AnimatePresence, useMotionValue, useSpring, useTransform, useReducedMotion } from "framer-motion";
+import {
+  motion,
+  AnimatePresence,
+  useMotionValue,
+  useSpring,
+  useTransform,
+  useReducedMotion,
+} from "framer-motion";
 
 // ─────────────────────────────────────────────
 // PREMIUM CURSOR GLOW — Liquid Glass blend mode
@@ -45,7 +53,7 @@ function CursorGlow() {
 
   return (
     <div
-      className="pointer-events-none fixed inset-0 z-[100] hidden md:block mix-blend-screen dark:mix-blend-color-dodge transition-opacity duration-500 ease-in-out"
+      className="pointer-events-none fixed inset-0 z-[100] hidden mix-blend-screen transition-opacity duration-500 ease-in-out md:block dark:mix-blend-color-dodge"
       style={{
         background: `radial-gradient(1200px circle at ${pos.x}px ${pos.y}px, rgba(139,92,246,0.1), rgba(14,165,233,0.05) 20%, transparent 40%)`,
       }}
@@ -59,18 +67,27 @@ function CursorGlow() {
 /**
  *
  */
-function MagneticButton({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+function MagneticButton({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
   const ref = useRef<HTMLDivElement>(null);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const prefersReducedMotion = useReducedMotion();
 
-  const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    if (prefersReducedMotion || !ref.current) return;
-    const rect = ref.current.getBoundingClientRect();
-    const cx = rect.left + rect.width / 2;
-    const cy = rect.top + rect.height / 2;
-    setOffset({ x: (e.clientX - cx) * 0.15, y: (e.clientY - cy) * 0.15 });
-  }, [prefersReducedMotion]);
+  const handleMouseMove = useCallback(
+    (e: React.MouseEvent) => {
+      if (prefersReducedMotion || !ref.current) return;
+      const rect = ref.current.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      setOffset({ x: (e.clientX - cx) * 0.15, y: (e.clientY - cy) * 0.15 });
+    },
+    [prefersReducedMotion]
+  );
 
   const handleMouseLeave = useCallback(() => setOffset({ x: 0, y: 0 }), []);
 
@@ -105,11 +122,14 @@ function SpotlightCard({
   const [isHovered, setIsHovered] = useState(false);
   const prefersReducedMotion = useReducedMotion();
 
-  const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    if (prefersReducedMotion || !cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
-    setMousePos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
-  }, [prefersReducedMotion]);
+  const handleMouseMove = useCallback(
+    (e: React.MouseEvent) => {
+      if (prefersReducedMotion || !cardRef.current) return;
+      const rect = cardRef.current.getBoundingClientRect();
+      setMousePos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+    },
+    [prefersReducedMotion]
+  );
 
   return (
     <motion.div
@@ -121,12 +141,14 @@ function SpotlightCard({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
       transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-      className={`relative overflow-hidden rounded-[32px] border border-border/50 bg-background/5 backdrop-blur-3xl transition-all duration-[500ms] ease-out ${isHovered ? "border-primary/40 shadow-2xl shadow-primary/10" : "shadow-sm"
-        } ${className}`}
+      className={`border-border/50 bg-background/5 relative overflow-hidden rounded-[32px] border backdrop-blur-3xl transition-all duration-[500ms] ease-out ${
+        isHovered ? "border-primary/40 shadow-primary/10 shadow-2xl" : "shadow-sm"
+      } ${className}`}
       style={{
-        transform: isHovered && !prefersReducedMotion
-          ? `perspective(1200px) rotateX(${(mousePos.y - 200) * -0.015}deg) rotateY(${(mousePos.x - 200) * 0.015}deg) scale3d(1.02, 1.02, 1.02)`
-          : "perspective(1200px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)",
+        transform:
+          isHovered && !prefersReducedMotion
+            ? `perspective(1200px) rotateX(${(mousePos.y - 200) * -0.015}deg) rotateY(${(mousePos.x - 200) * 0.015}deg) scale3d(1.02, 1.02, 1.02)`
+            : "perspective(1200px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)",
       }}
     >
       {/* Spotlight overlay */}
@@ -140,7 +162,7 @@ function SpotlightCard({
       )}
 
       {/* Glass artifact overlay on top */}
-      <div className="absolute inset-0 bg-gradient-to-b from-white/[0.04] to-transparent pointer-events-none" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/[0.04] to-transparent" />
       {children}
     </motion.div>
   );
@@ -218,49 +240,55 @@ function Navbar({
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-      className={`fixed top-4 left-4 right-4 z-50 transition-all duration-[600ms] rounded-2xl ${scrolled
-        ? "bg-background/80 backdrop-blur-2xl border border-border/40 py-3 shadow-lg"
-        : "bg-transparent py-4"
-        }`}
+      className={`fixed top-4 right-4 left-4 z-50 rounded-2xl transition-all duration-[600ms] ${
+        scrolled
+          ? "bg-background/80 border-border/40 border py-3 shadow-lg backdrop-blur-2xl"
+          : "bg-transparent py-4"
+      }`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 group">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        <Link href="/" className="group flex items-center gap-2">
           <Logo variant="full" size={32} />
         </Link>
 
-        <div className="hidden md:flex items-center gap-10">
+        <div className="hidden items-center gap-10 md:flex">
           {["Features", "Integrations", "Pricing"].map((item) => (
             <a
               key={item}
               href={item === "Pricing" ? "#pricing" : `#${item.toLowerCase()}`}
-              className="text-sm font-semibold tracking-wide text-foreground/70 hover:text-foreground transition-all duration-300 flex items-center gap-2"
+              className="text-foreground/70 hover:text-foreground flex items-center gap-2 text-sm font-semibold tracking-wide transition-all duration-300"
             >
               {item}
               {item === "Pricing" && (
-                <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wider">Beta</span>
+                <span className="bg-primary/10 text-primary rounded-full px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase">
+                  Beta
+                </span>
               )}
             </a>
           ))}
           <Link
             href="/search"
-            className="text-sm font-semibold tracking-wide text-foreground/70 hover:text-foreground transition-all duration-300"
+            className="text-foreground/70 hover:text-foreground text-sm font-semibold tracking-wide transition-all duration-300"
           >
             Find a Business
           </Link>
         </div>
 
         <div className="flex items-center gap-4">
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden items-center gap-4 md:flex">
             <Link href="/login">
-              <Button variant="ghost" className="text-sm font-bold rounded-full hover:bg-muted/50 transition-colors duration-300">
+              <Button
+                variant="ghost"
+                className="hover:bg-muted/50 rounded-full text-sm font-bold transition-colors duration-300"
+              >
                 Log In
               </Button>
             </Link>
             <MagneticButton>
               <Link href="/register">
-                <Button className="bg-foreground text-background hover:bg-foreground/90 rounded-full px-7 shadow-xl shadow-foreground/10 font-bold transition-all duration-300 relative overflow-hidden group">
+                <Button className="bg-foreground text-background hover:bg-foreground/90 shadow-foreground/10 group relative overflow-hidden rounded-full px-7 font-bold shadow-xl transition-all duration-300">
                   <span className="relative z-10">Get Started</span>
-                  <div className="absolute inset-0 bg-gradient-to-r from-primary/30 to-purple-500/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <div className="from-primary/30 absolute inset-0 bg-gradient-to-r to-purple-500/30 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
                 </Button>
               </Link>
             </MagneticButton>
@@ -268,9 +296,9 @@ function Navbar({
           <ThemeToggle />
           <button
             onClick={() => setMobileMenuOpen(true)}
-            className="md:hidden p-2 rounded-full hover:bg-black/5 dark:hover:bg-background/10 transition-colors"
+            className="dark:hover:bg-background/10 rounded-full p-2 transition-colors hover:bg-black/5 md:hidden"
           >
-            <Menu className="w-5 h-5 text-foreground" />
+            <Menu className="text-foreground h-5 w-5" />
           </button>
         </div>
       </div>
@@ -297,9 +325,9 @@ const mockChartData = [
 function CustomTooltip({ active, payload, label }: any) {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-background/90 backdrop-blur-md border border-border/50 p-3 rounded-xl shadow-xl">
-        <p className="text-sm font-medium text-muted-foreground mb-1">{label}</p>
-        <p className="text-xl font-bold bg-gradient-to-r from-primary to-purple-500 bg-clip-text text-transparent">
+      <div className="bg-background/90 border-border/50 rounded-xl border p-3 shadow-xl backdrop-blur-md">
+        <p className="text-muted-foreground mb-1 text-sm font-medium">{label}</p>
+        <p className="from-primary bg-gradient-to-r to-purple-500 bg-clip-text text-xl font-bold text-transparent">
           ₹{payload[0].value.toLocaleString()}
         </p>
       </div>
@@ -347,39 +375,47 @@ function Hero3D() {
 
   return (
     <section
-      className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden pt-32 pb-20"
+      className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden pt-32 pb-20"
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >
       {/* Liquid morphing background */}
-      <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-[800px] h-[800px] bg-gradient-to-r from-primary/10 to-primary/10 rounded-full blur-[120px] mix-blend-multiply dark:mix-blend-screen animate-float" style={{ animationDuration: '12s' }} />
-        <div className="absolute bottom-1/4 right-1/4 w-[700px] h-[700px] bg-gradient-to-r from-purple-500/10 to-amber-500/5 rounded-full blur-[120px] mix-blend-multiply dark:mix-blend-screen animate-float-delayed" style={{ animationDuration: '15s' }} />
+      <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+        <div
+          className="from-primary/10 to-primary/10 animate-float absolute top-1/4 left-1/4 h-[800px] w-[800px] rounded-full bg-gradient-to-r mix-blend-multiply blur-[120px] dark:mix-blend-screen"
+          style={{ animationDuration: "12s" }}
+        />
+        <div
+          className="animate-float-delayed absolute right-1/4 bottom-1/4 h-[700px] w-[700px] rounded-full bg-gradient-to-r from-purple-500/10 to-amber-500/5 mix-blend-multiply blur-[120px] dark:mix-blend-screen"
+          style={{ animationDuration: "15s" }}
+        />
       </div>
 
       {/* Text Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10 flex flex-col items-center">
+      <div className="relative z-10 mx-auto flex max-w-7xl flex-col items-center px-4 text-center sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 30, filter: "blur(12px)" }}
           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
           transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-          className="inline-flex items-center gap-2 px-6 py-2 rounded-full bg-background/40 backdrop-blur-md text-foreground text-xs font-extrabold mb-12 border border-foreground/10 shadow-sm"
+          className="bg-background/40 text-foreground border-foreground/10 mb-12 inline-flex items-center gap-2 rounded-full border px-6 py-2 text-xs font-extrabold shadow-sm backdrop-blur-md"
         >
-          <Sparkles className="w-4 h-4 text-primary" />
-          <span className="tracking-[0.15em] uppercase text-transparent bg-clip-text bg-gradient-to-r from-foreground to-foreground/50">Next-Generation Platform</span>
+          <Sparkles className="text-primary h-4 w-4" />
+          <span className="from-foreground to-foreground/50 bg-gradient-to-r bg-clip-text tracking-[0.15em] text-transparent uppercase">
+            Next-Generation Platform
+          </span>
         </motion.div>
 
         <motion.h1
           initial={{ opacity: 0, y: 40, filter: "blur(16px)" }}
           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
           transition={{ duration: 1.2, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-          className="text-[clamp(3rem,8vw,5.5rem)] font-black tracking-[-0.04em] leading-[0.9] text-foreground mb-6"
+          className="text-foreground mb-6 text-[clamp(3rem,8vw,5.5rem)] leading-[0.9] font-black tracking-[-0.04em]"
         >
           Operations,
           <br />
-          <span className="relative inline-block mt-1">
-            <span className="absolute inset-0 bg-gradient-to-r from-primary via-purple-500 to-amber-500 bg-clip-text text-transparent blur-xl opacity-40 animate-pulse-slow" />
-            <span className="relative bg-gradient-to-r from-primary via-purple-500 to-amber-500 bg-clip-text text-transparent animate-gradient-shift bg-[length:200%_auto]">
+          <span className="relative mt-1 inline-block">
+            <span className="from-primary animate-pulse-slow absolute inset-0 bg-gradient-to-r via-purple-500 to-amber-500 bg-clip-text text-transparent opacity-40 blur-xl" />
+            <span className="from-primary animate-gradient-shift relative bg-gradient-to-r via-purple-500 to-amber-500 bg-[length:200%_auto] bg-clip-text text-transparent">
               liquid smooth.
             </span>
           </span>
@@ -389,25 +425,26 @@ function Hero3D() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-          className="text-lg md:text-xl text-muted-foreground max-w-7xl mx-auto mb-10 leading-relaxed font-medium"
+          className="text-muted-foreground mx-auto mb-10 max-w-7xl text-lg leading-relaxed font-medium md:text-xl"
         >
-          The absolute pinnacle of service operations. Replace your entire fragmented stack with one beautifully unified engine.
+          The absolute pinnacle of service operations. Replace your entire fragmented stack with one
+          beautifully unified engine.
         </motion.p>
 
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.45, ease: [0.16, 1, 0.3, 1] }}
-          className="flex flex-col sm:flex-row items-center justify-center gap-6"
+          className="flex flex-col items-center justify-center gap-6 sm:flex-row"
         >
           <MagneticButton>
             <Link href="/register">
               <Button
                 size="lg"
-                className="h-16 px-12 rounded-full text-lg font-bold bg-cta text-cta-foreground shadow-2xl shadow-cta/20 hover:shadow-cta/30 hover:scale-[1.04] active:scale-[0.96] transition-all duration-400 ease-out"
+                className="bg-cta text-cta-foreground shadow-cta/20 hover:shadow-cta/30 h-16 rounded-full px-12 text-lg font-bold shadow-2xl transition-all duration-400 ease-out hover:scale-[1.04] active:scale-[0.96]"
               >
                 Start Free Trial
-                <ArrowRight className="ml-3 w-5 h-5" />
+                <ArrowRight className="ml-3 h-5 w-5" />
               </Button>
             </Link>
           </MagneticButton>
@@ -423,42 +460,45 @@ function Hero3D() {
         style={{ perspective: 1500 }}
       >
         <motion.div
-          style={{ rotateX: prefersReducedMotion ? 0 : rotateX, rotateY: prefersReducedMotion ? 0 : rotateY }}
-          className="relative w-full aspect-[16/10] rounded-[32px] overflow-hidden border border-white/20 dark:border-white/10 bg-background/40 dark:bg-black/40 backdrop-blur-[40px] shadow-[0_40px_120px_-20px_rgba(0,0,0,0.2)] dark:shadow-[0_40px_120px_-20px_rgba(0,0,0,0.6)]"
+          style={{
+            rotateX: prefersReducedMotion ? 0 : rotateX,
+            rotateY: prefersReducedMotion ? 0 : rotateY,
+          }}
+          className="bg-background/40 relative aspect-[16/10] w-full overflow-hidden rounded-[32px] border border-white/20 shadow-[0_40px_120px_-20px_rgba(0,0,0,0.2)] backdrop-blur-[40px] dark:border-white/10 dark:bg-black/40 dark:shadow-[0_40px_120px_-20px_rgba(0,0,0,0.6)]"
         >
           {/* Faux dashboard glowing grid lines */}
           <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+Cjwvc3ZnPg==')] opacity-[0.03] dark:opacity-[0.05]" />
 
-          <div className="absolute inset-0 p-8 flex flex-col pointer-events-none">
+          <div className="pointer-events-none absolute inset-0 flex flex-col p-8">
             {/* Dashboard Header */}
-            <div className="flex items-center justify-between border-b border-border/40 pb-4">
+            <div className="border-border/40 flex items-center justify-between border-b pb-4">
               <div className="flex items-center gap-4">
                 <div className="flex gap-2">
-                  <div className="w-3 h-3 rounded-full bg-red-400/80 shadow-[0_0_8px_rgba(248,113,113,0.5)]" />
-                  <div className="w-3 h-3 rounded-full bg-yellow-400/80 shadow-[0_0_8px_rgba(250,204,21,0.5)]" />
-                  <div className="w-3 h-3 rounded-full bg-green-400/80 shadow-[0_0_8px_rgba(74,222,128,0.5)]" />
+                  <div className="h-3 w-3 rounded-full bg-red-400/80 shadow-[0_0_8px_rgba(248,113,113,0.5)]" />
+                  <div className="h-3 w-3 rounded-full bg-yellow-400/80 shadow-[0_0_8px_rgba(250,204,21,0.5)]" />
+                  <div className="h-3 w-3 rounded-full bg-green-400/80 shadow-[0_0_8px_rgba(74,222,128,0.5)]" />
                 </div>
-                <div className="h-8 w-48 bg-muted/30 rounded-lg flex items-center px-3 border border-border/20">
-                  <Search className="w-4 h-4 text-muted-foreground mr-2" />
-                  <span className="text-xs text-muted-foreground">Search patients...</span>
+                <div className="bg-muted/30 border-border/20 flex h-8 w-48 items-center rounded-lg border px-3">
+                  <Search className="text-muted-foreground mr-2 h-4 w-4" />
+                  <span className="text-muted-foreground text-xs">Search patients...</span>
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-muted/50 flex items-center justify-center border border-border/50 transition-colors">
-                  <Bell className="w-4 h-4 text-foreground/70" />
+                <div className="bg-muted/50 border-border/50 flex h-8 w-8 items-center justify-center rounded-full border transition-colors">
+                  <Bell className="text-foreground/70 h-4 w-4" />
                 </div>
-                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-primary to-purple-500 p-[2px]">
-                  <div className="w-full h-full rounded-full bg-background flex items-center justify-center">
-                    <span className="text-xs font-bold text-foreground">AK</span>
+                <div className="from-primary h-8 w-8 rounded-full bg-gradient-to-tr to-purple-500 p-[2px]">
+                  <div className="bg-background flex h-full w-full items-center justify-center rounded-full">
+                    <span className="text-foreground text-xs font-bold">AK</span>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Dashboard Content */}
-            <div className="flex-1 flex gap-6 mt-6">
+            <div className="mt-6 flex flex-1 gap-6">
               {/* Sidebar List */}
-              <div className="w-48 hidden md:flex flex-col gap-2">
+              <div className="hidden w-48 flex-col gap-2 md:flex">
                 {[
                   { icon: LayoutDashboard, label: "Overview", active: true },
                   { icon: Calendar, label: "Appointments", active: false },
@@ -466,49 +506,102 @@ function Hero3D() {
                   { icon: FileText, label: "Invoices", active: false },
                   { icon: Settings, label: "Settings", active: false },
                 ].map((item, i) => (
-                  <div key={i} className={`h-10 rounded-xl px-3 flex items-center gap-3 transition-colors border border-transparent ${item.active ? 'bg-primary/10 border-primary/20 text-primary shadow-sm' : 'bg-muted/10 text-muted-foreground'}`}>
-                    <item.icon className={`w-4 h-4 ${item.active ? 'text-primary' : 'text-muted-foreground'}`} />
+                  <div
+                    key={i}
+                    className={`flex h-10 items-center gap-3 rounded-xl border border-transparent px-3 transition-colors ${item.active ? "bg-primary/10 border-primary/20 text-primary shadow-sm" : "bg-muted/10 text-muted-foreground"}`}
+                  >
+                    <item.icon
+                      className={`h-4 w-4 ${item.active ? "text-primary" : "text-muted-foreground"}`}
+                    />
                     <span className="text-sm font-medium">{item.label}</span>
                   </div>
                 ))}
               </div>
 
               {/* Main Area */}
-              <div className="flex-1 flex flex-col gap-6">
+              <div className="flex flex-1 flex-col gap-6">
                 {/* KPI Cards */}
                 <div className="grid grid-cols-3 gap-6">
                   {[
-                    { title: "Total Revenue", value: "₹24,500", trend: "+12.5%", color: "from-blue-500/20 to-blue-500/5", ring: "ring-blue-500/20", trendColor: "text-green-500 bg-green-500/10" },
-                    { title: "New Bookings", value: "145", trend: "+5.2%", color: "from-purple-500/20 to-purple-500/5", ring: "ring-purple-500/20", trendColor: "text-green-500 bg-green-500/10" },
-                    { title: "Cancellations", value: "3", trend: "-2.1%", color: "from-orange-500/20 to-orange-500/5", ring: "ring-orange-500/20", trendColor: "text-red-500 bg-red-500/10" },
+                    {
+                      title: "Total Revenue",
+                      value: "₹24,500",
+                      trend: "+12.5%",
+                      color: "from-blue-500/20 to-blue-500/5",
+                      ring: "ring-blue-500/20",
+                      trendColor: "text-green-500 bg-green-500/10",
+                    },
+                    {
+                      title: "New Bookings",
+                      value: "145",
+                      trend: "+5.2%",
+                      color: "from-purple-500/20 to-purple-500/5",
+                      ring: "ring-purple-500/20",
+                      trendColor: "text-green-500 bg-green-500/10",
+                    },
+                    {
+                      title: "Cancellations",
+                      value: "3",
+                      trend: "-2.1%",
+                      color: "from-orange-500/20 to-orange-500/5",
+                      ring: "ring-orange-500/20",
+                      trendColor: "text-red-500 bg-red-500/10",
+                    },
                   ].map((stat, i) => (
-                    <div key={i} className={`rounded-2xl bg-gradient-to-b ${stat.color} border border-border/40 backdrop-blur-md p-5 flex flex-col justify-between shadow-sm ring-1 ring-inset ${stat.ring}`}>
-                      <div className="flex justify-between items-start mb-2">
-                        <span className="text-sm font-semibold text-muted-foreground">{stat.title}</span>
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${stat.trendColor}`}>{stat.trend}</span>
+                    <div
+                      key={i}
+                      className={`rounded-2xl bg-gradient-to-b ${stat.color} border-border/40 flex flex-col justify-between border p-5 shadow-sm ring-1 backdrop-blur-md ring-inset ${stat.ring}`}
+                    >
+                      <div className="mb-2 flex items-start justify-between">
+                        <span className="text-muted-foreground text-sm font-semibold">
+                          {stat.title}
+                        </span>
+                        <span
+                          className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${stat.trendColor}`}
+                        >
+                          {stat.trend}
+                        </span>
                       </div>
-                      <span className="text-2xl font-black tracking-tight text-foreground">{stat.value}</span>
+                      <span className="text-foreground text-2xl font-black tracking-tight">
+                        {stat.value}
+                      </span>
                     </div>
                   ))}
                 </div>
 
                 {/* Real Recharts Area */}
-                <div className="flex-1 rounded-2xl bg-muted/10 border border-border/40 backdrop-blur-md relative overflow-hidden flex flex-col p-4 shadow-inner pointer-events-auto">
-                  <div className="flex items-center justify-between mb-2 px-2">
-                    <h3 className="text-sm font-bold text-foreground">Revenue Overview</h3>
-                    <span className="text-xs font-medium text-muted-foreground">Last 7 Days</span>
+                <div className="bg-muted/10 border-border/40 pointer-events-auto relative flex flex-1 flex-col overflow-hidden rounded-2xl border p-4 shadow-inner backdrop-blur-md">
+                  <div className="mb-2 flex items-center justify-between px-2">
+                    <h3 className="text-foreground text-sm font-bold">Revenue Overview</h3>
+                    <span className="text-muted-foreground text-xs font-medium">Last 7 Days</span>
                   </div>
-                  <div className="flex-1 w-full min-h-[200px]">
+                  <div className="min-h-[200px] w-full flex-1">
                     <ResponsiveContainer width="100%" height="100%">
-                      <AreaChart data={mockChartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                      <AreaChart
+                        data={mockChartData}
+                        margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+                      >
                         <defs>
                           <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
                             <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.4} />
                             <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
                           </linearGradient>
                         </defs>
-                        <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: 'var(--muted-foreground)' }} dy={10} />
-                        <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'var(--primary)', strokeWidth: 1, strokeDasharray: '4 4' }} />
+                        <XAxis
+                          dataKey="name"
+                          axisLine={false}
+                          tickLine={false}
+                          tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
+                          dy={10}
+                        />
+                        <Tooltip
+                          content={<CustomTooltip />}
+                          cursor={{
+                            stroke: "var(--primary)",
+                            strokeWidth: 1,
+                            strokeDasharray: "4 4",
+                          }}
+                        />
                         <Area
                           type="monotone"
                           dataKey="revenue"
@@ -528,12 +621,12 @@ function Hero3D() {
           </div>
 
           {/* Chromatic aberration & glass sweep */}
-          <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.08] to-transparent mix-blend-overlay pointer-events-none" />
-          <div className="absolute inset-0 box-shadow-inner border border-white/20 rounded-[32px] pointer-events-none" />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.08] to-transparent mix-blend-overlay" />
+          <div className="box-shadow-inner pointer-events-none absolute inset-0 rounded-[32px] border border-white/20" />
         </motion.div>
 
         {/* Ambient base glow */}
-        <div className="absolute -z-10 bottom-0 left-1/2 -translate-x-1/2 w-4/5 h-1/2 bg-primary/20 blur-[150px] rounded-full mix-blend-screen" />
+        <div className="bg-primary/20 absolute bottom-0 left-1/2 -z-10 h-1/2 w-4/5 -translate-x-1/2 rounded-full mix-blend-screen blur-[150px]" />
       </motion.div>
     </section>
   );
@@ -556,7 +649,7 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background selection:bg-foreground/10 selection:text-foreground overflow-hidden">
+    <div className="bg-background selection:bg-foreground/10 selection:text-foreground min-h-screen overflow-hidden">
       <CursorGlow />
       <Navbar scrolled={scrolled} setMobileMenuOpen={setMobileMenuOpen} />
 
@@ -568,16 +661,16 @@ export default function LandingPage() {
             animate={{ opacity: 1, backdropFilter: "blur(24px)" }}
             exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
             transition={{ duration: 0.4 }}
-            className="fixed inset-0 z-[60] bg-background/80 md:hidden"
+            className="bg-background/80 fixed inset-0 z-[60] md:hidden"
           >
-            <div className="flex flex-col h-full p-8 relative z-10">
-              <div className="flex items-center justify-between mb-16">
+            <div className="relative z-10 flex h-full flex-col p-8">
+              <div className="mb-16 flex items-center justify-between">
                 <Logo variant="full" size={32} />
                 <button
                   onClick={() => setMobileMenuOpen(false)}
-                  className="p-3 rounded-full bg-background/10 border border-white/20 backdrop-blur-md"
+                  className="bg-background/10 rounded-full border border-white/20 p-3 backdrop-blur-md"
                 >
-                  <X className="w-6 h-6" />
+                  <X className="h-6 w-6" />
                 </button>
               </div>
               <nav className="flex flex-col gap-6">
@@ -589,7 +682,7 @@ export default function LandingPage() {
                     key={item}
                     href={item === "Pricing" ? "#pricing" : `#${item.toLowerCase()}`}
                     onClick={() => setMobileMenuOpen(false)}
-                    className="text-4xl font-black tracking-[-0.04em] text-foreground hover:text-primary transition-colors"
+                    className="text-foreground hover:text-primary text-4xl font-black tracking-[-0.04em] transition-colors"
                   >
                     {item}
                   </motion.a>
@@ -602,7 +695,7 @@ export default function LandingPage() {
                   <Link
                     href="/search"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="text-4xl font-black tracking-[-0.04em] text-foreground/60 hover:text-primary transition-colors"
+                    className="text-foreground/60 hover:text-primary text-4xl font-black tracking-[-0.04em] transition-colors"
                   >
                     Find a Business
                   </Link>
@@ -614,7 +707,7 @@ export default function LandingPage() {
                     transition={{ delay: 0.4, duration: 0.5 }}
                   >
                     <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
-                      <Button variant="ghost" className="w-full text-xl h-14 font-bold rounded-2xl">
+                      <Button variant="ghost" className="h-14 w-full rounded-2xl text-xl font-bold">
                         Log In
                       </Button>
                     </Link>
@@ -625,7 +718,7 @@ export default function LandingPage() {
                     transition={{ delay: 0.5, duration: 0.5 }}
                   >
                     <Link href="/register" onClick={() => setMobileMenuOpen(false)}>
-                      <Button className="w-full h-16 text-xl bg-cta text-cta-foreground font-bold rounded-2xl shadow-xl shadow-cta/10">
+                      <Button className="bg-cta text-cta-foreground shadow-cta/10 h-16 w-full rounded-2xl text-xl font-bold shadow-xl">
                         Get Started
                       </Button>
                     </Link>
@@ -642,16 +735,16 @@ export default function LandingPage() {
         <Hero3D />
 
         {/* ─── FEATURES - Liquid Tiles ─── */}
-        <section id="features" className="py-32 lg:py-56 bg-background relative z-10">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex flex-col md:flex-row justify-between items-end mb-24 gap-8">
+        <section id="features" className="bg-background relative z-10 py-32 lg:py-56">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="mb-24 flex flex-col items-end justify-between gap-8 md:flex-row">
               <div className="max-w-7xl">
                 <motion.h2
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-100px" }}
                   transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-                  className="text-5xl md:text-7xl lg:text-[100px] font-black tracking-[-0.05em] leading-[0.85]"
+                  className="text-5xl leading-[0.85] font-black tracking-[-0.05em] md:text-7xl lg:text-[100px]"
                 >
                   Unrivaled
                   <br />
@@ -663,102 +756,124 @@ export default function LandingPage() {
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 1, delay: 0.2 }}
-                className="text-xl font-medium text-muted-foreground max-w-sm mb-4"
+                className="text-muted-foreground mb-4 max-w-sm text-xl font-medium"
               >
                 Six powerful modules engineered for maximum efficiency.
               </motion.p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
               {/* Large Card: Smart Bookings */}
-              <SpotlightCard className="md:col-span-2 md:row-span-2 p-6 md:p-8 lg:p-10 min-h-[300px] lg:min-h-[380px] flex flex-col justify-between group overflow-hidden bg-background/40">
-                <div className="z-10 relative">
-                  <div className="w-12 h-12 rounded-[16px] bg-blue-500/10 flex items-center justify-center mb-6 border border-blue-500/20 group-hover:scale-110 transition-transform duration-500 ease-out shadow-[0_0_30px_rgba(59,130,246,0.1)]">
-                    <Calendar className="w-6 h-6 text-primary" />
+              <SpotlightCard className="group bg-background/40 flex min-h-[300px] flex-col justify-between overflow-hidden p-6 md:col-span-2 md:row-span-2 md:p-8 lg:min-h-[380px] lg:p-10">
+                <div className="relative z-10">
+                  <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-[16px] border border-blue-500/20 bg-blue-500/10 shadow-[0_0_30px_rgba(59,130,246,0.1)] transition-transform duration-500 ease-out group-hover:scale-110">
+                    <Calendar className="text-primary h-6 w-6" />
                   </div>
-                  <h3 className="text-2xl font-bold mb-3 tracking-tight">Smart Bookings</h3>
-                  <p className="text-base text-muted-foreground leading-relaxed font-medium max-w-sm">
-                    Public scheduling pages with real-time availability, automated confirmations, and flawless calendar sync.
+                  <h3 className="mb-3 text-2xl font-bold tracking-tight">Smart Bookings</h3>
+                  <p className="text-muted-foreground max-w-sm text-base leading-relaxed font-medium">
+                    Public scheduling pages with real-time availability, automated confirmations,
+                    and flawless calendar sync.
                   </p>
                 </div>
 
                 {/* Decorative background element for large card */}
-                <div className="absolute right-0 bottom-0 w-2/3 h-2/3 bg-gradient-to-tl from-blue-500/10 to-transparent blur-3xl -z-10 transition-opacity duration-500 opacity-50 group-hover:opacity-100" />
-                <div className="absolute -right-10 -bottom-10 w-48 h-48 border border-blue-500/20 rounded-full sm:flex hidden -z-10" />
-                <div className="absolute -right-20 -bottom-20 w-64 h-64 border border-blue-500/20 rounded-full sm:flex hidden -z-10" />
+                <div className="absolute right-0 bottom-0 -z-10 h-2/3 w-2/3 bg-gradient-to-tl from-blue-500/10 to-transparent opacity-50 blur-3xl transition-opacity duration-500 group-hover:opacity-100" />
+                <div className="absolute -right-10 -bottom-10 -z-10 hidden h-48 w-48 rounded-full border border-blue-500/20 sm:flex" />
+                <div className="absolute -right-20 -bottom-20 -z-10 hidden h-64 w-64 rounded-full border border-blue-500/20 sm:flex" />
               </SpotlightCard>
 
               {/* Small Card 1: Unified Inbox */}
-              <SpotlightCard className="md:col-span-1 p-6 md:p-8 min-h-[220px] flex flex-col justify-between group overflow-hidden bg-background/40">
-                <div className="z-10 relative">
-                  <div className="w-10 h-10 rounded-[12px] bg-primary/10 flex items-center justify-center mb-5 border border-primary/20 group-hover:scale-110 transition-transform duration-500 ease-out">
-                    <MessageSquare className="w-5 h-5 text-primary" />
+              <SpotlightCard className="group bg-background/40 flex min-h-[220px] flex-col justify-between overflow-hidden p-6 md:col-span-1 md:p-8">
+                <div className="relative z-10">
+                  <div className="bg-primary/10 border-primary/20 mb-5 flex h-10 w-10 items-center justify-center rounded-[12px] border transition-transform duration-500 ease-out group-hover:scale-110">
+                    <MessageSquare className="text-primary h-5 w-5" />
                   </div>
-                  <h3 className="text-lg md:text-xl font-bold mb-2 tracking-tight">Unified Inbox</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed font-medium">
+                  <h3 className="mb-2 text-lg font-bold tracking-tight md:text-xl">
+                    Unified Inbox
+                  </h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed font-medium">
                     Email, SMS, and AI responses organized in one interface.
                   </p>
                 </div>
-                <div className="absolute right-0 bottom-0 w-1/2 h-1/2 bg-gradient-to-tl from-primary/10 to-transparent blur-2xl -z-10 transition-opacity duration-500 opacity-50 group-hover:opacity-100" />
+                <div className="from-primary/10 absolute right-0 bottom-0 -z-10 h-1/2 w-1/2 bg-gradient-to-tl to-transparent opacity-50 blur-2xl transition-opacity duration-500 group-hover:opacity-100" />
               </SpotlightCard>
 
               {/* Small Card 2: Dynamic Forms */}
-              <SpotlightCard className="md:col-span-1 p-6 md:p-8 min-h-[220px] flex flex-col justify-between group overflow-hidden bg-background/40">
-                <div className="z-10 relative">
-                  <div className="w-10 h-10 rounded-[12px] bg-purple-500/10 flex items-center justify-center mb-5 border border-purple-500/20 group-hover:scale-110 transition-transform duration-500 ease-out">
-                    <FileText className="w-5 h-5 text-purple-500" />
+              <SpotlightCard className="group bg-background/40 flex min-h-[220px] flex-col justify-between overflow-hidden p-6 md:col-span-1 md:p-8">
+                <div className="relative z-10">
+                  <div className="mb-5 flex h-10 w-10 items-center justify-center rounded-[12px] border border-purple-500/20 bg-purple-500/10 transition-transform duration-500 ease-out group-hover:scale-110">
+                    <FileText className="h-5 w-5 text-purple-500" />
                   </div>
-                  <h3 className="text-lg md:text-xl font-bold mb-2 tracking-tight">Dynamic Forms</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed font-medium">
+                  <h3 className="mb-2 text-lg font-bold tracking-tight md:text-xl">
+                    Dynamic Forms
+                  </h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed font-medium">
                     Intelligent intake workflows that adapt to user responses.
                   </p>
                 </div>
-                <div className="absolute right-0 bottom-0 w-1/2 h-1/2 bg-gradient-to-tl from-purple-500/10 to-transparent blur-2xl -z-10 transition-opacity duration-500 opacity-50 group-hover:opacity-100" />
+                <div className="absolute right-0 bottom-0 -z-10 h-1/2 w-1/2 bg-gradient-to-tl from-purple-500/10 to-transparent opacity-50 blur-2xl transition-opacity duration-500 group-hover:opacity-100" />
               </SpotlightCard>
 
               {/* Wide Card: Automation Engine */}
-              <SpotlightCard className="md:col-span-3 p-6 md:p-8 lg:p-10 min-h-[200px] flex flex-col md:flex-row items-start md:items-center justify-between group overflow-hidden bg-background/40">
-                <div className="max-w-xl z-10 relative">
-                  <div className="w-12 h-12 rounded-[16px] bg-amber-500/10 flex items-center justify-center mb-5 border border-amber-500/20 group-hover:scale-110 transition-transform duration-500 ease-out">
-                    <Zap className="w-6 h-6 text-amber-500" />
+              <SpotlightCard className="group bg-background/40 flex min-h-[200px] flex-col items-start justify-between overflow-hidden p-6 md:col-span-3 md:flex-row md:items-center md:p-8 lg:p-10">
+                <div className="relative z-10 max-w-xl">
+                  <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-[16px] border border-amber-500/20 bg-amber-500/10 transition-transform duration-500 ease-out group-hover:scale-110">
+                    <Zap className="h-6 w-6 text-amber-500" />
                   </div>
-                  <h3 className="text-2xl font-bold mb-3 tracking-tight">Automation Engine</h3>
-                  <p className="text-base text-muted-foreground leading-relaxed font-medium">
-                    Event-driven workflows for reminders, follow-ups, and notifications running silently in the background.
+                  <h3 className="mb-3 text-2xl font-bold tracking-tight">Automation Engine</h3>
+                  <p className="text-muted-foreground text-base leading-relaxed font-medium">
+                    Event-driven workflows for reminders, follow-ups, and notifications running
+                    silently in the background.
                   </p>
                 </div>
 
                 {/* Decorative abstract diagram or rings for wide card */}
-                <div className="relative mt-6 md:mt-0 w-full md:w-auto flex-1 flex justify-end z-10 pointer-events-none">
-                  <div className="w-32 h-32 md:w-40 md:h-40 relative opacity-80 group-hover:opacity-100 transition-opacity duration-700">
-                    <div className="absolute inset-0 rounded-full border border-amber-500/30 animate-[spin_10s_linear_infinite]" />
-                    <div className="absolute inset-4 rounded-full border border-dashed border-amber-500/30 animate-[spin_15s_linear_infinite_reverse]" />
-                    <div className="absolute inset-8 rounded-full border border-amber-500/20 animate-[spin_8s_linear_infinite]" />
-                    <div className="absolute inset-0 m-auto w-10 h-10 bg-amber-500/10 rounded-full blur-md" />
+                <div className="pointer-events-none relative z-10 mt-6 flex w-full flex-1 justify-end md:mt-0 md:w-auto">
+                  <div className="relative h-32 w-32 opacity-80 transition-opacity duration-700 group-hover:opacity-100 md:h-40 md:w-40">
+                    <div className="absolute inset-0 animate-[spin_10s_linear_infinite] rounded-full border border-amber-500/30" />
+                    <div className="absolute inset-4 animate-[spin_15s_linear_infinite_reverse] rounded-full border border-dashed border-amber-500/30" />
+                    <div className="absolute inset-8 animate-[spin_8s_linear_infinite] rounded-full border border-amber-500/20" />
+                    <div className="absolute inset-0 m-auto h-10 w-10 rounded-full bg-amber-500/10 blur-md" />
                   </div>
                 </div>
 
-                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-gradient-to-r from-transparent via-amber-500/5 to-transparent blur-3xl -z-10 opacity-50 group-hover:opacity-100 transition-opacity duration-1000" />
+                <div className="absolute top-1/2 left-1/2 -z-10 h-full w-full -translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-transparent via-amber-500/5 to-transparent opacity-50 blur-3xl transition-opacity duration-1000 group-hover:opacity-100" />
               </SpotlightCard>
             </div>
           </div>
         </section>
 
         {/* ─── INTEGRATIONS ─── */}
-        <section id="integrations" className="py-24 border-y border-border/40 bg-secondary/30 relative overflow-hidden">
-          <div className="absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-background to-transparent z-10" />
-          <div className="absolute inset-y-0 right-0 w-1/3 bg-gradient-to-l from-background to-transparent z-10" />
+        <section
+          id="integrations"
+          className="border-border/40 bg-secondary/30 relative overflow-hidden border-y py-24"
+        >
+          <div className="from-background absolute inset-y-0 left-0 z-10 w-1/3 bg-gradient-to-r to-transparent" />
+          <div className="from-background absolute inset-y-0 right-0 z-10 w-1/3 bg-gradient-to-l to-transparent" />
 
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12 text-center">
-            <h3 className="text-sm font-bold tracking-widest uppercase text-muted-foreground">Flawlessly connects with your favorite tools</h3>
+          <div className="mx-auto mb-12 max-w-7xl px-4 text-center sm:px-6 lg:px-8">
+            <h3 className="text-muted-foreground text-sm font-bold tracking-widest uppercase">
+              Flawlessly connects with your favorite tools
+            </h3>
           </div>
 
-          <div className="flex w-[200%] md:w-[150%] animate-marquee">
+          <div className="animate-marquee flex w-[200%] md:w-[150%]">
             {/* Double the logos to create the infinite loop effect smoothly */}
             {[1, 2].map((set) => (
-              <div key={set} className="flex flex-1 justify-around items-center px-4">
-                {['Google Calendar', 'Razorpay', 'Twilio', 'Mailchimp', 'Slack', 'Zoom', 'QuickBooks'].map((logo, i) => (
-                  <div key={i} className="text-xl md:text-2xl font-black text-foreground/20 whitespace-nowrap px-8 hover:text-foreground/40 transition-colors cursor-default">
+              <div key={set} className="flex flex-1 items-center justify-around px-4">
+                {[
+                  "Google Calendar",
+                  "Razorpay",
+                  "Twilio",
+                  "Mailchimp",
+                  "Slack",
+                  "Zoom",
+                  "QuickBooks",
+                ].map((logo, i) => (
+                  <div
+                    key={i}
+                    className="text-foreground/20 hover:text-foreground/40 cursor-default px-8 text-xl font-black whitespace-nowrap transition-colors md:text-2xl"
+                  >
                     {logo}
                   </div>
                 ))}
@@ -768,9 +883,9 @@ export default function LandingPage() {
         </section>
 
         {/* ─── SOCIAL PROOF - Minimal Numbers ─── */}
-        <section className="py-32 bg-foreground text-background">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-16 text-center">
+        <section className="bg-foreground text-background py-32">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-2 gap-16 text-center md:grid-cols-4">
               {[
                 { value: "6", suffix: "+", label: "Tools replaced" },
                 { value: "80", suffix: "%", label: "Time saved" },
@@ -784,31 +899,32 @@ export default function LandingPage() {
                   viewport={{ once: true }}
                   transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
                 >
-                  <div className="text-5xl md:text-6xl font-black tracking-tighter mb-4 text-transparent bg-clip-text bg-gradient-to-br from-background to-background/50">
+                  <div className="from-background to-background/50 mb-4 bg-gradient-to-br bg-clip-text text-5xl font-black tracking-tighter text-transparent md:text-6xl">
                     <AnimatedCounter value={stat.value} suffix={stat.suffix} />
                   </div>
-                  <div className="text-sm md:text-base font-bold tracking-widest uppercase text-background/60">{stat.label}</div>
+                  <div className="text-background/60 text-sm font-bold tracking-widest uppercase md:text-base">
+                    {stat.label}
+                  </div>
                 </motion.div>
               ))}
             </div>
           </div>
         </section>
 
-
         {/* ─── PRICING ─── */}
-        <section id="pricing" className="py-40 lg:py-64 relative overflow-hidden bg-background">
+        <section id="pricing" className="bg-background relative overflow-hidden py-40 lg:py-64">
           <div className="absolute inset-0 z-0">
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-r from-primary/10 via-purple-500/10 to-transparent rounded-full blur-[150px]" />
+            <div className="from-primary/10 absolute top-1/2 left-1/2 h-[800px] w-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-r via-purple-500/10 to-transparent blur-[150px]" />
           </div>
 
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div className="text-center mb-20">
+          <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="mb-20 text-center">
               <motion.h2
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.8 }}
-                className="text-5xl md:text-7xl font-black tracking-tight mb-6"
+                className="mb-6 text-5xl font-black tracking-tight md:text-7xl"
               >
                 Simple, <span className="text-primary italic">transparent</span> pricing.
               </motion.h2>
@@ -817,13 +933,13 @@ export default function LandingPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.8, delay: 0.1 }}
-                className="text-xl text-muted-foreground font-medium max-w-2xl mx-auto"
+                className="text-muted-foreground mx-auto max-w-2xl text-xl font-medium"
               >
                 No hidden fees. No complicated tiers. Pick a plan that scales with your growth.
               </motion.p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
               {[
                 {
                   id: "free",
@@ -839,7 +955,13 @@ export default function LandingPage() {
                   name: "Growth",
                   price: "₹1,999",
                   period: "month",
-                  features: ["1 phone number", "200 voice minutes", "500 SMS/month", "Email support", "3 staff members"],
+                  features: [
+                    "1 phone number",
+                    "200 voice minutes",
+                    "500 SMS/month",
+                    "Email support",
+                    "3 staff members",
+                  ],
                   highlight: true,
                   description: "Full power for growing teams.",
                 },
@@ -848,7 +970,14 @@ export default function LandingPage() {
                   name: "Pro",
                   price: "₹4,999",
                   period: "month",
-                  features: ["3 phone numbers", "1000 voice minutes", "2000 SMS/month", "Priority support", "Analytics", "10 staff members"],
+                  features: [
+                    "3 phone numbers",
+                    "1000 voice minutes",
+                    "2000 SMS/month",
+                    "Priority support",
+                    "Analytics",
+                    "10 staff members",
+                  ],
                   highlight: false,
                   description: "Professional grade operations.",
                 },
@@ -857,34 +986,49 @@ export default function LandingPage() {
                   name: "Enterprise",
                   price: "₹14,999",
                   period: "month",
-                  features: ["Unlimited numbers", "Unlimited voice", "Unlimited SMS", "SLA guarantee", "Dedicated support", "Custom integrations"],
+                  features: [
+                    "Unlimited numbers",
+                    "Unlimited voice",
+                    "Unlimited SMS",
+                    "SLA guarantee",
+                    "Dedicated support",
+                    "Custom integrations",
+                  ],
                   highlight: false,
                   description: "Custom scale and security.",
                 },
               ].map((plan) => (
                 <SpotlightCard
                   key={plan.name}
-                  className={`p-8 flex flex-col justify-between overflow-hidden shadow-none ${plan.highlight
-                    ? "border-primary/40 bg-primary/5 scale-105 shadow-2xl shadow-primary/10"
-                    : "border-border/40 bg-background/20"
-                    }`}
+                  className={`flex flex-col justify-between overflow-hidden p-8 shadow-none ${
+                    plan.highlight
+                      ? "border-primary/40 bg-primary/5 shadow-primary/10 scale-105 shadow-2xl"
+                      : "border-border/40 bg-background/20"
+                  }`}
                 >
                   {plan.highlight && (
-                    <div className="absolute top-0 right-0 px-4 py-1 bg-primary text-primary-foreground text-[10px] font-black uppercase tracking-widest rounded-bl-xl z-20">
+                    <div className="bg-primary text-primary-foreground absolute top-0 right-0 z-20 rounded-bl-xl px-4 py-1 text-[10px] font-black tracking-widest uppercase">
                       Popular
                     </div>
                   )}
                   <div>
-                    <h3 className="text-xl font-bold mb-2">{plan.name}</h3>
-                    <p className="text-xs text-muted-foreground mb-6 font-medium">{plan.description}</p>
+                    <h3 className="mb-2 text-xl font-bold">{plan.name}</h3>
+                    <p className="text-muted-foreground mb-6 text-xs font-medium">
+                      {plan.description}
+                    </p>
                     <div className="mb-8">
                       <span className="text-4xl font-black">{plan.price}</span>
-                      {plan.price !== "Free" && <span className="text-muted-foreground text-sm ml-2">/{plan.period}</span>}
+                      {plan.price !== "Free" && (
+                        <span className="text-muted-foreground ml-2 text-sm">/{plan.period}</span>
+                      )}
                     </div>
-                    <ul className="space-y-4 mb-8">
+                    <ul className="mb-8 space-y-4">
                       {plan.features.map((feature) => (
-                        <li key={feature} className="flex items-start gap-3 text-sm font-medium leading-tight">
-                          <CheckCheck className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                        <li
+                          key={feature}
+                          className="flex items-start gap-3 text-sm leading-tight font-medium"
+                        >
+                          <CheckCheck className="text-primary mt-0.5 h-4 w-4 shrink-0" />
                           <span>{feature}</span>
                         </li>
                       ))}
@@ -892,10 +1036,11 @@ export default function LandingPage() {
                   </div>
                   <Link href="/register">
                     <Button
-                      className={`w-full rounded-full h-12 font-bold transition-all duration-300 ${plan.highlight
-                        ? "bg-primary text-primary-foreground hover:opacity-90 shadow-lg shadow-primary/20"
-                        : "variant-outline hover:bg-muted/50 border-border/40 text-foreground"
-                        }`}
+                      className={`h-12 w-full rounded-full font-bold transition-all duration-300 ${
+                        plan.highlight
+                          ? "bg-primary text-primary-foreground shadow-primary/20 shadow-lg hover:opacity-90"
+                          : "variant-outline hover:bg-muted/50 border-border/40 text-foreground"
+                      }`}
                       variant={plan.highlight ? "default" : "outline"}
                     >
                       {plan.price === "Free" ? "Get Started Free" : "Subscribe Now"}
@@ -904,7 +1049,7 @@ export default function LandingPage() {
 
                   {/* Subtle design element for highlighted card */}
                   {plan.highlight && (
-                    <div className="absolute -right-8 -bottom-8 w-24 h-24 bg-primary/10 rounded-full blur-2xl -z-10" />
+                    <div className="bg-primary/10 absolute -right-8 -bottom-8 -z-10 h-24 w-24 rounded-full blur-2xl" />
                   )}
                 </SpotlightCard>
               ))}
@@ -912,28 +1057,26 @@ export default function LandingPage() {
           </div>
 
           {/* Ambient base glow */}
-          <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-2/3 h-1/2 bg-primary/5 blur-[150px] -z-10 rounded-full" />
+          <div className="bg-primary/5 absolute -top-24 left-1/2 -z-10 h-1/2 w-2/3 -translate-x-1/2 rounded-full blur-[150px]" />
         </section>
 
         {/* ─── Final CTA ─── */}
-        <section className="py-40 lg:py-64 relative overflow-hidden bg-gradient-to-b from-background to-primary/5">
+        <section className="from-background to-primary/5 relative overflow-hidden bg-gradient-to-b py-40 lg:py-64">
           <div className="absolute inset-0 z-0">
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-r from-primary/10 via-purple-500/10 to-transparent rounded-full blur-[150px] animate-pulse-slow" />
+            <div className="from-primary/10 animate-pulse-slow absolute top-1/2 left-1/2 h-[800px] w-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-r via-purple-500/10 to-transparent blur-[150px]" />
           </div>
 
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+          <div className="relative z-10 mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
             <motion.h2
               initial={{ opacity: 0, y: 40, scale: 0.95 }}
               whileInView={{ opacity: 1, y: 0, scale: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-              className="text-6xl md:text-8xl font-black tracking-[-0.05em] leading-[0.9] text-foreground mb-12"
+              className="text-foreground mb-12 text-6xl leading-[0.9] font-black tracking-[-0.05em] md:text-8xl"
             >
               The platform you
               <br />
-              <span className="text-foreground/30">
-                deserve.
-              </span>
+              <span className="text-foreground/30">deserve.</span>
             </motion.h2>
 
             <motion.div
@@ -941,18 +1084,18 @@ export default function LandingPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-              className="flex flex-col sm:flex-row items-center justify-center gap-6"
+              className="flex flex-col items-center justify-center gap-6 sm:flex-row"
             >
               <MagneticButton>
                 <Link href="/register">
                   <Button
                     size="lg"
-                    className="h-20 px-14 rounded-full text-xl font-black bg-foreground text-background shadow-2xl shadow-foreground/20 hover:scale-[1.05] active:scale-[0.95] transition-all duration-500 ease-out relative overflow-hidden group"
+                    className="bg-foreground text-background shadow-foreground/20 group relative h-20 overflow-hidden rounded-full px-14 text-xl font-black shadow-2xl transition-all duration-500 ease-out hover:scale-[1.05] active:scale-[0.95]"
                   >
                     <span className="relative z-10 flex items-center gap-3">
                       Start Building Now
                     </span>
-                    <span className="absolute inset-0 rounded-full border border-background/20 scale-150 opacity-0 group-hover:opacity-100 group-hover:scale-100 transition-all duration-700 ease-out" />
+                    <span className="border-background/20 absolute inset-0 scale-150 rounded-full border opacity-0 transition-all duration-700 ease-out group-hover:scale-100 group-hover:opacity-100" />
                   </Button>
                 </Link>
               </MagneticButton>
@@ -962,22 +1105,22 @@ export default function LandingPage() {
       </main>
 
       {/* ─── FOOTER ─── */}
-      <footer className="bg-background py-8 border-t border-border/40 relative z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-8">
-            <div className="flex items-center gap-3 opacity-60 hover:opacity-100 transition-opacity">
+      <footer className="bg-background border-border/40 relative z-10 border-t py-8">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col items-center justify-between gap-8 md:flex-row">
+            <div className="flex items-center gap-3 opacity-60 transition-opacity hover:opacity-100">
               <Logo variant="full" size={24} />
             </div>
             <div className="flex items-center gap-8">
               <Link
                 href="/privacy"
-                className="text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors"
+                className="text-muted-foreground hover:text-foreground text-sm font-semibold transition-colors"
               >
                 Privacy
               </Link>
               <Link
                 href="/terms"
-                className="text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors"
+                className="text-muted-foreground hover:text-foreground text-sm font-semibold transition-colors"
               >
                 Terms
               </Link>

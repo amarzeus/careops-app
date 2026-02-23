@@ -27,7 +27,7 @@ export async function recoverUser(email: string) {
   console.log("👤 User Found:");
   console.log(`  ID: ${user.id}`);
   console.log(`  Name: ${user.name}`);
-  console.log(`  Current Workspace ID: ${user.workspaceId || 'NULL'}`);
+  console.log(`  Current Workspace ID: ${user.workspaceId || "NULL"}`);
 
   if (user.workspace) {
     console.log("\n✅ User already has a workspace!");
@@ -42,9 +42,9 @@ export async function recoverUser(email: string) {
     where: {
       NOT: {
         users: {
-          some: {}
-        }
-      }
+          some: {},
+        },
+      },
     },
     take: 5,
   });

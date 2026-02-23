@@ -11,13 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
 
@@ -112,7 +106,7 @@ export function WebhooksSection() {
       <CardHeader>
         <div className="flex items-center gap-2">
           <CardTitle>Webhooks</CardTitle>
-          <Badge variant="secondary" className="bg-purple-100 text-purple-700 text-[10px]">
+          <Badge variant="secondary" className="bg-purple-100 text-[10px] text-purple-700">
             ADVANCED
           </Badge>
         </div>
@@ -121,8 +115,8 @@ export function WebhooksSection() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="p-4 bg-purple-50 rounded-lg border border-purple-100 space-y-4">
-          <div className="flex flex-col sm:flex-row gap-3 items-end">
+        <div className="space-y-4 rounded-lg border border-purple-100 bg-purple-50 p-4">
+          <div className="flex flex-col items-end gap-3 sm:flex-row">
             <div className="w-full space-y-1.5">
               <label className="text-xs font-medium text-purple-900">Endpoint URL</label>
               <Input
@@ -132,7 +126,7 @@ export function WebhooksSection() {
                 className="bg-background"
               />
             </div>
-            <div className="w-full sm:w-[200px] space-y-1.5">
+            <div className="w-full space-y-1.5 sm:w-[200px]">
               <label className="text-xs font-medium text-purple-900">Event</label>
               <Select value={newEvent} onValueChange={setNewEvent}>
                 <SelectTrigger className="bg-background">
@@ -152,33 +146,36 @@ export function WebhooksSection() {
               disabled={adding || !newUrl}
               className="bg-purple-600 hover:bg-purple-700"
             >
-              {adding ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+              {adding ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
             </Button>
           </div>
         </div>
 
         {loading ? (
-          <div className="text-center py-4 text-sm text-muted-foreground">Loading webhooks...</div>
+          <div className="text-muted-foreground py-4 text-center text-sm">Loading webhooks...</div>
         ) : (
           <div className="space-y-2">
             {webhooks.length === 0 && (
-              <div className="text-center py-6 border-2 border-dashed rounded-lg text-muted-foreground text-sm">
+              <div className="text-muted-foreground rounded-lg border-2 border-dashed py-6 text-center text-sm">
                 No webhooks configured. Add one above.
               </div>
             )}
             {webhooks.map((hook) => (
-              <div key={hook.id} className="flex items-center justify-between p-3 border rounded-lg bg-background group hover:border-purple-200 transition-colors">
+              <div
+                key={hook.id}
+                className="bg-background group flex items-center justify-between rounded-lg border p-3 transition-colors hover:border-purple-200"
+              >
                 <div className="flex items-center gap-3 overflow-hidden">
-                  <div className="w-8 h-8 bg-purple-100 rounded-md flex items-center justify-center shrink-0">
-                    <WebhookIcon className="w-4 h-4 text-purple-600" />
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-purple-100">
+                    <WebhookIcon className="h-4 w-4 text-purple-600" />
                   </div>
                   <div className="min-w-0">
-                    <p className="font-medium text-sm truncate pr-4">{hook.url}</p>
+                    <p className="truncate pr-4 text-sm font-medium">{hook.url}</p>
                     <div className="flex items-center gap-2">
-                      <Badge variant="outline" className="text-[10px] h-5 px-1.5">
-                        {triggerOptions.find(o => o.value === hook.event)?.label || hook.event}
+                      <Badge variant="outline" className="h-5 px-1.5 text-[10px]">
+                        {triggerOptions.find((o) => o.value === hook.event)?.label || hook.event}
                       </Badge>
-                      <span className="text-[10px] text-muted-foreground">
+                      <span className="text-muted-foreground text-[10px]">
                         {new Date(hook.createdAt).toLocaleDateString()}
                       </span>
                     </div>
@@ -187,10 +184,10 @@ export function WebhooksSection() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="text-muted-foreground hover:text-red-600 shrink-0"
+                  className="text-muted-foreground shrink-0 hover:text-red-600"
                   onClick={() => handleDeleteWebhook(hook.id)}
                 >
-                  <Trash2 className="w-4 h-4" />
+                  <Trash2 className="h-4 w-4" />
                 </Button>
               </div>
             ))}

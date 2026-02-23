@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getCurrentUser } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+import { NextRequest, NextResponse } from "next/server";
+import { getCurrentUser } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 
-import { getPlanLimits } from '@/lib/razorpay';
+import { getPlanLimits } from "@/lib/razorpay";
 
 /**
  *
@@ -12,11 +12,11 @@ export async function GET(req: NextRequest) {
   try {
     const user = await getCurrentUser();
     if (!user?.workspaceId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(req.url);
-    const activeOnly = searchParams.get('active') === 'true';
+    const activeOnly = searchParams.get("active") === "true";
 
     const where: Record<string, unknown> = {
       workspaceId: user.workspaceId,
@@ -31,16 +31,13 @@ export async function GET(req: NextRequest) {
       include: {
         voiceAgent: true,
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
 
     return NextResponse.json(numbers);
   } catch (error) {
-    console.error('[PhoneNumber:GET] Error:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch phone numbers' },
-      { status: 500 }
-    );
+    console.error("[PhoneNumber:GET] Error:", error);
+    return NextResponse.json({ error: "Failed to fetch phone numbers" }, { status: 500 });
   }
 }
 
@@ -52,7 +49,7 @@ export async function POST(req: NextRequest) {
   try {
     const user = await getCurrentUser();
     if (!user?.workspaceId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const subscription = await prisma.subscription.findUnique({
@@ -71,27 +68,19 @@ export async function POST(req: NextRequest) {
 
       if (currentCount >= maxPhoneNumbers) {
         return NextResponse.json(
-          { error: `Phone number limit reached. Your plan allows ${maxPhoneNumbers} phone number(s). Please upgrade to add more.` },
+          {
+            error: `Phone number limit reached. Your plan allows ${maxPhoneNumbers} phone number(s). Please upgrade to add more.`,
+          },
           { status: 402 }
         );
       }
     }
 
     const body = await req.json();
-    const {
-      phoneNumber,
-      label,
-      vapiPhoneId,
-      forwardToStaff,
-      forwardNumber,
-      voiceAgentId,
-    } = body;
+    const { phoneNumber, label, vapiPhoneId, forwardToStaff, forwardNumber, voiceAgentId } = body;
 
     if (!phoneNumber) {
-      return NextResponse.json(
-        { error: 'Phone number is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Phone number is required" }, { status: 400 });
     }
 
     const existing = await prisma.phoneNumber.findUnique({
@@ -99,10 +88,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (existing) {
-      return NextResponse.json(
-        { error: 'Phone number already exists' },
-        { status: 409 }
-      );
+      return NextResponse.json({ error: "Phone number already exists" }, { status: 409 });
     }
 
     if (voiceAgentId) {
@@ -114,10 +100,7 @@ export async function POST(req: NextRequest) {
       });
 
       if (!agent) {
-        return NextResponse.json(
-          { error: 'Voice agent not found' },
-          { status: 404 }
-        );
+        return NextResponse.json({ error: "Voice agent not found" }, { status: 404 });
       }
     }
 
@@ -135,10 +118,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(number, { status: 201 });
   } catch (error) {
-    console.error('[PhoneNumber:POST] Error:', error);
-    return NextResponse.json(
-      { error: 'Failed to create phone number' },
-      { status: 500 }
-    );
+    console.error("[PhoneNumber:POST] Error:", error);
+    return NextResponse.json({ error: "Failed to create phone number" }, { status: 500 });
   }
 }

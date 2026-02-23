@@ -26,16 +26,11 @@ export async function POST(req: Request) {
   const user = await getCurrentUser();
   if (!user || !user.workspaceId)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  if (user.role !== "OWNER")
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (user.role !== "OWNER") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-  const { name, trigger, messageTemplate, delayMinutes, isActive } =
-    await req.json();
+  const { name, trigger, messageTemplate, delayMinutes, isActive } = await req.json();
   if (!name || !trigger)
-    return NextResponse.json(
-      { error: "Name and trigger are required" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Name and trigger are required" }, { status: 400 });
 
   const rule = await prisma.automationRule.create({
     data: {

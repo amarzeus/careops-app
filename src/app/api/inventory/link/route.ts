@@ -32,8 +32,7 @@ export async function POST(req: Request) {
   if (!user || !user.workspaceId)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  if (user.role !== "OWNER")
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (user.role !== "OWNER") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const { serviceId, inventoryId, quantity } = await req.json();
 
@@ -79,14 +78,12 @@ export async function DELETE(req: Request) {
   if (!user || !user.workspaceId)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  if (user.role !== "OWNER")
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (user.role !== "OWNER") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const { searchParams } = new URL(req.url);
   const linkId = searchParams.get("id");
 
-  if (!linkId)
-    return NextResponse.json({ error: "Link ID is required" }, { status: 400 });
+  if (!linkId) return NextResponse.json({ error: "Link ID is required" }, { status: 400 });
 
   const link = await prisma.serviceInventoryLink.findUnique({
     where: { id: linkId },

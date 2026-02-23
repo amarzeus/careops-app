@@ -30,12 +30,10 @@ export async function POST(req: Request) {
   const user = await getCurrentUser();
   if (!user || !user.workspaceId)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  if (user.role !== "OWNER")
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (user.role !== "OWNER") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const { name, description, fields, serviceId, documents } = await req.json();
-  if (!name)
-    return NextResponse.json({ error: "Form name is required" }, { status: 400 });
+  if (!name) return NextResponse.json({ error: "Form name is required" }, { status: 400 });
 
   const form = await prisma.intakeForm.create({
     data: {

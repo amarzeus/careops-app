@@ -94,23 +94,25 @@ To experience the full power of CareOps without manual setup, you can seed a com
 
 ### 🔐 Login Credentials
 
-| Role | Email | Password |
-|------|-------|----------|
-| **OWNER** | `testowner@careops.test` | `Test@1234` |
-| STAFF | `jordan.smith@careops.test` | `Staff@1234` |
-| STAFF | `casey.lee@careops.test` | `Staff@1234` |
-| STAFF | `morgan.chen@careops.test` | `Staff@1234` |
-| STAFF | `riley.patel@careops.test` | `Staff@1234` |
-| STAFF | `drew.kim@careops.test` | `Staff@1234` |
+| Role      | Email                       | Password     |
+| --------- | --------------------------- | ------------ |
+| **OWNER** | `testowner@careops.test`    | `Test@1234`  |
+| STAFF     | `jordan.smith@careops.test` | `Staff@1234` |
+| STAFF     | `casey.lee@careops.test`    | `Staff@1234` |
+| STAFF     | `morgan.chen@careops.test`  | `Staff@1234` |
+| STAFF     | `riley.patel@careops.test`  | `Staff@1234` |
+| STAFF     | `drew.kim@careops.test`     | `Staff@1234` |
 
 ### 📊 Seeded Workspace: "CareOps Test Clinic"
 
 Run the following command to populate your local database:
+
 ```bash
 npx dotenv -e .env -- npx ts-node --compiler-options '{"module":"commonjs"}' prisma/seed-test-account.ts
 ```
 
 **What’s inside:**
+
 - **Contacts:** 20 diverse contacts with message histories.
 - **Bookings:** 12 bookings across all statuses (Confirmed, Pending, Completed, etc.).
 - **Inventory:** 8 items, with 5 flagged as **Low Stock** (triggering alerts).
@@ -119,6 +121,7 @@ npx dotenv -e .env -- npx ts-node --compiler-options '{"module":"commonjs"}' pri
 - **Alerts:** 8 active alerts on the dashboard (Inventory, Booking, and Automation).
 
 ### 🌐 Public Access (Local)
+
 - **Booking Page:** http://localhost:3000/book/cmlxxk4uf0000cvawxfjiqbkr
 - **Contact Form:** http://localhost:3000/contact/careops-clinic-cmlxxk4u
 

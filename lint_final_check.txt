@@ -1,0 +1,63 @@
+
+> careops-app@0.1.0 lint
+> eslint
+
+
+/home/amar/Desktop/Testing and Fixing/careops-app/playwright.config.ts
+  9:7  error  'shouldUseLocalWebServer' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+/home/amar/Desktop/Testing and Fixing/careops-app/prisma/seed-test-account.ts
+  20:1  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+
+/home/amar/Desktop/Testing and Fixing/careops-app/src/app/(dashboard)/bookings/page.tsx
+   56:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  120:44  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Desktop/Testing and Fixing/careops-app/src/app/(dashboard)/inventory/page.tsx
+   50:38  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  128:45  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Desktop/Testing and Fixing/careops-app/src/app/(public)/contact/[slug]/page.tsx
+  27:36  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Desktop/Testing and Fixing/careops-app/src/app/(public)/contact/page.tsx
+  14:16  warning  Missing JSDoc comment  jsdoc/require-jsdoc
+
+/home/amar/Desktop/Testing and Fixing/careops-app/src/app/(public)/form/[slug]/page.tsx
+  25:36  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Desktop/Testing and Fixing/careops-app/src/app/api/automation/[id]/test/route.ts
+  56:32  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Desktop/Testing and Fixing/careops-app/src/app/onboarding/page.tsx
+   52:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  474:52  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Desktop/Testing and Fixing/careops-app/src/components/voice-assistant.tsx
+  522:50   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  522:80   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  522:151  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  522:181  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Desktop/Testing and Fixing/careops-app/src/lib/gemini.ts
+    92:1   warning  Missing JSDoc comment                                                                                  jsdoc/require-jsdoc
+   874:17  warning  Unexpected any. Specify a different type                                                               @typescript-eslint/no-explicit-any
+   956:19  warning  Unexpected any. Specify a different type                                                               @typescript-eslint/no-explicit-any
+   988:1   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+   990:12  warning  Unexpected any. Specify a different type                                                               @typescript-eslint/no-explicit-any
+  1198:19  warning  Unexpected any. Specify a different type                                                               @typescript-eslint/no-explicit-any
+  1202:22  warning  Unexpected any. Specify a different type                                                               @typescript-eslint/no-explicit-any
+
+/home/amar/Desktop/Testing and Fixing/careops-app/src/lib/google-calendar.ts
+  250:12  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/amar/Desktop/Testing and Fixing/careops-app/src/lib/razorpay.ts
+  160:3  warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+
+/home/amar/Desktop/Testing and Fixing/careops-app/tests/unit/booking-submission.test.tsx
+   82:22  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  110:22  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+✖ 27 problems (1 error, 26 warnings)
+  0 errors and 5 warnings potentially fixable with the `--fix` option.
+

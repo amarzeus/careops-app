@@ -131,12 +131,10 @@ export function RuleList({
 }: RuleListProps) {
   if (rules.length === 0) {
     return (
-      <div className="text-center py-20">
-        <Zap className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-        <h3 className="text-lg font-medium text-muted-foreground">
-          No automation rules
-        </h3>
-        <p className="text-sm text-muted-foreground mt-1">
+      <div className="py-20 text-center">
+        <Zap className="text-muted-foreground mx-auto mb-4 h-16 w-16" />
+        <h3 className="text-muted-foreground text-lg font-medium">No automation rules</h3>
+        <p className="text-muted-foreground mt-1 text-sm">
           Create rules to automate your workflows
         </p>
       </div>
@@ -144,15 +142,12 @@ export function RuleList({
   }
 
   // Group rules by trigger type
-  const groupedRules = rules.reduce<Record<string, AutomationRuleDTO[]>>(
-    (acc, rule) => {
-      const trigger = rule.trigger || "OTHER";
-      if (!acc[trigger]) acc[trigger] = [];
-      acc[trigger].push(rule);
-      return acc;
-    },
-    {}
-  );
+  const groupedRules = rules.reduce<Record<string, AutomationRuleDTO[]>>((acc, rule) => {
+    const trigger = rule.trigger || "OTHER";
+    if (!acc[trigger]) acc[trigger] = [];
+    acc[trigger].push(rule);
+    return acc;
+  }, {});
 
   return (
     <div className="space-y-6">
@@ -162,23 +157,18 @@ export function RuleList({
         return (
           <div key={trigger}>
             {/* Group header */}
-            <div className="flex items-center gap-2 mb-3">
-              <GroupIcon className={`w-4 h-4 ${config.color}`} />
-              <h3 className="text-sm font-semibold text-muted-foreground">
-                {config.label}
-              </h3>
+            <div className="mb-3 flex items-center gap-2">
+              <GroupIcon className={`h-4 w-4 ${config.color}`} />
+              <h3 className="text-muted-foreground text-sm font-semibold">{config.label}</h3>
               <Badge variant="secondary" className="text-[10px]">
                 {triggerRules.length}
               </Badge>
-              <p className="text-xs text-muted-foreground ml-2">
-                {triggerDescriptions[trigger]}
-              </p>
+              <p className="text-muted-foreground ml-2 text-xs">{triggerDescriptions[trigger]}</p>
             </div>
 
             <div className="space-y-3">
               {triggerRules.map((rule) => {
-                const ruleConfig =
-                  triggerConfig[rule.trigger] || triggerConfig.NEW_CONTACT;
+                const ruleConfig = triggerConfig[rule.trigger] || triggerConfig.NEW_CONTACT;
                 const Icon = ruleConfig.icon;
                 return (
                   <Card key={rule.id}>
@@ -186,15 +176,15 @@ export function RuleList({
                       {/* Flow card: trigger -> action */}
                       <div className="flex items-center gap-4">
                         <div
-                          className={`w-10 h-10 ${ruleConfig.bgColor} rounded-lg flex items-center justify-center`}
+                          className={`h-10 w-10 ${ruleConfig.bgColor} flex items-center justify-center rounded-lg`}
                         >
-                          <Icon className={`w-5 h-5 ${ruleConfig.color}`} />
+                          <Icon className={`h-5 w-5 ${ruleConfig.color}`} />
                         </div>
-                        <ArrowRight className="w-4 h-4 text-muted-foreground shrink-0" />
-                        <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
-                          <Mail className="w-5 h-5 text-primary" />
+                        <ArrowRight className="text-muted-foreground h-4 w-4 shrink-0" />
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50">
+                          <Mail className="text-primary h-5 w-5" />
                         </div>
-                        <div className="flex-1 min-w-0">
+                        <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2">
                             <p className="font-medium">{rule.name}</p>
                             <Badge
@@ -205,18 +195,18 @@ export function RuleList({
                             </Badge>
                           </div>
                           {rule.messageTemplate && (
-                            <p className="text-xs text-muted-foreground mt-1 truncate max-w-md">
+                            <p className="text-muted-foreground mt-1 max-w-md truncate text-xs">
                               {rule.messageTemplate}
                             </p>
                           )}
-                          <div className="flex items-center gap-3 mt-1">
+                          <div className="mt-1 flex items-center gap-3">
                             {rule.delayMinutes > 0 && (
-                              <span className="text-[10px] text-muted-foreground">
+                              <span className="text-muted-foreground text-[10px]">
                                 Delay: {rule.delayMinutes} min
                               </span>
                             )}
-                            <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
-                              <Clock className="w-3 h-3" />
+                            <span className="text-muted-foreground flex items-center gap-1 text-[10px]">
+                              <Clock className="h-3 w-3" />
                               Last triggered: {getRelativeTime(rule.createdAt)}
                             </span>
                           </div>
@@ -228,7 +218,7 @@ export function RuleList({
                             className="text-xs"
                             onClick={() => onEdit(rule)}
                           >
-                            <Pencil className="w-3.5 h-3.5 mr-1" />
+                            <Pencil className="mr-1 h-3.5 w-3.5" />
                             Edit
                           </Button>
                           <Button
@@ -238,7 +228,7 @@ export function RuleList({
                             onClick={() => onTest(rule.id)}
                             disabled={testingId === rule.id}
                           >
-                            <PlayCircle className="w-3.5 h-3.5 mr-1" />
+                            <PlayCircle className="mr-1 h-3.5 w-3.5" />
                             {testingId === rule.id ? "Tested" : "Test"}
                           </Button>
                           <Switch
@@ -248,12 +238,8 @@ export function RuleList({
 
                           <Dialog>
                             <DialogTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="text-red-500"
-                              >
-                                <Trash2 className="w-4 h-4" />
+                              <Button variant="ghost" size="sm" className="text-red-500">
+                                <Trash2 className="h-4 w-4" />
                               </Button>
                             </DialogTrigger>
                             <DialogContent>
@@ -261,10 +247,8 @@ export function RuleList({
                                 <DialogTitle>Delete Automation Rule</DialogTitle>
                                 <DialogDescription>
                                   Are you sure you want to delete{" "}
-                                  <span className="font-semibold">
-                                    &quot;{rule.name}&quot;
-                                  </span>
-                                  ? This action cannot be undone.
+                                  <span className="font-semibold">&quot;{rule.name}&quot;</span>?
+                                  This action cannot be undone.
                                 </DialogDescription>
                               </DialogHeader>
                               {/* DialogClose wraps Cancel to close the uncontrolled Dialog */}
@@ -277,9 +261,7 @@ export function RuleList({
                                   onClick={() => onDelete(rule.id)}
                                   disabled={deletingId === rule.id}
                                 >
-                                  {deletingId === rule.id
-                                    ? "Deleting..."
-                                    : "Delete Rule"}
+                                  {deletingId === rule.id ? "Deleting..." : "Delete Rule"}
                                 </Button>
                               </DialogFooter>
                             </DialogContent>

@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { createWorkspaceVoiceAgent, AGENT_TEMPLATES, type AgentTemplateKey } from "@/lib/vapi-platform";
+import {
+  createWorkspaceVoiceAgent,
+  AGENT_TEMPLATES,
+  type AgentTemplateKey,
+} from "@/lib/vapi-platform";
 
 /**
  *
@@ -14,7 +18,8 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { templateKey, businessName, services, businessHours, additionalInstructions, voiceId } = body;
+    const { templateKey, businessName, services, businessHours, additionalInstructions, voiceId } =
+      body;
 
     if (!templateKey || !AGENT_TEMPLATES[templateKey as AgentTemplateKey]) {
       return NextResponse.json({ error: "Invalid template" }, { status: 400 });

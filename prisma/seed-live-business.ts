@@ -384,7 +384,8 @@ async function main() {
       workspaceId: workspace.id,
       name: "Welcome New Contact",
       trigger: "NEW_CONTACT",
-      messageTemplate: "Welcome to {{workspace_name}}! We're glad you reached out. How can we help you today?",
+      messageTemplate:
+        "Welcome to {{workspace_name}}! We're glad you reached out. How can we help you today?",
       isActive: true,
     },
   });
@@ -404,7 +405,8 @@ async function main() {
       workspaceId: workspace.id,
       name: "Booking Reminder",
       trigger: "BEFORE_BOOKING",
-      messageTemplate: "Reminder: You have an upcoming appointment tomorrow. Please arrive 15 minutes early.",
+      messageTemplate:
+        "Reminder: You have an upcoming appointment tomorrow. Please arrive 15 minutes early.",
       delayMinutes: 1440, // 24 hours before
       isActive: true,
     },

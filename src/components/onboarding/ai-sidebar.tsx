@@ -53,13 +53,13 @@ export function AISidebar({
   }, [chatMessages]);
 
   return (
-    <div className="w-80 border-l bg-background flex flex-col h-[calc(100vh-64px)] sticky top-16 hidden lg:flex shadow-sm">
-      <div className="p-4 border-b bg-gradient-to-r from-blue-50 to-white">
-        <h3 className="font-semibold text-sm flex items-center gap-2 text-blue-900">
-          <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
+    <div className="bg-background sticky top-16 flex hidden h-[calc(100vh-64px)] w-80 flex-col border-l shadow-sm lg:flex">
+      <div className="border-b bg-gradient-to-r from-blue-50 to-white p-4">
+        <h3 className="flex items-center gap-2 text-sm font-semibold text-blue-900">
+          <div className="h-2 w-2 animate-pulse rounded-full bg-blue-500" />
           CareOps Assistant
         </h3>
-        <p className="text-xs text-muted-foreground mt-1">
+        <p className="text-muted-foreground mt-1 text-xs">
           I can help you fill forms and set up your workspace.
         </p>
       </div>
@@ -70,10 +70,10 @@ export function AISidebar({
             <div
               key={i}
               className={cn(
-                "p-3 rounded-lg text-sm max-w-[90%]",
+                "max-w-[90%] rounded-lg p-3 text-sm",
                 msg.role === "assistant"
                   ? "bg-muted/30 text-muted-foreground rounded-tl-none"
-                  : "bg-primary text-white ml-auto rounded-tr-none"
+                  : "bg-primary ml-auto rounded-tr-none text-white"
               )}
             >
               {msg.content}
@@ -81,13 +81,13 @@ export function AISidebar({
           ))}
           {chatLoading && (
             <div className="flex gap-1 p-2">
-              <div className="w-2 h-2 bg-muted/50 rounded-full animate-bounce" />
+              <div className="bg-muted/50 h-2 w-2 animate-bounce rounded-full" />
               <div
-                className="w-2 h-2 bg-muted/50 rounded-full animate-bounce"
+                className="bg-muted/50 h-2 w-2 animate-bounce rounded-full"
                 style={{ animationDelay: "0.2s" }}
               />
               <div
-                className="w-2 h-2 bg-muted/50 rounded-full animate-bounce"
+                className="bg-muted/50 h-2 w-2 animate-bounce rounded-full"
                 style={{ animationDelay: "0.4s" }}
               />
             </div>
@@ -96,34 +96,31 @@ export function AISidebar({
         </div>
       </ScrollArea>
 
-      <div className="p-4 border-t bg-muted/30">
+      <div className="bg-muted/30 border-t p-4">
         {voiceMode ? (
-          <InlineVoiceMode
-            onTranscript={onVoiceTranscript}
-            onClose={() => setVoiceMode(false)}
-          />
+          <InlineVoiceMode onTranscript={onVoiceTranscript} onClose={() => setVoiceMode(false)} />
         ) : (
           <div className="flex gap-2">
             <Button
               variant="outline"
               size="icon"
-              className="shrink-0 rounded-full h-10 w-10 border-blue-200 text-primary hover:bg-blue-50 hover:text-primary/90"
+              className="text-primary hover:text-primary/90 h-10 w-10 shrink-0 rounded-full border-blue-200 hover:bg-blue-50"
               onClick={() => setVoiceMode(true)}
             >
               <Mic className="h-4 w-4" />
             </Button>
-            <div className="flex-1 relative">
+            <div className="relative flex-1">
               <Input
                 value={chatInput}
                 onChange={(e) => setChatInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && onSendMessage()}
                 placeholder="Type or speak..."
-                className="pr-8 rounded-full border-border/40 focus-visible:ring-blue-500"
+                className="border-border/40 rounded-full pr-8 focus-visible:ring-blue-500"
               />
               <button
                 onClick={onSendMessage}
                 disabled={!chatInput.trim() || chatLoading}
-                className="absolute right-1 top-1 h-8 w-8 flex items-center justify-center text-primary hover:text-blue-800 disabled:opacity-50"
+                className="text-primary absolute top-1 right-1 flex h-8 w-8 items-center justify-center hover:text-blue-800 disabled:opacity-50"
               >
                 <ArrowRight className="h-4 w-4" />
               </button>

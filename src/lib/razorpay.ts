@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import Razorpay from "razorpay";
 import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
@@ -64,7 +65,13 @@ export const PLANS = {
       phoneNumbers: -1,
       staff: -1,
     },
-    features: ["Everything in Pro", "Unlimited Numbers", "SLA", "Dedicated Support", "Custom Integrations"],
+    features: [
+      "Everything in Pro",
+      "Unlimited Numbers",
+      "SLA",
+      "Dedicated Support",
+      "Custom Integrations",
+    ],
   },
 } as const;
 
@@ -73,9 +80,7 @@ export type PlanKey = keyof typeof PLANS;
 /**
  *
  */
-export async function createRazorpayPlan(
-  planKey: PlanKey
-): Promise<{ id: string }> {
+export async function createRazorpayPlan(planKey: PlanKey): Promise<{ id: string }> {
   const razorpay = getRazorpayInstance();
   const plan = PLANS[planKey];
 
@@ -110,7 +115,8 @@ export async function createRazorpaySubscription(params: {
 
   // 1. Resolve Plan ID (if planKey was passed instead of a real ID)
   let realPlanId = params.planId;
-  let planKey: PlanKey = (params.planId as any) === "free" ? "free" : getPlanKeyFromPlanId(params.planId);
+  let planKey: PlanKey =
+    (params.planId as any) === "free" ? "free" : getPlanKeyFromPlanId(params.planId);
 
   if (params.planId === "growth" || params.planId === "pro" || params.planId === "enterprise") {
     planKey = params.planId as PlanKey;
@@ -133,7 +139,7 @@ export async function createRazorpaySubscription(params: {
         email: params.customerEmail,
         notes: { workspaceId: params.workspaceId },
       });
-      customerId = (razorpayCustomer as unknown as { id: string }).id;
+      customerId = (razorpayCustomer as any as { id: string }).id;
     } catch (error: any) {
       // If customer already exists, fetch them
       if (error.error?.description === "Customer already exists for the merchant") {
@@ -152,7 +158,7 @@ export async function createRazorpaySubscription(params: {
   }
 
   // 3. Create Subscription
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   const subscriptionsApi = razorpay.subscriptions as any;
   const subscription = await subscriptionsApi.create({
     plan_id: realPlanId,
@@ -204,10 +210,7 @@ export function verifyRazorpayWebhookSignature(
   signature: string,
   secret: string
 ): boolean {
-  const expectedSignature = crypto
-    .createHmac("sha256", secret)
-    .update(body)
-    .digest("hex");
+  const expectedSignature = crypto.createHmac("sha256", secret).update(body).digest("hex");
   return expectedSignature === signature;
 }
 
@@ -217,7 +220,8 @@ export function verifyRazorpayWebhookSignature(
 export function getPlanKeyFromPlanId(planId: string): PlanKey {
   if (planId.includes("growth") || planId === PLANS.growth.name.toLowerCase()) return "growth";
   if (planId.includes("pro") || planId === PLANS.pro.name.toLowerCase()) return "pro";
-  if (planId.includes("enterprise") || planId === PLANS.enterprise.name.toLowerCase()) return "enterprise";
+  if (planId.includes("enterprise") || planId === PLANS.enterprise.name.toLowerCase())
+    return "enterprise";
   return "free";
 }
 

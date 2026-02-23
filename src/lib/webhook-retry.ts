@@ -28,13 +28,13 @@ export async function scheduleWebhookRetry(
 ): Promise<void> {
   if (attemptNumber >= MAX_RETRIES) {
     console.log(`[WebhookRetry] Max retries reached for delivery ${deliveryLogId}`);
-    
+
     // Create alert for failed webhook
     const deliveryLog = await prisma.webhookDeliveryLog.findUnique({
       where: { id: deliveryLogId },
-      include: { webhook: true }
+      include: { webhook: true },
     });
-    
+
     if (deliveryLog) {
       await prisma.alert.create({
         data: {
@@ -46,7 +46,7 @@ export async function scheduleWebhookRetry(
         },
       });
     }
-    
+
     return;
   }
 
@@ -62,7 +62,9 @@ export async function scheduleWebhookRetry(
     },
   });
 
-  console.log(`[WebhookRetry] Scheduled retry ${attemptNumber + 1} for ${deliveryLogId} at ${retryAt}`);
+  console.log(
+    `[WebhookRetry] Scheduled retry ${attemptNumber + 1} for ${deliveryLogId} at ${retryAt}`
+  );
 }
 
 /**
@@ -75,7 +77,7 @@ export async function processWebhookRetries(): Promise<{
   failed: number;
 }> {
   const now = new Date();
-  
+
   // Find pending retries that are due
   const pendingRetries = await prisma.webhookDeliveryLog.findMany({
     where: {
@@ -95,7 +97,7 @@ export async function processWebhookRetries(): Promise<{
     try {
       // Reconstruct the payload from the stored request body
       const payload: WebhookPayload = JSON.parse(deliveryLog.requestBody || "{}");
-      
+
       const payloadString = serializePayload(payload);
       const signature = deliveryLog.webhook.secret
         ? generateWebhookSignature(payloadString, deliveryLog.webhook.secret)
@@ -211,16 +213,16 @@ export async function manualWebhookRetry(
       });
       return { success: true, message: "Webhook delivered successfully" };
     } else {
-      return { 
-        success: false, 
-        message: `Delivery failed with status ${response.status}` 
+      return {
+        success: false,
+        message: `Delivery failed with status ${response.status}`,
       };
     }
   } catch (error) {
     console.error("[WebhookRetry] Manual retry error:", error);
-    return { 
-      success: false, 
-      message: error instanceof Error ? error.message : "Unknown error" 
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : "Unknown error",
     };
   }
 }

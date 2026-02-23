@@ -10,7 +10,31 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Public routes that don't need auth
-  const publicRoutes = ["/login", "/register", "/verify-otp", "/forgot-password", "/book", "/contact", "/form", "/search", "/api/public", "/api/booking", "/api/voice/tools", "/api/auth/login", "/api/auth/register", "/api/auth/verify-otp", "/api/auth/resend-otp", "/api/auth/send-sms-otp", "/api/auth/send-whatsapp-otp", "/api/auth/forgot-password", "/api/auth/google", "/api/test/seed", "/api/ai/voice", "/api/ai/chat", "/api/health"];
+  const publicRoutes = [
+    "/login",
+    "/register",
+    "/verify-otp",
+    "/forgot-password",
+    "/book",
+    "/contact",
+    "/form",
+    "/search",
+    "/api/public",
+    "/api/booking",
+    "/api/voice/tools",
+    "/api/auth/login",
+    "/api/auth/register",
+    "/api/auth/verify-otp",
+    "/api/auth/resend-otp",
+    "/api/auth/send-sms-otp",
+    "/api/auth/send-whatsapp-otp",
+    "/api/auth/forgot-password",
+    "/api/auth/google",
+    "/api/test/seed",
+    "/api/ai/voice",
+    "/api/ai/chat",
+    "/api/health",
+  ];
   const isPublicRoute = publicRoutes.some((route) => pathname.startsWith(route));
 
   if (isPublicRoute || pathname === "/") {
@@ -18,7 +42,18 @@ export function middleware(request: NextRequest) {
   }
 
   // Protected routes
-  if (!token && (pathname.startsWith("/dashboard") || pathname.startsWith("/inbox") || pathname.startsWith("/bookings") || pathname.startsWith("/forms") || pathname.startsWith("/inventory") || pathname.startsWith("/staff") || pathname.startsWith("/settings") || pathname.startsWith("/automation") || pathname.startsWith("/onboarding"))) {
+  if (
+    !token &&
+    (pathname.startsWith("/dashboard") ||
+      pathname.startsWith("/inbox") ||
+      pathname.startsWith("/bookings") ||
+      pathname.startsWith("/forms") ||
+      pathname.startsWith("/inventory") ||
+      pathname.startsWith("/staff") ||
+      pathname.startsWith("/settings") ||
+      pathname.startsWith("/automation") ||
+      pathname.startsWith("/onboarding"))
+  ) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 

@@ -8,10 +8,7 @@ import { prisma } from "@/lib/prisma";
  * @param root0
  * @param root0.params
  */
-export async function GET(
-  req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const user = await getCurrentUser();
   if (!user || !user.workspaceId)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -39,9 +36,6 @@ export async function GET(
     return NextResponse.json({ logs });
   } catch (error) {
     console.error("Inventory history error:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch inventory history" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch inventory history" }, { status: 500 });
   }
 }

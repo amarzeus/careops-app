@@ -13,30 +13,38 @@ export async function POST(req: Request) {
   try {
     const { email, phone, method = "email" } = await req.json();
 
-    const normalizedPhone = (method === "sms" && phone) ? normalizePhoneNumber(phone) : undefined;
+    const normalizedPhone = method === "sms" && phone ? normalizePhoneNumber(phone) : undefined;
 
-    console.log(`[ForgotPassword] Request: method=${method}, email=${email}, phone=${phone}, normalizedPhone=${normalizedPhone}`);
+    console.log(
+      `[ForgotPassword] Request: method=${method}, email=${email}, phone=${phone}, normalizedPhone=${normalizedPhone}`
+    );
 
     const user = await prisma.user.findFirst({
       where: method === "email" ? { email } : { phone: normalizedPhone },
     });
 
     if (!user) {
-      console.log(`[ForgotPassword] User not found for ${method === "email" ? email : normalizedPhone}`);
+      console.log(
+        `[ForgotPassword] User not found for ${method === "email" ? email : normalizedPhone}`
+      );
       // Return success even if user not found (security: don't reveal user existence)
       return NextResponse.json({
-        message: method === "email"
-          ? "If an account exists with this email, a reset code has been sent."
-          : "If an account exists with this phone number, a reset code has been sent."
+        message:
+          method === "email"
+            ? "If an account exists with this email, a reset code has been sent."
+            : "If an account exists with this phone number, a reset code has been sent.",
       });
     }
 
     const oneMinuteAgo = new Date(Date.now() - 60 * 1000);
     if (user.updatedAt > oneMinuteAgo) {
       console.log(`[ForgotPassword] Rate limited for user ${user.id}`);
-      return NextResponse.json({
-        error: "Please wait a moment before requesting another code."
-      }, { status: 429 });
+      return NextResponse.json(
+        {
+          error: "Please wait a moment before requesting another code.",
+        },
+        { status: 429 }
+      );
     }
 
     // Generate and store OTP
@@ -72,14 +80,18 @@ export async function POST(req: Request) {
 
       if (!smsSent) {
         console.error("Failed to send password reset SMS to", user.phone);
-        return NextResponse.json({ error: "Failed to send SMS. Please try email." }, { status: 500 });
+        return NextResponse.json(
+          { error: "Failed to send SMS. Please try email." },
+          { status: 500 }
+        );
       }
     }
 
     return NextResponse.json({
-      message: method === "email"
-        ? "Verification code sent to your email."
-        : "Verification code sent to your phone.",
+      message:
+        method === "email"
+          ? "Verification code sent to your email."
+          : "Verification code sent to your phone.",
       requiresOTP: true,
       email: user.email,
       phone: user.phone,

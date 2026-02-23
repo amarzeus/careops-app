@@ -6,7 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Bot, Loader2, Plus, X } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
@@ -124,7 +130,11 @@ export function AgentCustomizer({ workspaceId, onAgentCreated, onCancel }: Agent
 
     const validServices = services.filter((s) => s.name.trim());
     if (validServices.length === 0) {
-      toast({ title: "Error", description: "At least one service is required", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "At least one service is required",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -171,7 +181,7 @@ export function AgentCustomizer({ workspaceId, onAgentCreated, onCancel }: Agent
     <Card className="w-full">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Bot className="w-5 h-5" />
+          <Bot className="h-5 w-5" />
           Create Voice Agent
         </CardTitle>
         <CardDescription>
@@ -194,7 +204,7 @@ export function AgentCustomizer({ workspaceId, onAgentCreated, onCancel }: Agent
             </SelectContent>
           </Select>
           {selectedTemplateInfo && (
-            <p className="text-sm text-muted-foreground">{selectedTemplateInfo.description}</p>
+            <p className="text-muted-foreground text-sm">{selectedTemplateInfo.description}</p>
           )}
         </div>
 
@@ -212,12 +222,12 @@ export function AgentCustomizer({ workspaceId, onAgentCreated, onCancel }: Agent
           <div className="flex items-center justify-between">
             <Label>Services</Label>
             <Button type="button" variant="outline" size="sm" onClick={addService}>
-              <Plus className="w-4 h-4 mr-1" />
+              <Plus className="mr-1 h-4 w-4" />
               Add Service
             </Button>
           </div>
           {services.map((service, index) => (
-            <div key={index} className="flex gap-2 items-start">
+            <div key={index} className="flex items-start gap-2">
               <Input
                 placeholder="Service name"
                 value={service.name}
@@ -239,8 +249,13 @@ export function AgentCustomizer({ workspaceId, onAgentCreated, onCancel }: Agent
                 className="w-28"
               />
               {services.length > 1 && (
-                <Button type="button" variant="ghost" size="icon" onClick={() => removeService(index)}>
-                  <X className="w-4 h-4" />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => removeService(index)}
+                >
+                  <X className="h-4 w-4" />
                 </Button>
               )}
             </div>
@@ -271,21 +286,23 @@ export function AgentCustomizer({ workspaceId, onAgentCreated, onCancel }: Agent
         <div className="space-y-2">
           <Label>Operating Days</Label>
           <div className="flex flex-wrap gap-2">
-            {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((day) => (
-              <Badge
-                key={day}
-                variant={businessHours.days.includes(day) ? "default" : "outline"}
-                className="cursor-pointer"
-                onClick={() => {
-                  const newDays = businessHours.days.includes(day)
-                    ? businessHours.days.filter((d) => d !== day)
-                    : [...businessHours.days, day];
-                  setBusinessHours({ ...businessHours, days: newDays });
-                }}
-              >
-                {day.slice(0, 3)}
-              </Badge>
-            ))}
+            {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map(
+              (day) => (
+                <Badge
+                  key={day}
+                  variant={businessHours.days.includes(day) ? "default" : "outline"}
+                  className="cursor-pointer"
+                  onClick={() => {
+                    const newDays = businessHours.days.includes(day)
+                      ? businessHours.days.filter((d) => d !== day)
+                      : [...businessHours.days, day];
+                    setBusinessHours({ ...businessHours, days: newDays });
+                  }}
+                >
+                  {day.slice(0, 3)}
+                </Badge>
+              )
+            )}
           </div>
         </div>
 
@@ -309,7 +326,7 @@ export function AgentCustomizer({ workspaceId, onAgentCreated, onCancel }: Agent
           <Button onClick={handleCreate} disabled={creating || loading}>
             {creating ? (
               <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Creating...
               </>
             ) : (

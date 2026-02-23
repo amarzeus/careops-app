@@ -13,7 +13,6 @@ import {
 
 // ──── Types ────────────────────────────────────────────────────────────────────
 
-
 // ──── OTP via WhatsApp ─────────────────────────────────────────────────────────
 
 /**
@@ -22,10 +21,7 @@ import {
  * @param phone - Phone number in E.164 format (e.g., +919876543210)
  * @param otp - The OTP code to send
  */
-export async function sendOTPViaWhatsApp(
-  phone: string,
-  otp: string
-): Promise<TwilioResult> {
+export async function sendOTPViaWhatsApp(phone: string, otp: string): Promise<TwilioResult> {
   return twilioSendWhatsAppOTP(phone, otp);
 }
 
@@ -104,10 +100,7 @@ export async function sendWelcomeMessage(
  * @param phone
  * @param message
  */
-export async function sendTextMessage(
-  phone: string,
-  message: string
-): Promise<TwilioResult> {
+export async function sendTextMessage(phone: string, message: string): Promise<TwilioResult> {
   return twilioSendWhatsApp(phone, message);
 }
 

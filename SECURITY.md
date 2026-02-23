@@ -2,8 +2,8 @@
 
 ## Supported Versions
 
-| Version | Supported          |
-| ------- | ------------------ |
+| Version | Supported              |
+| ------- | ---------------------- |
 | 0.1.x   | ✅ Actively maintained |
 
 ## Reporting a Vulnerability
@@ -16,6 +16,7 @@ responsibly by emailing:
 📧 **amarzeus.dev@gmail.com**
 
 Please include the following details:
+
 - A description of the vulnerability and its potential impact
 - Steps to reproduce the issue
 - Any suggested mitigations

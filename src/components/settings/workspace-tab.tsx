@@ -26,10 +26,7 @@ interface WorkspaceTabProps {
   contactFormUrl: string;
 }
 
-const workspaceStatusConfig: Record<
-  string,
-  { label: string; color: string; bgColor: string }
-> = {
+const workspaceStatusConfig: Record<string, { label: string; color: string; bgColor: string }> = {
   ONBOARDING: {
     label: "Onboarding",
     color: "text-amber-700",
@@ -72,29 +69,22 @@ export function WorkspaceTab({
   contactFormUrl,
 }: WorkspaceTabProps) {
   const statusConfig =
-    workspaceStatusConfig[workspace?.status || "ONBOARDING"] ||
-    workspaceStatusConfig.ONBOARDING;
+    workspaceStatusConfig[workspace?.status || "ONBOARDING"] || workspaceStatusConfig.ONBOARDING;
 
   return (
     <div className="space-y-6">
       {/* Workspace status badge */}
-      <div
-        className={`flex items-center gap-3 p-4 border rounded-lg ${statusConfig.bgColor}`}
-      >
-        <Globe className={`w-5 h-5 ${statusConfig.color}`} />
+      <div className={`flex items-center gap-3 rounded-lg border p-4 ${statusConfig.bgColor}`}>
+        <Globe className={`h-5 w-5 ${statusConfig.color}`} />
         <div>
           <p className={`text-sm font-medium ${statusConfig.color}`}>
             Workspace Status: {statusConfig.label}
           </p>
-          <p className="text-xs text-muted-foreground">
-            {workspace?.status === "ONBOARDING" &&
-              "Complete your setup to activate your workspace"}
-            {workspace?.status === "ACTIVE" &&
-              "Your workspace is live and accepting customers"}
-            {workspace?.status === "INACTIVE" &&
-              "Your workspace is currently paused"}
-            {!workspace?.status &&
-              "Complete your setup to activate your workspace"}
+          <p className="text-muted-foreground text-xs">
+            {workspace?.status === "ONBOARDING" && "Complete your setup to activate your workspace"}
+            {workspace?.status === "ACTIVE" && "Your workspace is live and accepting customers"}
+            {workspace?.status === "INACTIVE" && "Your workspace is currently paused"}
+            {!workspace?.status && "Complete your setup to activate your workspace"}
           </p>
         </div>
       </div>
@@ -105,7 +95,7 @@ export function WorkspaceTab({
           <CardDescription>Manage your business information</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label>Business Name</Label>
               <Input
@@ -128,7 +118,7 @@ export function WorkspaceTab({
               onChange={(e) => onUpdate({ address: e.target.value })}
             />
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label>Contact Email</Label>
               <Input
@@ -145,21 +135,19 @@ export function WorkspaceTab({
             </div>
           </div>
         </CardContent>
-        <CardFooter className="bg-muted/30 border-t flex justify-between items-center px-6 py-4">
-          <div className="text-xs text-muted-foreground">
-            Public links will use this info
-          </div>
+        <CardFooter className="bg-muted/30 flex items-center justify-between border-t px-6 py-4">
+          <div className="text-muted-foreground text-xs">Public links will use this info</div>
           <Button onClick={onSave} disabled={saving}>
             {saved ? (
               <>
-                <CheckCircle className="w-4 h-4 mr-2" />
+                <CheckCircle className="mr-2 h-4 w-4" />
                 Saved!
               </>
             ) : saving ? (
               "Saving..."
             ) : (
               <>
-                <Save className="w-4 h-4 mr-2" />
+                <Save className="mr-2 h-4 w-4" />
                 Save Changes
               </>
             )}
@@ -171,18 +159,14 @@ export function WorkspaceTab({
       <Card>
         <CardHeader>
           <CardTitle>Public Links</CardTitle>
-          <CardDescription>
-            Share these links with your customers
-          </CardDescription>
+          <CardDescription>Share these links with your customers</CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
-          <div className="flex items-center gap-3 p-3 bg-muted/30 rounded-lg">
-            <Link2 className="w-4 h-4 text-muted-foreground shrink-0" />
-            <div className="flex-1 min-w-0">
-              <p className="text-xs font-medium text-muted-foreground">Booking Page</p>
-              <code className="text-xs text-muted-foreground truncate block">
-                {bookingUrl}
-              </code>
+          <div className="bg-muted/30 flex items-center gap-3 rounded-lg p-3">
+            <Link2 className="text-muted-foreground h-4 w-4 shrink-0" />
+            <div className="min-w-0 flex-1">
+              <p className="text-muted-foreground text-xs font-medium">Booking Page</p>
+              <code className="text-muted-foreground block truncate text-xs">{bookingUrl}</code>
             </div>
             <Button
               variant="outline"
@@ -192,13 +176,11 @@ export function WorkspaceTab({
               {copied === "booking" ? "Copied!" : "Copy"}
             </Button>
           </div>
-          <div className="flex items-center gap-3 p-3 bg-muted/30 rounded-lg">
-            <Link2 className="w-4 h-4 text-muted-foreground shrink-0" />
-            <div className="flex-1 min-w-0">
-              <p className="text-xs font-medium text-muted-foreground">Contact Form</p>
-              <code className="text-xs text-muted-foreground truncate block">
-                {contactFormUrl}
-              </code>
+          <div className="bg-muted/30 flex items-center gap-3 rounded-lg p-3">
+            <Link2 className="text-muted-foreground h-4 w-4 shrink-0" />
+            <div className="min-w-0 flex-1">
+              <p className="text-muted-foreground text-xs font-medium">Contact Form</p>
+              <code className="text-muted-foreground block truncate text-xs">{contactFormUrl}</code>
             </div>
             <Button
               variant="outline"

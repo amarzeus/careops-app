@@ -28,10 +28,10 @@ export async function checkUserExists(email: string) {
   console.log(`  Email: ${user.email}`);
   console.log(`  Name: ${user.name}`);
   console.log(`  Role: ${user.role}`);
-  console.log(`  Email Verified: ${user.emailVerified ? '✅ Yes' : '❌ No'}`);
-  console.log(`  Has Password: ${user.passwordHash ? '✅ Yes' : '❌ No'}`);
-  console.log(`  Google ID: ${user.googleId || 'Not linked'}`);
-  console.log(`  Workspace ID: ${user.workspaceId || '❌ NULL - No workspace!'}`);
+  console.log(`  Email Verified: ${user.emailVerified ? "✅ Yes" : "❌ No"}`);
+  console.log(`  Has Password: ${user.passwordHash ? "✅ Yes" : "❌ No"}`);
+  console.log(`  Google ID: ${user.googleId || "Not linked"}`);
+  console.log(`  Workspace ID: ${user.workspaceId || "❌ NULL - No workspace!"}`);
   console.log(`  Created: ${user.createdAt}`);
   console.log(`  Updated: ${user.updatedAt}`);
 

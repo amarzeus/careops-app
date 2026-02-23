@@ -46,25 +46,22 @@ export async function POST(req: Request) {
   const limitCheck = await checkUsageLimit(user.workspaceId, "bookings");
   if (!limitCheck.allowed) {
     return NextResponse.json(
-      { error: `Booking limit exceeded. Used: ${limitCheck.used}/${limitCheck.limit}. Please upgrade your plan.` },
+      {
+        error: `Booking limit exceeded. Used: ${limitCheck.used}/${limitCheck.limit}. Please upgrade your plan.`,
+      },
       { status: 402 }
     );
   }
 
   const { serviceId, contactId, date, notes } = await req.json();
   if (!serviceId || !contactId || !date)
-    return NextResponse.json(
-      { error: "Missing required fields" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
 
   const service = await prisma.service.findUnique({ where: { id: serviceId } });
-  if (!service)
-    return NextResponse.json({ error: "Service not found" }, { status: 404 });
+  if (!service) return NextResponse.json({ error: "Service not found" }, { status: 404 });
 
   const contact = await prisma.contact.findUnique({ where: { id: contactId } });
-  if (!contact)
-    return NextResponse.json({ error: "Contact not found" }, { status: 404 });
+  if (!contact) return NextResponse.json({ error: "Contact not found" }, { status: 404 });
 
   const startDate = new Date(date);
   const endTime = new Date(startDate.getTime() + service.duration * 60000);

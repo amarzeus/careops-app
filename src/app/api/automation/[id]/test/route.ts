@@ -9,10 +9,7 @@ import { executeRule } from "@/lib/automation";
  * @param root0
  * @param root0.params
  */
-export async function POST(
-  req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const user = await getCurrentUser();
     if (!user || !user.workspaceId) {
@@ -56,6 +53,7 @@ export async function POST(
     }
 
     // Construct dummy data based on trigger type
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const data: Record<string, any> = {
       contact: {
         id: testContact.id,
@@ -74,7 +72,11 @@ export async function POST(
 
       if (booking) {
         data.booking = { id: booking.id, date: booking.date };
-        data.service = { id: booking.serviceId, name: booking.service.name, location: booking.service.location };
+        data.service = {
+          id: booking.serviceId,
+          name: booking.service.name,
+          location: booking.service.location,
+        };
       } else {
         // Fallback dummy data
         data.booking = { id: "test-booking", date: new Date() };
@@ -82,7 +84,7 @@ export async function POST(
       }
     } else if (rule.trigger === "INVENTORY_LOW") {
       const item = await prisma.inventoryItem.findFirst({
-        where: { workspaceId: user.workspaceId }
+        where: { workspaceId: user.workspaceId },
       });
       if (item) {
         data.item = {
@@ -90,7 +92,7 @@ export async function POST(
           quantity: item.quantity,
           threshold: item.threshold,
           unit: item.unit,
-          vendorEmail: item.vendorEmail
+          vendorEmail: item.vendorEmail,
         };
       } else {
         data.item = {
@@ -98,7 +100,7 @@ export async function POST(
           quantity: 5,
           threshold: 10,
           unit: "boxes",
-          vendorEmail: user.email // Send to user for test
+          vendorEmail: user.email, // Send to user for test
         };
       }
     } else if (rule.trigger === "FORM_PENDING") {
@@ -106,10 +108,10 @@ export async function POST(
     }
 
     // Execute the rule immediately (bypassing delay for testing purposes)
-    // We modify the rule object passed to executeRule to force immediate execution if we wanted, 
-    // but executeRule logic respects delayMinutes. 
+    // We modify the rule object passed to executeRule to force immediate execution if we wanted,
+    // but executeRule logic respects delayMinutes.
     // For testing, we might want to override delay.
-    // However, executeRule takes the rule object directly. 
+    // However, executeRule takes the rule object directly.
     // Let's copy the rule and set delay to 0 for the test.
 
     const testRule = { ...rule, delayMinutes: 0 };
@@ -119,9 +121,6 @@ export async function POST(
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Automation test error:", error);
-    return NextResponse.json(
-      { error: "Failed to test rule" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to test rule" }, { status: 500 });
   }
 }

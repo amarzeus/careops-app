@@ -32,9 +32,6 @@ export async function GET(req: Request) {
     return NextResponse.json({ logs });
   } catch (error) {
     console.error("Inventory history error:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch inventory history" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch inventory history" }, { status: 500 });
   }
 }

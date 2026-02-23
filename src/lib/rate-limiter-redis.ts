@@ -108,28 +108,28 @@ function createUpstashClient(): RedisClient {
       const res = await fetch(`${restUrl}/incr/${key}`, {
         headers: { Authorization: `Bearer ${restToken}` },
       });
-      const data = await res.json() as { result: number };
+      const data = (await res.json()) as { result: number };
       return data.result;
     },
     async expire(key: string, seconds: number): Promise<number> {
       const res = await fetch(`${restUrl}/expire/${key}/${seconds}`, {
         headers: { Authorization: `Bearer ${restToken}` },
       });
-      const data = await res.json() as { result: number };
+      const data = (await res.json()) as { result: number };
       return data.result;
     },
     async ttl(key: string): Promise<number> {
       const res = await fetch(`${restUrl}/ttl/${key}`, {
         headers: { Authorization: `Bearer ${restToken}` },
       });
-      const data = await res.json() as { result: number };
+      const data = (await res.json()) as { result: number };
       return data.result;
     },
     async get(key: string): Promise<string | null> {
       const res = await fetch(`${restUrl}/get/${key}`, {
         headers: { Authorization: `Bearer ${restToken}` },
       });
-      const data = await res.json() as { result: string | null };
+      const data = (await res.json()) as { result: string | null };
       return data.result;
     },
     async set(key: string, value: string, options?: { ex?: number }): Promise<"OK" | null> {
@@ -140,7 +140,7 @@ function createUpstashClient(): RedisClient {
       const res = await fetch(url, {
         headers: { Authorization: `Bearer ${restToken}` },
       });
-      const data = await res.json() as { result: string | null };
+      const data = (await res.json()) as { result: string | null };
       return data.result as "OK" | null;
     },
   };
@@ -150,5 +150,7 @@ function createUpstashClient(): RedisClient {
  *
  */
 function createNodeRedisClient(_url: string): RedisClient {
-  throw new Error("Node Redis client requires 'redis' package. Use Upstash for serverless or install redis package.");
+  throw new Error(
+    "Node Redis client requires 'redis' package. Use Upstash for serverless or install redis package."
+  );
 }

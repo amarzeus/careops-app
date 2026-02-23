@@ -7,10 +7,7 @@ import { prisma } from "@/lib/prisma";
  * @param root0
  * @param root0.params
  */
-export async function GET(
-  req: Request,
-  { params }: { params: Promise<{ slug: string }> }
-) {
+export async function GET(req: Request, { params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
 
   const form = await prisma.intakeForm.findUnique({
@@ -35,10 +32,7 @@ export async function GET(
  * @param root0
  * @param root0.params
  */
-export async function POST(
-  req: Request,
-  { params }: { params: Promise<{ slug: string }> }
-) {
+export async function POST(req: Request, { params }: { params: Promise<{ slug: string }> }) {
   try {
     const { slug } = await params;
     const { data, submissionId } = await req.json();
@@ -58,8 +52,7 @@ export async function POST(
 
     // Create new submission
     const form = await prisma.intakeForm.findUnique({ where: { slug } });
-    if (!form)
-      return NextResponse.json({ error: "Form not found" }, { status: 404 });
+    if (!form) return NextResponse.json({ error: "Form not found" }, { status: 404 });
 
     const submission = await prisma.formSubmission.create({
       data: {
@@ -80,9 +73,6 @@ export async function POST(
     });
   } catch (error) {
     console.error("Form submission error:", error);
-    return NextResponse.json(
-      { error: "Submission failed" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Submission failed" }, { status: 500 });
   }
 }

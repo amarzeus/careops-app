@@ -20,7 +20,7 @@ export async function POST() {
         "Go to Dashboard",
         `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`
       ),
-      workspaceId: user.workspaceId
+      workspaceId: user.workspaceId,
     });
 
     if (!success) {
@@ -33,9 +33,6 @@ export async function POST() {
     return NextResponse.json({ success: true, message: "Test email sent successfully" });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Connection failed";
-    return NextResponse.json(
-      { error: `Email connection failed: ${message}` },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: `Email connection failed: ${message}` }, { status: 500 });
   }
 }

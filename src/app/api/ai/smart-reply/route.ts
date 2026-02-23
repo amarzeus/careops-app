@@ -14,10 +14,7 @@ export async function POST(req: Request) {
 
   const { conversationId } = await req.json();
   if (!conversationId)
-    return NextResponse.json(
-      { error: "Conversation ID required" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Conversation ID required" }, { status: 400 });
 
   const conversation = await prisma.conversation.findUnique({
     where: { id: conversationId },
@@ -27,37 +24,25 @@ export async function POST(req: Request) {
     },
   });
 
-  if (!conversation)
-    return NextResponse.json(
-      { error: "Conversation not found" },
-      { status: 404 }
-    );
+  if (!conversation) return NextResponse.json({ error: "Conversation not found" }, { status: 404 });
 
   // Ownership verification: ensure the conversation belongs to the user's workspace
   if (conversation.workspaceId !== user.workspaceId)
-    return NextResponse.json(
-      { error: "Forbidden" },
-      { status: 403 }
-    );
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const history = conversation.messages
     .reverse()
-    .map(
-      (m) =>
-        `${m.direction === "INBOUND" ? conversation.contact.name : "Staff"}: ${m.content}`
-    )
+    .map((m) => `${m.direction === "INBOUND" ? conversation.contact.name : "Staff"}: ${m.content}`)
     .join("\n");
-  const lastInbound = conversation.messages
-    .filter((m) => m.direction === "INBOUND")
-    .pop();
+  const lastInbound = conversation.messages.filter((m) => m.direction === "INBOUND").pop();
 
   const workspace = await prisma.workspace.findUnique({
     where: { id: user.workspaceId },
   });
-  
+
   // Get the model preference for this workspace
   const model = await getWorkspaceGeminiModel(user.workspaceId);
-  
+
   try {
     const replies = await generateSmartReply(
       workspace?.name || "Business",
@@ -70,10 +55,13 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error("Smart reply error:", error);
     if (isQuotaError(error)) {
-      return NextResponse.json({
-        error: "AI limit reached",
-        message: "Smart replies are temporarily unavailable."
-      }, { status: 429 });
+      return NextResponse.json(
+        {
+          error: "AI limit reached",
+          message: "Smart replies are temporarily unavailable.",
+        },
+        { status: 429 }
+      );
     }
     return NextResponse.json({ error: "Failed to generate replies" }, { status: 500 });
   }

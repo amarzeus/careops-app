@@ -50,8 +50,12 @@ vi.mock("@/lib/vapi", () => ({
   processVapiWebhook: vi.fn((e) => ({
     callId: e.call_id,
     status: e.status,
-    action: e.type?.includes("ended") || e.type?.includes("completed") ? "end" :
-      e.type?.includes("in-progress") ? "update" : "create",
+    action:
+      e.type?.includes("ended") || e.type?.includes("completed")
+        ? "end"
+        : e.type?.includes("in-progress")
+          ? "update"
+          : "create",
   })),
 }));
 

@@ -3,8 +3,8 @@
  * Handles conversion between local times and UTC for bookings
  */
 
-import { fromZonedTime, toZonedTime } from 'date-fns-tz';
-import { format } from 'date-fns';
+import { fromZonedTime, toZonedTime } from "date-fns-tz";
+import { format } from "date-fns";
 
 /**
  * Convert a local date/time to UTC
@@ -13,7 +13,7 @@ import { format } from 'date-fns';
  * @returns UTC Date object
  */
 export function toUTC(localDate: Date | string, timezone: string): Date {
-  const date = typeof localDate === 'string' ? new Date(localDate) : localDate;
+  const date = typeof localDate === "string" ? new Date(localDate) : localDate;
   return fromZonedTime(date, timezone);
 }
 
@@ -34,11 +34,7 @@ export function fromUTC(utcDate: Date, timezone: string): Date {
  * @param timezone - IANA timezone
  * @returns UTC Date object
  */
-export function parseLocalDateTime(
-  dateStr: string,
-  timeStr: string,
-  timezone: string
-): Date {
+export function parseLocalDateTime(dateStr: string, timeStr: string, timezone: string): Date {
   const localDateTime = new Date(`${dateStr}T${timeStr}:00`);
   return toUTC(localDateTime, timezone);
 }
@@ -53,7 +49,7 @@ export function parseLocalDateTime(
 export function formatInTimeZone(
   utcDate: Date,
   timezone: string,
-  formatStr: string = 'PPp'
+  formatStr: string = "PPp"
 ): string {
   const zonedDate = fromUTC(utcDate, timezone);
   return format(zonedDate, formatStr);
@@ -74,7 +70,7 @@ export function nowInTimeZone(timezone: string): Date {
  * @returns Boolean indicating validity
  */
 export function isValidDate(date: Date | string): boolean {
-  const d = typeof date === 'string' ? new Date(date) : date;
+  const d = typeof date === "string" ? new Date(date) : date;
   return d instanceof Date && !isNaN(d.getTime());
 }
 
@@ -82,19 +78,19 @@ export function isValidDate(date: Date | string): boolean {
  * Common timezones list for UI dropdown
  */
 export const COMMON_TIMEZONES = [
-  { value: 'UTC', label: 'UTC' },
-  { value: 'America/New_York', label: 'Eastern Time (ET)' },
-  { value: 'America/Chicago', label: 'Central Time (CT)' },
-  { value: 'America/Denver', label: 'Mountain Time (MT)' },
-  { value: 'America/Los_Angeles', label: 'Pacific Time (PT)' },
-  { value: 'Europe/London', label: 'London (GMT)' },
-  { value: 'Europe/Paris', label: 'Paris (CET)' },
-  { value: 'Europe/Berlin', label: 'Berlin (CET)' },
-  { value: 'Asia/Tokyo', label: 'Tokyo (JST)' },
-  { value: 'Asia/Shanghai', label: 'Shanghai (CST)' },
-  { value: 'Asia/Dubai', label: 'Dubai (GST)' },
-  { value: 'Australia/Sydney', label: 'Sydney (AEST)' },
-  { value: 'Pacific/Auckland', label: 'Auckland (NZST)' },
+  { value: "UTC", label: "UTC" },
+  { value: "America/New_York", label: "Eastern Time (ET)" },
+  { value: "America/Chicago", label: "Central Time (CT)" },
+  { value: "America/Denver", label: "Mountain Time (MT)" },
+  { value: "America/Los_Angeles", label: "Pacific Time (PT)" },
+  { value: "Europe/London", label: "London (GMT)" },
+  { value: "Europe/Paris", label: "Paris (CET)" },
+  { value: "Europe/Berlin", label: "Berlin (CET)" },
+  { value: "Asia/Tokyo", label: "Tokyo (JST)" },
+  { value: "Asia/Shanghai", label: "Shanghai (CST)" },
+  { value: "Asia/Dubai", label: "Dubai (GST)" },
+  { value: "Australia/Sydney", label: "Sydney (AEST)" },
+  { value: "Pacific/Auckland", label: "Auckland (NZST)" },
 ];
 
 /**
@@ -125,10 +121,10 @@ export function formatBookingForDisplay(
   const localZoned = fromUTC(bookingDate, getClientTimezone());
 
   return {
-    workspaceTime: format(workspaceZoned, 'h:mm a'),
-    workspaceDate: format(workspaceZoned, 'EEEE, MMMM d, yyyy'),
-    localTime: format(localZoned, 'h:mm a'),
-    localDate: format(localZoned, 'EEEE, MMMM d, yyyy'),
+    workspaceTime: format(workspaceZoned, "h:mm a"),
+    workspaceDate: format(workspaceZoned, "EEEE, MMMM d, yyyy"),
+    localTime: format(localZoned, "h:mm a"),
+    localDate: format(localZoned, "EEEE, MMMM d, yyyy"),
     timezone: getClientTimezone(),
   };
 }

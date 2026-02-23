@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getCurrentUser } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
-import { normalizeVoicePhoneNumber } from '@/lib/voice-compliance';
-import { initiateOutboundCall, isVapiConfigured } from '@/lib/vapi';
+import { NextRequest, NextResponse } from "next/server";
+import { getCurrentUser } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { normalizeVoicePhoneNumber } from "@/lib/voice-compliance";
+import { initiateOutboundCall, isVapiConfigured } from "@/lib/vapi";
 
 /**
  *
@@ -12,12 +12,12 @@ export async function POST(req: NextRequest) {
   try {
     const user = await getCurrentUser();
     if (!user?.workspaceId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     if (!isVapiConfigured()) {
       return NextResponse.json(
-        { error: 'VAPI not configured. Please add VAPI_API_KEY to environment.' },
+        { error: "VAPI not configured. Please add VAPI_API_KEY to environment." },
         { status: 503 }
       );
     }
@@ -26,10 +26,7 @@ export async function POST(req: NextRequest) {
     const { phoneNumber, contactId, agentId, purpose, notes } = body;
 
     if (!phoneNumber) {
-      return NextResponse.json(
-        { error: 'Phone number is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Phone number is required" }, { status: 400 });
     }
 
     const workspaceId = user.workspaceId;
@@ -47,16 +44,16 @@ export async function POST(req: NextRequest) {
     if (dncEntry) {
       await prisma.voiceCall.create({
         data: {
-          direction: 'OUTBOUND',
-          status: 'SKIPPED',
+          direction: "OUTBOUND",
+          status: "SKIPPED",
           workspaceId,
-          outcome: 'DNC_SKIP',
-          metadata: JSON.stringify({ purpose, notes, phoneNumber: normalizedPhone, reason: 'dnc' }),
+          outcome: "DNC_SKIP",
+          metadata: JSON.stringify({ purpose, notes, phoneNumber: normalizedPhone, reason: "dnc" }),
         },
       });
 
       return NextResponse.json(
-        { error: 'Outbound calls to this number are blocked by Do Not Call policy' },
+        { error: "Outbound calls to this number are blocked by Do Not Call policy" },
         { status: 403 }
       );
     }
@@ -108,7 +105,7 @@ export async function POST(req: NextRequest) {
 
     if (!result.success) {
       return NextResponse.json(
-        { error: result.error || 'Failed to initiate call' },
+        { error: result.error || "Failed to initiate call" },
         { status: 500 }
       );
     }
@@ -116,8 +113,8 @@ export async function POST(req: NextRequest) {
     const voiceCall = await prisma.voiceCall.create({
       data: {
         callSid: result.callId,
-        direction: 'OUTBOUND',
-        status: 'INITIATED',
+        direction: "OUTBOUND",
+        status: "INITIATED",
         contactId: contact?.id,
         workspaceId,
         assistantId,
@@ -131,11 +128,8 @@ export async function POST(req: NextRequest) {
       voiceCall,
     });
   } catch (error) {
-    console.error('[Voice:Call:POST] Error:', error);
-    return NextResponse.json(
-      { error: 'Failed to initiate call' },
-      { status: 500 }
-    );
+    console.error("[Voice:Call:POST] Error:", error);
+    return NextResponse.json({ error: "Failed to initiate call" }, { status: 500 });
   }
 }
 
@@ -147,16 +141,16 @@ export async function GET(req: NextRequest) {
   try {
     const user = await getCurrentUser();
     if (!user?.workspaceId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(req.url);
-    const contactId = searchParams.get('contactId');
-    const status = searchParams.get('status');
-    const escalated = searchParams.get('escalated');
-    const outcome = searchParams.get('outcome');
-    const limit = parseInt(searchParams.get('limit') || '50');
-    const offset = parseInt(searchParams.get('offset') || '0');
+    const contactId = searchParams.get("contactId");
+    const status = searchParams.get("status");
+    const escalated = searchParams.get("escalated");
+    const outcome = searchParams.get("outcome");
+    const limit = parseInt(searchParams.get("limit") || "50");
+    const offset = parseInt(searchParams.get("offset") || "0");
 
     const where: Record<string, unknown> = {
       workspaceId: user.workspaceId,
@@ -170,11 +164,11 @@ export async function GET(req: NextRequest) {
       where.status = status;
     }
 
-    if (escalated === 'true') {
+    if (escalated === "true") {
       where.escalated = true;
     }
 
-    if (escalated === 'false') {
+    if (escalated === "false") {
       where.escalated = false;
     }
 
@@ -189,7 +183,7 @@ export async function GET(req: NextRequest) {
           contact: true,
           consent: true,
         },
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
         take: limit,
         skip: offset,
       }),
@@ -206,10 +200,7 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('[Voice:Call:GET] Error:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch calls' },
-      { status: 500 }
-    );
+    console.error("[Voice:Call:GET] Error:", error);
+    return NextResponse.json({ error: "Failed to fetch calls" }, { status: 500 });
   }
 }

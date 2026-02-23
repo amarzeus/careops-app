@@ -187,13 +187,13 @@ function VerifyOtpContent() {
   // Icons & colors per method
   const methodConfig = {
     email: {
-      icon: <Mail className="h-6 w-6 text-primary" />,
+      icon: <Mail className="text-primary h-6 w-6" />,
       bgIcon: "bg-blue-100",
       btnClass: "bg-primary hover:bg-primary/90",
       label: "email",
     },
     sms: {
-      icon: <Smartphone className="h-6 w-6 text-primary" />,
+      icon: <Smartphone className="text-primary h-6 w-6" />,
       bgIcon: "bg-blue-100",
       btnClass: "bg-primary hover:bg-primary/90",
       label: "phone",
@@ -209,7 +209,7 @@ function VerifyOtpContent() {
           <div className="mx-auto mb-4 flex h-16 w-16 animate-bounce items-center justify-center rounded-full bg-green-100">
             <CheckCircle2 className="h-8 w-8 text-green-600" />
           </div>
-          <h2 className="mb-2 text-2xl font-semibold text-foreground">Verified!</h2>
+          <h2 className="text-foreground mb-2 text-2xl font-semibold">Verified!</h2>
           <p className="text-muted-foreground">Redirecting you to your workspace...</p>
         </CardContent>
       </Card>
@@ -272,7 +272,9 @@ function VerifyOtpContent() {
                 onChange={(e) => setPhone(e.target.value)}
                 required
               />
-              <p className="text-xs text-muted-foreground">Use E.164 format (e.g., +919876543210)</p>
+              <p className="text-muted-foreground text-xs">
+                Use E.164 format (e.g., +919876543210)
+              </p>
             </div>
             <Button
               onClick={handleSendSMS}
@@ -326,13 +328,13 @@ function VerifyOtpContent() {
 
             {/* Resend section */}
             <div className="space-y-2 text-center">
-              <p className="text-sm text-muted-foreground">
+              <p className="text-muted-foreground text-sm">
                 {canResend ? (
                   "Didn&apos;t receive a code?"
                 ) : (
                   <>
                     Resend available in{" "}
-                    <span className="font-medium text-muted-foreground">{countdown}s</span>
+                    <span className="text-muted-foreground font-medium">{countdown}s</span>
                   </>
                 )}
               </p>
@@ -352,14 +354,14 @@ function VerifyOtpContent() {
 
             {/* Channel switcher */}
             <div className="space-y-2 border-t pt-4">
-              <p className="mb-2 text-center text-xs text-muted-foreground">Or verify using:</p>
+              <p className="text-muted-foreground mb-2 text-center text-xs">Or verify using:</p>
               <div className="flex justify-center gap-2">
                 {method !== "email" && (
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => switchMethod("email")}
-                    className="flex items-center gap-1.5 text-muted-foreground hover:text-primary"
+                    className="text-muted-foreground hover:text-primary flex items-center gap-1.5"
                   >
                     <Mail className="h-3.5 w-3.5" />
                     Email
@@ -370,7 +372,7 @@ function VerifyOtpContent() {
                     variant="outline"
                     size="sm"
                     onClick={() => switchMethod("sms")}
-                    className="flex items-center gap-1.5 text-muted-foreground hover:text-primary"
+                    className="text-muted-foreground hover:text-primary flex items-center gap-1.5"
                   >
                     <Smartphone className="h-3.5 w-3.5" />
                     SMS
@@ -390,7 +392,7 @@ function VerifyOtpContent() {
  */
 export default function VerifyOtpPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-muted/30 px-4">
+    <div className="bg-muted/30 flex min-h-screen items-center justify-center px-4">
       <Suspense fallback={<div>Loading...</div>}>
         <VerifyOtpContent />
       </Suspense>

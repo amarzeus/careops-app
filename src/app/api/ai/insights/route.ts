@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -12,10 +13,10 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const wid = user.workspaceId;
-  
+
   // Get the model preference for this workspace
   const model = await getWorkspaceGeminiModel(wid);
-  
+
   const weekAgo = new Date();
   weekAgo.setDate(weekAgo.getDate() - 7);
 
@@ -43,18 +44,19 @@ export async function GET() {
     }),
   ]);
 
-  const lowStockItems = allInventory.filter(
-    (item: any) => item.quantity <= item.threshold
-  ).length;
+  const lowStockItems = allInventory.filter((item: any) => item.quantity <= item.threshold).length;
 
-  const insights = await generateDashboardInsights({
-    totalBookings,
-    completedBookings,
-    newContacts,
-    pendingForms,
-    lowStockItems,
-    unreadMessages,
-  }, model);
+  const insights = await generateDashboardInsights(
+    {
+      totalBookings,
+      completedBookings,
+      newContacts,
+      pendingForms,
+      lowStockItems,
+      unreadMessages,
+    },
+    model
+  );
 
   return NextResponse.json({ insights });
 }

@@ -5,6 +5,7 @@
 **Problem:** Business owners need phone numbers assigned automatically without manual setup.
 
 **Key Finding:** Vapi does NOT have an API to search or purchase phone numbers. Vapi only provides:
+
 - Free US numbers (max 10, US-only)
 - Import endpoint for existing Twilio numbers
 
@@ -42,6 +43,7 @@
 ### Option A: Platform-Owned Twilio Account (RECOMMENDED)
 
 **How it works:**
+
 1. CareOps maintains ONE Twilio master account
 2. Create Twilio subaccounts per workspace (business)
 3. Search & purchase numbers programmatically
@@ -49,12 +51,14 @@
 5. Bill customers via Razorpay subscription
 
 **Pros:**
+
 - Fully automated provisioning
 - Single point of compliance management
 - Better UX (customer doesn't need Twilio account)
 - Revenue opportunity (markup on Twilio costs)
 
 **Cons:**
+
 - Platform bears Twilio costs upfront
 - Compliance burden on platform
 - Address verification required for some regions
@@ -71,16 +75,19 @@
 ### Option B: BYOT (Bring Your Own Twilio)
 
 **How it works:**
+
 1. Customer provides Twilio credentials
 2. CareOps imports their existing numbers
 3. Customer pays Twilio directly
 
 **Pros:**
+
 - No upfront cost to platform
 - Compliance is customer's responsibility
 - Works for all regions
 
 **Cons:**
+
 - Poor UX (customer must set up Twilio)
 - Not fully automated
 - Customer may leave if they own the number
@@ -90,14 +97,17 @@
 ### Option C: Vapi Free Numbers (US ONLY)
 
 **How it works:**
+
 1. Use Vapi's free US number provisioning
 2. Limited to US numbers, max 10 per account
 
 **Pros:**
+
 - Completely free
 - Simplest implementation
 
 **Cons:**
+
 - US numbers only
 - Max 10 numbers per platform (not per customer)
 - No international support
@@ -141,8 +151,8 @@ Customer Flow:
 ```typescript
 // lib/twilio-platform.ts
 
-import Twilio from 'twilio';
-import { prisma } from './prisma';
+import Twilio from "twilio";
+import { prisma } from "./prisma";
 
 const TWILIO_MAIN_SID = process.env.TWILIO_ACCOUNT_SID!;
 const TWILIO_MAIN_TOKEN = process.env.TWILIO_AUTH_TOKEN!;
@@ -158,7 +168,7 @@ export async function getOrCreateTwilioSubaccount(workspaceId: string) {
   }
 
   const client = Twilio(TWILIO_MAIN_SID, TWILIO_MAIN_TOKEN);
-  
+
   const subaccount = await client.api.v2010.accounts.create({
     friendlyName: `CareOps-${workspaceId.slice(0, 8)}`,
   });
@@ -172,11 +182,9 @@ export async function getOrCreateTwilioSubaccount(workspaceId: string) {
 }
 
 export function getTwilioClient(subaccountSid?: string) {
-  return Twilio(
-    TWILIO_MAIN_SID,
-    TWILIO_MAIN_TOKEN,
-    { accountSid: subaccountSid || TWILIO_MAIN_SID }
-  );
+  return Twilio(TWILIO_MAIN_SID, TWILIO_MAIN_TOKEN, {
+    accountSid: subaccountSid || TWILIO_MAIN_SID,
+  });
 }
 ```
 
@@ -188,14 +196,14 @@ export function getTwilioClient(subaccountSid?: string) {
 export async function GET(req: NextRequest) {
   const user = await getCurrentUser();
   if (!user?.workspaceId) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const { searchParams } = new URL(req.url);
-  const countryCode = searchParams.get('country') || 'US';
-  const areaCode = searchParams.get('areaCode');
-  const pattern = searchParams.get('pattern');
-  const type = searchParams.get('type') || 'local'; // local, tollfree, mobile
+  const countryCode = searchParams.get("country") || "US";
+  const areaCode = searchParams.get("areaCode");
+  const pattern = searchParams.get("pattern");
+  const type = searchParams.get("type") || "local"; // local, tollfree, mobile
 
   const subaccountSid = await getOrCreateTwilioSubaccount(user.workspaceId);
   const client = getTwilioClient(subaccountSid);
@@ -210,20 +218,17 @@ export async function GET(req: NextRequest) {
   if (pattern) searchOptions.contains = pattern;
 
   let availableNumbers;
-  
-  if (type === 'tollfree') {
-    availableNumbers = await client.availablePhoneNumbers(countryCode)
-      .tollFree.list(searchOptions);
-  } else if (type === 'mobile') {
-    availableNumbers = await client.availablePhoneNumbers(countryCode)
-      .mobile.list(searchOptions);
+
+  if (type === "tollfree") {
+    availableNumbers = await client.availablePhoneNumbers(countryCode).tollFree.list(searchOptions);
+  } else if (type === "mobile") {
+    availableNumbers = await client.availablePhoneNumbers(countryCode).mobile.list(searchOptions);
   } else {
-    availableNumbers = await client.availablePhoneNumbers(countryCode)
-      .local.list(searchOptions);
+    availableNumbers = await client.availablePhoneNumbers(countryCode).local.list(searchOptions);
   }
 
   return NextResponse.json({
-    numbers: availableNumbers.map(n => ({
+    numbers: availableNumbers.map((n) => ({
       phoneNumber: n.phoneNumber,
       friendlyName: n.friendlyName,
       locality: n.locality,
@@ -242,13 +247,13 @@ export async function GET(req: NextRequest) {
 
 function getEstimatedCost(country: string, type: string): number {
   const costs: Record<string, Record<string, number>> = {
-    US: { local: 1.00, tollfree: 2.00, mobile: 1.00 },
-    GB: { local: 0.50, tollfree: 5.00, mobile: 2.00 },
-    IN: { local: 2.00, tollfree: 5.00, mobile: 4.00 },
-    CA: { local: 1.00, tollfree: 2.00, mobile: 1.50 },
-    AU: { local: 1.50, tollfree: 3.00, mobile: 2.00 },
+    US: { local: 1.0, tollfree: 2.0, mobile: 1.0 },
+    GB: { local: 0.5, tollfree: 5.0, mobile: 2.0 },
+    IN: { local: 2.0, tollfree: 5.0, mobile: 4.0 },
+    CA: { local: 1.0, tollfree: 2.0, mobile: 1.5 },
+    AU: { local: 1.5, tollfree: 3.0, mobile: 2.0 },
   };
-  return costs[country]?.[type] || 3.00;
+  return costs[country]?.[type] || 3.0;
 }
 ```
 
@@ -260,7 +265,7 @@ function getEstimatedCost(country: string, type: string): number {
 export async function POST(req: NextRequest) {
   const user = await getCurrentUser();
   if (!user?.workspaceId) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const body = await req.json();
@@ -269,10 +274,7 @@ export async function POST(req: NextRequest) {
   // 1. Check plan limits
   const limitCheck = await checkPhoneNumberLimit(user.workspaceId);
   if (!limitCheck.allowed) {
-    return NextResponse.json(
-      { error: limitCheck.message },
-      { status: 402 }
-    );
+    return NextResponse.json({ error: limitCheck.message }, { status: 402 });
   }
 
   // 2. Get or create Twilio subaccount
@@ -284,9 +286,9 @@ export async function POST(req: NextRequest) {
     phoneNumber,
     friendlyName: `CareOps-${user.workspaceId.slice(0, 8)}`,
     voiceUrl: `${process.env.NEXT_PUBLIC_APP_URL}/api/voice/webhook`,
-    voiceMethod: 'POST',
+    voiceMethod: "POST",
     statusCallback: `${process.env.NEXT_PUBLIC_APP_URL}/api/voice/status`,
-    statusCallbackMethod: 'POST',
+    statusCallbackMethod: "POST",
   });
 
   // 4. Get Vapi assistant ID
@@ -317,7 +319,7 @@ export async function POST(req: NextRequest) {
   });
 
   // 7. Update usage record
-  await trackUsage(user.workspaceId, 'phone_numbers', 1);
+  await trackUsage(user.workspaceId, "phone_numbers", 1);
 
   return NextResponse.json({
     success: true,
@@ -334,10 +336,10 @@ export async function POST(req: NextRequest) {
 
 await twilio.incomingPhoneNumbers(purchased.sid).update({
   voiceUrl: `https://api.vapi.ai/call/webhook`, // Vapi handles this
-  voiceMethod: 'POST',
+  voiceMethod: "POST",
   statusCallback: `${process.env.NEXT_PUBLIC_APP_URL}/api/voice/twilio-status`,
-  statusCallbackMethod: 'POST',
-  statusCallbackEvent: ['initiated', 'ringing', 'answered', 'completed'],
+  statusCallbackMethod: "POST",
+  statusCallbackEvent: ["initiated", "ringing", "answered", "completed"],
 });
 ```
 
@@ -367,37 +369,40 @@ model PhoneNumber {
 
 ### Included in Plans
 
-| Plan | Phone Numbers | Voice Minutes |
-|------|--------------|---------------|
-| Free | 0 | 0 |
-| Growth (₹1,999/mo) | 1 included | 200 included |
-| Pro (₹4,999/mo) | 3 included | 1000 included |
-| Enterprise (₹14,999/mo) | Unlimited | Unlimited |
+| Plan                    | Phone Numbers | Voice Minutes |
+| ----------------------- | ------------- | ------------- |
+| Free                    | 0             | 0             |
+| Growth (₹1,999/mo)      | 1 included    | 200 included  |
+| Pro (₹4,999/mo)         | 3 included    | 1000 included |
+| Enterprise (₹14,999/mo) | Unlimited     | Unlimited     |
 
 ### Add-on Pricing
 
-| Item | Price |
-|------|-------|
+| Item                 | Price      |
+| -------------------- | ---------- |
 | Additional US Number | ₹150/month |
 | Additional IN Number | ₹500/month |
-| Extra Voice Minutes | ₹2/minute |
-| Toll-Free Number | ₹300/month |
+| Extra Voice Minutes  | ₹2/minute  |
+| Toll-Free Number     | ₹300/month |
 
 ---
 
 ## Compliance Considerations
 
 ### US Numbers
+
 - No address required for most numbers
 - Toll-free requires business verification
 
 ### India Numbers
+
 - TRAI regulations apply
 - Business registration required
 - Address verification mandatory
 - Use Twilio's regulatory bundle API
 
 ### EU Numbers (GDPR)
+
 - Local address in EU required
 - Data processing agreements
 - Voice recording consent
@@ -417,19 +422,29 @@ export async function checkRegulatoryRequirements(
   const requirements: Record<string, Record<string, typeof result>> = {
     US: {
       local: { required: false, documents: [], addressRequired: false },
-      tollfree: { required: true, documents: ['business_registration'], addressRequired: true },
+      tollfree: { required: true, documents: ["business_registration"], addressRequired: true },
     },
     IN: {
-      local: { required: true, documents: ['business_registration', 'identity_proof'], addressRequired: true },
-      mobile: { required: true, documents: ['identity_proof'], addressRequired: true },
+      local: {
+        required: true,
+        documents: ["business_registration", "identity_proof"],
+        addressRequired: true,
+      },
+      mobile: { required: true, documents: ["identity_proof"], addressRequired: true },
     },
     GB: {
       local: { required: false, documents: [], addressRequired: false },
-      tollfree: { required: true, documents: ['business_registration'], addressRequired: false },
+      tollfree: { required: true, documents: ["business_registration"], addressRequired: false },
     },
   };
 
-  return requirements[countryCode]?.[numberType] || { required: false, documents: [], addressRequired: false };
+  return (
+    requirements[countryCode]?.[numberType] || {
+      required: false,
+      documents: [],
+      addressRequired: false,
+    }
+  );
 }
 ```
 
@@ -493,24 +508,28 @@ export async function checkRegulatoryRequirements(
 ## Implementation Roadmap
 
 ### Week 1: Core Infrastructure
+
 - [ ] Add Twilio subaccount management
 - [ ] Create number search API
 - [ ] Create number purchase API
 - [ ] Update database schema
 
 ### Week 2: Vapi Integration
+
 - [ ] Import number to Vapi after purchase
 - [ ] Configure webhooks
 - [ ] Link numbers to agents
 - [ ] Test call flow
 
 ### Week 3: UI/UX
+
 - [ ] Number search UI with filters
 - [ ] Provisioning flow UI
 - [ ] Compliance forms for regulated countries
 - [ ] Error handling and feedback
 
 ### Week 4: Billing & Compliance
+
 - [ ] Track number costs per workspace
 - [ ] Enforce plan limits
 - [ ] Regulatory compliance API
@@ -535,14 +554,14 @@ NEXT_PUBLIC_APP_URL=https://your-domain.com
 
 ## Summary
 
-| Aspect | Solution |
-|--------|----------|
-| **Number Source** | Twilio (not Vapi) |
-| **Provisioning** | Programmatic via Twilio API |
-| **Voice AI** | Vapi (import numbers) |
-| **Subaccounts** | One per workspace for isolation |
-| **Billing** | Included in plan + overage charges |
-| **Compliance** | Platform-managed with customer data |
+| Aspect                  | Solution                                           |
+| ----------------------- | -------------------------------------------------- |
+| **Number Source**       | Twilio (not Vapi)                                  |
+| **Provisioning**        | Programmatic via Twilio API                        |
+| **Voice AI**            | Vapi (import numbers)                              |
+| **Subaccounts**         | One per workspace for isolation                    |
+| **Billing**             | Included in plan + overage charges                 |
+| **Compliance**          | Platform-managed with customer data                |
 | **Supported Countries** | US, UK, CA, AU (easy) + others (with verification) |
 
 This strategy enables **fully automated phone number provisioning** for business owners with no manual setup required.

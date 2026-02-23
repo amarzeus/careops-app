@@ -124,10 +124,7 @@ export function verifyRazorpayWebhookSignature(
   signature: string,
   secret: string
 ): boolean {
-  const expectedSignature = crypto
-    .createHmac("sha256", secret)
-    .update(body)
-    .digest("hex");
+  const expectedSignature = crypto.createHmac("sha256", secret).update(body).digest("hex");
   return expectedSignature === signature;
 }
 
@@ -141,12 +138,7 @@ function getPlanKeyFromRazorpayPlanId(planId: string): PlanKey {
   return "free";
 }
 
-export type UsageCategory =
-  | "voice_minutes"
-  | "sms_sent"
-  | "emails_sent"
-  | "bookings"
-  | "contacts";
+export type UsageCategory = "voice_minutes" | "sms_sent" | "emails_sent" | "bookings" | "contacts";
 
 /**
  *

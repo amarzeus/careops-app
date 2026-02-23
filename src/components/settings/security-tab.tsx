@@ -93,16 +93,14 @@ export function SecurityTab({
           {passwordMessage.text && (
             <div
               className={`text-sm ${
-                passwordMessage.type === "success"
-                  ? "text-green-600"
-                  : "text-red-600"
+                passwordMessage.type === "success" ? "text-green-600" : "text-red-600"
               }`}
             >
               {passwordMessage.text}
             </div>
           )}
         </CardContent>
-        <CardFooter className="bg-muted/30 border-t flex justify-end px-6 py-4">
+        <CardFooter className="bg-muted/30 flex justify-end border-t px-6 py-4">
           <Button
             onClick={onChangePassword}
             disabled={changingPassword || !currentPassword || !newPassword}
@@ -114,9 +112,9 @@ export function SecurityTab({
 
       {/* Danger Zone - enhanced */}
       <Card className="border-red-300 shadow-sm">
-        <CardHeader className="bg-red-50 border-b border-red-200 rounded-t-lg">
+        <CardHeader className="rounded-t-lg border-b border-red-200 bg-red-50">
           <div className="flex items-center gap-2">
-            <AlertTriangle className="w-5 h-5 text-red-600" />
+            <AlertTriangle className="h-5 w-5 text-red-600" />
             <CardTitle className="text-red-600">Danger Zone</CardTitle>
           </div>
           <CardDescription className="text-red-500">
@@ -124,19 +122,18 @@ export function SecurityTab({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4 pt-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border-2 border-red-200 bg-red-50 rounded-lg gap-4">
+          <div className="flex flex-col gap-4 rounded-lg border-2 border-red-200 bg-red-50 p-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h4 className="font-medium text-red-900">Delete Account</h4>
               <p className="text-sm text-red-700">
-                Permanently delete your account and all associated data including
-                contacts, bookings, forms, and automation rules. This cannot be
-                undone.
+                Permanently delete your account and all associated data including contacts,
+                bookings, forms, and automation rules. This cannot be undone.
               </p>
             </div>
             <Dialog>
               <DialogTrigger asChild>
-                <Button variant="destructive" className="shrink-0 w-full sm:w-auto">
-                  <Trash2 className="w-4 h-4 mr-2" />
+                <Button variant="destructive" className="w-full shrink-0 sm:w-auto">
+                  <Trash2 className="mr-2 h-4 w-4" />
                   Delete Account
                 </Button>
               </DialogTrigger>
@@ -144,17 +141,17 @@ export function SecurityTab({
                 <DialogHeader>
                   <DialogTitle>Are you absolutely sure?</DialogTitle>
                   <DialogDescription>
-                    This action cannot be undone. This will permanently delete
-                    your account and remove your data from our servers.
+                    This action cannot be undone. This will permanently delete your account and
+                    remove your data from our servers.
                   </DialogDescription>
                 </DialogHeader>
-                <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
-                  <AlertTriangle className="w-4 h-4 text-red-600 mt-0.5 shrink-0" />
+                <div className="flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 p-3">
+                  <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-red-600" />
                   <div className="text-xs text-red-700">
-                    <p className="font-medium mb-1">
+                    <p className="mb-1 font-medium">
                       The following data will be permanently deleted:
                     </p>
-                    <ul className="list-disc list-inside space-y-0.5">
+                    <ul className="list-inside list-disc space-y-0.5">
                       <li>All contacts and conversation history</li>
                       <li>All bookings and calendar data</li>
                       <li>All forms and submissions</li>

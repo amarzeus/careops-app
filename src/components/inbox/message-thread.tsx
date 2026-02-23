@@ -32,13 +32,13 @@ export function MessageThread({ messages, loading, contactName }: MessageThreadP
   if (loading) {
     return (
       <div className="flex justify-center p-4">
-        <Loader2 className="animate-spin text-muted-foreground" />
+        <Loader2 className="text-muted-foreground animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4" ref={scrollRef}>
+    <div className="flex-1 space-y-4 overflow-y-auto p-4 sm:p-6" ref={scrollRef}>
       {messages.map((msg, i) => {
         const showAvatar = i === 0 || messages[i - 1].direction !== msg.direction;
         const channel = msg.channel || "EMAIL";
@@ -46,19 +46,19 @@ export function MessageThread({ messages, loading, contactName }: MessageThreadP
           <div
             key={msg.id}
             className={cn(
-              "flex w-full mb-2",
+              "mb-2 flex w-full",
               msg.direction === "OUTBOUND" ? "justify-end" : "justify-start"
             )}
           >
             <div
               className={cn(
-                "flex items-end max-w-[85%] sm:max-w-[70%] gap-2",
+                "flex max-w-[85%] items-end gap-2 sm:max-w-[70%]",
                 msg.direction === "OUTBOUND" ? "flex-row-reverse" : "flex-row"
               )}
             >
               {msg.direction === "INBOUND" && showAvatar && (
-                <Avatar className="w-6 h-6 mb-1">
-                  <AvatarFallback className="text-[10px] bg-blue-100 text-primary/90">
+                <Avatar className="mb-1 h-6 w-6">
+                  <AvatarFallback className="text-primary/90 bg-blue-100 text-[10px]">
                     {contactName.charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
@@ -67,31 +67,31 @@ export function MessageThread({ messages, loading, contactName }: MessageThreadP
 
               <div
                 className={cn(
-                  "p-3 rounded-2xl text-sm leading-relaxed shadow-sm",
+                  "rounded-2xl p-3 text-sm leading-relaxed shadow-sm",
                   msg.direction === "OUTBOUND"
-                    ? "bg-primary text-white rounded-br-none"
-                    : "bg-background border border-border/40 text-muted-foreground rounded-bl-none"
+                    ? "bg-primary rounded-br-none text-white"
+                    : "bg-background border-border/40 text-muted-foreground rounded-bl-none border"
                 )}
               >
-                <div className="whitespace-pre-wrap break-words">{msg.content}</div>
+                <div className="break-words whitespace-pre-wrap">{msg.content}</div>
                 <div
                   className={cn(
-                    "flex items-center gap-1.5 mt-1 text-right",
+                    "mt-1 flex items-center gap-1.5 text-right",
                     msg.direction === "OUTBOUND" ? "text-blue-100" : "text-muted-foreground"
                   )}
                 >
                   <span
                     className={cn(
-                      "inline-flex items-center gap-0.5 text-[9px] font-medium rounded px-1 py-0.5",
+                      "inline-flex items-center gap-0.5 rounded px-1 py-0.5 text-[9px] font-medium",
                       msg.direction === "OUTBOUND"
                         ? "bg-blue-500/30 text-blue-100"
                         : "bg-muted/30 text-muted-foreground"
                     )}
                   >
                     {channel === "SMS" ? (
-                      <SmartphoneIcon className="w-2.5 h-2.5" />
+                      <SmartphoneIcon className="h-2.5 w-2.5" />
                     ) : (
-                      <Mail className="w-2.5 h-2.5" />
+                      <Mail className="h-2.5 w-2.5" />
                     )}
                     {channel}
                   </span>

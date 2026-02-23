@@ -189,16 +189,16 @@ export default function InboxPage() {
   if (loading) {
     return (
       <div className="flex h-screen items-center justify-center">
-        <Loader2 className="animate-spin text-primary" />
+        <Loader2 className="text-primary animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="flex h-screen bg-background">
+    <div className="bg-background flex h-screen">
       <div
         className={cn(
-          "w-full flex-col border-r border-border/40 md:w-80",
+          "border-border/40 w-full flex-col border-r md:w-80",
           mobileShowChat ? "hidden md:flex" : "flex"
         )}
       >
@@ -214,14 +214,14 @@ export default function InboxPage() {
 
       <div
         className={cn(
-          "flex min-w-0 flex-1 flex-col bg-muted/30/30",
+          "bg-muted/30/30 flex min-w-0 flex-1 flex-col",
           mobileShowChat ? "flex" : "hidden md:flex"
         )}
       >
         {activeConversation ? (
           <>
             {/* Header */}
-            <div className="flex h-16 items-center justify-between border-b border-border/40 bg-background px-4 sm:px-6">
+            <div className="border-border/40 bg-background flex h-16 items-center justify-between border-b px-4 sm:px-6">
               <div className="flex items-center gap-3">
                 <Button
                   variant="ghost"
@@ -232,26 +232,28 @@ export default function InboxPage() {
                   <ArrowLeft className="h-4 w-4" />
                 </Button>
                 <Avatar>
-                  <AvatarFallback className="bg-blue-100 text-primary/90">
+                  <AvatarFallback className="text-primary/90 bg-blue-100">
                     {activeConversation.contactName.charAt(0)}
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <h2 className="font-semibold text-foreground">{activeConversation.contactName}</h2>
-                  <p className="text-xs text-muted-foreground">{activeConversation.contactEmail}</p>
+                  <h2 className="text-foreground font-semibold">
+                    {activeConversation.contactName}
+                  </h2>
+                  <p className="text-muted-foreground text-xs">{activeConversation.contactEmail}</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <Button 
-                  variant="ghost" 
+                <Button
+                  variant="ghost"
                   size="icon"
                   onClick={() => setCallDialogOpen(true)}
                   title="Call contact"
                 >
-                  <Phone className="h-4 w-4 text-muted-foreground" />
+                  <Phone className="text-muted-foreground h-4 w-4" />
                 </Button>
                 <Button variant="ghost" size="icon">
-                  <MoreVertical className="h-4 w-4 text-muted-foreground" />
+                  <MoreVertical className="text-muted-foreground h-4 w-4" />
                 </Button>
               </div>
             </div>
@@ -269,7 +271,7 @@ export default function InboxPage() {
                     <span className="text-[11px] font-medium text-violet-700">AI Suggestions</span>
                     <Badge
                       variant="outline"
-                      className="h-4 border-violet-200 bg-background px-1 text-[9px]"
+                      className="bg-background h-4 border-violet-200 px-1 text-[9px]"
                     >
                       Tap to use
                     </Badge>
@@ -279,7 +281,7 @@ export default function InboxPage() {
                       <button
                         key={i}
                         onClick={() => setInputText(s)}
-                        className="flex items-center gap-1.5 rounded-lg border border-violet-200 bg-background px-3 py-2 text-xs whitespace-nowrap text-violet-800 shadow-sm transition-all hover:border-violet-300 hover:bg-violet-50 hover:shadow-md"
+                        className="bg-background flex items-center gap-1.5 rounded-lg border border-violet-200 px-3 py-2 text-xs whitespace-nowrap text-violet-800 shadow-sm transition-all hover:border-violet-300 hover:bg-violet-50 hover:shadow-md"
                       >
                         <Wand2 className="h-3 w-3 shrink-0 text-violet-400" />
                         <span className="line-clamp-2">{s}</span>
@@ -289,9 +291,11 @@ export default function InboxPage() {
                 </div>
               )}
               {loadingSuggestions && (
-                <div className="flex items-center gap-2 border-t border-border/40 bg-muted/30 px-4 py-3">
-                  <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />
-                  <span className="text-[11px] text-muted-foreground">Generating suggestions...</span>
+                <div className="border-border/40 bg-muted/30 flex items-center gap-2 border-t px-4 py-3">
+                  <Loader2 className="text-muted-foreground h-3.5 w-3.5 animate-spin" />
+                  <span className="text-muted-foreground text-[11px]">
+                    Generating suggestions...
+                  </span>
                 </div>
               )}
               <ChatInput
@@ -305,13 +309,15 @@ export default function InboxPage() {
             </div>
           </>
         ) : (
-          <div className="flex flex-1 flex-col items-center justify-center bg-muted/30/50 px-6 text-muted-foreground">
+          <div className="bg-muted/30/50 text-muted-foreground flex flex-1 flex-col items-center justify-center px-6">
             <div className="flex max-w-7xl flex-col items-center text-center">
               <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-blue-50">
                 <MessageSquare className="h-10 w-10 text-blue-300" />
               </div>
-              <h3 className="mb-2 text-lg font-medium text-muted-foreground">No conversation selected</h3>
-              <p className="text-sm text-muted-foreground">
+              <h3 className="text-muted-foreground mb-2 text-lg font-medium">
+                No conversation selected
+              </h3>
+              <p className="text-muted-foreground text-sm">
                 Choose a conversation from the sidebar to view messages and start replying.
               </p>
             </div>

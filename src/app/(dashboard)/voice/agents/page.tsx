@@ -28,16 +28,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Bot,
-  Plus,
-  MoreVertical,
-  Trash2,
-  Phone,
-  Loader2,
-  Power,
-  PowerOff
-} from "lucide-react";
+import { Bot, Plus, MoreVertical, Trash2, Phone, Loader2, Power, PowerOff } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { AgentCustomizer } from "@/components/voice/agent-customizer";
 
@@ -158,10 +149,7 @@ export default function VoiceAgentsPage() {
 
   return (
     <div className="flex flex-col gap-6 p-6">
-      <Header
-        title="Voice Agents"
-        subtitle="Manage your AI voice assistants"
-      />
+      <Header title="Voice Agents" subtitle="Manage your AI voice assistants" />
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
@@ -178,7 +166,7 @@ export default function VoiceAgentsPage() {
                 Create Agent
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Create Voice Agent</DialogTitle>
                 <DialogDescription>
@@ -199,8 +187,8 @@ export default function VoiceAgentsPage() {
               <Loader2 className="h-8 w-8 animate-spin" />
             </div>
           ) : agents.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground">
-              <Bot className="mx-auto h-12 w-12 mb-4 opacity-50" />
+            <div className="text-muted-foreground py-12 text-center">
+              <Bot className="mx-auto mb-4 h-12 w-12 opacity-50" />
               <p className="font-medium">No voice agents yet</p>
               <p className="text-sm">Create your first agent to start handling calls</p>
             </div>
@@ -222,9 +210,7 @@ export default function VoiceAgentsPage() {
                     <TableCell>
                       <div className="font-medium">{agent.name}</div>
                       {agent.description && (
-                        <div className="text-sm text-muted-foreground">
-                          {agent.description}
-                        </div>
+                        <div className="text-muted-foreground text-sm">{agent.description}</div>
                       )}
                     </TableCell>
                     <TableCell>
@@ -235,13 +221,19 @@ export default function VoiceAgentsPage() {
                     <TableCell>
                       <div className="flex flex-wrap gap-1">
                         {agent.canBook && (
-                          <Badge variant="outline" className="text-xs">Book</Badge>
+                          <Badge variant="outline" className="text-xs">
+                            Book
+                          </Badge>
                         )}
                         {agent.canCheckStatus && (
-                          <Badge variant="outline" className="text-xs">Status</Badge>
+                          <Badge variant="outline" className="text-xs">
+                            Status
+                          </Badge>
                         )}
                         {agent.canTransfer && (
-                          <Badge variant="outline" className="text-xs">Transfer</Badge>
+                          <Badge variant="outline" className="text-xs">
+                            Transfer
+                          </Badge>
                         )}
                       </div>
                     </TableCell>
@@ -256,10 +248,10 @@ export default function VoiceAgentsPage() {
                           ))}
                         </div>
                       ) : (
-                        <span className="text-sm text-muted-foreground">None</span>
+                        <span className="text-muted-foreground text-sm">None</span>
                       )}
                     </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
+                    <TableCell className="text-muted-foreground text-sm">
                       {new Date(agent.createdAt).toLocaleDateString()}
                     </TableCell>
                     <TableCell className="text-right">

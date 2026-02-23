@@ -167,9 +167,7 @@ export async function GET() {
   ]);
 
   // ──── Compute derived metrics ────
-  const lowStockItems = allInventoryItems.filter(
-    (i) => i.quantity <= i.threshold
-  );
+  const lowStockItems = allInventoryItems.filter((i) => i.quantity <= i.threshold);
   const criticalItems = allInventoryItems.filter(
     (i) => i.quantity === 0 || i.quantity <= Math.floor(i.threshold * 0.3)
   );
@@ -279,7 +277,7 @@ export async function GET() {
     unreadMessages: unansweredMessages,
   };
 
-  let aiInsights: any[] = [];
+  let aiInsights: unknown[] = [];
   try {
     aiInsights = await generateDashboardInsights(metricsForAI);
   } catch (error) {
@@ -327,20 +325,36 @@ export async function GET() {
       unit: i.unit,
     })),
     recentActivity: [
-      ...recentBookingsActivity.map((b: { id: string; createdAt: Date; status: string; contact: { name: string }; service: { name: string } }) => ({
-        id: `booking-${b.id}`,
-        type: "booking",
-        message: `Booking ${b.status.toLowerCase()} — ${b.contact.name} for ${b.service.name}`,
-        timestamp: b.createdAt.toISOString(),
-        link: "/bookings",
-      })),
-      ...recentFormActivity.map((f: { id: string; createdAt: Date; status: string; contact: { name: string }; intakeForm: { name: string } | null }) => ({
-        id: `form-${f.id}`,
-        type: "form",
-        message: `Form ${f.status.toLowerCase()} — ${f.contact.name}${f.intakeForm ? ` (${f.intakeForm.name})` : ""}`,
-        timestamp: f.createdAt.toISOString(),
-        link: "/forms",
-      })),
+      ...recentBookingsActivity.map(
+        (b: {
+          id: string;
+          createdAt: Date;
+          status: string;
+          contact: { name: string };
+          service: { name: string };
+        }) => ({
+          id: `booking-${b.id}`,
+          type: "booking",
+          message: `Booking ${b.status.toLowerCase()} — ${b.contact.name} for ${b.service.name}`,
+          timestamp: b.createdAt.toISOString(),
+          link: "/bookings",
+        })
+      ),
+      ...recentFormActivity.map(
+        (f: {
+          id: string;
+          createdAt: Date;
+          status: string;
+          contact: { name: string };
+          intakeForm: { name: string } | null;
+        }) => ({
+          id: `form-${f.id}`,
+          type: "form",
+          message: `Form ${f.status.toLowerCase()} — ${f.contact.name}${f.intakeForm ? ` (${f.intakeForm.name})` : ""}`,
+          timestamp: f.createdAt.toISOString(),
+          link: "/forms",
+        })
+      ),
       ...recentContactActivity.map((c: { id: string; createdAt: Date; name: string }) => ({
         id: `contact-${c.id}`,
         type: "contact",

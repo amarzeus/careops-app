@@ -1,0 +1,13 @@
+
+> careops-app@0.1.0 dev
+> NEXT_PUBLIC_APP_URL=http://localhost:${PORT:-3000} next dev -H 0.0.0.0 -p ${PORT:-3000}
+
+▲ Next.js 16.1.6 (Turbopack)
+- Local:         http://localhost:5010
+- Network:       http://0.0.0.0:5010
+- Environments: .env
+
+✓ Starting...
+⨯ Unable to acquire lock at /home/amar/Desktop/Testing and Fixing/careops-app/.next/dev/lock, is another instance of next dev running?
+  Suggestion: If you intended to restart next dev, terminate the other process, and then try again.
+[?25h
