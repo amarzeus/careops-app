@@ -284,7 +284,7 @@ export default function BookingsPage() {
                     <div
                       className={cn(
                         "shrink-0 rounded-xl border border-black/5 p-2 shadow-sm transition-transform group-hover:scale-110 sm:p-3",
-                        s.color === "blue" && "bg-blue-50 text-blue-600",
+                        s.color === "blue" && "bg-blue-50 text-primary",
                         s.color === "amber" && "bg-amber-50 text-amber-600",
                         s.color === "emerald" && "bg-emerald-50 text-emerald-600",
                         s.color === "rose" && "bg-rose-50 text-rose-600"

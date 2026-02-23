@@ -56,7 +56,7 @@ interface FullCalendarProps {
 type ViewMode = "month" | "week" | "day";
 
 const STATUS_STYLES: Record<string, string> = {
-  CONFIRMED: "bg-blue-50/90 border-l-[3px] border-blue-500 text-blue-700 shadow-sm ring-1 ring-blue-500/10 hover:bg-blue-100",
+  CONFIRMED: "bg-blue-50/90 border-l-[3px] border-blue-500 text-primary/90 shadow-sm ring-1 ring-blue-500/10 hover:bg-blue-100",
   PENDING: "bg-amber-50/90 border-l-[3px] border-amber-500 text-amber-700 shadow-sm ring-1 ring-amber-500/10 hover:bg-amber-100",
   COMPLETED: "bg-emerald-50/90 border-l-[3px] border-emerald-500 text-emerald-700 shadow-sm ring-1 ring-emerald-500/10 hover:bg-emerald-100",
   CANCELLED: "bg-muted/30 border-l-[3px] border-border/40 text-muted-foreground/80 grayscale shadow-none hover:grayscale-0",
@@ -164,7 +164,7 @@ export function FullCalendar({ bookings, externalEvents = [], onEdit, onNewBooki
                   className={cn(
                     "text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full transition-all",
                     isTodayDate
-                      ? "bg-blue-600 text-white shadow-sm"
+                      ? "bg-primary text-white shadow-sm"
                       : "text-muted-foreground group-hover:text-foreground"
                   )}
                 >
@@ -226,13 +226,13 @@ export function FullCalendar({ bookings, externalEvents = [], onEdit, onNewBooki
               >
                 <div className={cn(
                   "text-[9px] font-bold uppercase tracking-widest mb-0.5",
-                  isTodayDate ? "text-blue-600" : "text-muted-foreground"
+                  isTodayDate ? "text-primary" : "text-muted-foreground"
                 )}>
                   {format(day, "EEE")}
                 </div>
                 <div className={cn(
                   "text-xs font-bold w-6 h-6 flex items-center justify-center rounded-full mx-auto transition-all",
-                  isTodayDate ? "bg-blue-600 text-white shadow-sm" : "text-muted-foreground"
+                  isTodayDate ? "bg-primary text-white shadow-sm" : "text-muted-foreground"
                 )}>
                   {format(day, "d")}
                 </div>
@@ -393,7 +393,7 @@ export function FullCalendar({ bookings, externalEvents = [], onEdit, onNewBooki
                 className={cn(
                   "px-3 py-1 text-[9px] font-bold rounded-md capitalize transition-all",
                   view === m
-                    ? "bg-background text-blue-600 shadow-sm border border-border/40"
+                    ? "bg-background text-primary shadow-sm border border-border/40"
                     : "text-muted-foreground hover:text-muted-foreground"
                 )}
               >
@@ -403,7 +403,7 @@ export function FullCalendar({ bookings, externalEvents = [], onEdit, onNewBooki
           </div>
           <Button
             onClick={() => onNewBooking(currentDate)}
-            className="h-7 px-3 bg-blue-600 text-white text-[10px] font-bold rounded-lg shadow-sm hover:bg-blue-700 transition-all active:scale-95"
+            className="h-7 px-3 bg-primary text-white text-[10px] font-bold rounded-lg shadow-sm hover:bg-primary/90 transition-all active:scale-95"
           >
             Add Booking
           </Button>

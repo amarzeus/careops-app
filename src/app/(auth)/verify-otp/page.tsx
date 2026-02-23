@@ -187,15 +187,15 @@ function VerifyOtpContent() {
   // Icons & colors per method
   const methodConfig = {
     email: {
-      icon: <Mail className="h-6 w-6 text-blue-600" />,
+      icon: <Mail className="h-6 w-6 text-primary" />,
       bgIcon: "bg-blue-100",
-      btnClass: "bg-blue-600 hover:bg-blue-700",
+      btnClass: "bg-primary hover:bg-primary/90",
       label: "email",
     },
     sms: {
-      icon: <Smartphone className="h-6 w-6 text-blue-600" />,
+      icon: <Smartphone className="h-6 w-6 text-primary" />,
       bgIcon: "bg-blue-100",
-      btnClass: "bg-blue-600 hover:bg-blue-700",
+      btnClass: "bg-primary hover:bg-primary/90",
       label: "phone",
     },
   };
@@ -342,7 +342,7 @@ function VerifyOtpContent() {
                   size="sm"
                   onClick={handleResendEmail}
                   disabled={resending}
-                  className="text-blue-600 hover:text-blue-700"
+                  className="text-primary hover:text-primary/90"
                 >
                   <RefreshCw className={`mr-2 h-4 w-4 ${resending ? "animate-spin" : ""}`} />
                   {resending ? "Sending..." : "Resend Code"}
@@ -359,7 +359,7 @@ function VerifyOtpContent() {
                     variant="outline"
                     size="sm"
                     onClick={() => switchMethod("email")}
-                    className="flex items-center gap-1.5 text-muted-foreground hover:text-blue-600"
+                    className="flex items-center gap-1.5 text-muted-foreground hover:text-primary"
                   >
                     <Mail className="h-3.5 w-3.5" />
                     Email
@@ -370,7 +370,7 @@ function VerifyOtpContent() {
                     variant="outline"
                     size="sm"
                     onClick={() => switchMethod("sms")}
-                    className="flex items-center gap-1.5 text-muted-foreground hover:text-blue-600"
+                    className="flex items-center gap-1.5 text-muted-foreground hover:text-primary"
                   >
                     <Smartphone className="h-3.5 w-3.5" />
                     SMS

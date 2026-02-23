@@ -187,13 +187,13 @@ export default function FormsPage() {
           <TabsContent value="contact-forms">
             <div className="flex justify-end mb-4 mt-4">
               <Dialog open={cfDialog} onOpenChange={setCfDialog}>
-                <DialogTrigger asChild><Button className="bg-blue-600 hover:bg-blue-700"><Plus className="w-4 h-4 mr-2" />New Contact Form</Button></DialogTrigger>
+                <DialogTrigger asChild><Button className="bg-primary hover:bg-primary/90"><Plus className="w-4 h-4 mr-2" />New Contact Form</Button></DialogTrigger>
                 <DialogContent>
                   <DialogHeader><DialogTitle>Create Contact Form</DialogTitle><DialogDescription>This form will be publicly accessible for lead capture.</DialogDescription></DialogHeader>
                   <div className="space-y-4">
                     <div className="space-y-2"><Label>Form Name</Label><Input placeholder="Contact Us" value={newCF.name} onChange={e => setNewCF(p => ({ ...p, name: e.target.value }))} /></div>
                     <div className="space-y-2"><Label>Welcome Message</Label><Textarea placeholder="Thank you for reaching out..." value={newCF.welcomeMessage} onChange={e => setNewCF(p => ({ ...p, welcomeMessage: e.target.value }))} /></div>
-                    <Button onClick={createContactForm} className="w-full bg-blue-600 hover:bg-blue-700">Create Form</Button>
+                    <Button onClick={createContactForm} className="w-full bg-primary hover:bg-primary/90">Create Form</Button>
                   </div>
                 </DialogContent>
               </Dialog>
@@ -214,7 +214,7 @@ export default function FormsPage() {
           <TabsContent value="intake-forms">
             <div className="flex justify-end mb-4 mt-4">
               <Dialog open={ifDialog} onOpenChange={setIfDialog}>
-                <DialogTrigger asChild><Button className="bg-blue-600 hover:bg-blue-700"><Plus className="w-4 h-4 mr-2" />New Intake Form</Button></DialogTrigger>
+                <DialogTrigger asChild><Button className="bg-primary hover:bg-primary/90"><Plus className="w-4 h-4 mr-2" />New Intake Form</Button></DialogTrigger>
                 <DialogContent>
                   <DialogHeader><DialogTitle>Create Intake Form</DialogTitle><DialogDescription>This form is sent after a booking is made.</DialogDescription></DialogHeader>
                   <div className="space-y-4">
@@ -227,7 +227,7 @@ export default function FormsPage() {
                         <SelectContent>{services.map(s => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}</SelectContent>
                       </Select>
                     </div>
-                    <Button onClick={createIntakeForm} className="w-full bg-blue-600 hover:bg-blue-700">Create Form</Button>
+                    <Button onClick={createIntakeForm} className="w-full bg-primary hover:bg-primary/90">Create Form</Button>
                   </div>
                 </DialogContent>
               </Dialog>

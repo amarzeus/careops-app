@@ -66,6 +66,7 @@
     "next-themes": "^0.4.6",
     "nodemailer": "^8.0.1",
     "prisma": "6.2.1",
+    "razorpay": "^2.9.6",
     "react": "19.2.3",
     "react-day-picker": "^9.13.2",
     "react-dom": "19.2.3",
@@ -89,8 +90,8 @@
     "@types/react-dom": "^19",
     "@vitest/coverage-v8": "^4.0.18",
     "dotenv": "^17.2.4",
-    "eslint": "^9",
-    "eslint-config-next": "16.1.6",
+    "eslint": "^9.39.3",
+    "eslint-config-next": "^16.1.6",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-check-file": "^3.3.1",
     "eslint-plugin-jsdoc": "^62.5.4",
@@ -101,7 +102,7 @@
     "tailwindcss": "^4",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
-    "vercel": "^50.17.1",
+    "vercel": "^50.22.1",
     "vitest": "^4.0.18"
   }
 }

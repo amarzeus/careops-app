@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 
-export default function PlatformContactPage() {
+export default function ContactPage() {
     const [formData, setFormData] = useState({ name: "", email: "", subject: "", message: "" });
     const [submitting, setSubmitting] = useState(false);
     const [success, setSuccess] = useState(false);
@@ -80,7 +80,7 @@ export default function PlatformContactPage() {
                                 </div>
                                 <div>
                                     <h4 className="font-bold text-foreground">Email Us</h4>
-                                    <p className="text-muted-foreground">amarzeus.dev@gmail.com</p>
+                                    <p className="text-muted-foreground">support@careops.io</p>
                                 </div>
                             </div>
 

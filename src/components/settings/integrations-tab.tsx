@@ -64,7 +64,7 @@ export function IntegrationsTab({
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg">
             <div className="flex items-center gap-3">
-              <Mail className="w-5 h-5 text-blue-600" />
+              <Mail className="w-5 h-5 text-primary" />
               <div>
                 <p className="font-medium">Email Service</p>
                 <p className="text-xs text-muted-foreground">
@@ -102,7 +102,7 @@ export function IntegrationsTab({
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg">
             <div className="flex items-center gap-3">
-              <MessageSquare className="w-5 h-5 text-blue-600" />
+              <MessageSquare className="w-5 h-5 text-primary" />
               <div>
                 <p className="font-medium">Twilio SMS</p>
                 <p className="text-xs text-muted-foreground">
@@ -135,7 +135,7 @@ export function IntegrationsTab({
         <CardHeader>
           <div className="flex items-center gap-2">
             <CardTitle>Google Calendar</CardTitle>
-            <Badge variant="secondary" className="bg-blue-100 text-blue-700 text-[10px]">
+            <Badge variant="secondary" className="bg-blue-100 text-primary/90 text-[10px]">
               NEW
             </Badge>
           </div>
@@ -147,11 +147,11 @@ export function IntegrationsTab({
           <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg border border-blue-100">
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Calendar className="w-5 h-5 text-blue-600" />
+                <Calendar className="w-5 h-5 text-primary" />
               </div>
               <div>
                 <p className="font-medium text-blue-900">Google Calendar</p>
-                <p className="text-xs text-blue-600">
+                <p className="text-xs text-primary">
                   {calendarConnected
                     ? `Connected as ${workspace?.googleCalendarEmail || "Google Account"}`
                     : "Not connected — click below to link your Google Calendar"}
@@ -160,7 +160,7 @@ export function IntegrationsTab({
             </div>
             <Badge
               variant={calendarConnected ? "default" : "secondary"}
-              className={calendarConnected ? "bg-blue-600" : "bg-muted/30 text-muted-foreground"}
+              className={calendarConnected ? "bg-primary" : "bg-muted/30 text-muted-foreground"}
             >
               {calendarConnected ? "Connected" : "Disconnected"}
             </Badge>
@@ -201,7 +201,7 @@ export function IntegrationsTab({
             <Button
               variant="outline"
               size="sm"
-              className="w-full border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+              className="w-full border-blue-200 hover:bg-blue-50 hover:text-primary/90"
               onClick={onConnectCalendar}
               disabled={connectingCalendar}
             >

@@ -20,7 +20,7 @@ interface KeyAlertsProps {
 const priorityConfig = {
   critical: { bg: "bg-red-50 border-red-200", dot: "bg-red-500 animate-pulse", text: "text-red-700" },
   high: { bg: "bg-amber-50 border-amber-200", dot: "bg-amber-500", text: "text-amber-700" },
-  medium: { bg: "bg-blue-50 border-blue-200", dot: "bg-blue-500", text: "text-blue-700" },
+  medium: { bg: "bg-blue-50 border-blue-200", dot: "bg-blue-500", text: "text-primary/90" },
   low: { bg: "bg-muted/30 border-border/40", dot: "bg-muted", text: "text-muted-foreground" },
 };
 

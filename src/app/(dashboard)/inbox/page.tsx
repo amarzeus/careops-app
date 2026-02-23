@@ -18,6 +18,7 @@ import { ConversationDTO, MessageDTO } from "@/types/dto";
 import { ConversationList } from "@/components/inbox/conversation-list";
 import { MessageThread } from "@/components/inbox/message-thread";
 import { ChatInput } from "@/components/inbox/chat-input";
+import { OutboundCallDialog } from "@/components/inbox/outbound-call-dialog";
 import { toast } from "@/hooks/use-toast";
 
 /**
@@ -35,6 +36,7 @@ export default function InboxPage() {
   const [sending, setSending] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [mobileShowChat, setMobileShowChat] = useState(false);
+  const [callDialogOpen, setCallDialogOpen] = useState(false);
 
   const totalUnread = conversations.reduce((sum, c) => sum + c.unreadCount, 0);
 
@@ -187,7 +189,7 @@ export default function InboxPage() {
   if (loading) {
     return (
       <div className="flex h-screen items-center justify-center">
-        <Loader2 className="animate-spin text-blue-600" />
+        <Loader2 className="animate-spin text-primary" />
       </div>
     );
   }
@@ -230,7 +232,7 @@ export default function InboxPage() {
                   <ArrowLeft className="h-4 w-4" />
                 </Button>
                 <Avatar>
-                  <AvatarFallback className="bg-blue-100 text-blue-700">
+                  <AvatarFallback className="bg-blue-100 text-primary/90">
                     {activeConversation.contactName.charAt(0)}
                   </AvatarFallback>
                 </Avatar>
@@ -240,7 +242,12 @@ export default function InboxPage() {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <Button variant="ghost" size="icon">
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  onClick={() => setCallDialogOpen(true)}
+                  title="Call contact"
+                >
                   <Phone className="h-4 w-4 text-muted-foreground" />
                 </Button>
                 <Button variant="ghost" size="icon">
@@ -311,6 +318,21 @@ export default function InboxPage() {
           </div>
         )}
       </div>
+
+      <OutboundCallDialog
+        open={callDialogOpen}
+        onOpenChange={setCallDialogOpen}
+        contact={
+          activeConversation
+            ? {
+                id: activeConversation.contactId,
+                name: activeConversation.contactName,
+                phone: activeConversation.contactPhone,
+                email: activeConversation.contactEmail,
+              }
+            : null
+        }
+      />
     </div>
   );
 }

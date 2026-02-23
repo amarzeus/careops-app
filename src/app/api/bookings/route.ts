@@ -3,6 +3,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { triggerAutomation } from "@/lib/automation";
 import { syncBookingToCalendar } from "@/lib/google-calendar";
+import { checkUsageLimit, trackUsage } from "@/lib/razorpay-subscriptions";
 
 /**
  *
@@ -42,6 +43,14 @@ export async function POST(req: Request) {
   if (user.role !== "OWNER" && !user.canAccessBookings)
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
+  const limitCheck = await checkUsageLimit(user.workspaceId, "bookings");
+  if (!limitCheck.allowed) {
+    return NextResponse.json(
+      { error: `Booking limit exceeded. Used: ${limitCheck.used}/${limitCheck.limit}. Please upgrade your plan.` },
+      { status: 402 }
+    );
+  }
+
   const { serviceId, contactId, date, notes } = await req.json();
   if (!serviceId || !contactId || !date)
     return NextResponse.json(
@@ -78,6 +87,8 @@ export async function POST(req: Request) {
     contact,
     service,
   });
+
+  await trackUsage(user.workspaceId, "bookings", 1);
 
   // Sync to Google Calendar (fire-and-forget, never blocks booking flow)
   syncBookingToCalendar(booking.id, user.workspaceId).catch((err) =>

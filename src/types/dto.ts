@@ -1,5 +1,6 @@
 export interface ConversationDTO {
   id: string;
+  contactId: string;
   contactName: string;
   contactEmail: string;
   contactPhone: string | null;

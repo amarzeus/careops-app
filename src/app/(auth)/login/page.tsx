@@ -143,7 +143,7 @@ function LoginContent() {
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
                         <Label htmlFor="password" className="text-muted-foreground">Password</Label>
-                        <Link href="/forgot-password" className="text-xs font-medium text-blue-600 hover:text-blue-700 hover:underline">
+                        <Link href="/forgot-password" className="text-xs font-medium text-primary hover:text-primary/80 hover:underline">
                           Forgot password?
                         </Link>
                       </div>
@@ -162,7 +162,7 @@ function LoginContent() {
 
                 <Button
                   type="submit"
-                  className="w-full h-11 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5"
+                  className="w-full h-11 bg-primary hover:bg-primary/90 text-white font-medium shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5"
                   disabled={loading}
                 >
                   {loading ? (
@@ -181,7 +181,7 @@ function LoginContent() {
 
           <p className="text-center text-sm text-muted-foreground">
             Don&apos;t have an account?{" "}
-            <Link href="/register" className="font-semibold text-blue-600 hover:text-blue-700 hover:underline transition-colors">
+            <Link href="/register" className="font-semibold text-cta hover:text-cta/80 hover:underline transition-colors">
               Start your free trial
             </Link>
           </p>
@@ -190,7 +190,7 @@ function LoginContent() {
 
       {/* Right Column - Visuals (Hidden on Mobile) */}
       <div className="hidden lg:flex w-1/2 bg-muted/30 relative overflow-hidden items-center justify-center">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-800 opacity-90" />
+        <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/80 to-primary/60 opacity-90" />
         <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%23ffffff%22%20fill-opacity%3D%220.05%22%3E%3Cpath%20d%3D%22M36%2034v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6%2034v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6%204V0H4v4H0v2h4v4h2V6h4V4H6z%22%2F%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E')] opacity-20" />
 
         <div className="relative z-10 max-w-7xl text-white p-12">
@@ -223,7 +223,7 @@ function LoginContent() {
           <div className="flex items-center gap-4 text-sm font-medium text-blue-200">
             <div className="flex -space-x-2">
               {[1, 2, 3, 4].map((i) => (
-                <div key={i} className={`w-8 h-8 rounded-full border-2 border-indigo-600 bg-muted/50 flex items-center justify-center text-xs text-muted-foreground font-bold bg-gradient-to-br from-gray-100 to-gray-300`}>
+                <div key={i} className={`w-8 h-8 rounded-full border-2 border-primary bg-muted/50 flex items-center justify-center text-xs text-muted-foreground font-bold bg-gradient-to-br from-gray-100 to-gray-300`}>
                   {String.fromCharCode(64 + i)}
                 </div>
               ))}
@@ -251,7 +251,7 @@ export default function LoginPage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center bg-muted/30 px-4">
-        <Activity className="w-8 h-8 text-blue-600 animate-spin" />
+        <Activity className="w-8 h-8 text-primary animate-spin" />
       </div>
     }>
       <LoginContent />

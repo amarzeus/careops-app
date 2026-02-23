@@ -54,7 +54,7 @@ const triggerConfig: Record<
   BOOKING_CREATED: {
     label: "Booking Created",
     icon: Calendar,
-    color: "text-blue-600",
+    color: "text-primary",
     bgColor: "bg-blue-50",
   },
   BEFORE_BOOKING: {
@@ -192,7 +192,7 @@ export function RuleList({
                         </div>
                         <ArrowRight className="w-4 h-4 text-muted-foreground shrink-0" />
                         <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
-                          <Mail className="w-5 h-5 text-blue-600" />
+                          <Mail className="w-5 h-5 text-primary" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">

@@ -178,7 +178,7 @@ export function RuleDialog({
           </div>
           <Button
             onClick={handleSave}
-            className="w-full bg-blue-600 hover:bg-blue-700"
+            className="w-full bg-primary hover:bg-primary/90"
             disabled={saving}
           >
             {saving ? "Saving..." : rule ? "Save Changes" : "Create Rule"}

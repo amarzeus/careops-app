@@ -16,7 +16,7 @@ interface MetricCardProps {
 }
 
 const colorMap = {
-  blue: { bg: "bg-blue-50", icon: "text-blue-600", ring: "ring-blue-200" },
+  blue: { bg: "bg-blue-50", icon: "text-primary", ring: "ring-blue-200" },
   emerald: { bg: "bg-emerald-50", icon: "text-emerald-600", ring: "ring-emerald-200" },
   violet: { bg: "bg-violet-50", icon: "text-violet-600", ring: "ring-violet-200" },
   amber: { bg: "bg-amber-50", icon: "text-amber-600", ring: "ring-amber-200" },

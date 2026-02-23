@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, Suspense } from "react";
-import { Link2, Settings, Shield, User, Sparkles } from "lucide-react";
+import { CreditCard, Link2, Settings, Shield, User, Sparkles } from "lucide-react";
 import { Header } from "@/components/layout/header";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
@@ -12,6 +12,7 @@ import { IntegrationsTab } from "@/components/settings/integrations-tab";
 import { SecurityTab } from "@/components/settings/security-tab";
 import { AIPreferencesTab } from "@/components/settings/ai-preferences-tab";
 import { VoiceSettingsTab } from "@/components/settings/voice-settings-tab";
+import { BillingTab } from "@/components/settings/billing-tab";
 import { WorkspaceSettingsDTO, UserProfileDTO } from "@/types/dto";
 
 /**
@@ -265,6 +266,7 @@ function SettingsContent() {
           <div className="overflow-x-auto pb-1 -mb-1">
             <TabsList className="flex-nowrap whitespace-nowrap">
               <TabsTrigger value="workspace" className="flex items-center gap-2"><Settings className="w-4 h-4" /> <span className="hidden sm:inline">Workspace</span></TabsTrigger>
+              <TabsTrigger value="billing" className="flex items-center gap-2"><CreditCard className="w-4 h-4" /> <span className="hidden sm:inline">Billing</span></TabsTrigger>
               <TabsTrigger value="ai" className="flex items-center gap-2"><Sparkles className="w-4 h-4" /> <span className="hidden sm:inline">AI</span></TabsTrigger>
               <TabsTrigger value="voice" className="flex items-center gap-2"><Sparkles className="w-4 h-4" /> <span className="hidden sm:inline">Voice</span></TabsTrigger>
               <TabsTrigger value="integrations" className="flex items-center gap-2"><Link2 className="w-4 h-4" /> <span className="hidden sm:inline">Integrations</span></TabsTrigger>
@@ -285,6 +287,10 @@ function SettingsContent() {
               bookingUrl={bookingUrl}
               contactFormUrl={contactFormUrl}
             />
+          </TabsContent>
+
+          <TabsContent value="billing">
+            <BillingTab />
           </TabsContent>
 
           <TabsContent value="ai">

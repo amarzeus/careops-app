@@ -21,7 +21,7 @@
   --popover: #ffffff;
   --popover-foreground: #1d1d1f;
 
-  --primary: #0071e3;
+  --primary: #0ea5e9;
   --primary-foreground: #ffffff;
 
   --secondary: #f5f5f7;
@@ -31,14 +31,18 @@
   --muted-foreground: #86868b;
 
   --accent: #f5f5f7;
-  --accent-foreground: #0071e3;
+  --accent-foreground: #0ea5e9;
 
   --destructive: #ff3b30;
   --destructive-foreground: #ffffff;
 
   --border: #d2d2d7;
   --input: #d2d2d7;
-  --ring: #0071e3;
+  --ring: #0ea5e9;
+
+  /* CTA Brand Palette */
+  --cta: #f97316;
+  --cta-foreground: #ffffff;
 
   /* Glassmorphism */
   --glass-bg: rgba(255, 255, 255, 0.72);
@@ -71,7 +75,7 @@
   --popover: #1d1d1f;
   --popover-foreground: #f5f5f7;
 
-  --primary: #0071e3;
+  --primary: #0ea5e9;
   --primary-foreground: #ffffff;
 
   --secondary: #1d1d1f;
@@ -81,14 +85,18 @@
   --muted-foreground: #86868b;
 
   --accent: #1d1d1f;
-  --accent-foreground: #0071e3;
+  --accent-foreground: #0ea5e9;
 
   --destructive: #ff453a;
   --destructive-foreground: #ffffff;
 
   --border: #424245;
   --input: #424245;
-  --ring: #0071e3;
+  --ring: #0ea5e9;
+
+  /* CTA Brand Palette */
+  --cta: #f97316;
+  --cta-foreground: #ffffff;
 
   /* Glassmorphism Dark */
   --glass-bg: rgba(29, 29, 31, 0.72);
@@ -133,6 +141,8 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-cta: var(--cta);
+  --color-cta-foreground: var(--cta-foreground);
 
   --radius-sm: calc(var(--radius) - 2px);
   --radius-md: calc(var(--radius) - 1px);

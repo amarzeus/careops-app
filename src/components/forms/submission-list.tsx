@@ -68,7 +68,7 @@ export function SubmissionList({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-blue-600 hover:text-blue-700 h-8"
+                  className="text-primary hover:text-primary/90 h-8"
                   onClick={() => onResend(sub.id)}
                   title="Re-send form"
                 >

@@ -108,7 +108,7 @@ export default function CookiePolicyPage() {
                             <strong>Google AdSense</strong> — Serves advertisements on our platform.
                             Google uses the DoubleClick cookie to serve ads based on your prior visits.
                             You can opt out at{" "}
-                            <a href="https://www.google.com/settings/ads" className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">
+                            <a href="https://www.google.com/settings/ads" className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">
                                 Google Ads Settings
                             </a>.
                         </li>
@@ -119,7 +119,7 @@ export default function CookiePolicyPage() {
                         <li>
                             <strong>Google OAuth</strong> — Used when you sign in with Google or
                             connect Google Calendar. Subject to{" "}
-                            <a href="https://policies.google.com/privacy" className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">
+                            <a href="https://policies.google.com/privacy" className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">
                                 Google Privacy Policy
                             </a>.
                         </li>
@@ -135,10 +135,10 @@ export default function CookiePolicyPage() {
                     </p>
                     <p className="mb-4">Browser-specific guidance:</p>
                     <ul className="list-disc pl-6 space-y-2">
-                        <li><a href="https://support.google.com/chrome/answer/95647" className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">Google Chrome</a></li>
-                        <li><a href="https://support.mozilla.org/en-US/kb/cookies-information-websites-store-on-your-computer" className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">Mozilla Firefox</a></li>
-                        <li><a href="https://support.apple.com/en-gb/guide/safari/sfri11471" className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">Safari</a></li>
-                        <li><a href="https://support.microsoft.com/en-us/microsoft-edge/delete-cookies-in-microsoft-edge-63947406-40ac-c3b8-57b9-2a946a29ae09" className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">Microsoft Edge</a></li>
+                        <li><a href="https://support.google.com/chrome/answer/95647" className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">Google Chrome</a></li>
+                        <li><a href="https://support.mozilla.org/en-US/kb/cookies-information-websites-store-on-your-computer" className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">Mozilla Firefox</a></li>
+                        <li><a href="https://support.apple.com/en-gb/guide/safari/sfri11471" className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">Safari</a></li>
+                        <li><a href="https://support.microsoft.com/en-us/microsoft-edge/delete-cookies-in-microsoft-edge-63947406-40ac-c3b8-57b9-2a946a29ae09" className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">Microsoft Edge</a></li>
                     </ul>
                 </section>
 
@@ -149,11 +149,11 @@ export default function CookiePolicyPage() {
                         and web beacons to collect data about your visits to this and other websites
                         to provide relevant advertisements. For more information or to opt out of
                         personalised advertising, visit{" "}
-                        <a href="https://www.aboutads.info/choices/" className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">
+                        <a href="https://www.aboutads.info/choices/" className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">
                             aboutads.info
                         </a>{" "}
                         or{" "}
-                        <a href="https://www.youronlinechoices.com/" className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">
+                        <a href="https://www.youronlinechoices.com/" className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">
                             youronlinechoices.com
                         </a>.
                     </p>
@@ -172,7 +172,7 @@ export default function CookiePolicyPage() {
                     <h2 className="text-2xl font-bold text-foreground mb-4">7. Contact Us</h2>
                     <p>
                         For any questions about our use of cookies, contact{" "}
-                        <a href="mailto:amarzeus.dev@gmail.com" className="text-blue-600 hover:underline">
+                        <a href="mailto:amarzeus.dev@gmail.com" className="text-primary hover:underline">
                             amarzeus.dev@gmail.com
                         </a>.
                     </p>

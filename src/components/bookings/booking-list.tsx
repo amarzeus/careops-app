@@ -97,7 +97,7 @@ export function BookingList({ bookings, onStatusUpdate, onEdit }: BookingListPro
                 <TableCell className="py-2">
                   <span className={cn(
                     "inline-flex items-center px-2 py-0.5 rounded-md text-[9px] font-black tracking-tight uppercase border shadow-sm",
-                    booking.status === "CONFIRMED" && "bg-blue-50 text-blue-700 border-blue-100",
+                    booking.status === "CONFIRMED" && "bg-blue-50 text-primary/90 border-blue-100",
                     booking.status === "PENDING" && "bg-amber-50 text-amber-700 border-amber-100",
                     booking.status === "COMPLETED" && "bg-emerald-50 text-emerald-700 border-emerald-100",
                     (booking.status === "CANCELLED" || booking.status === "NO_SHOW") && "bg-rose-50 text-rose-700 border-rose-100",
@@ -118,7 +118,7 @@ export function BookingList({ bookings, onStatusUpdate, onEdit }: BookingListPro
                       <DropdownMenuItem onClick={() => onEdit(booking)} className="text-[11px] font-bold cursor-pointer gap-2 focus:bg-muted/30 transition-colors">
                         Edit Details
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => onStatusUpdate(booking.id, "CONFIRMED")} className="text-[11px] font-bold cursor-pointer gap-2 focus:bg-blue-50 focus:text-blue-700 transition-colors">
+                      <DropdownMenuItem onClick={() => onStatusUpdate(booking.id, "CONFIRMED")} className="text-[11px] font-bold cursor-pointer gap-2 focus:bg-blue-50 focus:text-primary/90 transition-colors">
                         Confirm
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => onStatusUpdate(booking.id, "COMPLETED")} className="text-[11px] font-bold cursor-pointer gap-2 focus:bg-emerald-50 focus:text-emerald-700 transition-colors">

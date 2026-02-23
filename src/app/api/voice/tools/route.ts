@@ -2,10 +2,11 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendSMS } from "@/lib/sms";
 import { isAfterHours, normalizeVoicePhoneNumber } from "@/lib/voice-compliance";
+import { checkUsageLimit, trackUsage } from "@/lib/razorpay-subscriptions";
 
-type ToolParams = Record<string, unknown>;
+type ToolParams = Record<string, unknown> & { _workspaceId?: string };
 type ToolResult = Record<string, unknown>;
-type ToolHandler = (params: ToolParams) => Promise<ToolResult>;
+type ToolHandler = (params: ToolParams, workspaceId: string) => Promise<ToolResult>;
 
 /**
  *
@@ -42,7 +43,7 @@ function isBookingOpenStatus(status: string): boolean {
 }
 
 const handlers: Record<string, ToolHandler> = {
-  check_availability: async (params) => {
+  check_availability: async (params, workspaceId) => {
     const serviceId = asString(params.serviceId);
     const date = asString(params.date);
 
@@ -50,7 +51,9 @@ const handlers: Record<string, ToolHandler> = {
       return { error: "serviceId and date are required" };
     }
 
-    const service = await prisma.service.findUnique({ where: { id: serviceId } });
+    const service = await prisma.service.findFirst({
+      where: { id: serviceId, workspaceId }
+    });
     if (!service) {
       return { error: "Service not found" };
     }
@@ -85,7 +88,7 @@ const handlers: Record<string, ToolHandler> = {
     };
   },
 
-  create_booking: async (params) => {
+  create_booking: async (params, workspaceId) => {
     const serviceId = asString(params.serviceId);
     const contactName = asString(params.contactName);
     const contactPhoneRaw = asString(params.contactPhone);
@@ -96,6 +99,14 @@ const handlers: Record<string, ToolHandler> = {
 
     if (!serviceId || !contactName || !contactPhoneRaw || !date || !time) {
       return { error: "serviceId, contactName, contactPhone, date, and time are required" };
+    }
+
+    const bookingLimit = await checkUsageLimit(workspaceId, "bookings");
+    if (!bookingLimit.allowed) {
+      return { 
+        error: `Booking limit reached. Used: ${bookingLimit.used}/${bookingLimit.limit}. Please upgrade your plan.`,
+        action: "upgrade_required"
+      };
     }
 
     const service = await prisma.service.findUnique({ where: { id: serviceId } });
@@ -122,6 +133,7 @@ const handlers: Record<string, ToolHandler> = {
           source: "voice_ai",
         },
       });
+      await trackUsage(workspaceId, "contacts", 1);
     }
 
     const startDate = parseDateAndTime(date, time);
@@ -143,6 +155,8 @@ const handlers: Record<string, ToolHandler> = {
       },
     });
 
+    await trackUsage(workspaceId, "bookings", 1);
+
     return {
       success: true,
       bookingId: booking.id,
@@ -150,19 +164,18 @@ const handlers: Record<string, ToolHandler> = {
     };
   },
 
-  get_booking_status: async (params) => {
+  get_booking_status: async (params, workspaceId) => {
     const bookingId = asString(params.bookingId);
     const customerPhoneRaw = asString(params.customerPhone);
-    const workspaceId = asString(params.workspaceId);
 
     let booking = null;
 
     if (bookingId) {
-      booking = await prisma.booking.findUnique({
-        where: { id: bookingId },
+      booking = await prisma.booking.findFirst({
+        where: { id: bookingId, workspaceId },
         include: { service: true, contact: true },
       });
-    } else if (customerPhoneRaw && workspaceId) {
+    } else if (customerPhoneRaw) {
       const normalizedPhone = normalizeVoicePhoneNumber(customerPhoneRaw);
       booking = await prisma.booking.findFirst({
         where: {
@@ -193,7 +206,7 @@ const handlers: Record<string, ToolHandler> = {
     };
   },
 
-  reschedule_booking: async (params) => {
+  reschedule_booking: async (params, workspaceId) => {
     const bookingId = asString(params.bookingId);
     const date = asString(params.date);
     const time = asString(params.time);
@@ -202,8 +215,8 @@ const handlers: Record<string, ToolHandler> = {
       return { error: "bookingId, date, and time are required" };
     }
 
-    const booking = await prisma.booking.findUnique({
-      where: { id: bookingId },
+    const booking = await prisma.booking.findFirst({
+      where: { id: bookingId, workspaceId },
       include: { service: true, contact: true },
     });
 
@@ -250,7 +263,7 @@ const handlers: Record<string, ToolHandler> = {
     };
   },
 
-  transfer_to_staff: async (params) => {
+  transfer_to_staff: async (params, _workspaceId) => {
     const staffName = asString(params.staffName) || "on-call staff";
     const reason = asString(params.reason) || "Customer requested escalation";
 
@@ -262,11 +275,10 @@ const handlers: Record<string, ToolHandler> = {
     };
   },
 
-  get_services: async (params) => {
-    const workspaceId = asString(params.workspaceId);
+  get_services: async (params, workspaceId) => {
     const services = await prisma.service.findMany({
       where: {
-        ...(workspaceId ? { workspaceId } : {}),
+        workspaceId,
         isActive: true,
       },
       select: {
@@ -282,17 +294,7 @@ const handlers: Record<string, ToolHandler> = {
     return { services };
   },
 
-  get_business_hours: async (params) => {
-    const workspaceId = asString(params.workspaceId);
-
-    if (!workspaceId) {
-      return {
-        businessHours: "Monday to Friday, 9:00 AM to 5:00 PM",
-        timezone: "UTC",
-        afterHours: false,
-      };
-    }
-
+  get_business_hours: async (params, workspaceId) => {
     const workspace = await prisma.workspace.findUnique({
       where: { id: workspaceId },
       select: { timezone: true },
@@ -323,6 +325,20 @@ const handlers: Record<string, ToolHandler> = {
  */
 export async function POST(req: Request) {
   try {
+    const workspaceId = req.headers.get("X-Workspace-Id");
+    
+    if (!workspaceId) {
+      return NextResponse.json({ error: "Missing workspace context" }, { status: 400 });
+    }
+
+    const entitlement = await checkUsageLimit(workspaceId, "voice_minutes");
+    if (!entitlement.allowed && entitlement.limit !== -1) {
+      return NextResponse.json({ 
+        error: `Voice minutes limit exceeded. Used: ${entitlement.used}/${entitlement.limit}. Please upgrade.`,
+        action: "upgrade_required"
+      }, { status: 402 });
+    }
+
     const body = (await req.json()) as {
       message?: {
         toolCalls?: Array<{
@@ -359,7 +375,7 @@ export async function POST(req: Request) {
 
       const handler = handlers[toolName];
       const result = handler
-        ? await handler(parsedArgs)
+        ? await handler(parsedArgs, workspaceId)
         : { error: `Tool ${toolName} not found` };
 
       results.push({

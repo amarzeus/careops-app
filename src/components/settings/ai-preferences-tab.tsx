@@ -118,7 +118,7 @@ export function AIPreferencesTab({ _onSelectTab }: { _onSelectTab?: (tab: string
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
-        <Loader2 className="animate-spin text-blue-600 w-6 h-6" />
+        <Loader2 className="animate-spin text-primary w-6 h-6" />
         <span className="ml-2 text-muted-foreground">Loading AI settings...</span>
       </div>
     );

@@ -43,7 +43,7 @@ export function ActionList({ insights }: ActionListProps) {
         <Card className="h-full">
             <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
-                    <AlertCircle className="w-5 h-5 text-blue-600" />
+                    <AlertCircle className="w-5 h-5 text-primary" />
                     Executive Attention Needed
                 </CardTitle>
             </CardHeader>

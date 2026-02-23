@@ -79,6 +79,15 @@ export async function GET(req: Request) {
                     workspaceId: workspace.id,
                 },
             });
+
+            await prisma.subscription.create({
+                data: {
+                    workspaceId: workspace.id,
+                    planKey: "free",
+                    status: "active",
+                },
+            });
+
             console.log(`[Google Auth Callback] New user created: ${user.id} with workspace: ${workspace.id}`);
         } else {
             console.log(`[Google Auth Callback] Existing user found: ${user.id}`);
@@ -107,6 +116,14 @@ export async function GET(req: Request) {
                 await prisma.user.update({
                     where: { id: user.id },
                     data: { workspaceId: workspace.id },
+                });
+
+                await prisma.subscription.create({
+                    data: {
+                        workspaceId: workspace.id,
+                        planKey: "free",
+                        status: "active",
+                    },
                 });
 
                 user.workspaceId = workspace.id;

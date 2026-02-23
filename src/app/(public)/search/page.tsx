@@ -12,6 +12,9 @@ import { motion, useReducedMotion } from "framer-motion";
 // ─────────────────────────────────────────────
 // PREMIUM CURSOR GLOW — Liquid Glass blend mode
 // ─────────────────────────────────────────────
+/**
+ *
+ */
 function CursorGlow() {
     const [pos, setPos] = useState({ x: -100, y: -100 });
     const prefersReducedMotion = useReducedMotion();
@@ -38,6 +41,9 @@ function CursorGlow() {
 // ─────────────────────────────────────────────
 // MAGNETIC BUTTON
 // ─────────────────────────────────────────────
+/**
+ *
+ */
 function MagneticButton({ children, className = "" }: { children: React.ReactNode; className?: string }) {
     const ref = useRef<HTMLDivElement>(null);
     const [offset, setOffset] = useState({ x: 0, y: 0 });
@@ -69,6 +75,9 @@ function MagneticButton({ children, className = "" }: { children: React.ReactNod
 // ─────────────────────────────────────────────
 // SPOTLIGHT CARD — Glassmorphic 3D tilt
 // ─────────────────────────────────────────────
+/**
+ *
+ */
 function SpotlightCard({
     children,
     className = "",
@@ -136,6 +145,9 @@ interface Workspace {
     }[];
 }
 
+/**
+ *
+ */
 export default function SearchPage() {
     const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
     const [loading, setLoading] = useState(true);
@@ -199,7 +211,7 @@ export default function SearchPage() {
                             </Link>
                             <MagneticButton>
                                 <Link href="/register">
-                                    <Button className="bg-foreground text-background hover:bg-foreground/90 rounded-full px-7 shadow-xl shadow-foreground/10 font-bold transition-all duration-300 relative overflow-hidden group">
+                                    <Button className="bg-cta text-cta-foreground hover:opacity-90 rounded-full px-7 shadow-xl shadow-cta/10 font-bold transition-all duration-300 relative overflow-hidden group">
                                         <span className="relative z-10">List Your Business</span>
                                         <div className="absolute inset-0 bg-gradient-to-r from-primary/30 to-purple-500/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                                     </Button>
@@ -320,7 +332,7 @@ export default function SearchPage() {
                                     {/* Action Buttons */}
                                     <div className="flex gap-3 mt-6 pt-6 border-t border-border/50">
                                         <Link href={`/book/${workspace.id}`} className="flex-1">
-                                            <Button className="w-full bg-foreground text-background hover:bg-foreground/90 font-bold rounded-xl shadow-md transition-all">
+                                            <Button className="w-full bg-cta text-cta-foreground hover:opacity-90 font-bold rounded-xl shadow-md transition-all">
                                                 Book Now
                                             </Button>
                                         </Link>
@@ -345,7 +357,7 @@ export default function SearchPage() {
                         </p>
                         <MagneticButton>
                             <Link href="/register">
-                                <Button className="bg-primary/10 text-primary hover:bg-primary/20 rounded-full px-8 py-6 text-lg font-bold transition-colors">
+                                <Button className="bg-cta text-cta-foreground hover:opacity-90 rounded-full px-8 py-6 text-lg font-bold transition-colors shadow-xl shadow-cta/10">
                                     List Your Business
                                 </Button>
                             </Link>

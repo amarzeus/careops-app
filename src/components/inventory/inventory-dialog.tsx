@@ -192,7 +192,7 @@ export function InventoryDialog({
           </div>
           <Button
             onClick={handleSave}
-            className="w-full bg-blue-600 hover:bg-blue-700 font-bold"
+            className="w-full bg-primary hover:bg-primary/90 font-bold"
             disabled={saving}
           >
             {saving ? "Saving..." : item ? "Save Changes" : "Create Item"}

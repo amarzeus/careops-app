@@ -73,7 +73,7 @@ export function Logo({ className, size = 32, variant = "full" }: LogoProps) {
 
             {variant === "full" && (
                 <span className="font-bold tracking-tight text-xl text-foreground select-none">
-                    Care<span className="text-indigo-600">Ops</span>
+                    Care<span className="text-primary">Ops</span>
                 </span>
             )}
         </div>

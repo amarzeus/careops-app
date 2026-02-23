@@ -81,6 +81,7 @@ export async function GET(_req: Request) {
 
             return {
                 id: c.id,
+                contactId: c.contact.id,
                 contactName: c.contact.name,
                 contactEmail: c.contact.email,
                 contactPhone: c.contact.phone || null,

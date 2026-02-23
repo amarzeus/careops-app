@@ -117,7 +117,7 @@ export function SubmissionDetailDialog({
                 <Button
                   size="sm"
                   variant="outline"
-                  className="text-blue-600"
+                  className="text-primary"
                   onClick={() => onResend(submission.id)}
                 >
                   <Send className="w-3 h-3 mr-1" /> Re-send Form

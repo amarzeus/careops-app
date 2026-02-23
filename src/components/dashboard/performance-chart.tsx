@@ -28,7 +28,7 @@ export function PerformanceChart({ data }: PerformanceChartProps) {
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <CardTitle className="text-base font-semibold text-foreground flex items-center gap-2">
-            <TrendingUp className="w-4 h-4 text-blue-600" />
+            <TrendingUp className="w-4 h-4 text-primary" />
             7-Day Performance
           </CardTitle>
           <div className="flex items-center gap-4 text-xs">

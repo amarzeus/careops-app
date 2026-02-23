@@ -88,7 +88,7 @@ export default function TermsPage() {
                         </p>
                         <div className="mt-4 p-4 bg-muted/30 rounded-lg border border-border/40">
                             <p className="font-semibold text-foreground">Amar Kumar</p>
-                            <a href="mailto:amarzeus.dev@gmail.com" className="text-blue-600 hover:underline">amarzeus.dev@gmail.com</a>
+                            <a href="mailto:amarzeus.dev@gmail.com" className="text-primary hover:underline">amarzeus.dev@gmail.com</a>
                         </div>
                     </div>
                 </section>

@@ -22,6 +22,9 @@ interface VoiceWebhookPayload {
   direction?: string;
 }
 
+/**
+ *
+ */
 async function resolveContactId(
   workspaceId: string,
   contactIdFromMetadata: string | undefined,
@@ -42,6 +45,9 @@ async function resolveContactId(
   return contact?.id || null;
 }
 
+/**
+ *
+ */
 export async function POST(req: NextRequest) {
   const startTime = Date.now();
   const signature = req.headers.get("x-vapi-signature");
@@ -152,6 +158,9 @@ export async function POST(req: NextRequest) {
   }
 }
 
+/**
+ *
+ */
 export async function GET() {
   return NextResponse.json({
     status: "ok",

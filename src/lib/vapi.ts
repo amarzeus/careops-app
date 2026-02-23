@@ -1,3 +1,5 @@
+import { checkUsageLimit } from "./razorpay-subscriptions";
+
 const apiKey = process.env.VAPI_API_KEY || '';
 
 interface VapiCall {
@@ -68,6 +70,15 @@ export async function initiateOutboundCall(
 ): Promise<{ callId: string; success: boolean; error?: string }> {
   if (!vapiClient) {
     return { callId: '', success: false, error: 'VAPI not configured' };
+  }
+
+  const limitCheck = await checkUsageLimit(request.workspaceId, "voice_minutes");
+  if (!limitCheck.allowed) {
+    return {
+      callId: '',
+      success: false,
+      error: `Voice minutes limit exceeded. Used: ${limitCheck.used}/${limitCheck.limit}. Please upgrade your plan.`,
+    };
   }
 
   try {

@@ -770,7 +770,7 @@ export function InlineVoiceMode({ onTranscript, onClose, className, autoStart = 
             voiceState === "idle" ? "opacity-60 group-hover:opacity-100" : "opacity-0"
           )}>
             <div className="w-10 h-10 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center shadow-sm">
-              <Mic className="w-4 h-4 text-indigo-600" />
+              <Mic className="w-4 h-4 text-primary" />
             </div>
           </div>
           {/* Stop icon when listening */}
@@ -796,7 +796,7 @@ export function InlineVoiceMode({ onTranscript, onClose, className, autoStart = 
           )}>
             <div className={cn(
               "w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5",
-              msg.role === "user" ? "bg-indigo-600" : "bg-muted/30"
+              msg.role === "user" ? "bg-primary" : "bg-muted/30"
             )}>
               <span className={cn(
                 "text-[8px] font-bold",
@@ -807,7 +807,7 @@ export function InlineVoiceMode({ onTranscript, onClose, className, autoStart = 
             </div>
             <div className={cn(
               "max-w-[85%] px-3 py-2 rounded-2xl text-[11px] leading-relaxed",
-              msg.role === "user" ? "bg-indigo-600 text-white rounded-tr-none" : "bg-muted/30 text-muted-foreground rounded-tl-none"
+              msg.role === "user" ? "bg-primary text-white rounded-tr-none" : "bg-muted/30 text-muted-foreground rounded-tl-none"
             )}>
               {msg.content}
             </div>
@@ -838,7 +838,7 @@ export function InlineVoiceMode({ onTranscript, onClose, className, autoStart = 
               "p-1.5 rounded-full transition-all",
               voiceState === "listening"
                 ? "bg-red-500 text-white animate-pulse"
-                : "bg-background border border-border/40 text-muted-foreground hover:text-indigo-600"
+                : "bg-background border border-border/40 text-muted-foreground hover:text-primary"
             )}
           >
             <Mic size={14} />
@@ -848,7 +848,7 @@ export function InlineVoiceMode({ onTranscript, onClose, className, autoStart = 
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             placeholder="Type a message..."
-            className="flex-1 bg-background border border-border/40 rounded-full px-3 py-1.5 text-[11px] focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-sm"
+            className="flex-1 bg-background border border-border/40 rounded-full px-3 py-1.5 text-[11px] focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm"
           />
           <button
             type="submit"
@@ -856,7 +856,7 @@ export function InlineVoiceMode({ onTranscript, onClose, className, autoStart = 
             className={cn(
               "p-1.5 rounded-full transition-all",
               inputText.trim() && voiceState !== "processing"
-                ? "bg-indigo-600 text-white shadow-sm hover:bg-indigo-700"
+                ? "bg-primary text-white shadow-sm hover:bg-primary/90"
                 : "bg-muted/30 text-muted-foreground"
             )}
           >
@@ -889,7 +889,7 @@ export function VoiceAssistantFAB({
   return (
     <button
       onClick={onClick}
-      className="fixed bottom-6 right-6 z-[9999] w-14 h-14 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-2xl hover:scale-105 transition-all duration-300 group text-white border-2 border-white/20"
+      className="fixed bottom-6 right-6 z-[9999] w-14 h-14 rounded-full bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center shadow-2xl hover:scale-105 transition-all duration-300 group text-white border-2 border-white/20"
       style={{ right: '24px', bottom: '24px', left: 'auto' }}
     >
       {pulse && (
@@ -1002,7 +1002,7 @@ export function GlobalVoiceOverlay({
               </span>
             </div>
             <div className="flex gap-1">
-              <button onClick={toggleMute} className="p-1.5 hover:bg-background/50 rounded-full text-indigo-400 hover:text-indigo-600 transition-colors">
+              <button onClick={toggleMute} className="p-1.5 hover:bg-background/50 rounded-full text-indigo-400 hover:text-primary transition-colors">
                 {isMuted ? <VolumeX size={14} /> : <Volume2 size={14} />}
               </button>
               <button onClick={onClose} className="p-1.5 hover:bg-red-50 rounded-full text-muted-foreground hover:text-red-500 transition-colors">
@@ -1039,7 +1039,7 @@ export function GlobalVoiceOverlay({
               >
                 <div className={cn(
                   "w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5",
-                  msg.role === "user" ? "bg-indigo-600" : "bg-muted/30"
+                  msg.role === "user" ? "bg-primary" : "bg-muted/30"
                 )}>
                   <span className={cn(
                     "text-[8px] font-bold",
@@ -1051,7 +1051,7 @@ export function GlobalVoiceOverlay({
                 <div className={cn(
                   "px-3 py-2 rounded-2xl text-sm leading-relaxed max-w-[85%]",
                   msg.role === "user"
-                    ? "bg-indigo-600 text-white rounded-tr-none"
+                    ? "bg-primary text-white rounded-tr-none"
                     : "bg-muted/30 text-muted-foreground rounded-tl-none"
                 )}>
                   {msg.content}
@@ -1085,7 +1085,7 @@ export function GlobalVoiceOverlay({
                   "p-2 rounded-full transition-all",
                   voiceState === "listening"
                     ? "bg-red-500 text-white animate-pulse"
-                    : "bg-background border border-border/40 text-muted-foreground hover:text-indigo-600"
+                    : "bg-background border border-border/40 text-muted-foreground hover:text-primary"
                 )}
               >
                 <Mic size={16} />
@@ -1095,7 +1095,7 @@ export function GlobalVoiceOverlay({
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
                 placeholder="Type a message..."
-                className="flex-1 bg-background border border-border/40 rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-sm"
+                className="flex-1 bg-background border border-border/40 rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm"
               />
               <button
                 type="submit"
@@ -1103,7 +1103,7 @@ export function GlobalVoiceOverlay({
                 className={cn(
                   "p-2 rounded-full transition-all",
                   inputText.trim() && voiceState !== "processing"
-                    ? "bg-indigo-600 text-white shadow-md hover:bg-indigo-700"
+                    ? "bg-primary text-white shadow-md hover:bg-primary/90"
                     : "bg-muted/30 text-muted-foreground"
                 )}
               >

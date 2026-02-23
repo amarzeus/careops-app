@@ -58,12 +58,14 @@ model Workspace {
   googleCalendarTokenExpiry  DateTime?
   googleCalendarEmail        String?
   googleCalendarId           String?              @default("primary")
+  twilioSubaccountSid        String?
   createdAt                  DateTime             @default(now())
   updatedAt                  DateTime             @updatedAt
   aiPreferences              AIPreferences?
   alerts                     Alert[]
   automationRules            AutomationRule[]
   bookings                   Booking[]
+  complianceDocuments        ComplianceDocument[]
   contacts                   Contact[]
   contactForms               ContactForm[]
   conversations              Conversation[]
@@ -81,6 +83,9 @@ model Workspace {
   webhooks                   Webhook[]
   webhookDeliveries          WebhookDeliveryLog[]
   webhookJobs                WebhookJob[]
+  subscription               Subscription?
+  usageRecords               UsageRecord[]
+  platformPhoneNumbers       PlatformPhoneNumber[]
 }
 
 model Webhook {
@@ -416,9 +421,13 @@ model PhoneNumber {
   phoneNumber    String      @unique
   label          String?
   vapiPhoneId    String?
+  twilioPhoneSid String?
   isActive       Boolean     @default(true)
   forwardToStaff Boolean     @default(false)
   forwardNumber  String?
+  monthlyFee     Float       @default(150)
+  country        String      @default("US")
+  numberType     String      @default("local")
   voiceAgentId   String?
   workspaceId    String
   createdAt      DateTime    @default(now())
@@ -499,4 +508,74 @@ model AIPreferences {
   createdAt                DateTime  @default(now())
   updatedAt                DateTime  @updatedAt
   workspace                Workspace @relation(fields: [workspaceId], references: [id])
+}
+
+model Subscription {
+  id                      String     @id @default(cuid())
+  workspaceId             String     @unique
+  razorpaySubscriptionId  String?    @unique
+  razorpayPlanId          String?
+  razorpayCustomerId      String?
+  planKey                 String     @default("free")
+  status                  String     @default("active")
+  currentPeriodStart      DateTime?
+  currentPeriodEnd        DateTime?
+  cancelAtPeriodEnd       Boolean    @default(false)
+  lastPaymentAt           DateTime?
+  cancelledAt             DateTime?
+  createdAt               DateTime   @default(now())
+  updatedAt               DateTime   @updatedAt
+  workspace               Workspace  @relation(fields: [workspaceId], references: [id])
+
+  @@index([razorpayCustomerId])
+  @@index([status])
+}
+
+model UsageRecord {
+  id              String    @id @default(cuid())
+  workspaceId     String
+  category        String
+  quantity        Int       @default(0)
+  periodStart     DateTime
+  periodEnd       DateTime
+  createdAt       DateTime  @default(now())
+  workspace       Workspace @relation(fields: [workspaceId], references: [id])
+
+  @@unique([workspaceId, category, periodStart])
+  @@index([workspaceId, periodStart])
+}
+
+model PlatformPhoneNumber {
+  id              String     @id @default(cuid())
+  phoneNumber     String     @unique
+  vapiPhoneId     String?
+  twilioPhoneSid  String?
+  status          String     @default("available")
+  workspaceId     String?
+  monthlyFee      Float      @default(150)
+  country         String     @default("IN")
+  assignedAt      DateTime?
+  createdAt       DateTime   @default(now())
+  workspace       Workspace? @relation(fields: [workspaceId], references: [id])
+
+  @@index([status])
+  @@index([workspaceId])
+}
+
+model ComplianceDocument {
+  id           String    @id @default(cuid())
+  workspaceId  String
+  documentType String
+  fileName     String
+  fileUrl      String
+  status       String    @default("PENDING")
+  reviewedAt   DateTime?
+  reviewedBy   String?
+  notes        String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  workspace    Workspace @relation(fields: [workspaceId], references: [id])
+
+  @@index([workspaceId, status])
+  @@index([documentType])
 }

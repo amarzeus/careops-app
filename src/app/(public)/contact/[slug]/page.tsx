@@ -116,7 +116,7 @@ export default function PublicContactPage({ params }: { params: Promise<{ slug: 
                 )}
               </div>
             ))}
-            <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700" disabled={submitting}>
+            <Button type="submit" className="w-full bg-primary hover:bg-primary/90" disabled={submitting}>
               {submitting ? "Submitting..." : <><Send className="w-4 h-4 mr-2" />Submit</>}
             </Button>
           </form>

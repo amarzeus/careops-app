@@ -20,7 +20,7 @@ interface TodaysScheduleProps {
 
 const statusColors: Record<string, string> = {
   PENDING: "bg-amber-100 text-amber-700 border-amber-200",
-  CONFIRMED: "bg-blue-100 text-blue-700 border-blue-200",
+  CONFIRMED: "bg-blue-100 text-primary/90 border-blue-200",
   COMPLETED: "bg-emerald-100 text-emerald-700 border-emerald-200",
   NO_SHOW: "bg-red-100 text-red-700 border-red-200",
 };
@@ -38,12 +38,12 @@ export function TodaysSchedule({ bookings }: TodaysScheduleProps) {
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="text-base font-semibold text-foreground flex items-center gap-2">
-            <Clock className="w-4 h-4 text-blue-600" />
+            <Clock className="w-4 h-4 text-primary" />
             Today&apos;s Schedule
           </CardTitle>
           <button
             onClick={() => router.push("/bookings")}
-            className="text-xs text-blue-600 hover:text-blue-700 font-medium"
+            className="text-xs text-primary hover:text-primary/90 font-medium"
           >
             View all
           </button>

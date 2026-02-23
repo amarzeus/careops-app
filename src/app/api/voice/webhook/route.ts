@@ -12,6 +12,7 @@ import {
 } from "@/lib/voice-compliance";
 import { processVapiWebhook } from "@/lib/vapi";
 import { verifyWebhookSignature } from "@/lib/webhook-security";
+import { trackUsage } from "@/lib/razorpay-subscriptions";
 
 interface VoiceWebhookPayload {
   type?: string;
@@ -291,6 +292,12 @@ export async function POST(req: NextRequest) {
         where: { callSid: call_id },
         select: { id: true, workspaceId: true },
       });
+
+      // Track voice usage
+      if (duration && duration > 0 && callForConsent?.workspaceId) {
+        const minutesUsed = Math.ceil(duration / 60);
+        await trackUsage(callForConsent.workspaceId, "voice_minutes", minutesUsed);
+      }
 
       if (callForConsent && consentDecision.provided) {
         await prisma.callConsent.upsert({

@@ -196,7 +196,7 @@ export function Sidebar({ userName, userRole, workspaceName }: SidebarProps) {
             <Logo variant="icon" size={32} />
             <div className="min-w-0 flex flex-col justify-center">
               <span className="text-lg font-bold leading-none tracking-tight text-foreground">
-                Care<span className="text-indigo-600">Ops</span>
+                Care<span className="text-primary">Ops</span>
               </span>
               <p className="max-w-[140px] truncate text-[10px] uppercase tracking-wider font-semibold text-muted-foreground/80">
                 {workspaceName || "Workspace"}
@@ -215,7 +215,7 @@ export function Sidebar({ userName, userRole, workspaceName }: SidebarProps) {
         {/* Footer — user info + logout */}
         <div className="shrink-0 border-t border-[var(--sidebar-border)] p-3">
           <div className="mb-2 flex items-center gap-3 rounded-lg px-2 py-1.5">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-primary/90 dark:bg-blue-900/40 dark:text-blue-300">
               {initials}
             </div>
             <div className="flex-1 min-w-0">
@@ -261,7 +261,7 @@ export function Sidebar({ userName, userRole, workspaceName }: SidebarProps) {
             <Logo variant="icon" size={32} />
             <div>
               <span className="text-lg font-bold leading-none tracking-tight text-foreground">
-                Care<span className="text-indigo-600">Ops</span>
+                Care<span className="text-primary">Ops</span>
               </span>
               <p className="max-w-[140px] truncate text-[10px] uppercase tracking-wider font-semibold text-muted-foreground/80">
                 {workspaceName || "Workspace"}
@@ -287,7 +287,7 @@ export function Sidebar({ userName, userRole, workspaceName }: SidebarProps) {
         {/* Drawer footer */}
         <div className="shrink-0 border-t border-[var(--sidebar-border)] p-3">
           <div className="mb-2 flex items-center gap-3 rounded-lg px-2 py-1.5">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-primary/90">
               {initials}
             </div>
             <div className="flex-1 min-w-0">

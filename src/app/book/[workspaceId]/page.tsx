@@ -147,14 +147,14 @@ export default function BookingPage() {
         }
     };
 
-    if (loading) return <div className="h-screen flex items-center justify-center"><Loader2 className="animate-spin text-blue-600" /></div>;
+    if (loading) return <div className="h-screen flex items-center justify-center"><Loader2 className="animate-spin text-primary" /></div>;
     if (!workspace) return <div className="h-screen flex items-center justify-center">Workspace not found</div>;
 
     return (
         <div className="min-h-screen bg-muted/30 flex flex-col items-center py-10 px-4">
             <div className="w-full max-w-7xl bg-background rounded-xl shadow-sm border overflow-hidden">
                 {/* Header */}
-                <div className="bg-blue-600 p-6 text-white text-center">
+                <div className="bg-primary p-6 text-white text-center">
                     <h1 className="text-2xl font-bold">{workspace.name}</h1>
                     <p className="opacity-90 text-sm mt-1">{workspace.address}</p>
                 </div>
@@ -280,7 +280,7 @@ export default function BookingPage() {
                                     <Textarea id="notes" value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} placeholder="Any specific requirements?" />
                                 </div>
 
-                                <Button className="w-full bg-blue-600 hover:bg-blue-700 mt-2" onClick={handleBook} disabled={submitting}>
+                                <Button className="w-full bg-primary hover:bg-primary/90 mt-2" onClick={handleBook} disabled={submitting}>
                                     {submitting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
                                     Confirm Booking
                                 </Button>

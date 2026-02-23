@@ -41,6 +41,14 @@ export async function POST(req: Request) {
       },
     });
 
+    await prisma.subscription.create({
+      data: {
+        workspaceId: workspace.id,
+        planKey: "free",
+        status: "active",
+      },
+    });
+
     // Generate and store OTP
     const { generateOTP, storeOTP } = await import("@/lib/otp");
     const otp = generateOTP();

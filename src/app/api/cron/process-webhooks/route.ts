@@ -4,6 +4,9 @@ import { getPendingJobs, processWebhookJob } from "@/lib/webhook-queue";
 const CRON_SECRET = process.env.CRON_SECRET;
 const BATCH_SIZE = 10;
 
+/**
+ *
+ */
 export async function GET(req: Request) {
   const authHeader = req.headers.get("authorization");
   const providedSecret = authHeader?.replace("Bearer ", "");
@@ -54,6 +57,9 @@ export async function GET(req: Request) {
   }
 }
 
+/**
+ *
+ */
 async function processWebhookJobByData(
   job: Awaited<ReturnType<typeof getPendingJobs>>[0]
 ): Promise<{ success: boolean; error?: string; processedAt: Date }> {

@@ -92,7 +92,7 @@ export default function StaffPage() {
     return (
         <div className="flex min-h-full flex-col">
             <Header title="Team & Permissions" subtitle="Manage staff access to CareOps">
-                <Button size="sm" className="h-9 gap-2 bg-blue-600 text-white hover:bg-blue-700" onClick={() => setDialogOpen(true)}>
+                <Button size="sm" className="h-9 gap-2 bg-primary text-white hover:bg-primary/90" onClick={() => setDialogOpen(true)}>
                     <Plus className="h-4 w-4" />
                     <span className="hidden sm:inline">Add Staff</span>
                 </Button>

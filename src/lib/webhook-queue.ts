@@ -20,6 +20,9 @@ export interface WebhookJobResult {
 const MAX_RETRIES = 3;
 const RETRY_DELAYS_MS = [5000, 15000, 60000];
 
+/**
+ *
+ */
 export async function enqueueWebhookJob(data: Omit<WebhookJobData, "createdAt">): Promise<string> {
   const job = await prisma.webhookJob.create({
     data: {
@@ -37,6 +40,9 @@ export async function enqueueWebhookJob(data: Omit<WebhookJobData, "createdAt">)
   return job.id;
 }
 
+/**
+ *
+ */
 export async function processWebhookJob(jobId: string): Promise<WebhookJobResult> {
   const job = await prisma.webhookJob.findUnique({
     where: { id: jobId },
@@ -97,6 +103,9 @@ export async function processWebhookJob(jobId: string): Promise<WebhookJobResult
   }
 }
 
+/**
+ *
+ */
 async function processJobByType(
   _type: string,
   _callSid: string,
@@ -119,6 +128,9 @@ async function processJobByType(
   }
 }
 
+/**
+ *
+ */
 async function handleVoiceCallCreated(
   callSid: string,
   workspaceId: string,
@@ -157,6 +169,9 @@ async function handleVoiceCallCreated(
   }
 }
 
+/**
+ *
+ */
 async function handleVoiceCallEnded(
   callSid: string,
   workspaceId: string,
@@ -188,6 +203,9 @@ async function handleVoiceCallEnded(
   });
 }
 
+/**
+ *
+ */
 async function handleVoiceCallUpdated(
   _callSid: string,
   _workspaceId: string,
@@ -198,6 +216,9 @@ async function handleVoiceCallUpdated(
   // This is a placeholder for additional async processing
 }
 
+/**
+ *
+ */
 export async function getPendingJobs(limit: number = 10): Promise<WebhookJobData[]> {
   const jobs = await prisma.webhookJob.findMany({
     where: {

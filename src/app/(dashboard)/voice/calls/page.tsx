@@ -86,7 +86,7 @@ function statusTone(status: string): string {
   const normalized = status.toUpperCase();
   if (["COMPLETED"].includes(normalized)) return "text-emerald-700 border-emerald-200 bg-emerald-50";
   if (["NO_ANSWER", "FAILED", "BUSY"].includes(normalized)) return "text-rose-700 border-rose-200 bg-rose-50";
-  if (["INITIATED", "RINGING", "IN_PROGRESS"].includes(normalized)) return "text-blue-700 border-blue-200 bg-blue-50";
+  if (["INITIATED", "RINGING", "IN_PROGRESS"].includes(normalized)) return "text-primary/90 border-blue-200 bg-blue-50";
   if (["SKIPPED"].includes(normalized)) return "text-amber-700 border-amber-200 bg-amber-50";
   return "text-muted-foreground border-border/40 bg-muted/30";
 }
@@ -251,7 +251,7 @@ export default function VoiceCallsPage() {
                   <p className="text-xs tracking-wide text-muted-foreground uppercase">Total Calls</p>
                   <p className="text-2xl font-bold text-foreground">{total}</p>
                 </div>
-                <PhoneCall className="h-5 w-5 text-blue-600" />
+                <PhoneCall className="h-5 w-5 text-primary" />
               </CardContent>
             </Card>
             <Card>
@@ -338,7 +338,7 @@ export default function VoiceCallsPage() {
             <CardContent className="min-h-0 flex-1 overflow-auto p-0">
               {loading ? (
                 <div className="flex h-full items-center justify-center p-8">
-                  <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
+                  <Loader2 className="h-5 w-5 animate-spin text-primary" />
                 </div>
               ) : filteredCalls.length === 0 ? (
                 <div className="flex h-full flex-col items-center justify-center p-8 text-center text-muted-foreground">

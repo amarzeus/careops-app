@@ -39,7 +39,7 @@ export default function PrivacyPage() {
             <div className="bg-gradient-to-b from-blue-50 to-white py-12 px-6 text-center">
                 <div className="flex justify-center mb-4">
                     <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center">
-                        <Shield className="w-8 h-8 text-blue-600" />
+                        <Shield className="w-8 h-8 text-primary" />
                     </div>
                 </div>
                 <h1 className="text-4xl font-bold text-foreground mb-2">Privacy Policy</h1>
@@ -52,7 +52,7 @@ export default function PrivacyPage() {
                     <h2 className="text-2xl font-bold text-foreground mb-4">1. Introduction</h2>
                     <p>
                         CareOps (&quot;we,&quot; &quot;our,&quot; or &quot;us&quot;), operated by Amar Kumar
-                        (<a href="mailto:amarzeus.dev@gmail.com" className="text-blue-600 hover:underline">amarzeus.dev@gmail.com</a>),
+                        (<a href="mailto:amarzeus.dev@gmail.com" className="text-primary hover:underline">amarzeus.dev@gmail.com</a>),
                         is committed to protecting your privacy. This Privacy Policy explains how we
                         collect, use, disclose, and safeguard your information when you use our platform.
                     </p>
@@ -68,7 +68,7 @@ export default function PrivacyPage() {
                         <li><strong>Business Data:</strong> Bookings, leads, inventory items, forms, and messages you create within the platform.</li>
                         <li><strong>Usage Data:</strong> Pages visited, features used, and error logs — collected to improve the platform.</li>
                         <li><strong>Device &amp; Technical Data:</strong> IP address, browser type, and operating system for security and analytics.</li>
-                        <li><strong>Cookie Data:</strong> See our <Link href="/cookies" className="text-blue-600 hover:underline">Cookie Policy</Link> for details.</li>
+                        <li><strong>Cookie Data:</strong> See our <Link href="/cookies" className="text-primary hover:underline">Cookie Policy</Link> for details.</li>
                     </ul>
                 </section>
 
@@ -115,11 +115,11 @@ export default function PrivacyPage() {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
-                                <tr><td className="px-4 py-3 font-medium">Google</td><td className="px-4 py-3">Authentication, Calendar sync</td><td className="px-4 py-3"><a href="https://policies.google.com/privacy" className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">View</a></td></tr>
-                                <tr className="bg-muted/30/50"><td className="px-4 py-3 font-medium">Twilio</td><td className="px-4 py-3">SMS, WhatsApp, OTP</td><td className="px-4 py-3"><a href="https://www.twilio.com/legal/privacy" className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">View</a></td></tr>
-                                <tr><td className="px-4 py-3 font-medium">Vapi.ai</td><td className="px-4 py-3">AI voice calls</td><td className="px-4 py-3"><a href="https://vapi.ai/privacy" className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">View</a></td></tr>
-                                <tr className="bg-muted/30/50"><td className="px-4 py-3 font-medium">Google Gemini</td><td className="px-4 py-3">AI features</td><td className="px-4 py-3"><a href="https://ai.google.dev/terms" className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">View</a></td></tr>
-                                <tr><td className="px-4 py-3 font-medium">Google AdSense</td><td className="px-4 py-3">Advertising</td><td className="px-4 py-3"><a href="https://policies.google.com/technologies/ads" className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">View</a></td></tr>
+                                <tr><td className="px-4 py-3 font-medium">Google</td><td className="px-4 py-3">Authentication, Calendar sync</td><td className="px-4 py-3"><a href="https://policies.google.com/privacy" className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">View</a></td></tr>
+                                <tr className="bg-muted/30/50"><td className="px-4 py-3 font-medium">Twilio</td><td className="px-4 py-3">SMS, WhatsApp, OTP</td><td className="px-4 py-3"><a href="https://www.twilio.com/legal/privacy" className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">View</a></td></tr>
+                                <tr><td className="px-4 py-3 font-medium">Vapi.ai</td><td className="px-4 py-3">AI voice calls</td><td className="px-4 py-3"><a href="https://vapi.ai/privacy" className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">View</a></td></tr>
+                                <tr className="bg-muted/30/50"><td className="px-4 py-3 font-medium">Google Gemini</td><td className="px-4 py-3">AI features</td><td className="px-4 py-3"><a href="https://ai.google.dev/terms" className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">View</a></td></tr>
+                                <tr><td className="px-4 py-3 font-medium">Google AdSense</td><td className="px-4 py-3">Advertising</td><td className="px-4 py-3"><a href="https://policies.google.com/technologies/ads" className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">View</a></td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -142,10 +142,10 @@ export default function PrivacyPage() {
                         vendor, uses cookies (including the DoubleClick cookie) to serve ads based on
                         your prior visits to this website and other websites. You may opt out of
                         personalised advertising by visiting{" "}
-                        <a href="https://www.google.com/settings/ads" className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">
+                        <a href="https://www.google.com/settings/ads" className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">
                             Google Ads Settings
                         </a>.
-                        See our <Link href="/cookies" className="text-blue-600 hover:underline">Cookie Policy</Link> for more details.
+                        See our <Link href="/cookies" className="text-primary hover:underline">Cookie Policy</Link> for more details.
                     </p>
                 </section>
 
@@ -169,7 +169,7 @@ export default function PrivacyPage() {
                         <li>Object to or restrict the processing of your data.</li>
                         <li>Data portability (receive your data in a machine-readable format).</li>
                     </ul>
-                    <p className="mt-4">To exercise these rights, email <a href="mailto:amarzeus.dev@gmail.com" className="text-blue-600 hover:underline">amarzeus.dev@gmail.com</a>.</p>
+                    <p className="mt-4">To exercise these rights, email <a href="mailto:amarzeus.dev@gmail.com" className="text-primary hover:underline">amarzeus.dev@gmail.com</a>.</p>
                 </section>
 
                 <section>
@@ -178,7 +178,7 @@ export default function PrivacyPage() {
                         We implement industry-standard security measures including HTTPS encryption,
                         bcrypt password hashing, and environment-variable-based secret management.
                         However, no system is 100% secure — please use a strong, unique password
-                        and report any vulnerabilities to <a href="mailto:amarzeus.dev@gmail.com" className="text-blue-600 hover:underline">amarzeus.dev@gmail.com</a>.
+                        and report any vulnerabilities to <a href="mailto:amarzeus.dev@gmail.com" className="text-primary hover:underline">amarzeus.dev@gmail.com</a>.
                     </p>
                 </section>
 
@@ -196,8 +196,8 @@ export default function PrivacyPage() {
                     <p>
                         For any privacy-related questions, contact:<br /><br />
                         <strong>Amar Kumar</strong><br />
-                        <a href="mailto:amarzeus.dev@gmail.com" className="text-blue-600 hover:underline">amarzeus.dev@gmail.com</a><br />
-                        <a href="https://github.com/amarzeus/careops-app" className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">github.com/amarzeus/careops-app</a>
+                        <a href="mailto:amarzeus.dev@gmail.com" className="text-primary hover:underline">amarzeus.dev@gmail.com</a><br />
+                        <a href="https://github.com/amarzeus/careops-app" className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">github.com/amarzeus/careops-app</a>
                     </p>
                 </section>
             </main>

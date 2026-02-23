@@ -27,6 +27,9 @@ import { motion, AnimatePresence, useMotionValue, useSpring, useTransform, useRe
 // ─────────────────────────────────────────────
 // PREMIUM CURSOR GLOW — Liquid Glass blend mode
 // ─────────────────────────────────────────────
+/**
+ *
+ */
 function CursorGlow() {
   const [pos, setPos] = useState({ x: -100, y: -100 });
   const prefersReducedMotion = useReducedMotion();
@@ -53,6 +56,9 @@ function CursorGlow() {
 // ─────────────────────────────────────────────
 // MAGNETIC BUTTON
 // ─────────────────────────────────────────────
+/**
+ *
+ */
 function MagneticButton({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   const ref = useRef<HTMLDivElement>(null);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
@@ -84,6 +90,9 @@ function MagneticButton({ children, className = "" }: { children: React.ReactNod
 // ─────────────────────────────────────────────
 // SPOTLIGHT CARD — Glassmorphic 3D tilt
 // ─────────────────────────────────────────────
+/**
+ *
+ */
 function SpotlightCard({
   children,
   className = "",
@@ -140,6 +149,9 @@ function SpotlightCard({
 // ─────────────────────────────────────────────
 // ANIMATED COUNTER
 // ─────────────────────────────────────────────
+/**
+ *
+ */
 function AnimatedCounter({ value, suffix = "" }: { value: string; suffix?: string }) {
   const ref = useRef<HTMLSpanElement>(null);
   const [display, setDisplay] = useState("0");
@@ -191,6 +203,9 @@ function AnimatedCounter({ value, suffix = "" }: { value: string; suffix?: strin
 // ─────────────────────────────────────────────
 // NAVBAR
 // ─────────────────────────────────────────────
+/**
+ *
+ */
 function Navbar({
   scrolled,
   setMobileMenuOpen,
@@ -276,6 +291,9 @@ const mockChartData = [
   { name: "Sun", revenue: 8500 },
 ];
 
+/**
+ *
+ */
 function CustomTooltip({ active, payload, label }: any) {
   if (active && payload && payload.length) {
     return (
@@ -293,6 +311,9 @@ function CustomTooltip({ active, payload, label }: any) {
 // ─────────────────────────────────────────────
 // UI/UX PRO MAX 3D HERO — Liquid Glass
 // ─────────────────────────────────────────────
+/**
+ *
+ */
 function Hero3D() {
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
@@ -332,7 +353,7 @@ function Hero3D() {
     >
       {/* Liquid morphing background */}
       <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-[800px] h-[800px] bg-gradient-to-r from-primary/10 to-indigo-500/10 rounded-full blur-[120px] mix-blend-multiply dark:mix-blend-screen animate-float" style={{ animationDuration: '12s' }} />
+        <div className="absolute top-1/4 left-1/4 w-[800px] h-[800px] bg-gradient-to-r from-primary/10 to-primary/10 rounded-full blur-[120px] mix-blend-multiply dark:mix-blend-screen animate-float" style={{ animationDuration: '12s' }} />
         <div className="absolute bottom-1/4 right-1/4 w-[700px] h-[700px] bg-gradient-to-r from-purple-500/10 to-amber-500/5 rounded-full blur-[120px] mix-blend-multiply dark:mix-blend-screen animate-float-delayed" style={{ animationDuration: '15s' }} />
       </div>
 
@@ -383,7 +404,7 @@ function Hero3D() {
             <Link href="/register">
               <Button
                 size="lg"
-                className="h-16 px-12 rounded-full text-lg font-bold bg-foreground text-background shadow-2xl shadow-foreground/20 hover:shadow-foreground/30 hover:scale-[1.04] active:scale-[0.96] transition-all duration-400 ease-out"
+                className="h-16 px-12 rounded-full text-lg font-bold bg-cta text-cta-foreground shadow-2xl shadow-cta/20 hover:shadow-cta/30 hover:scale-[1.04] active:scale-[0.96] transition-all duration-400 ease-out"
               >
                 Start Free Trial
                 <ArrowRight className="ml-3 w-5 h-5" />
@@ -521,6 +542,9 @@ function Hero3D() {
 // ─────────────────────────────────────────────
 // PAGE
 // ─────────────────────────────────────────────
+/**
+ *
+ */
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -556,20 +580,57 @@ export default function LandingPage() {
                   <X className="w-6 h-6" />
                 </button>
               </div>
-              <nav className="flex flex-col gap-8">
+              <nav className="flex flex-col gap-6">
                 {["Features", "Integrations", "Pricing"].map((item, i) => (
                   <motion.a
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.1, duration: 0.5 }}
                     key={item}
-                    href={`#${item.toLowerCase()}`}
+                    href={item === "Pricing" ? "#pricing" : `#${item.toLowerCase()}`}
                     onClick={() => setMobileMenuOpen(false)}
-                    className="text-5xl font-black tracking-[-0.04em] text-foreground hover:text-primary transition-colors"
+                    className="text-4xl font-black tracking-[-0.04em] text-foreground hover:text-primary transition-colors"
                   >
                     {item}
                   </motion.a>
                 ))}
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.3, duration: 0.5 }}
+                >
+                  <Link
+                    href="/search"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="text-4xl font-black tracking-[-0.04em] text-foreground/60 hover:text-primary transition-colors"
+                  >
+                    Find a Business
+                  </Link>
+                </motion.div>
+                <div className="mt-8 flex flex-col gap-4">
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4, duration: 0.5 }}
+                  >
+                    <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
+                      <Button variant="ghost" className="w-full text-xl h-14 font-bold rounded-2xl">
+                        Log In
+                      </Button>
+                    </Link>
+                  </motion.div>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5, duration: 0.5 }}
+                  >
+                    <Link href="/register" onClick={() => setMobileMenuOpen(false)}>
+                      <Button className="w-full h-16 text-xl bg-cta text-cta-foreground font-bold rounded-2xl shadow-xl shadow-cta/10">
+                        Get Started
+                      </Button>
+                    </Link>
+                  </motion.div>
+                </div>
               </nav>
             </div>
           </motion.div>
@@ -613,7 +674,7 @@ export default function LandingPage() {
               <SpotlightCard className="md:col-span-2 md:row-span-2 p-6 md:p-8 lg:p-10 min-h-[300px] lg:min-h-[380px] flex flex-col justify-between group overflow-hidden bg-background/40">
                 <div className="z-10 relative">
                   <div className="w-12 h-12 rounded-[16px] bg-blue-500/10 flex items-center justify-center mb-6 border border-blue-500/20 group-hover:scale-110 transition-transform duration-500 ease-out shadow-[0_0_30px_rgba(59,130,246,0.1)]">
-                    <Calendar className="w-6 h-6 text-blue-500" />
+                    <Calendar className="w-6 h-6 text-primary" />
                   </div>
                   <h3 className="text-2xl font-bold mb-3 tracking-tight">Smart Bookings</h3>
                   <p className="text-base text-muted-foreground leading-relaxed font-medium max-w-sm">
@@ -630,15 +691,15 @@ export default function LandingPage() {
               {/* Small Card 1: Unified Inbox */}
               <SpotlightCard className="md:col-span-1 p-6 md:p-8 min-h-[220px] flex flex-col justify-between group overflow-hidden bg-background/40">
                 <div className="z-10 relative">
-                  <div className="w-10 h-10 rounded-[12px] bg-indigo-500/10 flex items-center justify-center mb-5 border border-indigo-500/20 group-hover:scale-110 transition-transform duration-500 ease-out">
-                    <MessageSquare className="w-5 h-5 text-indigo-500" />
+                  <div className="w-10 h-10 rounded-[12px] bg-primary/10 flex items-center justify-center mb-5 border border-primary/20 group-hover:scale-110 transition-transform duration-500 ease-out">
+                    <MessageSquare className="w-5 h-5 text-primary" />
                   </div>
                   <h3 className="text-lg md:text-xl font-bold mb-2 tracking-tight">Unified Inbox</h3>
                   <p className="text-sm text-muted-foreground leading-relaxed font-medium">
                     Email, SMS, and AI responses organized in one interface.
                   </p>
                 </div>
-                <div className="absolute right-0 bottom-0 w-1/2 h-1/2 bg-gradient-to-tl from-indigo-500/10 to-transparent blur-2xl -z-10 transition-opacity duration-500 opacity-50 group-hover:opacity-100" />
+                <div className="absolute right-0 bottom-0 w-1/2 h-1/2 bg-gradient-to-tl from-primary/10 to-transparent blur-2xl -z-10 transition-opacity duration-500 opacity-50 group-hover:opacity-100" />
               </SpotlightCard>
 
               {/* Small Card 2: Dynamic Forms */}
@@ -828,8 +889,111 @@ export default function LandingPage() {
         </section>
 
         {/* ─── CTA - Fluid End ─── */}
-        <section className="py-40 lg:py-64 relative overflow-hidden bg-background">
+        <section id="pricing" className="py-40 lg:py-64 relative overflow-hidden bg-background">
+          <div className="absolute inset-0 z-0">
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-r from-primary/10 via-purple-500/10 to-transparent rounded-full blur-[150px]" />
+          </div>
 
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div className="text-center mb-16">
+              <motion.h2
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8 }}
+                className="text-5xl md:text-6xl font-black tracking-tight mb-4"
+              >
+                Simple, transparent pricing
+              </motion.h2>
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8, delay: 0.1 }}
+                className="text-xl text-muted-foreground"
+              >
+                No hidden fees. No long-term contracts. Cancel anytime.
+              </motion.p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[
+                {
+                  name: "Starter",
+                  price: "Free",
+                  period: "forever",
+                  features: ["Dashboard access", "50 SMS/month", "Contact forms", "1 staff member"],
+                  highlight: false,
+                },
+                {
+                  name: "Growth",
+                  price: "₹1,999",
+                  period: "month",
+                  features: ["1 phone number", "200 voice minutes", "500 SMS/month", "Email support", "3 staff members"],
+                  highlight: true,
+                },
+                {
+                  name: "Pro",
+                  price: "₹4,999",
+                  period: "month",
+                  features: ["3 phone numbers", "1000 voice minutes", "2000 SMS/month", "Priority support", "Analytics", "10 staff members"],
+                  highlight: false,
+                },
+                {
+                  name: "Enterprise",
+                  price: "₹14,999",
+                  period: "month",
+                  features: ["Unlimited numbers", "Unlimited voice", "Unlimited SMS", "SLA guarantee", "Dedicated support", "Custom integrations"],
+                  highlight: false,
+                },
+              ].map((plan, i) => (
+                <motion.div
+                  key={plan.name}
+                  initial={{ opacity: 0, y: 40 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8, delay: i * 0.1 }}
+                  className={`relative rounded-2xl p-6 ${plan.highlight
+                      ? "bg-primary text-primary-foreground ring-2 ring-primary/20"
+                      : "bg-card border border-border/50"
+                    }`}
+                >
+                  {plan.highlight && (
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                      <span className="px-3 py-1 rounded-full bg-primary text-primary-foreground text-xs font-bold">
+                        Popular
+                      </span>
+                    </div>
+                  )}
+                  <h3 className="text-xl font-bold mb-2">{plan.name}</h3>
+                  <div className="mb-4">
+                    <span className="text-3xl font-black">{plan.price}</span>
+                    <span className="text-sm opacity-70">/{plan.period}</span>
+                  </div>
+                  <ul className="space-y-2 mb-6 text-sm">
+                    {plan.features.map((feature) => (
+                      <li key={feature} className="flex items-center gap-2">
+                        <Check className="w-4 h-4 shrink-0" />
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <Link href="/register">
+                    <Button
+                      className="w-full"
+                      variant={plan.highlight ? "secondary" : "outline"}
+                    >
+                      {plan.price === "Free" ? "Get Started Free" : "Get Started"}
+                    </Button>
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ─── Final CTA ─── */}
+        <section className="py-40 lg:py-64 relative overflow-hidden bg-gradient-to-b from-background to-primary/5">
           <div className="absolute inset-0 z-0">
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-r from-primary/10 via-purple-500/10 to-transparent rounded-full blur-[150px] animate-pulse-slow" />
           </div>

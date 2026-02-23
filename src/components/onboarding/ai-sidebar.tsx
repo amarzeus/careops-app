@@ -73,7 +73,7 @@ export function AISidebar({
                 "p-3 rounded-lg text-sm max-w-[90%]",
                 msg.role === "assistant"
                   ? "bg-muted/30 text-muted-foreground rounded-tl-none"
-                  : "bg-blue-600 text-white ml-auto rounded-tr-none"
+                  : "bg-primary text-white ml-auto rounded-tr-none"
               )}
             >
               {msg.content}
@@ -107,7 +107,7 @@ export function AISidebar({
             <Button
               variant="outline"
               size="icon"
-              className="shrink-0 rounded-full h-10 w-10 border-blue-200 text-blue-600 hover:bg-blue-50 hover:text-blue-700"
+              className="shrink-0 rounded-full h-10 w-10 border-blue-200 text-primary hover:bg-blue-50 hover:text-primary/90"
               onClick={() => setVoiceMode(true)}
             >
               <Mic className="h-4 w-4" />
@@ -123,7 +123,7 @@ export function AISidebar({
               <button
                 onClick={onSendMessage}
                 disabled={!chatInput.trim() || chatLoading}
-                className="absolute right-1 top-1 h-8 w-8 flex items-center justify-center text-blue-600 hover:text-blue-800 disabled:opacity-50"
+                className="absolute right-1 top-1 h-8 w-8 flex items-center justify-center text-primary hover:text-blue-800 disabled:opacity-50"
               >
                 <ArrowRight className="h-4 w-4" />
               </button>

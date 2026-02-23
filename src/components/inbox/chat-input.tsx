@@ -18,8 +18,8 @@ interface ChatInputProps {
 }
 
 const channelConfig: Record<SendChannel, { icon: typeof Mail; label: string; color: string }> = {
-  email: { icon: Mail, label: "Email", color: "text-blue-600" },
-  sms: { icon: Smartphone, label: "SMS", color: "text-blue-600" },
+  email: { icon: Mail, label: "Email", color: "text-primary" },
+  sms: { icon: Smartphone, label: "SMS", color: "text-primary" },
 };
 
 /**
@@ -115,7 +115,7 @@ export function ChatInput({
         />
         <Button
           size="icon"
-          className="h-8 w-8 mb-1 shrink-0 bg-blue-600 hover:bg-blue-700"
+          className="h-8 w-8 mb-1 shrink-0 bg-primary hover:bg-primary/90"
           onClick={handleSend}
           disabled={!inputText.trim() || sending || disabled}
         >

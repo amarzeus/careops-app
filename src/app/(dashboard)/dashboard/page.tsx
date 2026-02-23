@@ -208,7 +208,7 @@ export default function DashboardPage() {
       <Header title="Dashboard" subtitle="Overview of your business performance">
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           {refreshing ? (
-            <Sparkles className="h-3.5 w-3.5 animate-pulse text-blue-500" />
+            <Sparkles className="h-3.5 w-3.5 animate-pulse text-primary" />
           ) : (
             <Clock className="h-3.5 w-3.5" />
           )}
@@ -223,7 +223,7 @@ export default function DashboardPage() {
           <Link href="/bookings">
             <Button
               size="sm"
-              className="h-8 gap-2 bg-blue-600 text-xs text-white hover:bg-blue-700"
+              className="h-8 gap-2 bg-primary text-xs text-white hover:bg-primary/90"
             >
               <Plus className="h-3.5 w-3.5" /> New Booking
             </Button>

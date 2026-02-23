@@ -1038,7 +1038,7 @@ export default function OnboardingPage() {
                   <Input type="time" value={newService.endTime} onChange={e => setNewService(prev => ({ ...prev, endTime: e.target.value }))} className="h-8 text-sm" />
                 </div>
               </div>
-              <Button onClick={addService} size="sm" className="w-full bg-blue-600 hover:bg-blue-700 h-8 text-xs" disabled={!newService.name}>
+              <Button onClick={addService} size="sm" className="w-full bg-primary hover:bg-primary/90 h-8 text-xs" disabled={!newService.name}>
                 {editingIndex.type === "service" ? "Update Service" : "Add Service"}
               </Button>
             </div>
@@ -1053,7 +1053,7 @@ export default function OnboardingPage() {
                         <p className="text-[10px] text-muted-foreground">{s.duration}m | {s.startTime}-{s.endTime} {s.location ? `| ${s.location}` : ""}</p>
                       </div>
                       <div className="flex items-center gap-1">
-                        <Button variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground hover:text-blue-600" onClick={() => editService(i)}>
+                        <Button variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground hover:text-primary" onClick={() => editService(i)}>
                           <Edit2 className="h-3 w-3" />
                         </Button>
                         <Button variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground hover:text-red-600" onClick={() => removeService(i)}>
@@ -1100,12 +1100,12 @@ export default function OnboardingPage() {
                 <Label className="text-[10px] font-bold uppercase text-muted-foreground">Documents (Agreement, etc.)</Label>
                 <Input type="file" onChange={handleFileUpload} className="h-8 text-sm" />
                 {newIntakeForm.documents.map((doc, i) => (
-                  <div key={i} className="flex items-center gap-1 text-[10px] text-blue-600">
+                  <div key={i} className="flex items-center gap-1 text-[10px] text-primary">
                     <FileText className="w-3 h-3" /> {doc.name}
                   </div>
                 ))}
               </div>
-              <Button onClick={addIntakeForm} size="sm" className="w-full bg-blue-600 hover:bg-blue-700 h-8 text-xs" disabled={!newIntakeForm.name}>
+              <Button onClick={addIntakeForm} size="sm" className="w-full bg-primary hover:bg-primary/90 h-8 text-xs" disabled={!newIntakeForm.name}>
                 {editingIndex.type === "form" ? "Update Form" : "Add Form"}
               </Button>
             </div>
@@ -1122,7 +1122,7 @@ export default function OnboardingPage() {
                         )}
                       </div>
                       <div className="flex items-center gap-1">
-                        <Button variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground hover:text-blue-600" onClick={() => editIntakeForm(i)}>
+                        <Button variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground hover:text-primary" onClick={() => editIntakeForm(i)}>
                           <Edit2 className="h-3 w-3" />
                         </Button>
                         <Button variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground hover:text-red-600" onClick={() => removeIntakeForm(i)}>
@@ -1162,7 +1162,7 @@ export default function OnboardingPage() {
                   <Input placeholder="boxes" value={newItem.unit} onChange={e => setNewItem(prev => ({ ...prev, unit: e.target.value }))} className="h-8 text-sm" />
                 </div>
               </div>
-              <Button onClick={addInventoryItem} size="sm" className="w-full bg-blue-600 hover:bg-blue-700 h-8 text-xs" disabled={!newItem.name}>
+              <Button onClick={addInventoryItem} size="sm" className="w-full bg-primary hover:bg-primary/90 h-8 text-xs" disabled={!newItem.name}>
                 {editingIndex.type === "inventory" ? "Update Item" : "Add Item"}
               </Button>
             </div>
@@ -1177,7 +1177,7 @@ export default function OnboardingPage() {
                         <p className="text-[10px] text-muted-foreground">{item.quantity} {item.unit} (alert: {item.threshold})</p>
                       </div>
                       <div className="flex items-center gap-1">
-                        <Button variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground hover:text-blue-600" onClick={() => editInventoryItem(i)}>
+                        <Button variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground hover:text-primary" onClick={() => editInventoryItem(i)}>
                           <Edit2 className="h-3 w-3" />
                         </Button>
                         <Button variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground hover:text-red-600" onClick={() => removeInventoryItem(i)}>
@@ -1211,7 +1211,7 @@ export default function OnboardingPage() {
                 <Label className="text-[10px] font-bold uppercase text-muted-foreground">Password *</Label>
                 <Input type="password" placeholder="Temporary password" value={newStaff.password} onChange={e => setNewStaff(prev => ({ ...prev, password: e.target.value }))} className="h-8 text-sm" />
               </div>
-              <Button onClick={addStaffMember} size="sm" className="w-full bg-blue-600 hover:bg-blue-700 h-8 text-xs" disabled={!newStaff.name || !newStaff.email || !newStaff.password}>
+              <Button onClick={addStaffMember} size="sm" className="w-full bg-primary hover:bg-primary/90 h-8 text-xs" disabled={!newStaff.name || !newStaff.email || !newStaff.password}>
                 {editingIndex.type === "staff" ? "Update Staff" : "Add Staff"}
               </Button>
             </div>
@@ -1226,7 +1226,7 @@ export default function OnboardingPage() {
                         <p className="text-[10px] text-muted-foreground">{s.email}</p>
                       </div>
                       <div className="flex items-center gap-1">
-                        <Button variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground hover:text-blue-600" onClick={() => editStaffMember(i)}>
+                        <Button variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground hover:text-primary" onClick={() => editStaffMember(i)}>
                           <Edit2 className="h-3 w-3" />
                         </Button>
                         <Button variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground hover:text-red-600" onClick={() => removeStaffMember(i)}>
@@ -1307,10 +1307,10 @@ export default function OnboardingPage() {
           <Progress value={(currentStep / 8) * 100} className="h-1.5" />
           <div className="flex justify-between mt-2 overflow-x-auto pb-1">
             {steps.map((step) => (
-              <div key={step.id} className={cn("flex flex-col items-center min-w-[60px]", step.id === currentStep ? "text-blue-600" : step.id < currentStep ? "text-green-600" : "text-muted-foreground")}>
+              <div key={step.id} className={cn("flex flex-col items-center min-w-[60px]", step.id === currentStep ? "text-primary" : step.id < currentStep ? "text-green-600" : "text-muted-foreground")}>
                 <div className={cn(
                   "w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-medium mb-0.5",
-                  step.id === currentStep ? "bg-blue-100 text-blue-700" : step.id < currentStep ? "bg-green-100 text-green-700" : "bg-muted/30 text-muted-foreground"
+                  step.id === currentStep ? "bg-blue-100 text-primary/90" : step.id < currentStep ? "bg-green-100 text-green-700" : "bg-muted/30 text-muted-foreground"
                 )}>
                   {step.id < currentStep ? <Check className="w-3 h-3" /> : step.id}
                 </div>
@@ -1329,7 +1329,7 @@ export default function OnboardingPage() {
             <Card>
               <CardHeader>
                 <div className="flex items-center gap-3">
-                  {React.createElement(steps[currentStep - 1].icon, { className: "w-5 h-5 text-blue-600" })}
+                  {React.createElement(steps[currentStep - 1].icon, { className: "w-5 h-5 text-primary" })}
                   <div>
                     <CardTitle>{steps[currentStep - 1].title}</CardTitle>
                     <CardDescription>{steps[currentStep - 1].description}</CardDescription>
@@ -1345,7 +1345,7 @@ export default function OnboardingPage() {
                   }} disabled={currentStep === 1 || loading}>
                     <ArrowLeft className="w-4 h-4 mr-2" /> Back
                   </Button>
-                  <Button onClick={() => saveStep()} className="bg-blue-600 hover:bg-blue-700" disabled={loading}>
+                  <Button onClick={() => saveStep()} className="bg-primary hover:bg-primary/90" disabled={loading}>
                     {loading ? "Saving..." : currentStep === 8 ? "Activate Workspace" : "Save & Continue"}
                     {currentStep < 8 && <ArrowRight className="w-4 h-4 ml-2" />}
                     {currentStep === 8 && <Rocket className="w-4 h-4 ml-2" />}

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { triggerAutomation } from "@/lib/automation";
+import { checkUsageLimit, trackUsage } from "@/lib/razorpay-subscriptions";
 
 /**
  *
@@ -37,6 +38,14 @@ export async function POST(req: Request) {
   const { name, email, phone, source, notes } = await req.json();
   if (!name)
     return NextResponse.json({ error: "Name is required" }, { status: 400 });
+
+  const limitCheck = await checkUsageLimit(user.workspaceId, "contacts");
+  if (!limitCheck.allowed) {
+    return NextResponse.json(
+      { error: `Contact limit exceeded. Used: ${limitCheck.used}/${limitCheck.limit}. Please upgrade your plan.` },
+      { status: 402 }
+    );
+  }
 
   // Check for existing contact
   const existingContact = await prisma.contact.findFirst({
@@ -87,6 +96,8 @@ export async function POST(req: Request) {
 
   // Trigger automation
   await triggerAutomation(user.workspaceId, "NEW_CONTACT", { contact });
+
+  await trackUsage(user.workspaceId, "contacts", 1);
 
   return NextResponse.json({ contact }, { status: 201 });
 }

@@ -113,7 +113,7 @@ function ContactsTable({ contacts, searchQuery }: { contacts: Contact[]; searchQ
               <TableCell className="font-medium">
                 <div className="flex items-center gap-3">
                   <Avatar className="h-8 w-8 shrink-0">
-                    <AvatarFallback className="bg-blue-50 text-xs font-semibold text-blue-700">
+                    <AvatarFallback className="bg-blue-50 text-xs font-semibold text-primary/90">
                       {contact.name.charAt(0).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
@@ -202,7 +202,7 @@ export default function ContactsPage() {
       <Header title="Contacts" subtitle="Manage your customer database and history">
         <CreateContactDialog
           trigger={
-            <Button size="sm" className="h-9 gap-2 bg-blue-600 text-white hover:bg-blue-700">
+            <Button size="sm" className="h-9 gap-2 bg-primary text-white hover:bg-primary/90">
               <Plus className="h-4 w-4" />
               <span className="hidden sm:inline">Add Contact</span>
             </Button>

@@ -202,7 +202,7 @@ export function InventoryList({
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-muted-foreground hover:text-blue-600 h-8 px-2"
+                    className="text-muted-foreground hover:text-primary h-8 px-2"
                     onClick={() => onEdit(item)}
                   >
                     <Edit2 className="w-3.5 h-3.5" />

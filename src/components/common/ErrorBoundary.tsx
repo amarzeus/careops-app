@@ -92,6 +92,9 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 }
 
+/**
+ *
+ */
 export function withErrorBoundary<P extends object>(
   WrappedComponent: React.ComponentType<P>,
   fallback?: ReactNode,

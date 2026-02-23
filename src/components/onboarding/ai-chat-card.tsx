@@ -73,7 +73,7 @@ export function AIChatCard({
           </div>
           <button
             onClick={() => setVoiceMode(!voiceMode)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-[11px] font-semibold hover:from-indigo-600 hover:to-purple-700 transition-all hover:scale-105 shadow-sm"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-primary to-purple-600 text-white text-[11px] font-semibold hover:from-primary hover:to-purple-700 transition-all hover:scale-105 shadow-sm"
           >
             {voiceMode ? (
               <MessageSquare className="w-3.5 h-3.5" />
@@ -106,7 +106,7 @@ export function AIChatCard({
                   className={cn(
                     "max-w-[85%] rounded-2xl px-4 py-2.5 text-sm animate-fade-in",
                     msg.role === "user"
-                      ? "bg-blue-600 text-white rounded-br-md"
+                      ? "bg-primary text-white rounded-br-md"
                       : "bg-muted/30 text-muted-foreground rounded-bl-md"
                   )}
                 >
@@ -152,7 +152,7 @@ export function AIChatCard({
               size="icon"
               variant="outline"
               onClick={() => setVoiceMode(true)}
-              className="border-indigo-200 text-indigo-600 hover:bg-indigo-50 hover:text-indigo-700 shrink-0"
+              className="border-indigo-200 text-primary hover:bg-indigo-50 hover:text-primary/90 shrink-0"
               title="Voice mode"
             >
               <Mic className="w-4 h-4" />
@@ -161,7 +161,7 @@ export function AIChatCard({
               size="icon"
               onClick={onSendMessage}
               disabled={chatLoading || !chatInput.trim()}
-              className="bg-blue-600 hover:bg-blue-700 shrink-0"
+              className="bg-primary hover:bg-primary/90 shrink-0"
             >
               <Send className="w-4 h-4" />
             </Button>

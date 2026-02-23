@@ -16,14 +16,23 @@ interface RedisClient {
 
 let redisClient: RedisClient | null = null;
 
+/**
+ *
+ */
 export function initRedisRateLimiter(client: RedisClient): void {
   redisClient = client;
 }
 
+/**
+ *
+ */
 export function isRedisConfigured(): boolean {
   return redisClient !== null;
 }
 
+/**
+ *
+ */
 export async function checkRateLimitRedis(
   identifier: string,
   config: RedisRateLimitConfig
@@ -70,6 +79,9 @@ export async function checkRateLimitRedis(
   }
 }
 
+/**
+ *
+ */
 export function createRedisClientFromEnv(): RedisClient | null {
   const redisUrl = process.env.REDIS_URL || process.env.UPSTASH_REDIS_REST_URL;
 
@@ -84,6 +96,9 @@ export function createRedisClientFromEnv(): RedisClient | null {
   return createNodeRedisClient(redisUrl);
 }
 
+/**
+ *
+ */
 function createUpstashClient(): RedisClient {
   const restUrl = process.env.UPSTASH_REDIS_REST_URL!;
   const restToken = process.env.UPSTASH_REDIS_REST_TOKEN!;
@@ -131,6 +146,9 @@ function createUpstashClient(): RedisClient {
   };
 }
 
+/**
+ *
+ */
 function createNodeRedisClient(_url: string): RedisClient {
   throw new Error("Node Redis client requires 'redis' package. Use Upstash for serverless or install redis package.");
 }

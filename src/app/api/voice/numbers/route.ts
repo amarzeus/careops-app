@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
+import { getPlanLimits } from '@/lib/razorpay';
+
 /**
  *
  * @param req
@@ -51,6 +53,28 @@ export async function POST(req: NextRequest) {
     const user = await getCurrentUser();
     if (!user?.workspaceId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const subscription = await prisma.subscription.findUnique({
+      where: { workspaceId: user.workspaceId },
+      select: { planKey: true },
+    });
+
+    const planKey = (subscription?.planKey || "free") as "free" | "growth" | "pro" | "enterprise";
+    const limits = getPlanLimits(planKey);
+    const maxPhoneNumbers = limits.phoneNumbers;
+
+    if (maxPhoneNumbers !== -1) {
+      const currentCount = await prisma.phoneNumber.count({
+        where: { workspaceId: user.workspaceId },
+      });
+
+      if (currentCount >= maxPhoneNumbers) {
+        return NextResponse.json(
+          { error: `Phone number limit reached. Your plan allows ${maxPhoneNumbers} phone number(s). Please upgrade to add more.` },
+          { status: 402 }
+        );
+      }
     }
 
     const body = await req.json();

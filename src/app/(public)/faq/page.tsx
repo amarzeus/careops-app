@@ -175,7 +175,7 @@ export default function FAQPage() {
             <div className="bg-gradient-to-b from-blue-50 to-white py-16 px-6 text-center">
                 <div className="flex justify-center mb-4">
                     <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center">
-                        <HelpCircle className="w-8 h-8 text-blue-600" />
+                        <HelpCircle className="w-8 h-8 text-primary" />
                     </div>
                 </div>
                 <h1 className="text-4xl font-bold text-foreground mb-4">
@@ -183,7 +183,7 @@ export default function FAQPage() {
                 </h1>
                 <p className="text-xl text-muted-foreground max-w-7xl mx-auto">
                     Everything you need to know about CareOps. Can&apos;t find an answer?{" "}
-                    <a href="mailto:amarzeus.dev@gmail.com" className="text-blue-600 hover:underline">
+                    <a href="mailto:amarzeus.dev@gmail.com" className="text-primary hover:underline">
                         Email us
                     </a>
                     .
@@ -195,7 +195,7 @@ export default function FAQPage() {
                 {faqs.map((category) => (
                     <section key={category.category}>
                         <h2 className="text-2xl font-bold text-foreground mb-8 pb-3 border-b border-border/40 flex items-center gap-2">
-                            <ChevronDown className="w-5 h-5 text-blue-600" />
+                            <ChevronDown className="w-5 h-5 text-primary" />
                             {category.category}
                         </h2>
                         <div className="space-y-6">
@@ -212,7 +212,7 @@ export default function FAQPage() {
                 ))}
 
                 {/* CTA */}
-                <div className="bg-blue-600 rounded-2xl p-10 text-center text-white">
+                <div className="bg-primary rounded-2xl p-10 text-center text-white">
                     <h2 className="text-2xl font-bold mb-3">Still have questions?</h2>
                     <p className="text-blue-100 mb-6">
                         Our team is happy to help. Drop us an email and we&apos;ll get back to
@@ -220,7 +220,7 @@ export default function FAQPage() {
                     </p>
                     <a
                         href="mailto:amarzeus.dev@gmail.com"
-                        className="inline-flex items-center gap-2 bg-background text-blue-600 font-semibold px-6 py-3 rounded-lg hover:bg-blue-50 transition-colors"
+                        className="inline-flex items-center gap-2 bg-background text-primary font-semibold px-6 py-3 rounded-lg hover:bg-blue-50 transition-colors"
                     >
                         Contact Support
                     </a>

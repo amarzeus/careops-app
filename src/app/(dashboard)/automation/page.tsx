@@ -124,7 +124,7 @@ export default function AutomationPage() {
       <Header title="Automation" subtitle="Event-based rules that work for you">
         <Button
           size="sm"
-          className="h-9 gap-2 bg-blue-600 text-white hover:bg-blue-700"
+          className="h-9 gap-2 bg-primary text-white hover:bg-primary/90"
           onClick={() => { setSelectedRule(null); setDialogOpen(true); }}
         >
           <Plus className="w-4 h-4 mr-2" /> New Rule

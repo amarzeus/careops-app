@@ -7,6 +7,9 @@ interface ErrorBoundaryWrapperProps {
   children: ReactNode;
 }
 
+/**
+ *
+ */
 export function DashboardErrorBoundary({ children }: ErrorBoundaryWrapperProps) {
   return (
     <ErrorBoundary

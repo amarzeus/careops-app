@@ -58,7 +58,7 @@ export function MessageThread({ messages, loading, contactName }: MessageThreadP
             >
               {msg.direction === "INBOUND" && showAvatar && (
                 <Avatar className="w-6 h-6 mb-1">
-                  <AvatarFallback className="text-[10px] bg-blue-100 text-blue-700">
+                  <AvatarFallback className="text-[10px] bg-blue-100 text-primary/90">
                     {contactName.charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
@@ -69,7 +69,7 @@ export function MessageThread({ messages, loading, contactName }: MessageThreadP
                 className={cn(
                   "p-3 rounded-2xl text-sm leading-relaxed shadow-sm",
                   msg.direction === "OUTBOUND"
-                    ? "bg-blue-600 text-white rounded-br-none"
+                    ? "bg-primary text-white rounded-br-none"
                     : "bg-background border border-border/40 text-muted-foreground rounded-bl-none"
                 )}
               >

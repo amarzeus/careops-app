@@ -27,7 +27,7 @@ interface AlertItem {
 }
 
 const alertTypeConfig: Record<string, { icon: React.ElementType; color: string }> = {
-  booking: { icon: Calendar, color: "text-blue-600" },
+  booking: { icon: Calendar, color: "text-primary" },
   inventory: { icon: Package, color: "text-red-600" },
   communication: { icon: MessageSquare, color: "text-green-600" },
   form: { icon: FileText, color: "text-purple-600" },
@@ -294,7 +294,7 @@ export function Header({ title, subtitle, children }: HeaderProps) {
                   {unreadCount > 0 && (
                     <button
                       onClick={markAllRead}
-                      className="text-xs text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1"
+                      className="text-xs text-primary hover:text-primary/90 font-medium flex items-center gap-1"
                     >
                       <CheckCheck className="w-3 h-3" /> Mark all read
                     </button>

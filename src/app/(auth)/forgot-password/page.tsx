@@ -179,7 +179,7 @@ export default function ForgotPasswordPage() {
 
                 <Button
                   type="submit"
-                  className="w-full bg-blue-600 hover:bg-blue-700 h-11 transition-all shadow-sm"
+                  className="w-full bg-primary hover:bg-primary/90 h-11 transition-all shadow-sm"
                   disabled={loading}
                 >
                   {loading ? (
@@ -220,7 +220,7 @@ export default function ForgotPasswordPage() {
                     type="button"
                     onClick={handleRequest}
                     disabled={loading}
-                    className="text-blue-600 hover:underline font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="text-primary hover:underline font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {loading ? "Sending..." : "Resend"}
                   </button>
@@ -234,7 +234,7 @@ export default function ForgotPasswordPage() {
               <Button
                 onClick={() => setStep("reset")}
                 disabled={otp.length !== 6}
-                className="w-full bg-blue-600 hover:bg-blue-700 h-11 shadow-sm"
+                className="w-full bg-primary hover:bg-primary/90 h-11 shadow-sm"
               >
                 Verify Code
               </Button>
@@ -280,7 +280,7 @@ export default function ForgotPasswordPage() {
               </div>
               <Button
                 type="submit"
-                className="w-full bg-blue-600 hover:bg-blue-700 h-11 shadow-sm"
+                className="w-full bg-primary hover:bg-primary/90 h-11 shadow-sm"
                 disabled={loading}
               >
                 {loading ? "Resetting..." : "Reset Password"}
@@ -299,7 +299,7 @@ export default function ForgotPasswordPage() {
                 </p>
               </div>
               <Link href="/login" className="block">
-                <Button className="w-full bg-blue-600 hover:bg-blue-700 h-11 shadow-md">
+                <Button className="w-full bg-primary hover:bg-primary/90 h-11 shadow-md">
                   Sign In Now
                 </Button>
               </Link>
@@ -310,7 +310,7 @@ export default function ForgotPasswordPage() {
             <div className="mt-8 pt-6 border-t border-border/40 text-center">
               <Link
                 href="/login"
-                className="text-sm text-muted-foreground hover:text-blue-600 inline-flex items-center font-medium transition-colors"
+                className="text-sm text-muted-foreground hover:text-primary inline-flex items-center font-medium transition-colors"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" /> Back to Sign In
               </Link>

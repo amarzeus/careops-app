@@ -21,6 +21,10 @@ const { mockPrisma } = vi.hoisted(() => ({
     callConsent: {
       upsert: vi.fn(),
     },
+    usageRecord: {
+      upsert: vi.fn(),
+      findUnique: vi.fn(),
+    },
   },
 }));
 
@@ -51,6 +55,9 @@ vi.mock("@/lib/vapi", () => ({
   })),
 }));
 
+/**
+ *
+ */
 function createMockRequest(body: Record<string, unknown>, signature?: string): NextRequest {
   const headers = new Headers();
   if (signature) headers.set("x-vapi-signature", signature);

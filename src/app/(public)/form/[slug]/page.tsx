@@ -97,7 +97,7 @@ function FormContent({ slug }: { slug: string }) {
         <CardHeader>
           <div className="flex items-center gap-3 mb-2">
             <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-              <FileText className="w-5 h-5 text-blue-600" />
+              <FileText className="w-5 h-5 text-primary" />
             </div>
             <div>
               <CardTitle>{form.name}</CardTitle>
@@ -118,7 +118,7 @@ function FormContent({ slug }: { slug: string }) {
                 )}
               </div>
             ))}
-            <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 h-12" disabled={submitting}>
+            <Button type="submit" className="w-full bg-primary hover:bg-primary/90 h-12" disabled={submitting}>
               {submitting ? "Submitting..." : <><Send className="w-4 h-4 mr-2" />Submit Form</>}
             </Button>
           </form>
