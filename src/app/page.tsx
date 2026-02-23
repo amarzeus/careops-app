@@ -861,7 +861,7 @@ export default function LandingPage() {
                   highlight: false,
                   description: "Custom scale and security.",
                 },
-              ].map((plan, i) => (
+              ].map((plan) => (
                 <SpotlightCard
                   key={plan.name}
                   className={`p-8 flex flex-col justify-between overflow-hidden shadow-none ${plan.highlight
