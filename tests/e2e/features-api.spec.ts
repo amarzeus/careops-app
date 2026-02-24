@@ -55,8 +55,8 @@ test.describe("Feature API Tests", () => {
       headers: headers(),
       multipart: {
         file: {
-          name: "test-upload.txt",
-          mimeType: "text/plain",
+          name: "test-upload.pdf",
+          mimeType: "application/pdf",
           buffer: buffer,
         },
       },
@@ -66,7 +66,7 @@ test.describe("Feature API Tests", () => {
     expect(response.ok()).toBeTruthy();
     const data = await response.json();
     expect(data.url).toContain("/uploads/");
-    expect(data.name).toBe("test-upload.txt");
+    expect(data.name).toBe("test-upload.pdf");
   });
 
   test("Webhooks: Should create and list webhooks", async ({ request }) => {

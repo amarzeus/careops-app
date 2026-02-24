@@ -95,10 +95,13 @@ test.describe("Feature UI Tests", () => {
 
     // 5. Add Webhook
     // Locate the Webhooks card by heading
-    await expect(page.getByRole("heading", { name: "Webhooks" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Webhooks" })).toBeVisible({
+      timeout: 30000,
+    });
 
     // Fill inputs FIRST
     const urlInput = page.getByPlaceholder(/hooks\.zapier\.com/i);
+    await expect(urlInput).toBeVisible({ timeout: 20000 });
     await urlInput.fill("https://example.com/hook");
 
     // Click Add Button

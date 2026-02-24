@@ -163,17 +163,15 @@ npm run dev
 Common development commands:
 
 ```bash
-# Run unit tests (Vitest)
+# Run the complete Maintenance Suite (Critical before PRs)
+# Includes: Lint, Type-check, Unit, E2E, Render validation, Security Audit, and Build
 npm test
 
-# Run end-to-end tests (Playwright)
+# Run End-to-End tests specifically
 npm run test:e2e
 
-# Lint the codebase
-npm run lint
-
-# Build for production
-npm run build
+# Run Unit tests specifically (Vitest)
+npm run test:unit
 ```
 
 ---
@@ -260,10 +258,27 @@ CareOps is built with a focus on clean architecture and strong engineering disci
 
 - Use TypeScript and React with Next.js 16.
 - Prefer absolute imports via `@/` instead of deep relative paths.
-- Follow existing file naming conventions enforced by ESLint.
-- Keep UI components small and composable.
-- Add or update unit tests (Vitest) for non-trivial changes.
-- Run `npm run lint` and `npm test` before opening a pull request.
+
+### 🧪 Automated Quality Assurance
+
+Before opening a pull request, you **must** ensure the entire application suite is stable. CareOps uses a high-integrity maintenance command that validates every layer of the system.
+
+RUN THIS COMMAND BEFORE EVERY PULL REQUEST:
+```bash
+npm test
+```
+
+This command executes the following sequentially:
+1.  **Linting**: Ensures code style consistency.
+2.  **Type-checking**: Validates TypeScript integrity (`tsc`).
+3.  **Formatting**: Verifies Prettier compliance.
+4.  **Unit Tests**: Executes logic tests via Vitest.
+5.  **E2E Tests**: Launches Playwright to verify critical routing and user flows.
+6.  **Render Validation**: Validates deployment blueprints for Render.com.
+7.  **Security Audit**: Checks for critical vulnerabilities in dependencies.
+8.  **Production Build**: Confirms that the code compiles successfully for production.
+
+A detailed summary report will be generated at the end of the process to confirm your changes are ready for contribution.
 
 To contribute:
 

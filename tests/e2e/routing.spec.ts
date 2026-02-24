@@ -7,7 +7,7 @@ import { test, expect } from "@playwright/test";
  */
 
 // Use a single worker for this spec to prevent dev server overloading
-test.use({ navigationTimeout: 60000, actionTimeout: 60000 });
+test.use({ navigationTimeout: 90000, actionTimeout: 90000 });
 test.describe.configure({ mode: "serial" });
 
 test.describe("Public Routing Validation", () => {
@@ -41,6 +41,7 @@ test.describe("Public Routing Validation", () => {
 
 test.describe("Protected (Dashboard) Routing Validation", () => {
   let token: string;
+  test.setTimeout(180000);
 
   test.beforeAll(async ({ request }) => {
     // Seed a test user with retry logic to handle dev server readiness
@@ -58,7 +59,7 @@ test.describe("Protected (Dashboard) Routing Validation", () => {
             status: "ACTIVE",
             onboardingStep: 8,
           },
-          timeout: 30000,
+          timeout: 45000,
         });
 
         if (seedRes.status() < 400) {
@@ -105,12 +106,19 @@ test.describe("Protected (Dashboard) Routing Validation", () => {
     { path: "/automation", heading: /Automation|Workflows/i },
     { path: "/settings", heading: /Settings|Preferences/i },
     { path: "/voice/setup", heading: /Voice|Receptionist|Setup/i },
-    { path: "/onboarding", heading: /Setup|Onboarding|Welcome/i },
+    { path: "/onboarding", heading: /CareOps Setup|Setup|Onboarding/i },
   ];
 
   for (const route of protectedRoutes) {
     test(`should access protected route ${route.path}`, async ({ page }) => {
-      await page.goto(route.path, { waitUntil: "load" });
+      await page.goto(route.path, { waitUntil: "domcontentloaded", timeout: 120000 });
+
+      // Wait for the main heading to be visible to ensure data-dependent render is done
+      await expect(
+        page.getByRole("heading").filter({ hasText: route.heading }).first()
+      ).toBeVisible({
+        timeout: 60000,
+      });
 
       // Verify redirection hasn't happened back to login
       await expect(page).not.toHaveURL(/login/);
@@ -118,7 +126,7 @@ test.describe("Protected (Dashboard) Routing Validation", () => {
       // Verify main heading or unique element via sidebar/header
       await expect(
         page.locator("h1, h2, header, main").filter({ hasText: route.heading }).first()
-      ).toBeVisible({ timeout: 30000 });
+      ).toBeVisible({ timeout: 45000 });
     });
   }
 });

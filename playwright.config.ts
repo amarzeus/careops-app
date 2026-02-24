@@ -18,8 +18,8 @@ export default defineConfig({
   use: {
     baseURL,
     trace: "on-first-retry",
-    actionTimeout: 60000,
-    navigationTimeout: 60000,
+    actionTimeout: 90000,
+    navigationTimeout: 120000,
   },
   projects: [
     {

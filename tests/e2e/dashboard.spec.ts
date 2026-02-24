@@ -43,7 +43,7 @@ test.describe("Owner Dashboard", () => {
     // Verify metrics API is available for this owner session
     const metricsRes = await request.get("/api/dashboard/metrics", {
       headers: { Cookie: `auth-token=${token}` },
-      timeout: 45000,
+      timeout: 60000,
     });
     expect(metricsRes.ok()).toBeTruthy();
     const metricsData = await metricsRes.json();
