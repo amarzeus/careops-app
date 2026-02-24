@@ -102,7 +102,11 @@ describe("Voice Webhook Handler", () => {
         metadata: { workspaceId: "ws-123" },
       });
 
-      mockPrisma.voiceCall.upsert.mockResolvedValue({ id: "vc-123", callSid: "call-123", metadata: "{}" });
+      mockPrisma.voiceCall.upsert.mockResolvedValue({
+        id: "vc-123",
+        callSid: "call-123",
+        metadata: "{}",
+      });
       mockPrisma.workspace.findUnique.mockResolvedValue({ timezone: "UTC" });
       mockPrisma.voiceCall.findFirst.mockResolvedValue(null);
       mockPrisma.voiceCall.update.mockResolvedValue({ id: "vc-123" });
@@ -136,7 +140,11 @@ describe("Voice Webhook Handler", () => {
       });
 
       mockPrisma.contact.findFirst.mockResolvedValue({ id: "contact-123" });
-      mockPrisma.voiceCall.upsert.mockResolvedValue({ id: "vc-456", callSid: "call-456", metadata: "{}" });
+      mockPrisma.voiceCall.upsert.mockResolvedValue({
+        id: "vc-456",
+        callSid: "call-456",
+        metadata: "{}",
+      });
       mockPrisma.workspace.findUnique.mockResolvedValue({ timezone: "UTC" });
       mockPrisma.voiceCall.update.mockResolvedValue({ id: "vc-456" });
 
@@ -207,7 +215,11 @@ describe("Voice Webhook Handler", () => {
       });
 
       mockPrisma.workspace.findUnique.mockResolvedValue({ timezone: "America/New_York" });
-      mockPrisma.voiceCall.upsert.mockResolvedValue({ id: "vc-ah", callSid: "call-after-hours", metadata: "{}" });
+      mockPrisma.voiceCall.upsert.mockResolvedValue({
+        id: "vc-ah",
+        callSid: "call-after-hours",
+        metadata: "{}",
+      });
       mockPrisma.voiceCall.update.mockResolvedValue({ id: "vc-ah" });
       mockPrisma.alert.create.mockResolvedValue({ id: "alert-ah" });
 
