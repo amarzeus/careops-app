@@ -99,14 +99,15 @@ export async function POST(req: NextRequest) {
   try {
     body = JSON.parse(rawBody) as VoiceWebhookPayload;
   } catch {
-    return NextResponse.json({ error: "Invalid JSON payload" }, { status: 400 });
+    return NextResponse.json({ error: "Invalid JSON payload" }, { status: 200 }); // Return 200 to stop retry
   }
 
   try {
     const { type, call_id, status, duration, recording_url, transcript, summary } = body;
 
     if (!call_id) {
-      return NextResponse.json({ error: "Missing call_id" }, { status: 400 });
+      // If we don't have a call_id, we can't do anything. Return 200 to stop retry.
+      return NextResponse.json({ error: "Missing call_id" }, { status: 200 });
     }
 
     const metadata = parseVoiceMetadata(body.metadata);
@@ -145,19 +146,56 @@ export async function POST(req: NextRequest) {
           : "INBOUND";
 
     if (processed.action === "create") {
-      const workspace =
-        workspaceId !== "unknown"
-          ? await prisma.workspace.findUnique({
+      // Split 'create' logic:
+      // 'call.ringing' -> Just upsert the record status.
+      // 'call.started' -> If status is 'started'/'in-progress', perform the alert checks.
+
+      const isRinging = type === "call.ringing";
+
+      const voiceCall = await prisma.voiceCall.upsert({
+        where: { callSid: call_id },
+        create: {
+          callSid: call_id,
+          direction,
+          status: normalizedStatus,
+          startedAt: new Date(),
+          assistantId: (metadata.assistantId as string | undefined) || null,
+          contactId,
+          workspaceId,
+          summary: null,
+          metadata: serializeVoiceMetadata(metadata),
+        },
+        update: {
+          status: normalizedStatus,
+          contactId,
+          // Only update metadata if we have new meaningful keys?
+          // Keeping it simple: update it.
+          metadata: serializeVoiceMetadata({
+              ...parseVoiceMetadata(metadata),
+              ...metadata,
+          }),
+        },
+      });
+
+      // ONLY if it's "call.started" do we check for alerts/returning caller
+      // This prevents double alerts if we get ringing then started.
+      if (!isRinging && type === "call.started" && workspaceId !== "unknown") {
+          // Idempotency: check if we already processed 'started' logic for this call?
+          // We can check if `metadata` already has `processedStarted`.
+          const currentMetadata = parseVoiceMetadata(voiceCall.metadata);
+          if (currentMetadata.processedStarted) {
+             return NextResponse.json({ success: true });
+          }
+
+          const workspace = await prisma.workspace.findUnique({
               where: { id: workspaceId },
               select: { timezone: true },
-            })
-          : null;
+            });
 
-      const afterHours =
-        direction === "INBOUND" ? isAfterHours(workspace?.timezone || null) : false;
+          const afterHours =
+            direction === "INBOUND" ? isAfterHours(workspace?.timezone || null) : false;
 
-      const previousCall =
-        workspaceId !== "unknown" && contactId
+          const previousCall = contactId
           ? await prisma.voiceCall.findFirst({
               where: {
                 workspaceId,
@@ -170,59 +208,48 @@ export async function POST(req: NextRequest) {
             })
           : null;
 
-      const mergedMetadata = {
-        ...metadata,
-        retryCount: parseRetryCount(metadata),
-        afterHours,
-        returningCaller: !!previousCall,
-        previousCallId: previousCall?.id,
-        previousCallSummary: previousCall?.summary,
-      };
+          const mergedMetadata = {
+            ...currentMetadata,
+            retryCount: parseRetryCount(metadata),
+            afterHours,
+            returningCaller: !!previousCall,
+            previousCallId: previousCall?.id,
+            previousCallSummary: previousCall?.summary,
+            processedStarted: true, // Mark as processed
+          };
 
-      const voiceCall = await prisma.voiceCall.upsert({
-        where: { callSid: call_id },
-        create: {
-          callSid: call_id,
-          direction,
-          status: normalizedStatus,
-          startedAt: new Date(),
-          assistantId: (metadata.assistantId as string | undefined) || null,
-          contactId,
-          workspaceId,
-          summary: previousCall?.summary || null,
-          metadata: serializeVoiceMetadata(mergedMetadata),
-        },
-        update: {
-          status: normalizedStatus,
-          startedAt: new Date(),
-          contactId,
-          metadata: serializeVoiceMetadata(mergedMetadata),
-        },
-      });
+          await prisma.voiceCall.update({
+              where: { id: voiceCall.id },
+              data: {
+                  summary: previousCall?.summary || null,
+                  metadata: serializeVoiceMetadata(mergedMetadata),
+              }
+          });
 
-      if (afterHours && workspaceId !== "unknown") {
-        await prisma.alert.create({
-          data: {
-            type: "voice_call",
-            title: "After-hours call received",
-            message: "A caller reached your voice line outside business hours.",
-            actionUrl: `/voice/calls/${voiceCall.id}`,
-            workspaceId,
-          },
-        });
-      }
+          if (afterHours) {
+            await prisma.alert.create({
+              data: {
+                type: "voice_call",
+                title: "After-hours call received",
+                message: "A caller reached your voice line outside business hours.",
+                actionUrl: `/voice/calls/${voiceCall.id}`,
+                workspaceId,
+              },
+            });
+          }
 
-      if (previousCall && workspaceId !== "unknown") {
-        await prisma.alert.create({
-          data: {
-            type: "voice_call",
-            title: "Returning caller detected",
-            message: "CareOps AI matched this caller to a recent conversation.",
-            actionUrl: `/voice/calls/${voiceCall.id}`,
-            workspaceId,
-            isRead: true,
-          },
-        });
+          if (previousCall) {
+            await prisma.alert.create({
+              data: {
+                type: "voice_call",
+                title: "Returning caller detected",
+                message: "CareOps AI matched this caller to a recent conversation.",
+                actionUrl: `/voice/calls/${voiceCall.id}`,
+                workspaceId,
+                isRead: true,
+              },
+            });
+          }
       }
     }
 
@@ -239,15 +266,23 @@ export async function POST(req: NextRequest) {
     if (processed.action === "end") {
       const existing = await prisma.voiceCall.findFirst({
         where: { callSid: call_id },
-        select: { id: true, metadata: true, workspaceId: true, direction: true },
+        select: { id: true, metadata: true, workspaceId: true, direction: true, duration: true }, // Select duration to check if already ended/processed?
       });
+
       const alertWorkspaceId =
         workspaceId !== "unknown" ? workspaceId : existing?.workspaceId || "unknown";
 
       const existingMetadata = parseVoiceMetadata(existing?.metadata || {});
+
+      // Idempotency check for 'end'
+      if (existingMetadata.processedEnded) {
+          return NextResponse.json({ success: true });
+      }
+
       const mergedMetadata: Record<string, unknown> = {
         ...existingMetadata,
         ...metadata,
+        processedEnded: true, // Mark as processed
       };
 
       const retryCount = parseRetryCount(mergedMetadata);
@@ -299,6 +334,8 @@ export async function POST(req: NextRequest) {
       });
 
       // Track voice usage
+      // Check if usage was already tracked via metadata or existing record state?
+      // We rely on `processedEnded` flag in metadata now.
       if (duration && duration > 0 && callForConsent?.workspaceId) {
         const minutesUsed = Math.ceil(duration / 60);
         await trackUsage(callForConsent.workspaceId, "voice_minutes", minutesUsed);
@@ -340,6 +377,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("[VAPI:Webhook] Error:", error);
+    // Return 200/500 depending on error?
+    // If it's a transient DB error, 500 is good for retry.
+    // If it's logic error, 200 is better.
+    // For safety, let's keep 500 for now if it's DB related, but we handled JSON parsing above.
     return NextResponse.json({ error: "Webhook processing failed" }, { status: 500 });
   }
 }

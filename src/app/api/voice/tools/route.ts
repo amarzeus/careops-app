@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { sendSMS } from "@/lib/sms";
 import { isAfterHours, normalizeVoicePhoneNumber } from "@/lib/voice-compliance";
 import { checkUsageLimit, trackUsage } from "@/lib/razorpay-subscriptions";
+import { verifyWebhookSignature } from "@/lib/webhook-security";
 
 type ToolParams = Record<string, unknown> & { _workspaceId?: string };
 type ToolResult = Record<string, unknown>;
@@ -331,6 +332,41 @@ const handlers: Record<string, ToolHandler> = {
  */
 export async function POST(req: Request) {
   try {
+    const signature = req.headers.get("x-vapi-signature");
+    const secret = process.env.VAPI_WEBHOOK_SECRET;
+    const rawBody = await req.text();
+
+    if (secret) {
+      if (!signature) {
+        return NextResponse.json({ error: "Missing tool signature" }, { status: 401 });
+      }
+
+      const normalizedSignature = signature.replace(/^sha256=/i, "").trim();
+      const isValid = verifyWebhookSignature(rawBody, normalizedSignature, secret);
+      if (!isValid) {
+        return NextResponse.json({ error: "Invalid tool signature" }, { status: 401 });
+      }
+    }
+
+    let body;
+    try {
+        body = JSON.parse(rawBody) as {
+            message?: {
+                toolCalls?: Array<{
+                id: string;
+                function: {
+                    name: string;
+                    arguments?: unknown;
+                };
+                }>;
+            };
+        };
+    } catch {
+        return NextResponse.json({ error: "Invalid JSON payload" }, { status: 400 });
+    }
+
+    // We expect X-Workspace-Id to be passed in headers, but if VAPI calls this,
+    // it passes custom headers as configured in the assistant.
     const workspaceId = req.headers.get("X-Workspace-Id");
 
     if (!workspaceId) {
@@ -347,18 +383,6 @@ export async function POST(req: Request) {
         { status: 402 }
       );
     }
-
-    const body = (await req.json()) as {
-      message?: {
-        toolCalls?: Array<{
-          id: string;
-          function: {
-            name: string;
-            arguments?: unknown;
-          };
-        }>;
-      };
-    };
 
     const toolCalls = body.message?.toolCalls || [];
     if (toolCalls.length === 0) {
