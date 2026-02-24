@@ -7,7 +7,7 @@ import { createToken, hashPassword } from "@/lib/auth";
  * @param req
  */
 export async function POST(req: Request) {
-  if (process.env.NODE_ENV === "production") {
+  if (process.env.NODE_ENV === "production" && process.env.ALLOW_TEST_SEED !== "true") {
     return NextResponse.json({ error: "Not allowed in production" }, { status: 403 });
   }
 

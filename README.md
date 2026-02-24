@@ -264,11 +264,13 @@ CareOps is built with a focus on clean architecture and strong engineering disci
 Before opening a pull request, you **must** ensure the entire application suite is stable. CareOps uses a high-integrity maintenance command that validates every layer of the system.
 
 RUN THIS COMMAND BEFORE EVERY PULL REQUEST:
+
 ```bash
 npm test
 ```
 
 This command executes the following sequentially:
+
 1.  **Linting**: Ensures code style consistency.
 2.  **Type-checking**: Validates TypeScript integrity (`tsc`).
 3.  **Formatting**: Verifies Prettier compliance.
