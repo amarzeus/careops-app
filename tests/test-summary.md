@@ -19,11 +19,10 @@
 
 ## Execution Status
 
-- API Tests: Passing (flaky due to test server 404s on seed).
-- UI Tests: Passing (flaky timeouts on loading states).
+- API Tests: **Passing** (Stabilized by limiting parallel workers and fixing seed dependencies).
+- UI Tests: **Passing** (Timeouts reduced via hydration guards and optimized worker count).
 
 ## Next Steps
 
-- Investigate `api/test/seed` 404 errors during parallel execution.
-- Optimize UI loading states to reduce timeouts.
 - Add more granular RBAC tests for STAFF role.
+- Implement automated regression testing for Gemini-based voice agents.

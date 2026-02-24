@@ -24,7 +24,7 @@
     "type-check": "tsc --noEmit",
     "format:check": "prettier --check .",
     "test:audit": "npm audit --audit-level=critical",
-    "test:maintenance": "npm run lint && npm run type-check && npm run format:check && npm run test:unit && npm run test:e2e && npm run render:validate && npm run test:audit && npm run build && echo '\\n--- Test Summary ---' && cat tests/test-summary.md",
+    "test:maintenance": "npm run lint && npm run type-check && npm run format:check && npm run test:unit && npm run test:e2e && npm run render:validate && npm run test:audit && npm run build && npx tsx scripts/print-summary.ts",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "render": "bash ./scripts/render-cli.sh",
