@@ -1,150 +1,20 @@
 import { prisma } from "@/lib/prisma";
 import { checkUsageLimit } from "./razorpay-subscriptions";
+import {
+  createVapiAssistant,
+  createVapiPhoneNumber,
+  VOICE_TOOLS
+} from "./vapi";
 
-const getVapiClient = () => {
-  const apiKey = process.env.VAPI_API_KEY;
-  if (!apiKey) throw new Error("VAPI_API_KEY not configured");
-
-  return {
-    async createAssistant(config: {
-      name: string;
-      systemPrompt: string;
-      voiceId?: string;
-      workspaceId: string;
-      tools?: string[];
-      voiceModel?: string;
-    }) {
-      const response = await fetch("https://api.vapi.ai/assistant", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: config.name,
-          model: {
-            provider: "google",
-            model: "gemini-2.5-flash-native-audio", // Strictly use native audio
-            messages: [
-              {
-                role: "system",
-                content: config.systemPrompt,
-              },
-            ],
-            tools: config.tools || [],
-          },
-          voice: {
-            provider: "11labs",
-            voiceId: config.voiceId || "21m00Tcm4TlvDq8ikWAM",
-          },
-          serverUrl: `${process.env.NEXT_PUBLIC_APP_URL}/api/voice/tools`,
-          serverHeaders: {
-            "X-Workspace-Id": config.workspaceId,
-          },
-          recordingEnabled: true,
-          transcriptEnabled: true,
-        }),
-      });
-
-      if (!response.ok) {
-        const error = await response.text();
-        throw new Error(`Failed to create assistant: ${error}`);
-      }
-
-      return response.json();
-    },
-
-    async createPhoneNumber(config: { number: string; assistantId: string; workspaceId: string }) {
-      const response = await fetch("https://api.vapi.ai/phone-number", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          provider: "twilio",
-          number: config.number,
-          assistantId: config.assistantId,
-          serverUrl: `${process.env.NEXT_PUBLIC_APP_URL}/api/voice/tools`,
-          serverHeaders: {
-            "X-Workspace-Id": config.workspaceId,
-          },
-        }),
-      });
-
-      if (!response.ok) {
-        const error = await response.text();
-        throw new Error(`Failed to create phone number: ${error}`);
-      }
-
-      return response.json();
-    },
-
-    async listPhoneNumbers() {
-      const response = await fetch("https://api.vapi.ai/phone-number", {
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to list phone numbers");
-      }
-
-      return response.json();
-    },
-
-    async importTwilioNumber(config: {
-      twilioPhoneNumberSid: string;
-      assistantId?: string;
-      workspaceId: string;
-    }) {
-      const response = await fetch("https://api.vapi.ai/phone-number/import/twilio", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          twilioPhoneNumberSid: config.twilioPhoneNumberSid,
-          assistantId: config.assistantId,
-          serverUrl: `${process.env.NEXT_PUBLIC_APP_URL}/api/voice/tools`,
-          serverHeaders: {
-            "X-Workspace-Id": config.workspaceId,
-          },
-        }),
-      });
-
-      if (!response.ok) {
-        const error = await response.text();
-        throw new Error(`Failed to import Twilio number: ${error}`);
-      }
-
-      return response.json();
-    },
-
-    async deleteAssistant(assistantId: string) {
-      const response = await fetch(`https://api.vapi.ai/assistant/${assistantId}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-        },
-      });
-
-      return response.ok;
-    },
-
-    async deletePhoneNumber(phoneNumberId: string) {
-      const response = await fetch(`https://api.vapi.ai/phone-number/${phoneNumberId}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-        },
-      });
-
-      return response.ok;
-    },
-  };
+// Map template tool names to actual VOICE_TOOLS definitions
+const getToolsForTemplate = (toolNames: readonly string[]) => {
+  return toolNames.map(name => {
+    const tool = VOICE_TOOLS.find(t => t.function.name === name);
+    if (!tool) {
+      console.warn(`Tool ${name} not found in VOICE_TOOLS`);
+    }
+    return tool;
+  }).filter(t => t !== undefined);
 };
 
 export const AGENT_TEMPLATES = {
@@ -183,7 +53,7 @@ CAPABILITIES YOU HAVE:
 PRICING:
 {pricing}`,
     defaultVoiceId: "21m00Tcm4TlvDq8ikWAM",
-    tools: ["checkAvailability", "bookAppointment", "cancelAppointment", "transferCall"],
+    tools: ["check_availability", "create_booking", "reschedule_booking", "transfer_to_staff", "get_services", "get_business_hours"],
   },
 
   booking: {
@@ -210,7 +80,7 @@ PROCESS:
 
 Always be helpful and try to find a solution that works for the customer.`,
     defaultVoiceId: "EXAVITQu4vr4xnSDxMaL",
-    tools: ["checkAvailability", "bookAppointment", "rescheduleAppointment", "cancelAppointment"],
+    tools: ["check_availability", "create_booking", "reschedule_booking", "get_booking_status"],
   },
 
   support: {
@@ -240,7 +110,7 @@ If you cannot resolve an issue or the customer requests to speak with someone:
 
 Always maintain a calm, professional, and empathetic tone.`,
     defaultVoiceId: "yoZ06aMxZJJ28mfd3POQ",
-    tools: ["checkStatus", "transferCall", "createNote"],
+    tools: ["get_booking_status", "transfer_to_staff"],
   },
 
   outbound: {
@@ -266,7 +136,7 @@ SCRIPT GUIDELINES:
 
 Always be polite and professional. If the customer seems busy, offer to call back at a better time.`,
     defaultVoiceId: "21m00Tcm4TlvDq8ikWAM",
-    tools: ["checkAppointment", "rescheduleAppointment", "createNote"],
+    tools: ["get_booking_status", "reschedule_booking"],
   },
 } as const;
 
@@ -288,7 +158,6 @@ export async function createWorkspaceVoiceAgent(
   }
 ): Promise<{ agentId: string; vapiAssistantId: string }> {
   const template = AGENT_TEMPLATES[templateKey];
-  const vapiClient = getVapiClient();
 
   const servicesList = customization.services
     .map((s) => `- ${s.name}: ${s.duration} minutes${s.price ? ` (₹${s.price})` : ""}`)
@@ -312,12 +181,14 @@ export async function createWorkspaceVoiceAgent(
     systemPrompt += `\n\nADDITIONAL INSTRUCTIONS:\n${customization.additionalInstructions}`;
   }
 
-  const vapiAssistant = await vapiClient.createAssistant({
+  const tools = getToolsForTemplate(template.tools);
+
+  const vapiAssistant = await createVapiAssistant({
     name: `${customization.businessName} - ${template.name}`,
     systemPrompt,
     voiceId: customization.voiceId || template.defaultVoiceId,
     workspaceId,
-    tools: [...template.tools],
+    tools,
     voiceModel: customization.voiceModel,
   });
 
@@ -329,11 +200,11 @@ export async function createWorkspaceVoiceAgent(
       prompt: systemPrompt,
       voiceId: customization.voiceId || template.defaultVoiceId,
       isActive: true,
-      canBook: (template.tools as readonly string[]).includes("bookAppointment"),
+      canBook: (template.tools as readonly string[]).includes("create_booking"),
       canCheckStatus:
-        (template.tools as readonly string[]).includes("checkAvailability") ||
-        (template.tools as readonly string[]).includes("checkStatus"),
-      canTransfer: (template.tools as readonly string[]).includes("transferCall"),
+        (template.tools as readonly string[]).includes("check_availability") ||
+        (template.tools as readonly string[]).includes("get_booking_status"),
+      canTransfer: (template.tools as readonly string[]).includes("transfer_to_staff"),
       canHandleInquiry: true,
     },
   });
@@ -386,8 +257,7 @@ export async function provisionPhoneNumber(
     throw new Error("Agent not found or not properly configured");
   }
 
-  const vapiClient = getVapiClient();
-  const vapiPhone = await vapiClient.createPhoneNumber({
+  const vapiPhone = await createVapiPhoneNumber({
     number: options.phoneNumber,
     assistantId: agent.vapiAssistantId,
     workspaceId,
@@ -458,5 +328,3 @@ export async function searchAvailablePhoneNumbers(
     })
   );
 }
-
-export { getVapiClient };

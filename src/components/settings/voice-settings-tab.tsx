@@ -204,13 +204,15 @@ export function VoiceSettingsTab() {
           data: {
             ...agentForm,
             id: editingAgent?.id,
-            tools: VOICE_TOOLS.filter((_, i) => {
-              if (i === 0) return agentForm.canCheckStatus;
-              if (i === 1) return agentForm.canBook;
-              if (i === 2) return agentForm.canCheckStatus;
-              if (i === 3) return agentForm.canTransfer;
+            tools: VOICE_TOOLS.filter((t) => {
+              const name = t.function.name;
+              if (name === "check_availability") return agentForm.canCheckStatus;
+              if (name === "create_booking") return agentForm.canBook;
+              if (name === "get_booking_status") return agentForm.canCheckStatus;
+              if (name === "reschedule_booking") return agentForm.canBook;
+              if (name === "transfer_to_staff") return agentForm.canTransfer;
               return true;
-            }).map((t) => t.name),
+            }).map((t) => t.function.name),
           },
         }),
       });

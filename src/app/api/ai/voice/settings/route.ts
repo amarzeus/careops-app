@@ -1,8 +1,13 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { getVapiStatus } from "@/lib/vapi";
+import {
+  getVapiStatus,
+  createVapiAssistant,
+  updateVapiAssistant,
+  deleteVapiPhoneNumber,
+  deleteVapiAssistant // If I need to delete assistant on deleteAgent
+} from "@/lib/vapi";
 
 /**
  *
@@ -43,38 +48,6 @@ export async function GET() {
  *
  * @param req
  */
-import { createVapiAssistant, updateVapiAssistant } from "@/lib/vapi";
-
-const NEXT_PUBLIC_APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://careops-app.onrender.com";
-
-// Helper to construct Vapi Assistant config
-const getVapiConfig = (data: any) => {
-  return {
-    name: data.name,
-    model: {
-      provider: "openai",
-      model: "gpt-4",
-      systemPrompt: data.prompt || "You are a helpful assistant.",
-    },
-    voice: {
-      provider: "11labs",
-      voiceId: "21m00Tcm4TlvDq8ikWAM", // Default voice
-    },
-    transcriber: {
-      provider: "deepgram",
-      model: "nova-2",
-      language: "en",
-    },
-    serverUrl: `${NEXT_PUBLIC_APP_URL}/api/voice/tools`,
-    serverMessages: ["tool-calls"],
-    tools: data.tools ? JSON.parse(JSON.stringify(data.tools)) : [],
-  };
-};
-
-/**
- *
- * @param req
- */
 export async function POST(req: Request) {
   const user = await getCurrentUser();
   if (!user?.workspaceId || user.role !== "OWNER") {
@@ -88,12 +61,18 @@ export async function POST(req: Request) {
     if (action === "createAgent") {
       let vapiAssistantId = null;
       try {
-        const vapiConfig = getVapiConfig(data);
-        const vapiAssistant = await createVapiAssistant(vapiConfig);
-        vapiAssistantId = (vapiAssistant as { id: string }).id;
+        const vapiAssistant = await createVapiAssistant({
+          name: data.name,
+          systemPrompt: data.prompt || "You are a helpful assistant.",
+          workspaceId: user.workspaceId,
+          tools: data.tools || [],
+          voiceId: data.voiceId,
+        });
+        vapiAssistantId = vapiAssistant.id;
       } catch (e) {
         console.error("Failed to create Vapi assistant:", e);
-        // Fallback: proceed without Vapi ID, or fail? specific req says "sync", so maybe warn but proceed
+        // Fallback: proceed without Vapi ID? Ideally we should fail or warn.
+        // But to keep existing behavior (which seemed to try-catch), we'll proceed.
       }
 
       const agent = await prisma.voiceAgent.create({
@@ -109,6 +88,7 @@ export async function POST(req: Request) {
           tools: JSON.stringify(data.tools || []),
           workspaceId: user.workspaceId,
           vapiAssistantId: vapiAssistantId,
+          voiceId: data.voiceId, // Save voiceId if provided
         },
       });
       return NextResponse.json({ agent });
@@ -117,17 +97,27 @@ export async function POST(req: Request) {
     if (action === "updateAgent") {
       if (data.vapiAssistantId) {
         try {
-          const vapiConfig = getVapiConfig(data);
-          await updateVapiAssistant(data.vapiAssistantId, vapiConfig);
+          await updateVapiAssistant(data.vapiAssistantId, {
+            name: data.name,
+            systemPrompt: data.prompt,
+            workspaceId: user.workspaceId,
+            tools: data.tools,
+            voiceId: data.voiceId,
+          });
         } catch (e) {
           console.error("Failed to update Vapi assistant:", e);
         }
       } else {
-        // Check if we should create one now?
+        // Create one now if missing
         try {
-          const vapiConfig = getVapiConfig(data);
-          const vapiAssistant = await createVapiAssistant(vapiConfig);
-          data.vapiAssistantId = (vapiAssistant as { id: string }).id;
+          const vapiAssistant = await createVapiAssistant({
+            name: data.name,
+            systemPrompt: data.prompt || "You are a helpful assistant.",
+            workspaceId: user.workspaceId,
+            tools: data.tools || [],
+            voiceId: data.voiceId,
+          });
+          data.vapiAssistantId = vapiAssistant.id;
         } catch (e) {
           console.error("Failed to backfill Vapi assistant:", e);
         }
@@ -147,17 +137,59 @@ export async function POST(req: Request) {
           tools: JSON.stringify(data.tools || []),
           isActive: data.isActive,
           vapiAssistantId: data.vapiAssistantId,
+          voiceId: data.voiceId,
         },
       });
       return NextResponse.json({ agent });
     }
 
     if (action === "deleteAgent") {
+      // If we have vapiAssistantId, delete from Vapi too
+      const agent = await prisma.voiceAgent.findUnique({ where: { id: data.id } });
+      if (agent?.vapiAssistantId) {
+          try {
+              await deleteVapiAssistant(agent.vapiAssistantId);
+          } catch (e) {
+              console.error("Failed to delete Vapi assistant:", e);
+          }
+      }
+
       await prisma.voiceAgent.delete({ where: { id: data.id } });
       return NextResponse.json({ success: true });
     }
 
     if (action === "createPhoneNumber") {
+      // If we want to provision via VAPI here too?
+      // The existing code just created DB record.
+      // But we have createVapiPhoneNumber now.
+      // The existing code:
+      /*
+      const phoneNumber = await prisma.phoneNumber.create({
+        data: {
+          phoneNumber: data.phoneNumber,
+          label: data.label,
+          voiceAgentId: data.voiceAgentId || null,
+          forwardToStaff: data.forwardToStaff || false,
+          forwardNumber: data.forwardNumber,
+          workspaceId: user.workspaceId,
+        },
+      });
+      */
+      // It didn't seem to call VAPI provision.
+      // But `provisionPhoneNumber` in `vapi-platform.ts` does.
+      // If this action is used by UI to manually add a number, maybe it expects manual provisioning?
+      // Or maybe this is just adding an existing number to DB?
+      // Given the name `createPhoneNumber`, it sounds like provisioning.
+      // I'll stick to existing behavior (DB only) to avoid breaking if UI handles provisioning separately via `provision` API.
+      // But wait, `src/app/api/voice/numbers/provision/route.ts` exists. That's likely where provisioning happens.
+      // This route `api/ai/voice/settings` seems to be general settings management.
+      // I'll leave `createPhoneNumber` as DB only, assuming it's for tracking or maybe manual entry.
+      // However, if the user expects VAPI integration, this might be a gap.
+      // But I should focus on fixing what was there + improvements.
+      // The improvement is consistent VAPI usage.
+      // If I change this to provision, I might break things if params are missing (like agentId).
+      // I'll leave it as is.
+
       const phoneNumber = await prisma.phoneNumber.create({
         data: {
           phoneNumber: data.phoneNumber,
@@ -186,6 +218,21 @@ export async function POST(req: Request) {
     }
 
     if (action === "deletePhoneNumber") {
+      // Same here, delete from Vapi?
+      // existing code:
+      // await prisma.phoneNumber.delete({ where: { id: data.id } });
+
+      // `src/app/api/voice/numbers/[id]/route.ts` handled DELETE with VAPI deletion.
+      // I should duplicate that logic here if this action is used.
+      const existing = await prisma.phoneNumber.findUnique({ where: { id: data.id } });
+      if (existing?.vapiPhoneId) {
+          try {
+              await deleteVapiPhoneNumber(existing.vapiPhoneId);
+          } catch (e) {
+              console.error("Failed to delete Vapi phone number:", e);
+          }
+      }
+
       await prisma.phoneNumber.delete({ where: { id: data.id } });
       return NextResponse.json({ success: true });
     }
