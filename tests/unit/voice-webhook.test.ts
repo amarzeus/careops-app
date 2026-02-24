@@ -7,6 +7,7 @@ const { mockPrisma } = vi.hoisted(() => ({
     voiceCall: {
       upsert: vi.fn(),
       updateMany: vi.fn(),
+      update: vi.fn(),
       findFirst: vi.fn(),
     },
     contact: {
@@ -89,7 +90,7 @@ describe("Voice Webhook Handler", () => {
       const res = await POST(req);
       const data = await res.json();
 
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(200); // Changed from 400 to 200 to stop retry loops
       expect(data.error).toBe("Missing call_id");
     });
 
@@ -101,7 +102,10 @@ describe("Voice Webhook Handler", () => {
         metadata: { workspaceId: "ws-123" },
       });
 
-      mockPrisma.voiceCall.upsert.mockResolvedValue({ id: "vc-123", callSid: "call-123" });
+      mockPrisma.voiceCall.upsert.mockResolvedValue({ id: "vc-123", callSid: "call-123", metadata: "{}" });
+      mockPrisma.workspace.findUnique.mockResolvedValue({ timezone: "UTC" });
+      mockPrisma.voiceCall.findFirst.mockResolvedValue(null);
+      mockPrisma.voiceCall.update.mockResolvedValue({ id: "vc-123" });
 
       const res = await POST(req);
       const data = await res.json();
@@ -132,7 +136,9 @@ describe("Voice Webhook Handler", () => {
       });
 
       mockPrisma.contact.findFirst.mockResolvedValue({ id: "contact-123" });
-      mockPrisma.voiceCall.upsert.mockResolvedValue({ id: "vc-456", callSid: "call-456" });
+      mockPrisma.voiceCall.upsert.mockResolvedValue({ id: "vc-456", callSid: "call-456", metadata: "{}" });
+      mockPrisma.workspace.findUnique.mockResolvedValue({ timezone: "UTC" });
+      mockPrisma.voiceCall.update.mockResolvedValue({ id: "vc-456" });
 
       const res = await POST(req);
       const data = await res.json();
@@ -144,6 +150,8 @@ describe("Voice Webhook Handler", () => {
           where: { callSid: "call-456" },
         })
       );
+      // Also verify update called for alerts logic since it is call.started
+      expect(mockPrisma.voiceCall.update).toHaveBeenCalled();
     });
 
     it("should update voice call status on in-progress event", async () => {
@@ -199,11 +207,14 @@ describe("Voice Webhook Handler", () => {
       });
 
       mockPrisma.workspace.findUnique.mockResolvedValue({ timezone: "America/New_York" });
-      mockPrisma.voiceCall.upsert.mockResolvedValue({ id: "vc-ah", callSid: "call-after-hours" });
+      mockPrisma.voiceCall.upsert.mockResolvedValue({ id: "vc-ah", callSid: "call-after-hours", metadata: "{}" });
+      mockPrisma.voiceCall.update.mockResolvedValue({ id: "vc-ah" });
       mockPrisma.alert.create.mockResolvedValue({ id: "alert-ah" });
 
       const res = await POST(req);
       expect(res.status).toBe(200);
+      // Verify alert was created
+      expect(mockPrisma.alert.create).toHaveBeenCalled();
     });
   });
 

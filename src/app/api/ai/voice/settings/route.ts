@@ -6,7 +6,7 @@ import {
   createVapiAssistant,
   updateVapiAssistant,
   deleteVapiPhoneNumber,
-  deleteVapiAssistant // If I need to delete assistant on deleteAgent
+  deleteVapiAssistant, // If I need to delete assistant on deleteAgent
 } from "@/lib/vapi";
 
 /**
@@ -147,11 +147,11 @@ export async function POST(req: Request) {
       // If we have vapiAssistantId, delete from Vapi too
       const agent = await prisma.voiceAgent.findUnique({ where: { id: data.id } });
       if (agent?.vapiAssistantId) {
-          try {
-              await deleteVapiAssistant(agent.vapiAssistantId);
-          } catch (e) {
-              console.error("Failed to delete Vapi assistant:", e);
-          }
+        try {
+          await deleteVapiAssistant(agent.vapiAssistantId);
+        } catch (e) {
+          console.error("Failed to delete Vapi assistant:", e);
+        }
       }
 
       await prisma.voiceAgent.delete({ where: { id: data.id } });
@@ -226,11 +226,11 @@ export async function POST(req: Request) {
       // I should duplicate that logic here if this action is used.
       const existing = await prisma.phoneNumber.findUnique({ where: { id: data.id } });
       if (existing?.vapiPhoneId) {
-          try {
-              await deleteVapiPhoneNumber(existing.vapiPhoneId);
-          } catch (e) {
-              console.error("Failed to delete Vapi phone number:", e);
-          }
+        try {
+          await deleteVapiPhoneNumber(existing.vapiPhoneId);
+        } catch (e) {
+          console.error("Failed to delete Vapi phone number:", e);
+        }
       }
 
       await prisma.phoneNumber.delete({ where: { id: data.id } });

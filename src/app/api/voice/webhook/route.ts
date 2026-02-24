@@ -171,8 +171,8 @@ export async function POST(req: NextRequest) {
           // Only update metadata if we have new meaningful keys?
           // Keeping it simple: update it.
           metadata: serializeVoiceMetadata({
-              ...parseVoiceMetadata(metadata),
-              ...metadata,
+            ...parseVoiceMetadata(metadata),
+            ...metadata,
           }),
         },
       });
@@ -180,22 +180,22 @@ export async function POST(req: NextRequest) {
       // ONLY if it's "call.started" do we check for alerts/returning caller
       // This prevents double alerts if we get ringing then started.
       if (!isRinging && type === "call.started" && workspaceId !== "unknown") {
-          // Idempotency: check if we already processed 'started' logic for this call?
-          // We can check if `metadata` already has `processedStarted`.
-          const currentMetadata = parseVoiceMetadata(voiceCall.metadata);
-          if (currentMetadata.processedStarted) {
-             return NextResponse.json({ success: true });
-          }
+        // Idempotency: check if we already processed 'started' logic for this call?
+        // We can check if `metadata` already has `processedStarted`.
+        const currentMetadata = parseVoiceMetadata(voiceCall.metadata);
+        if (currentMetadata.processedStarted) {
+          return NextResponse.json({ success: true });
+        }
 
-          const workspace = await prisma.workspace.findUnique({
-              where: { id: workspaceId },
-              select: { timezone: true },
-            });
+        const workspace = await prisma.workspace.findUnique({
+          where: { id: workspaceId },
+          select: { timezone: true },
+        });
 
-          const afterHours =
-            direction === "INBOUND" ? isAfterHours(workspace?.timezone || null) : false;
+        const afterHours =
+          direction === "INBOUND" ? isAfterHours(workspace?.timezone || null) : false;
 
-          const previousCall = contactId
+        const previousCall = contactId
           ? await prisma.voiceCall.findFirst({
               where: {
                 workspaceId,
@@ -208,48 +208,48 @@ export async function POST(req: NextRequest) {
             })
           : null;
 
-          const mergedMetadata = {
-            ...currentMetadata,
-            retryCount: parseRetryCount(metadata),
-            afterHours,
-            returningCaller: !!previousCall,
-            previousCallId: previousCall?.id,
-            previousCallSummary: previousCall?.summary,
-            processedStarted: true, // Mark as processed
-          };
+        const mergedMetadata = {
+          ...currentMetadata,
+          retryCount: parseRetryCount(metadata),
+          afterHours,
+          returningCaller: !!previousCall,
+          previousCallId: previousCall?.id,
+          previousCallSummary: previousCall?.summary,
+          processedStarted: true, // Mark as processed
+        };
 
-          await prisma.voiceCall.update({
-              where: { id: voiceCall.id },
-              data: {
-                  summary: previousCall?.summary || null,
-                  metadata: serializeVoiceMetadata(mergedMetadata),
-              }
+        await prisma.voiceCall.update({
+          where: { id: voiceCall.id },
+          data: {
+            summary: previousCall?.summary || null,
+            metadata: serializeVoiceMetadata(mergedMetadata),
+          },
+        });
+
+        if (afterHours) {
+          await prisma.alert.create({
+            data: {
+              type: "voice_call",
+              title: "After-hours call received",
+              message: "A caller reached your voice line outside business hours.",
+              actionUrl: `/voice/calls/${voiceCall.id}`,
+              workspaceId,
+            },
           });
+        }
 
-          if (afterHours) {
-            await prisma.alert.create({
-              data: {
-                type: "voice_call",
-                title: "After-hours call received",
-                message: "A caller reached your voice line outside business hours.",
-                actionUrl: `/voice/calls/${voiceCall.id}`,
-                workspaceId,
-              },
-            });
-          }
-
-          if (previousCall) {
-            await prisma.alert.create({
-              data: {
-                type: "voice_call",
-                title: "Returning caller detected",
-                message: "CareOps AI matched this caller to a recent conversation.",
-                actionUrl: `/voice/calls/${voiceCall.id}`,
-                workspaceId,
-                isRead: true,
-              },
-            });
-          }
+        if (previousCall) {
+          await prisma.alert.create({
+            data: {
+              type: "voice_call",
+              title: "Returning caller detected",
+              message: "CareOps AI matched this caller to a recent conversation.",
+              actionUrl: `/voice/calls/${voiceCall.id}`,
+              workspaceId,
+              isRead: true,
+            },
+          });
+        }
       }
     }
 
@@ -276,7 +276,7 @@ export async function POST(req: NextRequest) {
 
       // Idempotency check for 'end'
       if (existingMetadata.processedEnded) {
-          return NextResponse.json({ success: true });
+        return NextResponse.json({ success: true });
       }
 
       const mergedMetadata: Record<string, unknown> = {
