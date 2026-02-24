@@ -49,11 +49,6 @@ export async function POST(req: NextRequest) {
       days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
     };
 
-    const aiPrefs = await prisma.aIPreferences.findUnique({
-      where: { workspaceId: user.workspaceId },
-      select: { voiceModel: true },
-    });
-
     const result = await createWorkspaceVoiceAgent(
       user.workspaceId,
       templateKey as AgentTemplateKey,
@@ -63,7 +58,7 @@ export async function POST(req: NextRequest) {
         businessHours: businessHours || defaultHours,
         additionalInstructions,
         voiceId,
-        voiceModel: aiPrefs?.voiceModel || "gemini-2.5-flash-native-audio",
+        voiceModel: "gemini-2.5-flash-native-audio", // Strictly use this model
       }
     );
 

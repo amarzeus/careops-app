@@ -24,7 +24,7 @@ const getVapiClient = () => {
           name: config.name,
           model: {
             provider: "google",
-            model: config.voiceModel || "gemini-2.5-flash-native-audio",
+            model: "gemini-2.5-flash-native-audio", // Strictly use native audio
             messages: [
               {
                 role: "system",

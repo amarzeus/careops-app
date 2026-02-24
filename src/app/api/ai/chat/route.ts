@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { aiOnboardingAssistant, getWorkspaceGeminiModel, isQuotaError } from "@/lib/gemini";
+import { aiOnboardingAssistant, isQuotaError } from "@/lib/gemini";
 import { getCurrentUser } from "@/lib/auth";
 
 /**
@@ -24,8 +24,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Message is required" }, { status: 400 });
     }
 
-    // Get model preference for workspace
-    const model = await getWorkspaceGeminiModel(user.workspaceId);
+    // Strictly use Gemini 2.5 Flash Lite for chat as requested
+    const model = "gemini-2.5-flash-lite";
 
     const response = await aiOnboardingAssistant(
       message,

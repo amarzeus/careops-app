@@ -816,7 +816,7 @@ export async function aiOnboardingAssistant(
   currentStep: number,
   businessInfo: Record<string, unknown>,
   conversationHistory: Array<{ role: "user" | "assistant"; content: string }> = [],
-  model: string = DEFAULT_GEMINI_MODEL
+  _model: string = DEFAULT_GEMINI_MODEL
 ): Promise<AIOnboardingResponse> {
   const stepStatus = buildStepStatus(currentStep, businessInfo);
 
@@ -841,7 +841,7 @@ BEHAVIOR RULES:
     // Instead, we inspect the response for function calls.
     const response = await withRetry(() =>
       client.models.generateContent({
-        model: model || DEFAULT_GEMINI_MODEL,
+        model: "gemini-2.5-flash-lite",
         config: {
           systemInstruction: systemPrompt,
 
