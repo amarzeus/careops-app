@@ -41,6 +41,7 @@ interface AIPreferences {
   alertOnAnomaly: boolean;
   dailyInsightTime: string | null;
   geminiModel: string;
+  voiceModel: string;
 }
 
 const DEFAULT_AI_PREFERENCES: AIPreferences = {
@@ -56,6 +57,7 @@ const DEFAULT_AI_PREFERENCES: AIPreferences = {
   alertOnAnomaly: true,
   dailyInsightTime: "09:00",
   geminiModel: "gemini-2.5-flash-lite",
+  voiceModel: "gemini-2.5-flash-native-audio",
 };
 
 /**
@@ -119,6 +121,7 @@ export function AIPreferencesTab({ _onSelectTab }: { _onSelectTab?: (tab: string
           alertOnAnomaly: preferences.alertOnAnomaly,
           dailyInsightTime: preferences.dailyInsightTime,
           geminiModel: preferences.geminiModel,
+          voiceModel: preferences.voiceModel,
         }),
       });
 
@@ -272,7 +275,7 @@ export function AIPreferencesTab({ _onSelectTab }: { _onSelectTab?: (tab: string
           </div>
 
           <div className="space-y-2">
-            <Label className="text-sm">AI Model</Label>
+            <Label className="text-sm">AI Assistant Chat Model</Label>
             <Select
               value={prefs.geminiModel}
               onValueChange={(v) => updatePreference("geminiModel", v)}
@@ -283,6 +286,23 @@ export function AIPreferencesTab({ _onSelectTab }: { _onSelectTab?: (tab: string
               <SelectContent>
                 <SelectItem value="gemini-2.5-flash-lite">
                   Gemini 2.5 Flash-Lite (Cheapest)
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-sm">AI Assistant Voice Model</Label>
+            <Select
+              value={prefs.voiceModel}
+              onValueChange={(v) => updatePreference("voiceModel", v)}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="gemini-2.5-flash-native-audio">
+                  Gemini 2.5 Flash Native Audio Dialog
                 </SelectItem>
               </SelectContent>
             </Select>

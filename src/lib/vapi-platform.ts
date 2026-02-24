@@ -12,6 +12,7 @@ const getVapiClient = () => {
       voiceId?: string;
       workspaceId: string;
       tools?: string[];
+      voiceModel?: string;
     }) {
       const response = await fetch("https://api.vapi.ai/assistant", {
         method: "POST",
@@ -22,8 +23,8 @@ const getVapiClient = () => {
         body: JSON.stringify({
           name: config.name,
           model: {
-            provider: "openai",
-            model: "gpt-4o-mini",
+            provider: "google",
+            model: config.voiceModel || "gemini-2.5-flash-native-audio",
             messages: [
               {
                 role: "system",
@@ -283,6 +284,7 @@ export async function createWorkspaceVoiceAgent(
     businessHours: { open: string; close: string; days: string[] };
     additionalInstructions?: string;
     voiceId?: string;
+    voiceModel?: string;
   }
 ): Promise<{ agentId: string; vapiAssistantId: string }> {
   const template = AGENT_TEMPLATES[templateKey];
@@ -316,6 +318,7 @@ export async function createWorkspaceVoiceAgent(
     voiceId: customization.voiceId || template.defaultVoiceId,
     workspaceId,
     tools: [...template.tools],
+    voiceModel: customization.voiceModel,
   });
 
   const agent = await prisma.voiceAgent.create({
