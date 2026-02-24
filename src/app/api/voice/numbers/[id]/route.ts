@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { getVapiClient } from "@/lib/vapi-platform";
+import { deleteVapiPhoneNumber } from "@/lib/vapi";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -127,8 +127,7 @@ export async function DELETE(req: NextRequest, { params }: RouteParams) {
 
     if (existing.vapiPhoneId) {
       try {
-        const vapiClient = getVapiClient();
-        await vapiClient.deletePhoneNumber(existing.vapiPhoneId);
+        await deleteVapiPhoneNumber(existing.vapiPhoneId);
       } catch (vapiError) {
         console.error("[PhoneNumber:DELETE] Vapi deletion failed:", vapiError);
       }
