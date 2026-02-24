@@ -16,6 +16,7 @@ import {
   Menu,
   X,
   PhoneCall,
+  Folder,
   ChevronRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -29,6 +30,7 @@ const navItems = [
   { href: "/bookings", label: "Bookings", icon: Calendar, badgeKey: "bookings" as const },
   { href: "/contacts", label: "Contacts", icon: Users, badgeKey: null },
   { href: "/forms", label: "Forms", icon: FileText, badgeKey: null },
+  { href: "/files", label: "Files", icon: Folder, badgeKey: null },
   { href: "/inventory", label: "Inventory", icon: Package, badgeKey: "lowStock" as const },
   { href: "/voice/calls", label: "Voice", icon: PhoneCall, badgeKey: null },
   { href: "/staff", label: "Staff", icon: Users, badgeKey: null },

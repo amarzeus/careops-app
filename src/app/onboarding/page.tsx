@@ -28,6 +28,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Progress } from "@/components/ui/progress";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
+import { FileDisplay } from "@/components/file-display";
 import {
   Select,
   SelectContent,
@@ -180,7 +181,7 @@ export default function OnboardingPage() {
     name: string;
     description: string;
     serviceId: string;
-    documents: Array<{ name: string; url: string }>;
+    documents: Array<{ name: string; url: string; size?: number; type?: string }>;
   }>({ name: "", description: "", serviceId: "", documents: [] });
   const [editingIndex, setEditingIndex] = useState<{
     type: "service" | "form" | "inventory" | "staff" | null;
@@ -1128,7 +1129,15 @@ export default function OnboardingPage() {
         const data = await res.json();
         setNewIntakeForm((prev) => ({
           ...prev,
-          documents: [...prev.documents, { name: data.name, url: data.url }],
+          documents: [
+            ...prev.documents,
+            {
+              name: data.name,
+              url: data.url,
+              size: data.size,
+              type: data.type,
+            },
+          ],
         }));
       }
     } catch (error) {
@@ -1508,11 +1517,15 @@ export default function OnboardingPage() {
                   Documents (Agreement, etc.)
                 </Label>
                 <Input type="file" onChange={handleFileUpload} className="h-8 text-sm" />
-                {newIntakeForm.documents.map((doc, i) => (
-                  <div key={i} className="text-primary flex items-center gap-1 text-[10px]">
-                    <FileText className="h-3 w-3" /> {doc.name}
-                  </div>
-                ))}
+                <FileDisplay
+                  files={newIntakeForm.documents}
+                  onRemove={(index) => {
+                    setNewIntakeForm((prev) => ({
+                      ...prev,
+                      documents: prev.documents.filter((_, i) => i !== index),
+                    }));
+                  }}
+                />
               </div>
               <Button
                 onClick={addIntakeForm}
