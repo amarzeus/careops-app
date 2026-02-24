@@ -30,12 +30,18 @@ interface FileItem {
   uploadedAt: string;
 }
 
+/**
+ *
+ */
 function formatFileSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+/**
+ *
+ */
 function formatDate(dateStr: string): string {
   const date = new Date(dateStr);
   return date.toLocaleDateString("en-US", {
@@ -47,16 +53,25 @@ function formatDate(dateStr: string): string {
   });
 }
 
+/**
+ *
+ */
 function getFileIcon(type: string, _name: string) {
   if (type.startsWith("image/")) return Image;
   if (type === "application/pdf") return FileText;
   return File;
 }
 
+/**
+ *
+ */
 function isImage(type: string): boolean {
   return type.startsWith("image/");
 }
 
+/**
+ *
+ */
 export default function FilesPage() {
   const [files, setFiles] = useState<FileItem[]>([]);
   const [loading, setLoading] = useState(true);

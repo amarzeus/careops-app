@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Mic, MicOff, X, Volume2, VolumeX, MessageSquare, Send } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -270,7 +269,7 @@ export function useVoiceEngine(
     continuousModeRef.current = active;
   }, []);
 
-  const recognitionRef = useRef<any>(null);
+  const recognitionRef = useRef<ISpeechRecognition | null>(null);
   const synthRef = useRef<SpeechSynthesis | null>(null);
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   const silenceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -516,12 +515,44 @@ export function useVoiceEngine(
     [onTranscript, speak, stopSpeaking, setContinuousMode]
   );
 
+  interface ISpeechRecognitionEvent {
+    results: {
+      length: number;
+      [index: number]: {
+        isFinal: boolean;
+        [index: number]: {
+          transcript: string;
+        };
+      };
+    };
+  }
+
+  interface ISpeechRecognitionErrorEvent {
+    error: string;
+  }
+
+  interface ISpeechRecognition {
+    continuous: boolean;
+    interimResults: boolean;
+    lang: string;
+    onstart: (() => void) | null;
+    onresult: ((event: ISpeechRecognitionEvent) => void) | null;
+    onerror: ((event: ISpeechRecognitionErrorEvent) => void) | null;
+    onend: (() => void) | null;
+    start: () => void;
+    stop: () => void;
+    abort: () => void;
+  }
+
+  interface WindowWithSpeechRecognition extends Window {
+    SpeechRecognition?: new () => ISpeechRecognition;
+    webkitSpeechRecognition?: new () => ISpeechRecognition;
+  }
+
   const startListening = useCallback(async () => {
     const SpeechRecognition =
-      (window as any as { SpeechRecognition: any; webkitSpeechRecognition: any })
-        .SpeechRecognition ||
-      (window as any as { SpeechRecognition: any; webkitSpeechRecognition: any })
-        .webkitSpeechRecognition;
+      (window as unknown as WindowWithSpeechRecognition).SpeechRecognition ||
+      (window as unknown as WindowWithSpeechRecognition).webkitSpeechRecognition;
     if (!SpeechRecognition) {
       setError("Speech recognition not supported. Use Chrome.");
       return;
@@ -557,7 +588,7 @@ export function useVoiceEngine(
 
     recognition.onstart = () => setVoiceState("listening");
 
-    recognition.onresult = (event: any) => {
+    recognition.onresult = (event: ISpeechRecognitionEvent) => {
       let interim = "";
       accumulatedFinal = "";
       // event.results is the full running list since recognition started
@@ -582,7 +613,7 @@ export function useVoiceEngine(
       }, 1800); // 1.8s silence detection
     };
 
-    recognition.onerror = (event: any) => {
+    recognition.onerror = (event: ISpeechRecognitionErrorEvent) => {
       // no-speech in continuous mode: just restart recognition
       if (event.error === "no-speech") {
         if (continuousModeRef.current && voiceStateRef.current === "listening") {

@@ -1,7 +1,21 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from "next/server";
 import { getCurrentUser, hashPassword } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
+
+interface StaffCreatePayload {
+  email: string;
+  name: string;
+  password?: string;
+  canAccessInbox?: boolean;
+  canAccessBookings?: boolean;
+  canAccessForms?: boolean;
+  canAccessInventory?: boolean;
+}
+
+interface StaffUpdatePayload extends Partial<StaffCreatePayload> {
+  id: string;
+}
 
 /**
  *
@@ -49,7 +63,8 @@ export async function POST(req: Request) {
     canAccessBookings,
     canAccessForms,
     canAccessInventory,
-  } = await req.json();
+  }: StaffCreatePayload = await req.json();
+
   if (!email || !name || !password)
     return NextResponse.json({ error: "Email, name, and password are required" }, { status: 400 });
 
@@ -103,7 +118,8 @@ export async function PUT(req: Request) {
     canAccessBookings,
     canAccessForms,
     canAccessInventory,
-  } = await req.json();
+  }: StaffUpdatePayload = await req.json();
+
   if (!id) return NextResponse.json({ error: "User ID is required" }, { status: 400 });
 
   const existingUser = await prisma.user.findUnique({
@@ -114,7 +130,7 @@ export async function PUT(req: Request) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
 
-  const updateData: any = {
+  const updateData: Prisma.UserUpdateInput = {
     name,
     email,
     canAccessInbox,

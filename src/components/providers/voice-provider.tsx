@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { createContext, useContext, useEffect, useState } from "react";
@@ -10,6 +9,20 @@ import {
 } from "@/components/voice-assistant";
 import { usePathname, useRouter } from "next/navigation";
 import { VoiceActionService } from "@/lib/voice-actions";
+
+interface VoiceHistoryItem {
+  role: "user" | "assistant";
+  content: string;
+}
+
+interface VoiceApiResponse {
+  message?: string;
+  action?: {
+    type: string;
+    path?: string;
+    [key: string]: any;
+  };
+}
 
 interface VoiceContextType {
   voiceState: VoiceState;
@@ -52,7 +65,7 @@ export function VoiceProvider({ children }: { children: React.ReactNode }) {
   const handleTranscript = async (
     text: string,
     clientContext?: Record<string, unknown>,
-    history?: any[]
+    history?: VoiceHistoryItem[]
   ) => {
     try {
       const response = await fetch("/api/ai/voice", {
@@ -70,7 +83,7 @@ export function VoiceProvider({ children }: { children: React.ReactNode }) {
 
       // Prevent SyntaxError: Unexpected end of JSON input
       const contentType = response.headers.get("content-type");
-      let data: any = {};
+      let data: VoiceApiResponse = {};
 
       if (contentType && contentType.includes("application/json")) {
         try {
@@ -104,7 +117,7 @@ export function VoiceProvider({ children }: { children: React.ReactNode }) {
         }
         // Enhanced Voice Actions
         else {
-          VoiceActionService.execute(data.action, router);
+          VoiceActionService.execute(data.action as any, router);
         }
       }
 
