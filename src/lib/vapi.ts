@@ -104,7 +104,7 @@ export async function initiateOutboundCall(
       assistantOverrides: {
         serverUrl: `${NEXT_PUBLIC_APP_URL}/api/voice/tools`,
         serverHeaders: {
-            "X-Workspace-Id": request.workspaceId,
+          "X-Workspace-Id": request.workspaceId,
         },
       },
       metadata: {
@@ -242,7 +242,7 @@ export const VOICE_TOOLS = [
         },
         required: ["serviceId", "date"],
       },
-    }
+    },
   },
   {
     type: "function",
@@ -262,7 +262,7 @@ export const VOICE_TOOLS = [
         },
         required: ["serviceId", "contactName", "contactPhone", "date", "time"],
       },
-    }
+    },
   },
   {
     type: "function",
@@ -278,7 +278,7 @@ export const VOICE_TOOLS = [
         },
         required: [],
       },
-    }
+    },
   },
   {
     type: "function",
@@ -294,7 +294,7 @@ export const VOICE_TOOLS = [
         },
         required: ["bookingId", "date", "time"],
       },
-    }
+    },
   },
   {
     type: "function",
@@ -309,7 +309,7 @@ export const VOICE_TOOLS = [
         },
         required: ["staffName", "reason"],
       },
-    }
+    },
   },
   {
     type: "function",
@@ -320,7 +320,7 @@ export const VOICE_TOOLS = [
         type: "object",
         properties: {},
       },
-    }
+    },
   },
   {
     type: "function",
@@ -331,7 +331,7 @@ export const VOICE_TOOLS = [
         type: "object",
         properties: {},
       },
-    }
+    },
   },
 ];
 
@@ -424,14 +424,16 @@ export async function createVapiAssistant(config: {
   }
 
   // Map tool names to full definitions if needed
-  const resolvedTools = (config.tools || []).map((t) => {
-    if (typeof t === "string") {
-      const toolDef = VOICE_TOOLS.find((vt) => vt.function.name === t);
-      if (!toolDef) console.warn(`Tool ${t} not found in VOICE_TOOLS`);
-      return toolDef || t;
-    }
-    return t;
-  }).filter((t) => typeof t !== "string"); // Filter out unresolved strings or mix?
+  const resolvedTools = (config.tools || [])
+    .map((t) => {
+      if (typeof t === "string") {
+        const toolDef = VOICE_TOOLS.find((vt) => vt.function.name === t);
+        if (!toolDef) console.warn(`Tool ${t} not found in VOICE_TOOLS`);
+        return toolDef || t;
+      }
+      return t;
+    })
+    .filter((t) => typeof t !== "string"); // Filter out unresolved strings or mix?
   // VAPI might allow strings if they are references, but we want definitions.
   // If we couldn't resolve, we probably shouldn't pass the string unless we are sure.
   // For safety, let's keep valid objects.
@@ -499,30 +501,34 @@ export async function updateVapiAssistant(
 
   if (config.systemPrompt || config.tools) {
     // Resolve tools here as well
-    const resolvedTools = config.tools ? (config.tools as unknown[]).map((t) => {
-        if (typeof t === "string") {
-            const toolDef = VOICE_TOOLS.find((vt) => vt.function.name === t);
-            return toolDef || t;
-        }
-        return t;
-    }).filter((t) => typeof t !== "string") : undefined;
+    const resolvedTools = config.tools
+      ? (config.tools as unknown[])
+          .map((t) => {
+            if (typeof t === "string") {
+              const toolDef = VOICE_TOOLS.find((vt) => vt.function.name === t);
+              return toolDef || t;
+            }
+            return t;
+          })
+          .filter((t) => typeof t !== "string")
+      : undefined;
 
     const modelConfig: Record<string, unknown> = {
-        provider: "google",
-        model: "gemini-2.5-flash-native-audio",
+      provider: "google",
+      model: "gemini-2.5-flash-native-audio",
     };
 
     if (config.systemPrompt) {
-        modelConfig.messages = [
-            {
-                role: "system",
-                content: config.systemPrompt,
-            },
-        ];
+      modelConfig.messages = [
+        {
+          role: "system",
+          content: config.systemPrompt,
+        },
+      ];
     }
 
     if (resolvedTools) {
-        modelConfig.tools = resolvedTools;
+      modelConfig.tools = resolvedTools;
     }
 
     updatePayload.model = modelConfig;
@@ -530,16 +536,16 @@ export async function updateVapiAssistant(
 
   if (config.voiceId) {
     updatePayload.voice = {
-        provider: "11labs",
-        voiceId: config.voiceId,
+      provider: "11labs",
+      voiceId: config.voiceId,
     };
   }
 
   if (config.workspaceId) {
-      updatePayload.serverUrl = `${NEXT_PUBLIC_APP_URL}/api/voice/tools`;
-      updatePayload.serverHeaders = {
-          "X-Workspace-Id": config.workspaceId,
-      };
+    updatePayload.serverUrl = `${NEXT_PUBLIC_APP_URL}/api/voice/tools`;
+    updatePayload.serverHeaders = {
+      "X-Workspace-Id": config.workspaceId,
+    };
   }
 
   try {
@@ -555,99 +561,99 @@ export async function updateVapiAssistant(
  * Create a new Vapi phone number
  */
 export async function createVapiPhoneNumber(config: {
-    number: string;
-    assistantId: string;
-    workspaceId: string;
+  number: string;
+  assistantId: string;
+  workspaceId: string;
 }): Promise<{ id: string; [key: string]: unknown }> {
-    if (!vapiClient) {
-        throw new Error("VAPI client not initialized");
-    }
+  if (!vapiClient) {
+    throw new Error("VAPI client not initialized");
+  }
 
-    try {
-        const phoneNumber = await vapiClient.phoneNumbers.create({
-            provider: "twilio",
-            number: config.number,
-            assistantId: config.assistantId,
-            serverUrl: `${NEXT_PUBLIC_APP_URL}/api/voice/tools`,
-            serverHeaders: {
-                "X-Workspace-Id": config.workspaceId,
-            },
-        });
-        return phoneNumber;
-    } catch (error) {
-        console.error("[VAPI] Failed to create phone number:", error);
-        throw error;
-    }
+  try {
+    const phoneNumber = await vapiClient.phoneNumbers.create({
+      provider: "twilio",
+      number: config.number,
+      assistantId: config.assistantId,
+      serverUrl: `${NEXT_PUBLIC_APP_URL}/api/voice/tools`,
+      serverHeaders: {
+        "X-Workspace-Id": config.workspaceId,
+      },
+    });
+    return phoneNumber;
+  } catch (error) {
+    console.error("[VAPI] Failed to create phone number:", error);
+    throw error;
+  }
 }
 
 /**
  * Import a Twilio phone number
  */
 export async function importTwilioNumber(config: {
-    twilioPhoneNumberSid: string;
-    assistantId?: string;
-    workspaceId: string;
+  twilioPhoneNumberSid: string;
+  assistantId?: string;
+  workspaceId: string;
 }): Promise<{ id: string; [key: string]: unknown }> {
-    if (!vapiClient) {
-        throw new Error("VAPI client not initialized");
-    }
+  if (!vapiClient) {
+    throw new Error("VAPI client not initialized");
+  }
 
-    try {
-        // SDK might have a specific method for import, or use create with import param
-        // Assuming create with provider twilio handles import via SID if provided in a specific way or use a dedicated endpoint
-        // Looking at vapi-platform.ts, it calls /phone-number/import/twilio
-        // If SDK doesn't support import explicitly, we might need to fallback to fetch or check if phoneNumbers.create handles it.
-        // But since the task is to use SDK, I'll check if I can use phoneNumbers.create or if phoneNumbers.import exists.
-        // The interface above mocked `import`.
+  try {
+    // SDK might have a specific method for import, or use create with import param
+    // Assuming create with provider twilio handles import via SID if provided in a specific way or use a dedicated endpoint
+    // Looking at vapi-platform.ts, it calls /phone-number/import/twilio
+    // If SDK doesn't support import explicitly, we might need to fallback to fetch or check if phoneNumbers.create handles it.
+    // But since the task is to use SDK, I'll check if I can use phoneNumbers.create or if phoneNumbers.import exists.
+    // The interface above mocked `import`.
 
-        // Let's assume the SDK has an import method or similar. If not, I'll update the interface to match reality later.
-        // For now, I'll use the mocked import method.
-        const phoneNumber = await vapiClient.phoneNumbers.create({
-             provider: "twilio",
-             twilioPhoneNumberSid: config.twilioPhoneNumberSid,
-             assistantId: config.assistantId,
-             serverUrl: `${NEXT_PUBLIC_APP_URL}/api/voice/tools`,
-             serverHeaders: {
-                "X-Workspace-Id": config.workspaceId,
-            },
-        });
-        return phoneNumber;
-    } catch (error) {
-        console.error("[VAPI] Failed to import phone number:", error);
-        throw error;
-    }
+    // Let's assume the SDK has an import method or similar. If not, I'll update the interface to match reality later.
+    // For now, I'll use the mocked import method.
+    const phoneNumber = await vapiClient.phoneNumbers.create({
+      provider: "twilio",
+      twilioPhoneNumberSid: config.twilioPhoneNumberSid,
+      assistantId: config.assistantId,
+      serverUrl: `${NEXT_PUBLIC_APP_URL}/api/voice/tools`,
+      serverHeaders: {
+        "X-Workspace-Id": config.workspaceId,
+      },
+    });
+    return phoneNumber;
+  } catch (error) {
+    console.error("[VAPI] Failed to import phone number:", error);
+    throw error;
+  }
 }
 
 /**
  * Delete a Vapi assistant
  */
 export async function deleteVapiAssistant(id: string): Promise<boolean> {
-    if (!vapiClient) {
-        throw new Error("VAPI client not initialized");
-    }
+  if (!vapiClient) {
+    throw new Error("VAPI client not initialized");
+  }
 
-    try {
-        await vapiClient.assistants.delete(id);
-        return true;
-    } catch (error) {
-        console.error("[VAPI] Failed to delete assistant:", error);
-        return false;
-    }
+  try {
+    await vapiClient.assistants.delete(id);
+    return true;
+  } catch (error) {
+    console.error("[VAPI] Failed to delete assistant:", error);
+    return false;
+  }
 }
 
 /**
  * Delete a Vapi phone number
  */
 export async function deleteVapiPhoneNumber(id: string): Promise<boolean> {
-    if (!vapiClient) {
-        throw new Error("VAPI client not initialized");
-    }
+  if (!vapiClient) {
+    throw new Error("VAPI client not initialized");
+  }
 
-    try {
-        await vapiClient.phoneNumbers.delete(id);
-        return true;
-    } catch (error) {
-        console.error("[VAPI] Failed to delete phone number:", error);
-        return false;
-    }
+  try {
+    await vapiClient.phoneNumbers.delete(id);
+    return true;
+  } catch (error) {
+    console.error("[VAPI] Failed to delete phone number:", error);
+    return false;
+  }
 }

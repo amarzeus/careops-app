@@ -350,19 +350,19 @@ export async function POST(req: Request) {
 
     let body;
     try {
-        body = JSON.parse(rawBody) as {
-            message?: {
-                toolCalls?: Array<{
-                id: string;
-                function: {
-                    name: string;
-                    arguments?: unknown;
-                };
-                }>;
+      body = JSON.parse(rawBody) as {
+        message?: {
+          toolCalls?: Array<{
+            id: string;
+            function: {
+              name: string;
+              arguments?: unknown;
             };
+          }>;
         };
+      };
     } catch {
-        return NextResponse.json({ error: "Invalid JSON payload" }, { status: 400 });
+      return NextResponse.json({ error: "Invalid JSON payload" }, { status: 400 });
     }
 
     // We expect X-Workspace-Id to be passed in headers, but if VAPI calls this,

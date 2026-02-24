@@ -1,20 +1,18 @@
 import { prisma } from "@/lib/prisma";
 import { checkUsageLimit } from "./razorpay-subscriptions";
-import {
-  createVapiAssistant,
-  createVapiPhoneNumber,
-  VOICE_TOOLS
-} from "./vapi";
+import { createVapiAssistant, createVapiPhoneNumber, VOICE_TOOLS } from "./vapi";
 
 // Map template tool names to actual VOICE_TOOLS definitions
 const getToolsForTemplate = (toolNames: readonly string[]) => {
-  return toolNames.map(name => {
-    const tool = VOICE_TOOLS.find(t => t.function.name === name);
-    if (!tool) {
-      console.warn(`Tool ${name} not found in VOICE_TOOLS`);
-    }
-    return tool;
-  }).filter(t => t !== undefined);
+  return toolNames
+    .map((name) => {
+      const tool = VOICE_TOOLS.find((t) => t.function.name === name);
+      if (!tool) {
+        console.warn(`Tool ${name} not found in VOICE_TOOLS`);
+      }
+      return tool;
+    })
+    .filter((t) => t !== undefined);
 };
 
 export const AGENT_TEMPLATES = {
@@ -53,7 +51,14 @@ CAPABILITIES YOU HAVE:
 PRICING:
 {pricing}`,
     defaultVoiceId: "21m00Tcm4TlvDq8ikWAM",
-    tools: ["check_availability", "create_booking", "reschedule_booking", "transfer_to_staff", "get_services", "get_business_hours"],
+    tools: [
+      "check_availability",
+      "create_booking",
+      "reschedule_booking",
+      "transfer_to_staff",
+      "get_services",
+      "get_business_hours",
+    ],
   },
 
   booking: {
