@@ -3,7 +3,12 @@ import { test, expect } from "@playwright/test";
 test.describe("Feature UI Tests", () => {
   test.setTimeout(60000);
 
-  test("AI Wiring: Should chat with onboarding assistant", async ({ page, request, context }) => {
+  test("AI Wiring: Should chat with onboarding assistant", async ({
+    page,
+    request,
+    context,
+    baseURL,
+  }) => {
     // Skip test if no Gemini API key is configured (CI environments)
     test.skip(!process.env.GEMINI_API_KEY, "GEMINI_API_KEY not configured - skipping AI test");
 
@@ -26,7 +31,7 @@ test.describe("Feature UI Tests", () => {
       {
         name: "auth-token",
         value: token,
-        url: "http://localhost:5000",
+        url: baseURL,
       },
     ]);
 
@@ -56,7 +61,7 @@ test.describe("Feature UI Tests", () => {
     ).toBeVisible({ timeout: 20000 });
   });
 
-  test("Webhooks: Should add a new webhook", async ({ page, request, context }) => {
+  test("Webhooks: Should add a new webhook", async ({ page, request, context, baseURL }) => {
     // 1. Seed user in active state
     const email = `test-hooks-${Date.now()}@example.com`;
     const seedRes = await request.post("/api/test/seed", {
@@ -76,7 +81,7 @@ test.describe("Feature UI Tests", () => {
       {
         name: "auth-token",
         value: token,
-        url: "http://localhost:5000",
+        url: baseURL,
       },
     ]);
 

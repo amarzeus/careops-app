@@ -83,13 +83,13 @@ test.describe("Protected (Dashboard) Routing Validation", () => {
     }
   });
 
-  test.beforeEach(async ({ context }) => {
-    const baseURL = test.info().project.use.baseURL || "http://localhost:5000";
+  test.beforeEach(async ({ context, baseURL }) => {
+    const projectBaseURL = baseURL || "http://localhost:5000";
     await context.addCookies([
       {
         name: "auth-token",
         value: token,
-        url: baseURL,
+        url: projectBaseURL,
       },
     ]);
   });

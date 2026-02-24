@@ -343,6 +343,11 @@ function CustomTooltip({ active, payload, label }: any) {
  *
  */
 function Hero3D() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
   const prefersReducedMotion = useReducedMotion();
@@ -576,44 +581,46 @@ function Hero3D() {
                     <span className="text-muted-foreground text-xs font-medium">Last 7 Days</span>
                   </div>
                   <div className="min-h-[200px] w-full flex-1">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <AreaChart
-                        data={mockChartData}
-                        margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
-                      >
-                        <defs>
-                          <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.4} />
-                            <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
-                          </linearGradient>
-                        </defs>
-                        <XAxis
-                          dataKey="name"
-                          axisLine={false}
-                          tickLine={false}
-                          tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
-                          dy={10}
-                        />
-                        <Tooltip
-                          content={<CustomTooltip />}
-                          cursor={{
-                            stroke: "var(--primary)",
-                            strokeWidth: 1,
-                            strokeDasharray: "4 4",
-                          }}
-                        />
-                        <Area
-                          type="monotone"
-                          dataKey="revenue"
-                          stroke="var(--primary)"
-                          strokeWidth={3}
-                          fillOpacity={1}
-                          fill="url(#colorRevenue)"
-                          activeDot={{ r: 6, strokeWidth: 0, fill: "var(--primary)" }}
-                          animationDuration={1500}
-                        />
-                      </AreaChart>
-                    </ResponsiveContainer>
+                    {mounted && (
+                      <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+                        <AreaChart
+                          data={mockChartData}
+                          margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+                        >
+                          <defs>
+                            <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.4} />
+                              <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
+                            </linearGradient>
+                          </defs>
+                          <XAxis
+                            dataKey="name"
+                            axisLine={false}
+                            tickLine={false}
+                            tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
+                            dy={10}
+                          />
+                          <Tooltip
+                            content={<CustomTooltip />}
+                            cursor={{
+                              stroke: "var(--primary)",
+                              strokeWidth: 1,
+                              strokeDasharray: "4 4",
+                            }}
+                          />
+                          <Area
+                            type="monotone"
+                            dataKey="revenue"
+                            stroke="var(--primary)"
+                            strokeWidth={3}
+                            fillOpacity={1}
+                            fill="url(#colorRevenue)"
+                            activeDot={{ r: 6, strokeWidth: 0, fill: "var(--primary)" }}
+                            animationDuration={1500}
+                          />
+                        </AreaChart>
+                      </ResponsiveContainer>
+                    )}
                   </div>
                 </div>
               </div>

@@ -11,6 +11,7 @@ import {
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp } from "lucide-react";
+import { useState, useEffect } from "react";
 
 interface ChartDataPoint {
   name: string;
@@ -29,6 +30,12 @@ interface PerformanceChartProps {
  * @param root0.data
  */
 export function PerformanceChart({ data }: PerformanceChartProps) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const hasData = data.some((d) => d.bookings > 0 || d.leads > 0 || d.completed > 0);
 
   return (
@@ -56,15 +63,17 @@ export function PerformanceChart({ data }: PerformanceChartProps) {
         </div>
       </CardHeader>
       <CardContent>
-        {!hasData ? (
+        {!hasData || !mounted ? (
           <div className="text-muted-foreground flex h-[260px] items-center justify-center text-sm">
             <div className="text-center">
               <TrendingUp className="mx-auto mb-2 h-10 w-10 opacity-30" />
-              <p>Performance data will appear as activity grows</p>
+              <p>
+                {!mounted ? "Loading chart..." : "Performance data will appear as activity grows"}
+              </p>
             </div>
           </div>
         ) : (
-          <ResponsiveContainer width="100%" height={260}>
+          <ResponsiveContainer width="100%" height={260} minWidth={0}>
             <AreaChart data={data} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
               <defs>
                 <linearGradient id="colorBookings" x1="0" y1="0" x2="0" y2="1">

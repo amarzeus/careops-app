@@ -31,12 +31,7 @@ export function getClient(): GoogleGenAI {
  * Note: Gemini 2.0 Flash is deprecated and will be shut down June 1, 2026.
  */
 export const GEMINI_MODELS = {
-  "gemini-3.1-pro-preview": "Gemini 3.1 Pro (Latest - Reasoning)",
-  "gemini-3-flash": "Gemini 3 Flash (Latest - Multimodal)",
-  "gemini-2.5-pro": "Gemini 2.5 Pro (Advanced)",
-  "gemini-2.5-flash": "Gemini 2.5 Flash (Fast)",
   "gemini-2.5-flash-lite": "Gemini 2.5 Flash-Lite (Cheapest)",
-  "gemini-2.0-flash": "Gemini 2.0 Flash (Deprecated)",
 } as const;
 
 export type GeminiModelId = keyof typeof GEMINI_MODELS;
@@ -44,7 +39,7 @@ export type GeminiModelId = keyof typeof GEMINI_MODELS;
 /**
  * Default model to use.
  */
-export const DEFAULT_GEMINI_MODEL: GeminiModelId = "gemini-2.0-flash";
+export const DEFAULT_GEMINI_MODEL: GeminiModelId = "gemini-2.5-flash-lite";
 
 /**
  * Gets the AI model preference for a workspace.
@@ -92,6 +87,23 @@ export function isQuotaError(error: any): boolean {
     (typeof err.message === "string" && err.message.toLowerCase().includes("rate limit")) ||
     (typeof err.message === "string" && err.message.toLowerCase().includes("429"))
   );
+}
+
+// Helper for rate limited retries
+/**
+ *
+ */
+async function withRetry<T>(fn: () => Promise<T>, retries = 3, delay = 2000): Promise<T> {
+  try {
+    return await fn();
+  } catch (error: any) {
+    if (retries > 0 && isQuotaError(error)) {
+      console.warn(`Gemini API 429 caught, retrying in ${delay}ms... (${retries} retries left)`);
+      await new Promise((resolve) => setTimeout(resolve, delay));
+      return withRetry(fn, retries - 1, delay * 2);
+    }
+    throw error;
+  }
 }
 
 /**
@@ -827,16 +839,18 @@ BEHAVIOR RULES:
     const client = getClient();
     // We do NOT use responseSchema when using tools, as the model needs flexibility to call tools or just talk.
     // Instead, we inspect the response for function calls.
-    const response = await client.models.generateContent({
-      model: model || DEFAULT_GEMINI_MODEL,
-      config: {
-        systemInstruction: systemPrompt,
+    const response = await withRetry(() =>
+      client.models.generateContent({
+        model: model || DEFAULT_GEMINI_MODEL,
+        config: {
+          systemInstruction: systemPrompt,
 
-        tools: onboardingTools as any,
-      },
+          tools: onboardingTools as any,
+        },
 
-      contents: contents as any,
-    });
+        contents: contents as any,
+      })
+    );
 
     const text = response.text || ""; // Text might be empty if only a tool call is made, but usually Gemini explains itself.
 

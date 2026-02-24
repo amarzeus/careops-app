@@ -1,7 +1,0 @@
-
-> careops-app@0.1.0 type-check
-> tsc --noEmit
-
-src/lib/gemini.ts(87,18): error TS2339: Property 'toLowerCase' does not exist on type '{}'.
-src/lib/gemini.ts(88,18): error TS2339: Property 'toLowerCase' does not exist on type '{}'.
-src/lib/gemini.ts(89,18): error TS2339: Property 'toLowerCase' does not exist on type '{}'.

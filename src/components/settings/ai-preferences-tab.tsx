@@ -55,7 +55,7 @@ const DEFAULT_AI_PREFERENCES: AIPreferences = {
   defaultReplyTone: "professional",
   alertOnAnomaly: true,
   dailyInsightTime: "09:00",
-  geminiModel: "gemini-2.0-flash",
+  geminiModel: "gemini-2.5-flash-lite",
 };
 
 /**

@@ -99,3 +99,20 @@ CareOps_Hackathon_*.txt
 
 # ─── docs/ is intentionally tracked ─────────────────────────
 # (do NOT add docs/ here)
+
+# ─── Scratch scripts ──────────────────────────────────────────
+*.sh
+!install.sh
+!render-build.sh
+
+# ─── Stray text/logs from testing ──────────────────────────────
+*.txt
+!README.md
+!CHANGELOG.md
+!CONTRIBUTING.md
+!SECURITY.md
+*.log
+*.pid
+audit_results.json
+booking_test_output.txt
+dev_output.txt

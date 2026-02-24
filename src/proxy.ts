@@ -5,7 +5,7 @@ import type { NextRequest } from "next/server";
  *
  * @param request
  */
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const token = request.cookies.get("auth-token")?.value;
   const { pathname } = request.nextUrl;
 

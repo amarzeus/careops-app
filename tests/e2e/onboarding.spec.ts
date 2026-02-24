@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 test.describe("Onboarding Flow", () => {
-  test("[P0] should complete full business setup", async ({ page, request, context }) => {
+  test("[P0] should complete full business setup", async ({ page, request, context, baseURL }) => {
     const email = `test-${Date.now()}@example.com`;
     const seedRes = await request.post("/api/test/seed", {
       data: {
@@ -21,7 +21,7 @@ test.describe("Onboarding Flow", () => {
       {
         name: "auth-token",
         value: token,
-        url: "http://localhost:5000",
+        url: baseURL,
       },
     ]);
 

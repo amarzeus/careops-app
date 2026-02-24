@@ -32,35 +32,35 @@ model User {
 }
 
 model Workspace {
-  id                         String               @id @default(cuid())
+  id                         String                @id @default(cuid())
   name                       String
   address                    String?
-  timezone                   String               @default("UTC")
+  timezone                   String                @default("UTC")
   contactEmail               String?
   contactPhone               String?
-  status                     String               @default("ONBOARDING")
-  onboardingStep             Int                  @default(1)
+  status                     String                @default("ONBOARDING")
+  onboardingStep             Int                   @default(1)
   emailProvider              String?
   emailApiKey                String?
   emailFromName              String?
   emailFromAddress           String?
-  emailConfigured            Boolean              @default(false)
+  emailConfigured            Boolean               @default(false)
   smsProvider                String?
   smsApiKey                  String?
   smsFromNumber              String?
-  smsConfigured              Boolean              @default(false)
+  smsConfigured              Boolean               @default(false)
   whatsappProvider           String?
   whatsappIntegratedNumber   String?
-  whatsappConfigured         Boolean              @default(false)
-  googleCalendarConnected    Boolean              @default(false)
+  whatsappConfigured         Boolean               @default(false)
+  googleCalendarConnected    Boolean               @default(false)
   googleCalendarAccessToken  String?
   googleCalendarRefreshToken String?
   googleCalendarTokenExpiry  DateTime?
   googleCalendarEmail        String?
-  googleCalendarId           String?              @default("primary")
+  googleCalendarId           String?               @default("primary")
   twilioSubaccountSid        String?
-  createdAt                  DateTime             @default(now())
-  updatedAt                  DateTime             @updatedAt
+  createdAt                  DateTime              @default(now())
+  updatedAt                  DateTime              @updatedAt
   aiPreferences              AIPreferences?
   alerts                     Alert[]
   automationRules            AutomationRule[]
@@ -471,21 +471,21 @@ model DoNotCallEntry {
 }
 
 model WebhookJob {
-  id           String    @id @default(cuid())
-  type         String
-  callId       String
-  callSid      String
-  workspaceId  String
-  payload      String
-  metadata     String    @default("{}")
-  status       String    @default("pending")
-  retryCount   Int       @default(0)
-  error        String?
-  nextRetryAt  DateTime?
-  processedAt  DateTime?
-  completedAt  DateTime?
-  createdAt    DateTime  @default(now())
-  workspace    Workspace @relation(fields: [workspaceId], references: [id])
+  id          String    @id @default(cuid())
+  type        String
+  callId      String
+  callSid     String
+  workspaceId String
+  payload     String
+  metadata    String    @default("{}")
+  status      String    @default("pending")
+  retryCount  Int       @default(0)
+  error       String?
+  nextRetryAt DateTime?
+  processedAt DateTime?
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
 
   @@index([status, nextRetryAt])
   @@index([workspaceId, createdAt])
@@ -504,59 +504,59 @@ model AIPreferences {
   defaultReplyTone         String    @default("professional")
   alertOnAnomaly           Boolean   @default(true)
   dailyInsightTime         String?
-  geminiModel              String    @default("gemini-2.0-flash")
+  geminiModel              String    @default("gemini-2.5-flash-lite")
   createdAt                DateTime  @default(now())
   updatedAt                DateTime  @updatedAt
   workspace                Workspace @relation(fields: [workspaceId], references: [id])
 }
 
 model Subscription {
-  id                      String     @id @default(cuid())
-  workspaceId             String     @unique
-  razorpaySubscriptionId  String?    @unique
-  razorpayPlanId          String?
-  razorpayCustomerId      String?
-  planKey                 String     @default("free")
-  status                  String     @default("active")
-  currentPeriodStart      DateTime?
-  currentPeriodEnd        DateTime?
-  cancelAtPeriodEnd       Boolean    @default(false)
-  lastPaymentAt           DateTime?
-  cancelledAt             DateTime?
-  createdAt               DateTime   @default(now())
-  updatedAt               DateTime   @updatedAt
-  workspace               Workspace  @relation(fields: [workspaceId], references: [id])
+  id                     String    @id @default(cuid())
+  workspaceId            String    @unique
+  razorpaySubscriptionId String?   @unique
+  razorpayPlanId         String?
+  razorpayCustomerId     String?
+  planKey                String    @default("free")
+  status                 String    @default("active")
+  currentPeriodStart     DateTime?
+  currentPeriodEnd       DateTime?
+  cancelAtPeriodEnd      Boolean   @default(false)
+  lastPaymentAt          DateTime?
+  cancelledAt            DateTime?
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+  workspace              Workspace @relation(fields: [workspaceId], references: [id])
 
   @@index([razorpayCustomerId])
   @@index([status])
 }
 
 model UsageRecord {
-  id              String    @id @default(cuid())
-  workspaceId     String
-  category        String
-  quantity        Int       @default(0)
-  periodStart     DateTime
-  periodEnd       DateTime
-  createdAt       DateTime  @default(now())
-  workspace       Workspace @relation(fields: [workspaceId], references: [id])
+  id          String    @id @default(cuid())
+  workspaceId String
+  category    String
+  quantity    Int       @default(0)
+  periodStart DateTime
+  periodEnd   DateTime
+  createdAt   DateTime  @default(now())
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
 
   @@unique([workspaceId, category, periodStart])
   @@index([workspaceId, periodStart])
 }
 
 model PlatformPhoneNumber {
-  id              String     @id @default(cuid())
-  phoneNumber     String     @unique
-  vapiPhoneId     String?
-  twilioPhoneSid  String?
-  status          String     @default("available")
-  workspaceId     String?
-  monthlyFee      Float      @default(150)
-  country         String     @default("IN")
-  assignedAt      DateTime?
-  createdAt       DateTime   @default(now())
-  workspace       Workspace? @relation(fields: [workspaceId], references: [id])
+  id             String     @id @default(cuid())
+  phoneNumber    String     @unique
+  vapiPhoneId    String?
+  twilioPhoneSid String?
+  status         String     @default("available")
+  workspaceId    String?
+  monthlyFee     Float      @default(150)
+  country        String     @default("IN")
+  assignedAt     DateTime?
+  createdAt      DateTime   @default(now())
+  workspace      Workspace? @relation(fields: [workspaceId], references: [id])
 
   @@index([status])
   @@index([workspaceId])
