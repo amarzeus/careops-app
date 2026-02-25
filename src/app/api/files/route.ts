@@ -57,9 +57,15 @@ export async function GET() {
             type = "image/" + ext.slice(1);
           }
 
+          // Determine display name (strip timestamp prefix)
+          const displayName = filename.includes("_")
+            ? filename.split("_").slice(1).join("_")
+            : filename;
+
           files.push({
             name: filename,
-            url: `/uploads/${user.workspaceId}/${filename}`,
+            displayName: displayName,
+            url: `/api/files/${user.workspaceId}/${filename}`,
             size: stats.size,
             type,
             uploadedAt: stats.mtime.toISOString(),

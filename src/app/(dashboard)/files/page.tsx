@@ -11,7 +11,11 @@ import {
   FolderOpen,
   Loader2,
   Eye,
+  Share2,
+  Copy,
+  Check,
 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 import NextImage from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -26,6 +30,7 @@ import { Header } from "@/components/layout/header";
 
 interface FileItem {
   name: string;
+  displayName: string;
   url: string;
   size: number;
   type: string;
@@ -75,6 +80,7 @@ function isImage(type: string): boolean {
  *
  */
 export default function FilesPage() {
+  const { toast } = useToast();
   const [files, setFiles] = useState<FileItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState<string | null>(null);
@@ -124,12 +130,23 @@ export default function FilesPage() {
 
   const handleDownload = (url: string, name: string) => {
     const link = document.createElement("a");
-    link.href = url;
+    // Ensure the URL has the download flag and encoding is correct
+    link.href = `${url}${url.includes("?") ? "&" : "?"}download=1`;
     link.download = name;
-    link.target = "_blank";
+    // Removing target="_blank" as it can sometimes prevent the download attribute from working 
+    // for same-origin dynamic routes in some browsers
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  const handleShare = (file: FileItem) => {
+    const fullUrl = `${window.location.origin}${file.url}`;
+    navigator.clipboard.writeText(fullUrl);
+    toast({
+      title: "Link copied to clipboard",
+      description: "Anyone in your workspace can access this file via the link.",
+    });
   };
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -262,8 +279,8 @@ export default function FilesPage() {
                         </div>
                       )}
                       <div className="min-w-0 flex-1">
-                        <p className="truncate font-medium" title={file.name}>
-                          {file.name}
+                        <p className="truncate font-medium" title={file.displayName || file.name}>
+                          {file.displayName || file.name}
                         </p>
                         <div className="text-muted-foreground mt-1 flex items-center gap-2 text-xs">
                           <span>{formatFileSize(file.size)}</span>
@@ -282,15 +299,19 @@ export default function FilesPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => handleDownload(file.url, file.name)}
+                        onClick={() => handleDownload(file.url, file.displayName || file.name)}
                       >
-                        <Download className="mr-1 h-3 w-3" />
-                        Download
+                        <Download className="h-3 w-3 sm:mr-1" />
+                        <span className="hidden sm:inline">Download</span>
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={() => handleShare(file)}>
+                        <Share2 className="h-3 w-3 sm:mr-1" />
+                        <span className="hidden sm:inline">Share</span>
                       </Button>
                       <Button
                         variant="outline"
                         size="sm"
-                        className="text-destructive hover:text-destructive"
+                        className="text-destructive hover:bg-destructive hover:text-white"
                         onClick={() => handleDelete(file.name)}
                         disabled={deleting === file.name}
                       >

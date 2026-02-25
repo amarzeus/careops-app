@@ -73,10 +73,9 @@ export async function POST(req: Request) {
       );
     }
 
-    // Generate secure filename: {timestamp}-{uuid}{extension}
+    // Generate secure filename: {timestamp}_{originalName}
     const timestamp = Date.now();
-    const uuid = crypto.randomUUID().slice(0, 8);
-    const safeFilename = `${timestamp}-${uuid}${fileExtension}`;
+    const safeFilename = `${timestamp}_${file.name.replaceAll(" ", "_")}`;
 
     // Workspace-based directory for isolation
     const uploadDir = path.join(process.cwd(), "public/uploads", user.workspaceId);
