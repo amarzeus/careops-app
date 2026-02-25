@@ -18,6 +18,7 @@ export async function GET() {
 
     let files: Array<{
       name: string;
+      displayName: string;
       url: string;
       size: number;
       type: string;

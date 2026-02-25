@@ -89,6 +89,11 @@ test.describe("File Storage Lifecycle", () => {
     const serverFileName = uploadData.url.split("/").pop();
     expect(serverFileName).toBeTruthy();
 
+    // Derive display name for UI check (must match logic in API/Frontend)
+    const displayName = serverFileName.includes("_")
+      ? serverFileName.split("_").slice(1).join("_")
+      : serverFileName;
+
     // Dialog should close automatically on successful upload
     await expect(uploadDialog).not.toBeVisible({ timeout: 25000 });
 
@@ -96,12 +101,12 @@ test.describe("File Storage Lifecycle", () => {
     await page.reload();
     await expect(page.locator("h1")).toContainText("Files", { timeout: 15000 });
 
-    // Wait for the exact server-generated filename to appear in the list
-    await expect(page.locator(`text=${serverFileName}`)).toBeVisible({ timeout: 25000 });
-    console.log(`File uploaded and visible as ${serverFileName}.`);
+    // Wait for the display name to appear in the list
+    await expect(page.locator(`text=${displayName}`)).toBeVisible({ timeout: 25000 });
+    console.log(`File uploaded and visible as ${displayName}.`);
 
     // 6. Test delete
-    const fileCard = page.locator("div.overflow-hidden", { hasText: serverFileName }).first();
+    const fileCard = page.locator("div.overflow-hidden", { hasText: displayName }).first();
     const deleteButton = fileCard
       .locator("button")
       .filter({ has: page.locator(".lucide-trash2") })

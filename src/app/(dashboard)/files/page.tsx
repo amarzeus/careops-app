@@ -12,8 +12,6 @@ import {
   Loader2,
   Eye,
   Share2,
-  Copy,
-  Check,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import NextImage from "next/image";
@@ -133,7 +131,7 @@ export default function FilesPage() {
     // Ensure the URL has the download flag and encoding is correct
     link.href = `${url}${url.includes("?") ? "&" : "?"}download=1`;
     link.download = name;
-    // Removing target="_blank" as it can sometimes prevent the download attribute from working 
+    // Removing target="_blank" as it can sometimes prevent the download attribute from working
     // for same-origin dynamic routes in some browsers
     document.body.appendChild(link);
     link.click();
@@ -204,7 +202,6 @@ export default function FilesPage() {
       </Header>
 
       <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-5 p-4 sm:gap-6 sm:p-6">
-
         {/* Stats */}
         <div className="grid gap-4 md:grid-cols-3">
           <Card>
