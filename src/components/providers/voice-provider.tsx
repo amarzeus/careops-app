@@ -8,7 +8,7 @@ import {
   GlobalVoiceOverlay,
 } from "@/components/voice-assistant";
 import { usePathname, useRouter } from "next/navigation";
-import { VoiceActionService } from "@/lib/voice-actions";
+import { VoiceActionService, type VoiceAction } from "@/lib/voice-actions";
 
 interface VoiceHistoryItem {
   role: "user" | "assistant";
@@ -17,10 +17,8 @@ interface VoiceHistoryItem {
 
 interface VoiceApiResponse {
   message?: string;
-  action?: {
-    type: string;
+  action?: VoiceAction & {
     path?: string;
-    [key: string]: any;
   };
 }
 
@@ -117,7 +115,7 @@ export function VoiceProvider({ children }: { children: React.ReactNode }) {
         }
         // Enhanced Voice Actions
         else {
-          VoiceActionService.execute(data.action as any, router);
+          VoiceActionService.execute(data.action as VoiceAction, router);
         }
       }
 

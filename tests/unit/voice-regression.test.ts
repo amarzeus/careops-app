@@ -38,6 +38,12 @@ vi.mock("@/lib/razorpay-subscriptions", () => ({
   trackUsage: vi.fn(),
 }));
 
+/**
+ * Creates a mock NextRequest for testing voice webhooks.
+ * @param body - The request payload.
+ * @param signature - Mock VAPI signature.
+ * @returns A NextRequest instance.
+ */
 function createMockRequest(body: Record<string, unknown>, signature = "test-sig"): NextRequest {
   const headers = new Headers();
   headers.set("x-vapi-signature", signature);

@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import {
   FileText,
-  Image,
+  Image as ImageIcon,
   File,
   Download,
   Trash2,
@@ -12,6 +12,7 @@ import {
   Loader2,
   Eye,
 } from "lucide-react";
+import NextImage from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -56,11 +57,11 @@ function formatDate(dateStr: string): string {
 /**
  *
  */
-function getFileIcon(type: string, _name: string) {
-  if (type.startsWith("image/")) return Image;
+const getFileIcon = (type: string, _name: string) => {
+  if (type.startsWith("image/")) return ImageIcon;
   if (type === "application/pdf") return FileText;
   return File;
-}
+};
 
 /**
  *
@@ -244,8 +245,14 @@ export default function FilesPage() {
             return (
               <Card key={file.name} className="overflow-hidden">
                 {isImg && (
-                  <div className="bg-muted flex h-40 items-center justify-center overflow-hidden">
-                    <img src={file.url} alt={file.name} className="h-full w-full object-cover" />
+                  <div className="bg-muted relative flex h-40 items-center justify-center overflow-hidden">
+                    <NextImage
+                      src={file.url}
+                      alt={file.name}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    />
                   </div>
                 )}
                 <CardContent className="p-4">
@@ -347,11 +354,14 @@ export default function FilesPage() {
           </DialogHeader>
           <div className="flex min-h-[200px] items-center justify-center p-4 pt-0">
             {previewFile && (
-              <img
-                src={previewFile.url}
-                alt={previewFile.name}
-                className="max-h-[70vh] object-contain"
-              />
+              <div className="relative h-[70vh] w-full">
+                <NextImage
+                  src={previewFile.url}
+                  alt={previewFile.name}
+                  fill
+                  className="object-contain"
+                />
+              </div>
             )}
           </div>
           <DialogFooter className="p-4 pt-0">

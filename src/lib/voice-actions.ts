@@ -1,4 +1,5 @@
 import { toast } from "@/hooks/use-toast";
+import type { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 export type VoiceActionType =
   | "navigate"
@@ -13,8 +14,7 @@ export interface VoiceAction {
 }
 
 export const VoiceActionService = {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  execute: (action: VoiceAction, router: any) => {
+  execute: (action: VoiceAction, router: AppRouterInstance) => {
     console.log("Executing Voice Action:", action);
 
     switch (action.type) {

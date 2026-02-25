@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { FileText, Image, File, Download, X, Eye, Loader2 } from "lucide-react";
+import { FileText, Image as ImageIcon, File, Download, X, Eye, Loader2 } from "lucide-react";
+import NextImage from "next/image";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
@@ -25,13 +26,13 @@ function getFileIcon(mimeType: string | undefined, fileName: string) {
   if (!mimeType) {
     const ext = fileName.split(".").pop()?.toLowerCase();
     if (["jpg", "jpeg", "png", "webp", "gif"].includes(ext || "")) {
-      return Image;
+      return ImageIcon;
     }
     if (ext === "pdf") return FileText;
     return File;
   }
 
-  if (mimeType.startsWith("image/")) return Image;
+  if (mimeType.startsWith("image/")) return ImageIcon;
   if (mimeType === "application/pdf") return FileText;
   return File;
 }
@@ -96,8 +97,14 @@ export function FileDisplay({ files, onRemove, readOnly = false }: FileDisplayPr
             >
               <div className="flex min-w-0 flex-1 items-center gap-2">
                 {isImageFile ? (
-                  <div className="bg-muted h-10 w-10 flex-shrink-0 overflow-hidden rounded">
-                    <img src={file.url} alt={file.name} className="h-full w-full object-cover" />
+                  <div className="bg-muted relative h-10 w-10 flex-shrink-0 overflow-hidden rounded">
+                    <NextImage
+                      src={file.url}
+                      alt={file.name}
+                      fill
+                      className="object-cover"
+                      sizes="40px"
+                    />
                   </div>
                 ) : (
                   <div className="bg-muted flex h-10 w-10 flex-shrink-0 items-center justify-center rounded">
@@ -161,13 +168,16 @@ export function FileDisplay({ files, onRemove, readOnly = false }: FileDisplayPr
           <div className="flex min-h-[200px] items-center justify-center p-4 pt-0">
             {isLoading && <Loader2 className="h-8 w-8 animate-spin" />}
             {previewUrl && (
-              <img
-                src={previewUrl}
-                alt="Preview"
-                className="max-h-[70vh] object-contain"
-                onLoad={() => setIsLoading(false)}
-                onError={() => setIsLoading(false)}
-              />
+              <div className="relative h-[70vh] w-full">
+                <NextImage
+                  src={previewUrl}
+                  alt="Preview"
+                  fill
+                  className="object-contain"
+                  onLoad={() => setIsLoading(false)}
+                  onError={() => setIsLoading(false)}
+                />
+              </div>
             )}
           </div>
         </DialogContent>
