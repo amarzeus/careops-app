@@ -5,11 +5,9 @@ set -e
 
 echo "🚀 Starting robust build process..."
 
-# 0. Patch Prisma Schema for Production (PostgreSQL)
-if [[ "$DATABASE_URL" == postgres* ]]; then
-  echo "🔧 Detected PostgreSQL environment. Patching schema.prisma..."
-  sed -i 's/provider = "sqlite"/provider = "postgresql"/g' prisma/schema.prisma
-fi
+# 0. Deprecated: Schema patching is no longer needed
+# The project now uses explicit postgres and sqlite schema files.
+# We will use prisma/postgres/schema.prisma directly.
 
 
 # 1. Install dependencies using the lock file
@@ -24,9 +22,9 @@ if [ ! -f "./node_modules/.bin/next" ]; then
   exit 1
 fi
 
-# 3. Generate Prisma Client
+# 3. Generate Prisma Client from PostgreSQL schema
 echo "🗄️  Generating Prisma client..."
-npx prisma generate
+npx prisma generate --schema=prisma/postgres/schema.prisma
 
 # 4. Build Next.js
 echo "🔨 Building Next.js application..."
