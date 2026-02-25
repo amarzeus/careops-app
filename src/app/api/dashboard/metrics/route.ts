@@ -167,9 +167,9 @@ export async function GET() {
   ]);
 
   // ──── Compute derived metrics ────
-  const lowStockItems = allInventoryItems.filter((i) => i.quantity <= i.threshold);
+  const lowStockItems = allInventoryItems.filter((i: { quantity: number; threshold: number }) => i.quantity <= i.threshold);
   const criticalItems = allInventoryItems.filter(
-    (i) => i.quantity === 0 || i.quantity <= Math.floor(i.threshold * 0.3)
+    (i: { quantity: number; threshold: number }) => i.quantity === 0 || i.quantity <= Math.floor(i.threshold * 0.3)
   );
 
   // ──── Build weekly chart data ────
@@ -179,16 +179,16 @@ export async function GET() {
     const ds = startOfDay(date).getTime();
     const dateStr = date.toLocaleDateString("en-US", { weekday: "short" });
     const dayBookings = recentBookings7d.filter(
-      (b) => startOfDay(new Date(b.createdAt)).getTime() === ds
+      (b: { createdAt: Date }) => startOfDay(new Date(b.createdAt)).getTime() === ds
     );
     const dayContacts = recentContacts7d.filter(
-      (c) => startOfDay(new Date(c.createdAt)).getTime() === ds
+      (c: { createdAt: Date }) => startOfDay(new Date(c.createdAt)).getTime() === ds
     );
     chartData.push({
       name: dateStr,
       bookings: dayBookings.length,
       leads: dayContacts.length,
-      completed: dayBookings.filter((b) => b.status === "COMPLETED").length,
+      completed: dayBookings.filter((b: { status: string }) => b.status === "COMPLETED").length,
     });
   }
 
@@ -257,7 +257,7 @@ export async function GET() {
   }
 
   // Surfacing database-stored alerts
-  unresolvedAlerts.forEach((alert) => {
+  unresolvedAlerts.forEach((alert: any) => {
     keyAlerts.push({
       priority: alert.type === "critical" ? "critical" : "high",
       category: alert.type.charAt(0).toUpperCase() + alert.type.slice(1),
@@ -304,7 +304,7 @@ export async function GET() {
       criticalItems: criticalItems.length,
       totalInventoryItems: allInventoryItems.length,
     },
-    todaysBookings: bookingsTodayList.map((b) => ({
+    todaysBookings: bookingsTodayList.map((b: any) => ({
       id: b.id,
       time: new Date(b.date).toLocaleTimeString([], {
         hour: "2-digit",
@@ -317,7 +317,7 @@ export async function GET() {
     chartData,
     keyAlerts,
     aiInsights,
-    lowStockDetails: lowStockItems.map((i) => ({
+    lowStockDetails: lowStockItems.map((i: any) => ({
       id: i.id,
       name: i.name,
       quantity: i.quantity,

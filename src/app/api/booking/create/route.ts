@@ -68,7 +68,7 @@ export async function POST(req: Request) {
     // 2. CRITICAL FIX: Use transaction with Serializable isolation to prevent race conditions
     // This ensures conflict check and booking creation are atomic
     const result = await prisma.$transaction(
-      async (tx) => {
+      async (tx: any) => {
         // 2a. Validate availability (within transaction - prevents race conditions)
         const existingConflict = await tx.booking.findFirst({
           where: {

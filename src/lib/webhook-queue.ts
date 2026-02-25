@@ -229,7 +229,7 @@ export async function getPendingJobs(limit: number = 10): Promise<WebhookJobData
     orderBy: { createdAt: "asc" },
   });
 
-  return jobs.map((job) => ({
+  return jobs.map((job: any) => ({
     type: job.type as WebhookJobData["type"],
     callId: job.callId,
     callSid: job.callSid,

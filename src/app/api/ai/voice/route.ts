@@ -33,7 +33,33 @@ export async function POST(req: Request) {
     }
 
     let systemPrompt = "";
-    let contextSummary: any = {};
+    let contextSummary: {
+      workspaceName: string;
+      todaysBookings: number;
+      upcomingBookings: number;
+      totalContacts: number;
+      unreadMessages: number;
+      pendingForms: number;
+      lowStockItems: { name: string; qty: number; threshold: number; unit: string }[];
+      unreadAlerts: { type: string; title: string; message: string }[];
+      totalServices: number;
+      totalStaff: number;
+      userName: string;
+      userRole: string;
+    } = {
+      workspaceName: "",
+      todaysBookings: 0,
+      upcomingBookings: 0,
+      totalContacts: 0,
+      unreadMessages: 0,
+      pendingForms: 0,
+      lowStockItems: [],
+      unreadAlerts: [],
+      totalServices: 0,
+      totalStaff: 0,
+      userName: "",
+      userRole: "",
+    };
 
     if (user && user.workspaceId) {
       const wid = user.workspaceId;
@@ -87,7 +113,7 @@ export async function POST(req: Request) {
         prisma.user.count({ where: { workspaceId: wid, role: "STAFF" } }),
       ]);
 
-      const lowStock = lowStockItems.filter((item) => item.quantity <= item.threshold);
+      const lowStock = lowStockItems.filter((item: any) => item.quantity <= item.threshold);
 
       contextSummary = {
         workspaceName: workspace?.name || "Unknown",
@@ -96,13 +122,13 @@ export async function POST(req: Request) {
         totalContacts: contactsCount,
         unreadMessages: unreadConversations,
         pendingForms: pendingForms,
-        lowStockItems: lowStock.map((i) => ({
+        lowStockItems: lowStock.map((i: any) => ({
           name: i.name,
           qty: i.quantity,
           threshold: i.threshold,
           unit: i.unit,
         })),
-        unreadAlerts: recentAlerts.map((a) => ({
+        unreadAlerts: recentAlerts.map((a: any) => ({
           type: a.type,
           title: a.title,
           message: a.message,
@@ -111,7 +137,7 @@ export async function POST(req: Request) {
         totalStaff: staffCount,
         userName: user.name,
         userRole: user.role,
-      } as any;
+      };
 
       systemPrompt = `You are CareOps AI — a voice-first operations assistant for "${contextSummary.workspaceName}".
 You are speaking to ${contextSummary.userName} (${contextSummary.userRole}).
@@ -133,19 +159,18 @@ You are speaking to ${contextSummary.userName} (${contextSummary.userRole}).
 - Total contacts: ${contextSummary.totalContacts}
 - Unread messages: ${contextSummary.unreadMessages}
 - Pending forms: ${contextSummary.pendingForms}
-- Low stock items: ${
-        contextSummary.lowStockItems.length > 0
+- Low stock items: ${contextSummary.lowStockItems.length > 0
           ? (
-              contextSummary.lowStockItems as {
-                name: string;
-                qty: number;
-                unit: string;
-              }[]
-            )
-              .map((i) => `${i.name}: ${i.qty} ${i.unit}`)
-              .join(", ")
+            contextSummary.lowStockItems as {
+              name: string;
+              qty: number;
+              unit: string;
+            }[]
+          )
+            .map((i) => `${i.name}: ${i.qty} ${i.unit}`)
+            .join(", ")
           : "None"
-      }
+        }
 - Active alerts: ${contextSummary.unreadAlerts.length > 0 ? contextSummary.unreadAlerts.map((a: any) => a.title).join(", ") : "None"}
 - Total services: ${contextSummary.totalServices}
 - Staff members: ${contextSummary.totalStaff}

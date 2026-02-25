@@ -87,7 +87,7 @@ export async function GET(req: Request) {
       const slotEndUTC = toUTC(slotEndLocal, timezone);
 
       // Check overlap with existing bookings (all in UTC)
-      const isOverlap = existingBookings.some((booking) => {
+      const isOverlap = existingBookings.some((booking: { date: Date; endTime: Date }) => {
         const bStart = new Date(booking.date);
         const bEnd = new Date(booking.endTime);
 

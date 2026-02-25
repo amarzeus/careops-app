@@ -50,19 +50,19 @@ export async function GET(_req: Request) {
 
     // Format for UI with intent classification
     const formatted = await Promise.all(
-      conversations.map(async (c) => {
+      conversations.map(async (c: any) => {
         // Find the last inbound message for classification
         const lastInboundMessage = c.messages.find(
-          (m) => !m.isAutomated && m.direction === "INBOUND"
+          (m: { isAutomated: boolean; direction: string; content: string }) => !m.isAutomated && m.direction === "INBOUND"
         );
 
         let intent = null;
         if (lastInboundMessage?.content && c.unreadCount > 0) {
           try {
             const history = c.messages
-              .filter((m) => m.direction === "INBOUND" && !m.isAutomated)
+              .filter((m: { direction: string; isAutomated: boolean }) => m.direction === "INBOUND" && !m.isAutomated)
               .slice(0, 3)
-              .map((m) => m.content);
+              .map((m: { content: string }) => m.content);
 
             const classification = await classifyConversationIntent(
               lastInboundMessage.content,

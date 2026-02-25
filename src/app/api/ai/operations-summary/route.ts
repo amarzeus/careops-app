@@ -57,7 +57,7 @@ export async function GET() {
     }),
   ]);
 
-  const lowStockItems = allItems.filter((i) => i.quantity <= i.threshold).length;
+  const lowStockItems = allItems.filter((i: { quantity: number; threshold: number }) => i.quantity <= i.threshold).length;
   const workspace = await prisma.workspace.findUnique({ where: { id: user.workspaceId } });
 
   try {

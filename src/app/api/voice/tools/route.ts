@@ -29,7 +29,7 @@ function parseDateAndTime(dateValue: unknown, timeValue: unknown): Date | null {
   const [year, month, day] = date.split("-").map(Number);
   const [hours, minutes] = time.split(":").map(Number);
 
-  if ([year, month, day, hours, minutes].some((part) => Number.isNaN(part))) {
+  if ([year, month, day, hours, minutes].some((part: number) => Number.isNaN(part))) {
     return null;
   }
 
@@ -72,13 +72,13 @@ const handlers: Record<string, ToolHandler> = {
     });
 
     const bookedSlots = new Set(
-      existingBookings.map((booking) =>
+      existingBookings.map((booking: { date: Date }) =>
         booking.date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false })
       )
     );
 
     const allSlots = ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00"];
-    const slots = allSlots.filter((slot) => !bookedSlots.has(slot));
+    const slots = allSlots.filter((slot: string) => !bookedSlots.has(slot));
 
     return {
       available: slots.length > 0,
@@ -308,11 +308,11 @@ const handlers: Record<string, ToolHandler> = {
     });
 
     const starts = services
-      .map((service) => service.startTime)
+      .map((service: { startTime: string }) => service.startTime)
       .filter(Boolean)
       .sort();
     const ends = services
-      .map((service) => service.endTime)
+      .map((service: { endTime: string }) => service.endTime)
       .filter(Boolean)
       .sort();
 
@@ -398,12 +398,12 @@ export async function POST(req: Request) {
       const parsedArgs: ToolParams =
         typeof rawArgs === "string"
           ? (() => {
-              try {
-                return JSON.parse(rawArgs) as ToolParams;
-              } catch {
-                return {};
-              }
-            })()
+            try {
+              return JSON.parse(rawArgs) as ToolParams;
+            } catch {
+              return {};
+            }
+          })()
           : (rawArgs as ToolParams) || {};
 
       const handler = handlers[toolName];

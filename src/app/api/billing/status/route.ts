@@ -30,7 +30,7 @@ export async function GET() {
   });
 
   const usageMap = usage.reduce(
-    (acc, record) => {
+    (acc: Record<string, number>, record: { category: string; quantity: number }) => {
       acc[record.category] = record.quantity;
       return acc;
     },

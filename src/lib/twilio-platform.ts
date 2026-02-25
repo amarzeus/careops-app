@@ -210,7 +210,7 @@ async function searchAvailableNumbers(options: {
       availableNumbers = await client.availablePhoneNumbers(countryCode).local.list(searchOptions);
     }
 
-    return availableNumbers.map((n) => ({
+    return availableNumbers.map((n: any) => ({
       phoneNumber: n.phoneNumber,
       friendlyName: n.friendlyName || n.phoneNumber,
       locality: n.locality || "",
@@ -608,7 +608,7 @@ async function getWorkspacePhoneNumbers(workspaceId: string): Promise<{
 
   return {
     total: numbers.length,
-    numbers: numbers.map((n) => ({
+    numbers: numbers.map((n: any) => ({
       id: n.id,
       phoneNumber: n.phoneNumber,
       label: n.label,
