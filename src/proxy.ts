@@ -34,6 +34,7 @@ export function proxy(request: NextRequest) {
     "/api/ai/voice",
     "/api/ai/chat",
     "/api/health",
+    "/api/files", // Allow public file sharing
   ];
   const isPublicRoute = publicRoutes.some((route) => pathname.startsWith(route));
 

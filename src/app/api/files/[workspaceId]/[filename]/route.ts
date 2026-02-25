@@ -14,10 +14,16 @@ export async function GET(
   const { workspaceId, filename } = await params;
   const user = await getCurrentUser();
 
-  // Basic security: require auth and matching workspace
-  // Note: For public sharing, this might need to be relaxed or use a signed token
-  if (!user || user.workspaceId !== workspaceId) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  // Basic security: In authenticated contexts we might check workspace match.
+  // For public sharing and incognito mode, we allow access without a token.
+  if (user && user.workspaceId !== workspaceId) {
+    // If logged in but belonging to a DIFFERENT workspace, block it.
+    // This allows unauthenticated users (like incognito mode) to view shared links,
+    // but prevents authenticated users from snooping other workspaces' files.
+    return NextResponse.json(
+      { error: "Unauthorized access to another workspace's file" },
+      { status: 401 }
+    );
   }
 
   // Prevent path traversal
