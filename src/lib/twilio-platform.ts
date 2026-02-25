@@ -210,20 +210,29 @@ async function searchAvailableNumbers(options: {
       availableNumbers = await client.availablePhoneNumbers(countryCode).local.list(searchOptions);
     }
 
-    return availableNumbers.map((n: any) => ({
-      phoneNumber: n.phoneNumber,
-      friendlyName: n.friendlyName || n.phoneNumber,
-      locality: n.locality || "",
-      region: n.region || "",
-      isoCountry: n.isoCountry || countryCode,
-      capabilities: {
-        voice: n.capabilities?.voice ?? true,
-        sms: n.capabilities?.sms ?? true,
-        mms: n.capabilities?.mms ?? false,
-      },
-      monthlyCost: getMonthlyCost(countryCode, numberType),
-      numberType,
-    }));
+    return availableNumbers.map(
+      (n: {
+        phoneNumber: string;
+        friendlyName?: string;
+        locality?: string;
+        region?: string;
+        isoCountry?: string;
+        capabilities?: { voice?: boolean; sms?: boolean; mms?: boolean };
+      }) => ({
+        phoneNumber: n.phoneNumber,
+        friendlyName: n.friendlyName || n.phoneNumber,
+        locality: n.locality || "",
+        region: n.region || "",
+        isoCountry: n.isoCountry || countryCode,
+        capabilities: {
+          voice: n.capabilities?.voice ?? true,
+          sms: n.capabilities?.sms ?? true,
+          mms: n.capabilities?.mms ?? false,
+        },
+        monthlyCost: getMonthlyCost(countryCode, numberType),
+        numberType,
+      })
+    );
   } catch (error) {
     console.error("[Twilio:Search] Error:", error);
     return getMockNumbers(countryCode);
@@ -608,25 +617,34 @@ async function getWorkspacePhoneNumbers(workspaceId: string): Promise<{
 
   return {
     total: numbers.length,
-    numbers: numbers.map((n: any) => ({
-      id: n.id,
-      phoneNumber: n.phoneNumber,
-      label: n.label,
-      isActive: n.isActive,
-      country: n.phoneNumber.startsWith("+91")
-        ? "IN"
-        : n.phoneNumber.startsWith("+44")
-          ? "GB"
-          : n.phoneNumber.startsWith("+1") && n.phoneNumber.length === 12
-            ? n.phoneNumber.startsWith("+1 (416)") || n.phoneNumber.startsWith("+1604")
-              ? "CA"
-              : "US"
-            : n.phoneNumber.startsWith("+61")
-              ? "AU"
-              : "US",
-      monthlyCost: n.monthlyFee || 150,
-      voiceAgent: n.voiceAgent,
-    })),
+    numbers: numbers.map(
+      (n: {
+        id: string;
+        phoneNumber: string;
+        label: string | null;
+        isActive: boolean;
+        monthlyFee?: number;
+        voiceAgent: { id: string; name: string } | null;
+      }) => ({
+        id: n.id,
+        phoneNumber: n.phoneNumber,
+        label: n.label,
+        isActive: n.isActive,
+        country: n.phoneNumber.startsWith("+91")
+          ? "IN"
+          : n.phoneNumber.startsWith("+44")
+            ? "GB"
+            : n.phoneNumber.startsWith("+1") && n.phoneNumber.length === 12
+              ? n.phoneNumber.startsWith("+1 (416)") || n.phoneNumber.startsWith("+1604")
+                ? "CA"
+                : "US"
+              : n.phoneNumber.startsWith("+61")
+                ? "AU"
+                : "US",
+        monthlyCost: n.monthlyFee || 150,
+        voiceAgent: n.voiceAgent,
+      })
+    ),
   };
 }
 

@@ -89,7 +89,7 @@ function formatPrice(price: number): string {
  */
 export default function PricingPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="from-background to-secondary/40 min-h-screen bg-gradient-to-br">
       <Header title="Pricing" subtitle="Choose the plan that's right for your business" />
 
       <div className="mx-auto w-full max-w-7xl p-4 sm:p-6">

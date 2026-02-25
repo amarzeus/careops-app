@@ -837,6 +837,7 @@ export function InlineVoiceMode({
         <div className="flex items-center gap-1">
           <button
             onClick={() => setIsMuted(!isMuted)}
+            aria-label={isMuted ? "Unmute" : "Mute"}
             className="hover:bg-muted/30 rounded-full p-1.5 transition-colors"
             title={isMuted ? "Unmute" : "Mute"}
           >
@@ -848,6 +849,7 @@ export function InlineVoiceMode({
           </button>
           <button
             onClick={handleClose}
+            aria-label="Back to chat"
             className="hover:bg-muted/30 rounded-full p-1.5 transition-colors"
             title="Back to chat"
           >
@@ -860,6 +862,13 @@ export function InlineVoiceMode({
       <div className="relative flex min-h-[140px] flex-1 items-center justify-center">
         <button
           onClick={handleMicClick}
+          aria-label={
+            voiceState === "idle"
+              ? "Click to speak"
+              : voiceState === "listening"
+                ? "Click to stop"
+                : "Voice Assistant Globe"
+          }
           disabled={voiceState === "processing"}
           className="group relative cursor-pointer"
           title={
@@ -949,6 +958,7 @@ export function InlineVoiceMode({
           <button
             type="button"
             onClick={handleMicClick}
+            aria-label={voiceState === "listening" ? "Stop listening" : "Start listening"}
             className={cn(
               "rounded-full p-1.5 transition-all",
               voiceState === "listening"
@@ -967,6 +977,7 @@ export function InlineVoiceMode({
           />
           <button
             type="submit"
+            aria-label="Send message"
             disabled={!inputText.trim() || voiceState === "processing"}
             className={cn(
               "rounded-full p-1.5 transition-all",
@@ -1003,6 +1014,7 @@ export function VoiceAssistantFAB({
   return (
     <button
       onClick={onClick}
+      aria-label={isOpen ? "Close Voice Assistant" : "Open Voice Assistant"}
       className="from-primary group fixed right-6 bottom-6 z-[9999] flex h-14 w-14 items-center justify-center rounded-full border-2 border-white/20 bg-gradient-to-br to-purple-600 text-white shadow-2xl transition-all duration-300 hover:scale-105"
       style={{ right: "24px", bottom: "24px", left: "auto" }}
     >
@@ -1117,12 +1129,14 @@ export function GlobalVoiceOverlay({
             <div className="flex gap-1">
               <button
                 onClick={toggleMute}
+                aria-label={isMuted ? "Unmute" : "Mute"}
                 className="hover:bg-background/50 hover:text-primary rounded-full p-1.5 text-indigo-400 transition-colors"
               >
                 {isMuted ? <VolumeX size={14} /> : <Volume2 size={14} />}
               </button>
               <button
                 onClick={onClose}
+                aria-label="Close"
                 className="text-muted-foreground rounded-full p-1.5 transition-colors hover:bg-red-50 hover:text-red-500"
               >
                 <X size={14} />
@@ -1203,6 +1217,7 @@ export function GlobalVoiceOverlay({
               <button
                 type="button"
                 onClick={onMicClick}
+                aria-label={voiceState === "listening" ? "Stop listening" : "Start listening"}
                 className={cn(
                   "rounded-full p-2 transition-all",
                   voiceState === "listening"
@@ -1221,6 +1236,7 @@ export function GlobalVoiceOverlay({
               />
               <button
                 type="submit"
+                aria-label="Send message"
                 disabled={!inputText.trim() || voiceState === "processing"}
                 className={cn(
                   "rounded-full p-2 transition-all",

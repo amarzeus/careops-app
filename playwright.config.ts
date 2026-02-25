@@ -30,13 +30,13 @@ export default defineConfig({
   webServer: process.env.SKIP_WEBSERVER
     ? undefined
     : {
-      command: "npm run start",
-      url: "http://localhost:5000",
-      reuseExistingServer: !process.env.CI,
-      timeout: 300 * 1000,
-      env: {
-        PORT: "5000",
-        ALLOW_TEST_SEED: "true",
+        command: "npm run start",
+        url: "http://localhost:5000",
+        reuseExistingServer: !process.env.CI,
+        timeout: 300 * 1000,
+        env: {
+          PORT: "5000",
+          ALLOW_TEST_SEED: "true",
+        },
       },
-    },
 });

@@ -159,18 +159,19 @@ You are speaking to ${contextSummary.userName} (${contextSummary.userRole}).
 - Total contacts: ${contextSummary.totalContacts}
 - Unread messages: ${contextSummary.unreadMessages}
 - Pending forms: ${contextSummary.pendingForms}
-- Low stock items: ${contextSummary.lowStockItems.length > 0
+- Low stock items: ${
+        contextSummary.lowStockItems.length > 0
           ? (
-            contextSummary.lowStockItems as {
-              name: string;
-              qty: number;
-              unit: string;
-            }[]
-          )
-            .map((i) => `${i.name}: ${i.qty} ${i.unit}`)
-            .join(", ")
+              contextSummary.lowStockItems as {
+                name: string;
+                qty: number;
+                unit: string;
+              }[]
+            )
+              .map((i) => `${i.name}: ${i.qty} ${i.unit}`)
+              .join(", ")
           : "None"
-        }
+      }
 - Active alerts: ${contextSummary.unreadAlerts.length > 0 ? contextSummary.unreadAlerts.map((a: any) => a.title).join(", ") : "None"}
 - Total services: ${contextSummary.totalServices}
 - Staff members: ${contextSummary.totalStaff}

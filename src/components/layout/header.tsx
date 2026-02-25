@@ -261,6 +261,7 @@ export function Header({ title, subtitle, children }: HeaderProps) {
                     setSearchResults([]);
                   }}
                   className="absolute top-1/2 right-3 -translate-y-1/2"
+                  aria-label="Clear search"
                 >
                   <X className="text-muted-foreground hover:text-muted-foreground h-3 w-3" />
                 </button>
@@ -272,6 +273,7 @@ export function Header({ title, subtitle, children }: HeaderProps) {
               size="icon"
               className="md:hidden"
               onClick={() => setSearchOpen(!searchOpen)}
+              aria-label="Toggle mobile search"
             >
               <Search className="text-muted-foreground h-5 w-5" />
             </Button>
@@ -301,6 +303,7 @@ export function Header({ title, subtitle, children }: HeaderProps) {
                           setSearchResults([]);
                         }}
                         className="absolute top-1/2 right-3 -translate-y-1/2"
+                        aria-label="Clear search"
                       >
                         <X className="text-muted-foreground hover:text-muted-foreground h-4 w-4" />
                       </button>
@@ -346,6 +349,7 @@ export function Header({ title, subtitle, children }: HeaderProps) {
                 setBellOpen(!bellOpen);
                 if (!bellOpen) fetchAlerts();
               }}
+              aria-label="Notifications"
             >
               <Bell className="text-muted-foreground h-5 w-5" />
               {unreadCount > 0 && (

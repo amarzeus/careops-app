@@ -16,6 +16,7 @@ CareOps is a unified intelligence layer for service businesses, automating the f
   <a href="https://github.com/amarzeus/careops-app">
     <img src="https://img.shields.io/librariesio/github/amarzeus/careops-app?style=for-the-badge&label=dependencies" alt="Dependencies" />
   </a>
+  <img src="https://img.shields.io/badge/A11y-WCAG%202.1-green?style=for-the-badge&logo=accessible-icon" />
 </p>
 
 ---
@@ -63,6 +64,8 @@ CareOps leverages industrial-grade providers to power its communication and inte
 | **Twilio**            | **Messaging Hub**         | Drives all SMS, WhatsApp, and OTP authentication flows with enterprise-grade deliverability.                              |
 | **Google Calendar**   | **Availability Sync**     | Real-time two-way synchronization for all bookings, ensuring zero double-bookings.                                        |
 | **Nodemailer**        | **Enterprise Email**      | Managed SMTP layer for automated intake forms, agreements, and vendor reorder alerts.                                     |
+| **GitHub CLI**        | **CI/CD Visibility**      | Integrated verification suite ensuring local environments are synchronized with the repo's CI/CD health.                  |
+| **Axe Core**          | **A11y Guard**            | Automated WCAG 2.1 compliance audits baked into the E2E pipeline via `@axe-core/playwright`.                              |
 
 ---
 
@@ -81,8 +84,13 @@ CareOps leverages industrial-grade providers to power its communication and inte
 
 ### 📦 Precision Inventory
 
-- **Usage Tracking**: Inventory is automatically deducted based on specific service types.
 - **Vendor Alerts**: Automated emails sent to vendors when items hit critical thresholds.
+
+### 🧪 Quality & Accessibility
+
+- **Automated A11y**: Continuous WCAG auditing for all core user journeys (Auth, Pricing, Landing).
+- **Maintenance Dashboard**: A rich CLI dashboard summarizing Build, Test, Lint, and Security health.
+- **GH CLI Validation**: Automated checks for GitHub authentication and CI pipeline status.
 
 ---
 
@@ -164,14 +172,17 @@ Common development commands:
 
 ```bash
 # Run the complete Maintenance Suite (Critical before PRs)
-# Includes: Lint, Type-check, Unit, E2E, Render validation, Security Audit, and Build
+# Includes: GH CLI, Lint, Type-check, Format, Unit, Build, E2E, A11y, Render, and Security
 npm test
+
+# Run Accessibility audits specifically
+npm run test:a11y
+
+# Run GitHub CLI verification
+npm run test:gh
 
 # Run End-to-End tests specifically
 npm run test:e2e
-
-# Run Unit tests specifically (Vitest)
-npm run test:unit
 ```
 
 ---

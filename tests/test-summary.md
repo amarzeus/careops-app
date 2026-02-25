@@ -7,6 +7,7 @@
 - [x] tests/e2e/features-api.spec.ts - Validates RBAC, File Storage, Webhooks, and AI Wiring APIs.
 - [x] tests/e2e/rbac-staff.spec.ts - Validates granular STAFF permissions across all modules.
 - [x] tests/e2e/files.spec.ts - Validates full file upload/delete lifecycle with secure filename interception.
+- [ ] tests/e2e/accessibility.spec.ts - Audits core pages for WCAG compliance.
 
 ### Unit Tests
 
@@ -20,12 +21,14 @@
 - **Webhooks**: Covered via API (Create/List) and UI (Settings > Integrations > Webhooks).
 - **RBAC**: Strictly enforced for OWNER and STAFF roles with granular permissions.
 - **Voice Logic**: Automated regression testing for VAPI/Gemini orchestration.
+- **Accessibility**: Automated WCAG compliance audits integrated into E2E pipeline.
 
 ## Execution Status
 
 - API Tests: **Passing** (Stabilized by limiting parallel workers and fixing seed dependencies).
 - UI Tests: **Passing** (Timeouts reduced via hydration guards and optimized worker count).
 - Unit Tests: **Passing** (Comprehensive coverage for voice and automation logic).
+- Accessibility: **Pending** (New suite created, verification in progress).
 - Quality: **Passing** (Zero lint warnings and 100% type safety).
 
 ## Next Steps

@@ -52,7 +52,7 @@ export async function recoverUser(email: string) {
   if (orphanedWorkspaces.length > 0) {
     console.log(`   Found ${orphanedWorkspaces.length} orphaned workspaces`);
     console.log("\n   Options:");
-    orphanedWorkspaces.forEach((ws: any, idx: number) => {
+    orphanedWorkspaces.forEach((ws: { id: string; name: string; createdAt: Date }, idx: number) => {
       console.log(`   ${idx + 1}. ${ws.name} (${ws.id}) - Created: ${ws.createdAt}`);
     });
     console.log("\n   To link to one of these workspaces, run:");

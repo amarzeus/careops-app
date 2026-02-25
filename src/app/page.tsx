@@ -296,6 +296,7 @@ function Navbar({
           <ThemeToggle />
           <button
             onClick={() => setMobileMenuOpen(true)}
+            aria-label="Open menu"
             className="dark:hover:bg-background/10 rounded-full p-2 transition-colors hover:bg-black/5 md:hidden"
           >
             <Menu className="text-foreground h-5 w-5" />
@@ -675,6 +676,7 @@ export default function LandingPage() {
                 <Logo variant="full" size={32} />
                 <button
                   onClick={() => setMobileMenuOpen(false)}
+                  aria-label="Close menu"
                   className="bg-background/10 rounded-full border border-white/20 p-3 backdrop-blur-md"
                 >
                   <X className="h-6 w-6" />
@@ -755,7 +757,7 @@ export default function LandingPage() {
                 >
                   Unrivaled
                   <br />
-                  <span className="text-foreground/20">excellence.</span>
+                  <span className="text-foreground/60">excellence.</span>
                 </motion.h2>
               </div>
               <motion.p
@@ -879,7 +881,7 @@ export default function LandingPage() {
                 ].map((logo, i) => (
                   <div
                     key={i}
-                    className="text-foreground/20 hover:text-foreground/40 cursor-default px-8 text-xl font-black whitespace-nowrap transition-colors md:text-2xl"
+                    className="text-foreground/60 hover:text-foreground/80 cursor-default px-8 text-xl font-black whitespace-nowrap transition-colors md:text-2xl"
                   >
                     {logo}
                   </div>
@@ -1115,7 +1117,7 @@ export default function LandingPage() {
       <footer className="bg-background border-border/40 relative z-10 border-t py-8">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col items-center justify-between gap-8 md:flex-row">
-            <div className="flex items-center gap-3 opacity-60 transition-opacity hover:opacity-100">
+            <div className="flex items-center gap-3 opacity-100 transition-opacity">
               <Logo variant="full" size={24} />
             </div>
             <div className="flex items-center gap-8">

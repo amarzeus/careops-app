@@ -32,9 +32,14 @@ export async function POST(req: Request) {
 
   const history = conversation.messages
     .reverse()
-    .map((m: { direction: string; content: string }) => `${m.direction === "INBOUND" ? conversation.contact.name : "Staff"}: ${m.content}`)
+    .map(
+      (m: { direction: string; content: string }) =>
+        `${m.direction === "INBOUND" ? conversation.contact.name : "Staff"}: ${m.content}`
+    )
     .join("\n");
-  const lastInbound = conversation.messages.filter((m: { direction: string }) => m.direction === "INBOUND").pop();
+  const lastInbound = conversation.messages
+    .filter((m: { direction: string }) => m.direction === "INBOUND")
+    .pop();
 
   const workspace = await prisma.workspace.findUnique({
     where: { id: user.workspaceId },

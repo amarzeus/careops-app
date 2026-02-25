@@ -398,12 +398,12 @@ export async function POST(req: Request) {
       const parsedArgs: ToolParams =
         typeof rawArgs === "string"
           ? (() => {
-            try {
-              return JSON.parse(rawArgs) as ToolParams;
-            } catch {
-              return {};
-            }
-          })()
+              try {
+                return JSON.parse(rawArgs) as ToolParams;
+              } catch {
+                return {};
+              }
+            })()
           : (rawArgs as ToolParams) || {};
 
       const handler = handlers[toolName];

@@ -229,14 +229,25 @@ export async function getPendingJobs(limit: number = 10): Promise<WebhookJobData
     orderBy: { createdAt: "asc" },
   });
 
-  return jobs.map((job: any) => ({
-    type: job.type as WebhookJobData["type"],
-    callId: job.callId,
-    callSid: job.callSid,
-    workspaceId: job.workspaceId,
-    payload: JSON.parse(job.payload as string) as Record<string, unknown>,
-    metadata: JSON.parse(job.metadata as string) as Record<string, unknown>,
-    retryCount: job.retryCount,
-    createdAt: job.createdAt,
-  }));
+  return jobs.map(
+    (job: {
+      type: string;
+      callId: string;
+      callSid: string;
+      workspaceId: string;
+      payload: string | null;
+      metadata: string | null;
+      retryCount: number;
+      createdAt: Date;
+    }) => ({
+      type: job.type as WebhookJobData["type"],
+      callId: job.callId,
+      callSid: job.callSid,
+      workspaceId: job.workspaceId,
+      payload: JSON.parse((job.payload as string) || "{}") as Record<string, unknown>,
+      metadata: JSON.parse((job.metadata as string) || "{}") as Record<string, unknown>,
+      retryCount: job.retryCount,
+      createdAt: job.createdAt,
+    })
+  );
 }

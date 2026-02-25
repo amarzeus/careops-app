@@ -194,6 +194,7 @@ export function Sidebar({ userName, userRole, workspaceName }: SidebarProps) {
           <button
             onClick={handleLogout}
             title="Sign Out"
+            aria-label="Sign Out"
             className="text-muted-foreground flex h-8 w-8 items-center justify-center rounded-full bg-slate-200 text-xs font-semibold transition-colors hover:bg-red-100 hover:text-red-600 dark:bg-slate-700 dark:text-slate-300"
           >
             {initials}

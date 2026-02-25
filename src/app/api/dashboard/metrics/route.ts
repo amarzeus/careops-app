@@ -167,9 +167,12 @@ export async function GET() {
   ]);
 
   // ──── Compute derived metrics ────
-  const lowStockItems = allInventoryItems.filter((i: { quantity: number; threshold: number }) => i.quantity <= i.threshold);
+  const lowStockItems = allInventoryItems.filter(
+    (i: { quantity: number; threshold: number }) => i.quantity <= i.threshold
+  );
   const criticalItems = allInventoryItems.filter(
-    (i: { quantity: number; threshold: number }) => i.quantity === 0 || i.quantity <= Math.floor(i.threshold * 0.3)
+    (i: { quantity: number; threshold: number }) =>
+      i.quantity === 0 || i.quantity <= Math.floor(i.threshold * 0.3)
   );
 
   // ──── Build weekly chart data ────
@@ -257,7 +260,7 @@ export async function GET() {
   }
 
   // Surfacing database-stored alerts
-  unresolvedAlerts.forEach((alert: any) => {
+  unresolvedAlerts.forEach((alert: { type: string; message: string; actionUrl: string | null }) => {
     keyAlerts.push({
       priority: alert.type === "critical" ? "critical" : "high",
       category: alert.type.charAt(0).toUpperCase() + alert.type.slice(1),
@@ -304,26 +307,36 @@ export async function GET() {
       criticalItems: criticalItems.length,
       totalInventoryItems: allInventoryItems.length,
     },
-    todaysBookings: bookingsTodayList.map((b: any) => ({
-      id: b.id,
-      time: new Date(b.date).toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-      service: b.service.name,
-      contact: b.contact.name,
-      status: b.status,
-    })),
+    todaysBookings: bookingsTodayList.map(
+      (b: {
+        id: string;
+        date: Date;
+        service: { name: string };
+        contact: { name: string };
+        status: string;
+      }) => ({
+        id: b.id,
+        time: new Date(b.date).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+        service: b.service.name,
+        contact: b.contact.name,
+        status: b.status,
+      })
+    ),
     chartData,
     keyAlerts,
     aiInsights,
-    lowStockDetails: lowStockItems.map((i: any) => ({
-      id: i.id,
-      name: i.name,
-      quantity: i.quantity,
-      threshold: i.threshold,
-      unit: i.unit,
-    })),
+    lowStockDetails: lowStockItems.map(
+      (i: { id: string; name: string; quantity: number; threshold: number; unit: string }) => ({
+        id: i.id,
+        name: i.name,
+        quantity: i.quantity,
+        threshold: i.threshold,
+        unit: i.unit,
+      })
+    ),
     recentActivity: [
       ...recentBookingsActivity.map(
         (b: {
