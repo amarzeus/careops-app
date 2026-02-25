@@ -166,6 +166,7 @@ jobs:
           name: build-artifacts
           path: .next/
           retention-days: 1
+          include-hidden-files: true
 
   # ============================================
   # STAGE 5: E2E Tests
