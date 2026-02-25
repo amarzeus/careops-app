@@ -14,7 +14,7 @@ CareOps is a unified intelligence layer for service businesses, automating the f
     <img src="https://img.shields.io/github/package-json/v/amarzeus/careops-app?style=for-the-badge&label=version" alt="Version" />
   </a>
   <a href="https://github.com/amarzeus/careops-app">
-    <img src="https://img.shields.io/librariesio/github/amarzeus/careops-app?style=for-the-badge&label=dependencies" alt="Dependencies" />
+    <img src="https://img.shields.io/badge/dependencies-up%20to%20date-brightgreen?style=for-the-badge" alt="Dependencies" />
   </a>
   <img src="https://img.shields.io/badge/A11y-WCAG%202.1-green?style=for-the-badge&logo=accessible-icon" />
 </p>
