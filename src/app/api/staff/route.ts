@@ -130,7 +130,7 @@ export async function PUT(req: Request) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
 
-  const updateData: any = {
+  const updateData: Prisma.UserUpdateInput = {
     name,
     email,
     canAccessInbox,
