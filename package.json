@@ -108,7 +108,6 @@
     "tailwindcss": "^4",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
-    "vercel": "^28.18.5",
     "vitest": "^4.0.18"
   }
 }
