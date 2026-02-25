@@ -120,6 +120,20 @@ jobs:
     name: Build Application
     runs-on: ubuntu-latest
     needs: [lint-and-typecheck, unit-tests]
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: careops_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -143,10 +157,13 @@ jobs:
           JWT_SECRET: test-secret-for-ci
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/careops_test
 
+      - name: Verify build output
+        run: ls -la .next/
+
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: build-files
+          name: build-artifacts
           path: .next/
           retention-days: 1
 
@@ -188,8 +205,11 @@ jobs:
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
-          name: build-files
+          name: build-artifacts
           path: .next/
+
+      - name: Verify build artifact download
+        run: ls -la .next/
 
       - name: Generate Prisma Client
         run: npx prisma generate --schema=prisma/postgres/schema.prisma
