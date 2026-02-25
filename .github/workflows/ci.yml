@@ -320,3 +320,4 @@ jobs:
         run: npx playwright test tests/e2e/smoke.spec.ts
         env:
           BASE_URL: https://careops-app.onrender.com
+          SKIP_WEBSERVER: "1"
