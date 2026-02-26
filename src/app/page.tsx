@@ -147,10 +147,9 @@ function SpotlightCard({
         isHovered ? "border-primary/40 shadow-primary/10 shadow-2xl" : "shadow-sm"
       } ${className}`}
       style={{
-        transform:
-          isHovered && !prefersReducedMotion
-            ? `perspective(1200px) rotateX(${(mousePos.y - 200) * -0.015}deg) rotateY(${(mousePos.x - 200) * 0.015}deg) scale3d(1.02, 1.02, 1.02)`
-            : "perspective(1200px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)",
+        transform: isHovered && !prefersReducedMotion
+          ? `perspective(1000px) rotateX(${(mousePos.y - 100) * -0.015}deg) rotateY(${(mousePos.x - 150) * 0.015}deg) scale3d(1.005, 1.005, 1.005)`
+          : "perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)",
       }}
     >
       {/* Spotlight overlay */}
@@ -417,7 +416,7 @@ function Hero3D() {
           initial={{ opacity: 0, y: 40, filter: "blur(16px)" }}
           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
           transition={{ duration: 1.2, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-          className="text-foreground mb-5 text-[clamp(2rem,9vw,4.8rem)] leading-[0.92] font-black tracking-[-0.04em] sm:mb-6 sm:leading-[0.9]"
+          className="text-foreground mb-5 text-5xl leading-[1.05] font-black tracking-[-0.04em] sm:mb-6 sm:text-6xl md:text-7xl lg:text-[84px] lg:leading-[0.9]"
         >
           Operations,
           <br />
@@ -459,25 +458,25 @@ function Hero3D() {
         </motion.div>
       </div>
 
-      {/* Hero 3D Mockup - Liquid Glass Style */}
+      {/* 3D Dashboard Mockup */}
       <motion.div
-        initial={{ opacity: 0, y: 150, rotateX: 20, scale: 0.9 }}
-        animate={{ opacity: 1, y: 0, rotateX: 0, scale: 1 }}
-        transition={{ duration: 1.5, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        className="relative mt-14 w-full max-w-7xl px-4 sm:mt-20 sm:px-6"
-        style={{ perspective: 1500 }}
+        initial={{ opacity: 0, y: 50, rotateX: 5 }}
+        animate={{ opacity: 1, y: 0, rotateX: 0 }}
+        transition={{ duration: 1.2, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        className="mt-12 w-full max-w-5xl px-4 md:mt-24 sm:px-6 lg:px-8 mx-auto"
+        style={{ perspective: 1800 }}
       >
         <motion.div
           style={{
             rotateX: prefersReducedMotion ? 0 : rotateX,
             rotateY: prefersReducedMotion ? 0 : rotateY,
           }}
-          className="bg-background/40 relative aspect-[3/4] w-full overflow-hidden rounded-[24px] border border-white/20 shadow-[0_40px_120px_-20px_rgba(0,0,0,0.2)] backdrop-blur-[40px] sm:aspect-[4/5] sm:rounded-[28px] md:aspect-[3/2] lg:aspect-[16/10] lg:rounded-[32px] dark:border-white/10 dark:bg-black/40 dark:shadow-[0_40px_120px_-20px_rgba(0,0,0,0.6)]"
+          className="bg-background/40 relative mx-auto flex h-auto w-full flex-col overflow-hidden rounded-[24px] border border-white/20 shadow-[0_40px_120px_-20px_rgba(0,0,0,0.2)] backdrop-blur-[40px] sm:rounded-[28px] lg:rounded-[32px] dark:border-white/10 dark:bg-black/40 dark:shadow-[0_40px_120px_-20px_rgba(0,0,0,0.6)]"
         >
           {/* Faux dashboard glowing grid lines */}
           <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+Cjwvc3ZnPg==')] opacity-[0.03] dark:opacity-[0.05]" />
 
-          <div className="pointer-events-none absolute inset-0 flex flex-col overflow-y-auto p-2.5 sm:overflow-visible sm:p-5 lg:p-8">
+          <div className="pointer-events-none relative z-10 flex h-full w-full flex-col p-4 sm:p-5 lg:p-8">
             {/* Dashboard Header */}
             <div className="border-border/40 flex flex-wrap items-center justify-between gap-2 border-b pb-3 sm:pb-4">
               <div className="flex items-center gap-2 sm:gap-4">
@@ -504,9 +503,9 @@ function Hero3D() {
             </div>
 
             {/* Dashboard Content */}
-            <div className="mt-3 flex min-h-0 flex-1 gap-2 sm:mt-6 sm:gap-6">
+            <div className="mt-2 flex min-h-0 flex-1 gap-2 sm:mt-4 sm:gap-4">
               {/* Sidebar List */}
-              <div className="hidden w-48 flex-col gap-2 md:flex">
+              <div className="hidden w-40 flex-col gap-1.5 md:flex">
                 {[
                   { icon: LayoutDashboard, label: "Overview", active: true },
                   { icon: Calendar, label: "Appointments", active: false },
@@ -516,18 +515,18 @@ function Hero3D() {
                 ].map((item, i) => (
                   <div
                     key={i}
-                    className={`flex h-10 items-center gap-3 rounded-xl border border-transparent px-3 transition-colors ${item.active ? "bg-primary/10 border-primary/20 text-primary shadow-sm" : "bg-muted/10 text-muted-foreground"}`}
+                    className={`flex h-9 items-center gap-2.5 rounded-xl border border-transparent px-3 transition-colors ${item.active ? "bg-primary/10 border-primary/20 text-primary shadow-sm" : "bg-muted/10 text-muted-foreground"}`}
                   >
                     <item.icon
-                      className={`h-4 w-4 ${item.active ? "text-primary" : "text-muted-foreground"}`}
+                      className={`h-3.5 w-3.5 ${item.active ? "text-primary" : "text-muted-foreground"}`}
                     />
-                    <span className="text-sm font-medium">{item.label}</span>
+                    <span className="text-xs font-semibold">{item.label}</span>
                   </div>
                 ))}
               </div>
 
               {/* Main Area */}
-              <div className="flex min-h-0 flex-1 flex-col gap-2.5 sm:gap-6">
+              <div className="flex min-h-0 flex-1 flex-col gap-2.5 sm:gap-4">
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-4">
                   {[
                     {
@@ -578,13 +577,13 @@ function Hero3D() {
                 </div>
 
                 {/* Real Recharts Area */}
-                <div className="bg-muted/10 border-border/40 pointer-events-auto relative flex h-[190px] flex-col overflow-visible rounded-xl border p-1.5 shadow-inner backdrop-blur-md min-[380px]:p-2 sm:h-auto sm:min-h-[220px] sm:flex-1 sm:rounded-2xl sm:p-4">
+                <div className="bg-background/90 border-border/40 pointer-events-auto relative flex min-h-[220px] flex-col overflow-visible rounded-xl border p-1.5 shadow-inner sm:flex-1 sm:rounded-2xl md:p-3 dark:bg-white/5 dark:backdrop-blur-md transition-all duration-300">
                   <div className="mb-1 flex flex-col items-start justify-between gap-1 px-1 sm:mb-2 sm:flex-row sm:items-center sm:gap-0">
                     <h3 className="text-foreground text-xs font-bold sm:text-sm">Revenue Overview</h3>
                     <span className="text-muted-foreground text-[10px] font-medium sm:text-xs">Last 7 Days</span>
                   </div>
-                  <div className="h-full min-h-[132px] w-full flex-1 sm:min-h-[180px]">
-                    {mounted && (
+                  <div className="relative z-0 min-h-[140px] w-full flex-1 sm:min-h-[180px]">
+        {/* Floating User Avatars */}        {mounted && (
                       <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                         <AreaChart
                           data={mockChartData}
@@ -637,7 +636,7 @@ function Hero3D() {
 
           {/* Chromatic aberration & glass sweep */}
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.08] to-transparent mix-blend-overlay" />
-          <div className="box-shadow-inner pointer-events-none absolute inset-0 rounded-[32px] border border-white/20" />
+          <div className="box-shadow-inner pointer-events-none absolute inset-0 rounded-[28px] border border-white/20 lg:rounded-[32px]" />
         </motion.div>
 
         {/* Ambient base glow */}
@@ -779,7 +778,7 @@ export default function LandingPage() {
             </div>
 
             <div className="grid grid-cols-1 gap-4 sm:gap-5 md:grid-cols-6 lg:auto-rows-fr">
-              <SpotlightCard className="group bg-background/70 dark:bg-background/40 flex flex-col justify-between overflow-hidden p-5 md:col-span-4 md:row-span-2 md:p-6 lg:p-8">
+              <SpotlightCard className="group bg-background/70 dark:bg-background/40 flex flex-col justify-between overflow-hidden p-5 md:col-span-3 md:row-span-2 md:p-6 lg:p-8">
                 <div className="relative z-10">
                   <motion.div whileHover={{ scale: 1.05, rotate: 5 }} className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl border border-blue-500/20 bg-blue-500/10 shadow-[0_0_30px_rgba(59,130,246,0.15)] transition-colors group-hover:bg-blue-500/20">
                     <Calendar className="text-blue-500 h-6 w-6" />
@@ -809,7 +808,7 @@ export default function LandingPage() {
                 <div className="absolute right-0 bottom-0 -z-10 h-3/4 w-3/4 bg-gradient-to-tl from-blue-500/15 to-transparent opacity-50 blur-3xl transition-all duration-700 group-hover:scale-110 group-hover:opacity-100" />
               </SpotlightCard>
 
-              <SpotlightCard className="group bg-background/70 dark:bg-background/40 flex flex-col justify-between overflow-hidden p-5 md:col-span-2 md:p-6 lg:p-7">
+              <SpotlightCard className="group bg-background/70 dark:bg-background/40 flex flex-col justify-between overflow-hidden p-5 md:col-span-3 md:p-6 lg:p-7">
                 <div className="relative z-10">
                   <motion.div whileHover={{ scale: 1.05, rotate: -5 }} className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl border border-pink-500/20 bg-pink-500/10 transition-colors group-hover:bg-pink-500/20">
                     <MessageSquare className="text-pink-500 h-6 w-6" />
@@ -830,7 +829,7 @@ export default function LandingPage() {
                 <div className="absolute right-0 bottom-0 -z-10 h-2/3 w-2/3 bg-gradient-to-tl from-pink-500/15 to-transparent opacity-50 blur-2xl transition-all duration-500 group-hover:scale-110 group-hover:opacity-100" />
               </SpotlightCard>
 
-              <SpotlightCard className="group bg-background/70 dark:bg-background/40 flex flex-col justify-between overflow-hidden p-5 md:col-span-2 md:p-6 lg:p-7">
+              <SpotlightCard className="group bg-background/70 dark:bg-background/40 flex flex-col justify-between overflow-hidden p-5 md:col-span-3 md:p-6 lg:p-7">
                 <div className="relative z-10">
                   <motion.div whileHover={{ scale: 1.05, rotate: 5 }} className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl border border-purple-500/20 bg-purple-500/10 transition-colors group-hover:bg-purple-500/20">
                     <FileText className="h-6 w-6 text-purple-500" />
