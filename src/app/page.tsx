@@ -147,9 +147,10 @@ function SpotlightCard({
         isHovered ? "border-primary/40 shadow-primary/10 shadow-2xl" : "shadow-sm"
       } ${className}`}
       style={{
-        transform: isHovered && !prefersReducedMotion
-          ? `perspective(1000px) rotateX(${(mousePos.y - 100) * -0.015}deg) rotateY(${(mousePos.x - 150) * 0.015}deg) scale3d(1.005, 1.005, 1.005)`
-          : "perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)",
+        transform:
+          isHovered && !prefersReducedMotion
+            ? `perspective(1000px) rotateX(${(mousePos.y - 100) * -0.015}deg) rotateY(${(mousePos.x - 150) * 0.015}deg) scale3d(1.005, 1.005, 1.005)`
+            : "perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)",
       }}
     >
       {/* Spotlight overlay */}
@@ -328,8 +329,10 @@ function CustomTooltip({ active, payload, label }: any) {
   if (active && payload && payload.length) {
     return (
       <div className="bg-background/90 border-border/50 rounded-xl border px-2 py-1.5 shadow-xl backdrop-blur-md sm:px-3 sm:py-2.5">
-        <p className="text-muted-foreground mb-1 text-[11px] font-medium whitespace-nowrap sm:text-sm">{label}</p>
-        <p className="from-primary bg-gradient-to-r to-purple-500 bg-clip-text text-sm font-bold text-transparent whitespace-nowrap min-[380px]:text-base sm:text-xl">
+        <p className="text-muted-foreground mb-1 text-[11px] font-medium whitespace-nowrap sm:text-sm">
+          {label}
+        </p>
+        <p className="from-primary bg-gradient-to-r to-purple-500 bg-clip-text text-sm font-bold whitespace-nowrap text-transparent min-[380px]:text-base sm:text-xl">
           ₹{payload[0].value.toLocaleString()}
         </p>
       </div>
@@ -448,7 +451,7 @@ function Hero3D() {
             <Link href="/register">
               <Button
                 size="lg"
-                className="bg-cta text-cta-foreground shadow-cta/20 hover:shadow-cta/30 min-h-[44px] h-12 w-full rounded-full px-6 text-base font-bold shadow-2xl transition-all duration-400 ease-out hover:scale-[1.04] active:scale-[0.96] sm:h-16 sm:w-auto sm:px-12 sm:text-lg"
+                className="bg-cta text-cta-foreground shadow-cta/20 hover:shadow-cta/30 h-12 min-h-[44px] w-full rounded-full px-6 text-base font-bold shadow-2xl transition-all duration-400 ease-out hover:scale-[1.04] active:scale-[0.96] sm:h-16 sm:w-auto sm:px-12 sm:text-lg"
               >
                 Start Free Trial
                 <ArrowRight className="ml-3 h-5 w-5" />
@@ -463,7 +466,7 @@ function Hero3D() {
         initial={{ opacity: 0, y: 50, rotateX: 5 }}
         animate={{ opacity: 1, y: 0, rotateX: 0 }}
         transition={{ duration: 1.2, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        className="mt-12 w-full max-w-5xl px-4 md:mt-24 sm:px-6 lg:px-8 mx-auto"
+        className="mx-auto mt-12 w-full max-w-5xl px-4 sm:px-6 md:mt-24 lg:px-8"
         style={{ perspective: 1800 }}
       >
         <motion.div
@@ -560,7 +563,13 @@ function Hero3D() {
                     >
                       <div className="mb-1 flex items-start justify-between sm:mb-2">
                         <span className="text-muted-foreground text-[10px] font-semibold sm:text-sm">
-                          <span className="sm:hidden">{stat.title === "Total Revenue" ? "Revenue" : stat.title === "New Bookings" ? "Bookings" : "Cancels"}</span>
+                          <span className="sm:hidden">
+                            {stat.title === "Total Revenue"
+                              ? "Revenue"
+                              : stat.title === "New Bookings"
+                                ? "Bookings"
+                                : "Cancels"}
+                          </span>
                           <span className="hidden sm:inline">{stat.title}</span>
                         </span>
                         <span
@@ -577,13 +586,18 @@ function Hero3D() {
                 </div>
 
                 {/* Real Recharts Area */}
-                <div className="bg-background/90 border-border/40 pointer-events-auto relative flex min-h-[220px] flex-col overflow-visible rounded-xl border p-1.5 shadow-inner sm:flex-1 sm:rounded-2xl md:p-3 dark:bg-white/5 dark:backdrop-blur-md transition-all duration-300">
+                <div className="bg-background/90 border-border/40 pointer-events-auto relative flex min-h-[220px] flex-col overflow-visible rounded-xl border p-1.5 shadow-inner transition-all duration-300 sm:flex-1 sm:rounded-2xl md:p-3 dark:bg-white/5 dark:backdrop-blur-md">
                   <div className="mb-1 flex flex-col items-start justify-between gap-1 px-1 sm:mb-2 sm:flex-row sm:items-center sm:gap-0">
-                    <h3 className="text-foreground text-xs font-bold sm:text-sm">Revenue Overview</h3>
-                    <span className="text-muted-foreground text-[10px] font-medium sm:text-xs">Last 7 Days</span>
+                    <h3 className="text-foreground text-xs font-bold sm:text-sm">
+                      Revenue Overview
+                    </h3>
+                    <span className="text-muted-foreground text-[10px] font-medium sm:text-xs">
+                      Last 7 Days
+                    </span>
                   </div>
                   <div className="relative z-0 min-h-[140px] w-full flex-1 sm:min-h-[180px]">
-        {/* Floating User Avatars */}        {mounted && (
+                    {/* Floating User Avatars */}{" "}
+                    {mounted && (
                       <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                         <AreaChart
                           data={mockChartData}
@@ -780,20 +794,30 @@ export default function LandingPage() {
             <div className="grid grid-cols-1 gap-4 sm:gap-5 md:grid-cols-6 lg:auto-rows-fr">
               <SpotlightCard className="group bg-background/70 dark:bg-background/40 flex flex-col justify-between overflow-hidden p-5 md:col-span-3 md:row-span-2 md:p-6 lg:p-8">
                 <div className="relative z-10">
-                  <motion.div whileHover={{ scale: 1.05, rotate: 5 }} className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl border border-blue-500/20 bg-blue-500/10 shadow-[0_0_30px_rgba(59,130,246,0.15)] transition-colors group-hover:bg-blue-500/20">
-                    <Calendar className="text-blue-500 h-6 w-6" />
+                  <motion.div
+                    whileHover={{ scale: 1.05, rotate: 5 }}
+                    className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl border border-blue-500/20 bg-blue-500/10 shadow-[0_0_30px_rgba(59,130,246,0.15)] transition-colors group-hover:bg-blue-500/20"
+                  >
+                    <Calendar className="h-6 w-6 text-blue-500" />
                   </motion.div>
-                  <h3 className="mb-3 text-xl font-bold tracking-tight md:text-2xl">Smart Bookings</h3>
+                  <h3 className="mb-3 text-xl font-bold tracking-tight md:text-2xl">
+                    Smart Bookings
+                  </h3>
                   <p className="text-foreground/80 max-w-xl text-sm leading-relaxed font-medium md:text-base">
-                    Public scheduling pages with live availability, automated reminders, and conflict-free
-                    calendar sync across your entire team.
+                    Public scheduling pages with live availability, automated reminders, and
+                    conflict-free calendar sync across your entire team.
                   </p>
                   <div className="mt-5 flex flex-wrap gap-2">
-                    {["24/7 self-scheduling", "No-show recovery", "Multi-location routing"].map((chip) => (
-                      <span key={chip} className="bg-background/80 border-border/60 text-foreground/85 rounded-full border px-3 py-1.5 text-xs font-semibold shadow-sm">
-                        {chip}
-                      </span>
-                    ))}
+                    {["24/7 self-scheduling", "No-show recovery", "Multi-location routing"].map(
+                      (chip) => (
+                        <span
+                          key={chip}
+                          className="bg-background/80 border-border/60 text-foreground/85 rounded-full border px-3 py-1.5 text-xs font-semibold shadow-sm"
+                        >
+                          {chip}
+                        </span>
+                      )
+                    )}
                   </div>
                 </div>
                 {/* Decorative animations */}
@@ -802,7 +826,9 @@ export default function LandingPage() {
                   animate={{ y: [0, -8, 0], rotate: [0, 2, -1, 0] }}
                   transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
                 >
-                  <span className="text-foreground/80 text-xs font-semibold uppercase tracking-wider">No-shows</span>
+                  <span className="text-foreground/80 text-xs font-semibold tracking-wider uppercase">
+                    No-shows
+                  </span>
                   <span className="text-foreground text-base font-black">-35%</span>
                 </motion.div>
                 <div className="absolute right-0 bottom-0 -z-10 h-3/4 w-3/4 bg-gradient-to-tl from-blue-500/15 to-transparent opacity-50 blur-3xl transition-all duration-700 group-hover:scale-110 group-hover:opacity-100" />
@@ -810,17 +836,28 @@ export default function LandingPage() {
 
               <SpotlightCard className="group bg-background/70 dark:bg-background/40 flex flex-col justify-between overflow-hidden p-5 md:col-span-3 md:p-6 lg:p-7">
                 <div className="relative z-10">
-                  <motion.div whileHover={{ scale: 1.05, rotate: -5 }} className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl border border-pink-500/20 bg-pink-500/10 transition-colors group-hover:bg-pink-500/20">
-                    <MessageSquare className="text-pink-500 h-6 w-6" />
+                  <motion.div
+                    whileHover={{ scale: 1.05, rotate: -5 }}
+                    className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl border border-pink-500/20 bg-pink-500/10 transition-colors group-hover:bg-pink-500/20"
+                  >
+                    <MessageSquare className="h-6 w-6 text-pink-500" />
                   </motion.div>
-                  <h3 className="mb-2 text-lg font-bold tracking-tight md:text-xl">Unified Inbox</h3>
+                  <h3 className="mb-2 text-lg font-bold tracking-tight md:text-xl">
+                    Unified Inbox
+                  </h3>
                   <ul className="text-foreground/80 space-y-2 text-sm leading-relaxed font-medium">
-                    <li className="flex items-center gap-2"><div className="h-1.5 w-1.5 rounded-full bg-pink-500/50" />SMS, email, & chat timelines</li>
-                    <li className="flex items-center gap-2"><div className="h-1.5 w-1.5 rounded-full bg-pink-500/50" />AI suggested 1-click replies</li>
+                    <li className="flex items-center gap-2">
+                      <div className="h-1.5 w-1.5 rounded-full bg-pink-500/50" />
+                      SMS, email, & chat timelines
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <div className="h-1.5 w-1.5 rounded-full bg-pink-500/50" />
+                      AI suggested 1-click replies
+                    </li>
                   </ul>
                 </div>
                 <motion.div
-                  className="pointer-events-none absolute top-5 right-5 rounded-full border border-border/60 bg-background/90 px-3 py-1 text-xs font-bold text-foreground shadow-lg backdrop-blur-md"
+                  className="border-border/60 bg-background/90 text-foreground pointer-events-none absolute top-5 right-5 rounded-full border px-3 py-1 text-xs font-bold shadow-lg backdrop-blur-md"
                   animate={{ y: [0, -5, 0], scale: [1, 1.05, 1] }}
                   transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
                 >
@@ -831,13 +868,24 @@ export default function LandingPage() {
 
               <SpotlightCard className="group bg-background/70 dark:bg-background/40 flex flex-col justify-between overflow-hidden p-5 md:col-span-3 md:p-6 lg:p-7">
                 <div className="relative z-10">
-                  <motion.div whileHover={{ scale: 1.05, rotate: 5 }} className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl border border-purple-500/20 bg-purple-500/10 transition-colors group-hover:bg-purple-500/20">
+                  <motion.div
+                    whileHover={{ scale: 1.05, rotate: 5 }}
+                    className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl border border-purple-500/20 bg-purple-500/10 transition-colors group-hover:bg-purple-500/20"
+                  >
                     <FileText className="h-6 w-6 text-purple-500" />
                   </motion.div>
-                  <h3 className="mb-2 text-lg font-bold tracking-tight md:text-xl">Dynamic Forms</h3>
+                  <h3 className="mb-2 text-lg font-bold tracking-tight md:text-xl">
+                    Dynamic Forms
+                  </h3>
                   <ul className="text-foreground/80 space-y-2 text-sm leading-relaxed font-medium">
-                    <li className="flex items-center gap-2"><div className="h-1.5 w-1.5 rounded-full bg-purple-500/50" />Fields adapt to user input</li>
-                    <li className="flex items-center gap-2"><div className="h-1.5 w-1.5 rounded-full bg-purple-500/50" />Validated CRM handoffs</li>
+                    <li className="flex items-center gap-2">
+                      <div className="h-1.5 w-1.5 rounded-full bg-purple-500/50" />
+                      Fields adapt to user input
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <div className="h-1.5 w-1.5 rounded-full bg-purple-500/50" />
+                      Validated CRM handoffs
+                    </li>
                   </ul>
                 </div>
                 <motion.div
@@ -858,12 +906,18 @@ export default function LandingPage() {
 
               <SpotlightCard className="group bg-background/70 dark:bg-background/40 flex flex-col justify-between overflow-hidden p-5 md:col-span-2 md:row-span-2 xl:p-8">
                 <div className="relative z-10 flex h-full flex-col">
-                  <motion.div whileHover={{ scale: 1.05, y: -2 }} className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl border border-emerald-500/20 bg-emerald-500/10 transition-colors group-hover:bg-emerald-500/20">
+                  <motion.div
+                    whileHover={{ scale: 1.05, y: -2 }}
+                    className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl border border-emerald-500/20 bg-emerald-500/10 transition-colors group-hover:bg-emerald-500/20"
+                  >
                     <BarChart3 className="h-6 w-6 text-emerald-500" />
                   </motion.div>
-                  <h3 className="mb-2 text-lg font-bold tracking-tight md:text-xl">Live Analytics</h3>
-                  <p className="text-foreground/80 mb-6 text-sm flex-1 font-medium leading-[1.6]">
-                    Real-time metrics, predictive forecasting, and custom KPI tracking to optimize operational flow. Monitor staff utilization and revenue leaks instantly.
+                  <h3 className="mb-2 text-lg font-bold tracking-tight md:text-xl">
+                    Live Analytics
+                  </h3>
+                  <p className="text-foreground/80 mb-6 flex-1 text-sm leading-[1.6] font-medium">
+                    Real-time metrics, predictive forecasting, and custom KPI tracking to optimize
+                    operational flow. Monitor staff utilization and revenue leaks instantly.
                   </p>
                   <div className="grid grid-cols-2 gap-3 text-center">
                     {[
@@ -874,15 +928,21 @@ export default function LandingPage() {
                     ].map((m, i) => (
                       <motion.div
                         key={m.label}
-                        className="flex flex-col items-center justify-center rounded-xl border border-border/60 bg-background/80 p-2.5 shadow-sm transition-colors group-hover:border-emerald-500/20"
+                        className="border-border/60 bg-background/80 flex flex-col items-center justify-center rounded-xl border p-2.5 shadow-sm transition-colors group-hover:border-emerald-500/20"
                         initial={{ opacity: 0, scale: 0.9 }}
                         whileInView={{ opacity: 1, scale: 1 }}
                         transition={{ duration: 0.4, delay: i * 0.1 }}
                         viewport={{ once: true }}
                         whileHover={{ y: -2 }}
                       >
-                        <div className="text-foreground/70 mb-1 text-xs font-semibold uppercase tracking-wider">{m.label}</div>
-                        <div className={`text-base font-black sm:text-lg ${m.trend === 'up' ? 'text-emerald-500' : 'text-foreground'}`}>{m.value}</div>
+                        <div className="text-foreground/70 mb-1 text-xs font-semibold tracking-wider uppercase">
+                          {m.label}
+                        </div>
+                        <div
+                          className={`text-base font-black sm:text-lg ${m.trend === "up" ? "text-emerald-500" : "text-foreground"}`}
+                        >
+                          {m.value}
+                        </div>
                       </motion.div>
                     ))}
                   </div>
@@ -892,12 +952,19 @@ export default function LandingPage() {
 
               <SpotlightCard className="group bg-background/70 dark:bg-background/40 flex flex-col justify-between overflow-hidden p-5 md:col-span-2 md:row-span-2 xl:p-8">
                 <div className="relative z-10 flex h-full flex-col">
-                  <motion.div whileHover={{ scale: 1.05, rotate: -5 }} className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl border border-cyan-500/20 bg-cyan-500/10 transition-colors group-hover:bg-cyan-500/20">
+                  <motion.div
+                    whileHover={{ scale: 1.05, rotate: -5 }}
+                    className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl border border-cyan-500/20 bg-cyan-500/10 transition-colors group-hover:bg-cyan-500/20"
+                  >
                     <ShieldCheck className="h-6 w-6 text-cyan-500" />
                   </motion.div>
-                  <h3 className="mb-2 text-lg font-bold tracking-tight md:text-xl">Compliance Guardrails</h3>
-                  <p className="text-foreground/80 mb-6 text-sm flex-1 font-medium leading-[1.6]">
-                    HIPAA & SOC2 ready infrastructure. Implement strict role-based access controls, comprehensive activity logging, and automatic data retention policies for complete peace of mind.
+                  <h3 className="mb-2 text-lg font-bold tracking-tight md:text-xl">
+                    Compliance Guardrails
+                  </h3>
+                  <p className="text-foreground/80 mb-6 flex-1 text-sm leading-[1.6] font-medium">
+                    HIPAA & SOC2 ready infrastructure. Implement strict role-based access controls,
+                    comprehensive activity logging, and automatic data retention policies for
+                    complete peace of mind.
                   </p>
                   <div className="flex flex-col gap-3">
                     {[
@@ -911,10 +978,10 @@ export default function LandingPage() {
                         whileInView={{ opacity: 1, x: 0 }}
                         transition={{ delay: i * 0.15, duration: 0.4 }}
                         viewport={{ once: true }}
-                        className="flex items-center gap-3 rounded-xl border border-border/40 bg-background/50 px-3 py-2.5 transition-colors group-hover:border-cyan-500/30"
+                        className="border-border/40 bg-background/50 flex items-center gap-3 rounded-xl border px-3 py-2.5 transition-colors group-hover:border-cyan-500/30"
                       >
                         <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-cyan-500/10 text-cyan-500">
-                           <item.icon className="h-4 w-4" />
+                          <item.icon className="h-4 w-4" />
                         </div>
                         <span className="text-sm font-bold">{item.text}</span>
                       </motion.div>
@@ -926,43 +993,72 @@ export default function LandingPage() {
 
               <SpotlightCard className="group bg-background/70 dark:bg-background/40 flex flex-col justify-between overflow-hidden p-5 md:col-span-2 md:row-span-2 xl:p-8">
                 <div className="relative z-10 flex h-full flex-col">
-                  <motion.div whileHover={{ scale: 1.05, rotate: 5 }} className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl border border-amber-500/20 bg-amber-500/10 transition-colors group-hover:bg-amber-500/20">
+                  <motion.div
+                    whileHover={{ scale: 1.05, rotate: 5 }}
+                    className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl border border-amber-500/20 bg-amber-500/10 transition-colors group-hover:bg-amber-500/20"
+                  >
                     <Zap className="h-6 w-6 text-amber-500" />
                   </motion.div>
-                  <h3 className="mb-2 text-lg font-bold tracking-tight md:text-xl">Automation Engine</h3>
-                  <p className="text-foreground/80 mb-6 text-sm flex-1 font-medium leading-[1.6]">
-                    Visually map out complex sequences using our drag-and-drop workflow builder. Build timed and event-based flows for reminders, escalations, and automated follow-ups.
+                  <h3 className="mb-2 text-lg font-bold tracking-tight md:text-xl">
+                    Automation Engine
+                  </h3>
+                  <p className="text-foreground/80 mb-6 flex-1 text-sm leading-[1.6] font-medium">
+                    Visually map out complex sequences using our drag-and-drop workflow builder.
+                    Build timed and event-based flows for reminders, escalations, and automated
+                    follow-ups.
                   </p>
                   <div className="relative mt-auto">
                     <div className="flex flex-col gap-2">
-                       <motion.div 
-                         className="h-2 w-full rounded-full bg-amber-500/10 overflow-hidden"
-                         initial={{ opacity: 0 }}
-                         whileInView={{ opacity: 1 }}
-                         viewport={{ once: true }}
-                       >
-                         <motion.div className="h-full bg-amber-500" animate={{ x: ["-100%", "100%"] }} transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }} />
-                       </motion.div>
-                       <motion.div 
-                         className="h-2 w-4/5 rounded-full bg-amber-500/10 overflow-hidden"
-                         initial={{ opacity: 0 }}
-                         whileInView={{ opacity: 1 }}
-                         viewport={{ once: true }}
-                       >
-                         <motion.div className="h-full bg-amber-400" animate={{ x: ["-100%", "100%"] }} transition={{ repeat: Infinity, duration: 2.5, ease: "easeInOut", delay: 0.2 }} />
-                       </motion.div>
-                       <motion.div 
-                         className="h-2 w-3/5 rounded-full bg-amber-500/10 overflow-hidden"
-                         initial={{ opacity: 0 }}
-                         whileInView={{ opacity: 1 }}
-                         viewport={{ once: true }}
-                       >
-                         <motion.div className="h-full bg-amber-300" animate={{ x: ["-100%", "100%"] }} transition={{ repeat: Infinity, duration: 3, ease: "easeInOut", delay: 0.4 }} />
-                       </motion.div>
+                      <motion.div
+                        className="h-2 w-full overflow-hidden rounded-full bg-amber-500/10"
+                        initial={{ opacity: 0 }}
+                        whileInView={{ opacity: 1 }}
+                        viewport={{ once: true }}
+                      >
+                        <motion.div
+                          className="h-full bg-amber-500"
+                          animate={{ x: ["-100%", "100%"] }}
+                          transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+                        />
+                      </motion.div>
+                      <motion.div
+                        className="h-2 w-4/5 overflow-hidden rounded-full bg-amber-500/10"
+                        initial={{ opacity: 0 }}
+                        whileInView={{ opacity: 1 }}
+                        viewport={{ once: true }}
+                      >
+                        <motion.div
+                          className="h-full bg-amber-400"
+                          animate={{ x: ["-100%", "100%"] }}
+                          transition={{
+                            repeat: Infinity,
+                            duration: 2.5,
+                            ease: "easeInOut",
+                            delay: 0.2,
+                          }}
+                        />
+                      </motion.div>
+                      <motion.div
+                        className="h-2 w-3/5 overflow-hidden rounded-full bg-amber-500/10"
+                        initial={{ opacity: 0 }}
+                        whileInView={{ opacity: 1 }}
+                        viewport={{ once: true }}
+                      >
+                        <motion.div
+                          className="h-full bg-amber-300"
+                          animate={{ x: ["-100%", "100%"] }}
+                          transition={{
+                            repeat: Infinity,
+                            duration: 3,
+                            ease: "easeInOut",
+                            delay: 0.4,
+                          }}
+                        />
+                      </motion.div>
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="absolute right-0 bottom-0 -z-10 h-3/4 w-3/4 bg-gradient-to-tl from-amber-500/15 to-transparent opacity-50 blur-3xl transition-all duration-700 group-hover:scale-110 group-hover:opacity-100" />
               </SpotlightCard>
             </div>
@@ -1038,7 +1134,10 @@ export default function LandingPage() {
         </section>
 
         {/* ─── PRICING ─── */}
-        <section id="pricing" className="bg-background relative overflow-hidden py-14 sm:py-20 lg:py-32">
+        <section
+          id="pricing"
+          className="bg-background relative overflow-hidden py-14 sm:py-20 lg:py-32"
+        >
           <div className="absolute inset-0 z-0">
             <div className="from-primary/10 absolute top-1/2 left-1/2 h-[800px] w-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-r via-purple-500/10 to-transparent blur-[150px]" />
           </div>
@@ -1126,7 +1225,7 @@ export default function LandingPage() {
               ].map((plan) => (
                 <SpotlightCard
                   key={plan.name}
-                  className={`flex flex-col justify-between overflow-hidden p-6 sm:p-8 shadow-none ${
+                  className={`flex flex-col justify-between overflow-hidden p-6 shadow-none sm:p-8 ${
                     plan.highlight
                       ? "border-primary/40 bg-primary/5 shadow-primary/10 shadow-2xl lg:scale-105"
                       : "border-border/40 bg-background/20"
@@ -1216,7 +1315,7 @@ export default function LandingPage() {
                 <Link href="/register">
                   <Button
                     size="lg"
-                    className="bg-foreground text-background shadow-foreground/20 group relative min-h-[44px] h-14 overflow-hidden rounded-full px-8 text-base font-black shadow-2xl transition-all duration-500 ease-out hover:scale-[1.05] active:scale-[0.95] sm:h-16 sm:px-10 sm:text-lg"
+                    className="bg-foreground text-background shadow-foreground/20 group relative h-14 min-h-[44px] overflow-hidden rounded-full px-8 text-base font-black shadow-2xl transition-all duration-500 ease-out hover:scale-[1.05] active:scale-[0.95] sm:h-16 sm:px-10 sm:text-lg"
                   >
                     <span className="relative z-10 flex items-center gap-3">
                       Start Building Now
