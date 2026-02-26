@@ -7,6 +7,8 @@ import {
   MessageSquare,
   FileText,
   Zap,
+  BarChart3,
+  ShieldCheck,
   X,
   Menu,
   Sparkles,
@@ -240,13 +242,13 @@ function Navbar({
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-      className={`fixed top-4 right-4 left-4 z-50 rounded-2xl transition-all duration-[600ms] ${
+      className={`fixed top-2 right-2 left-2 z-50 rounded-2xl transition-all duration-[600ms] sm:top-4 sm:right-4 sm:left-4 ${
         scrolled
           ? "bg-background/80 border-border/40 border py-3 shadow-lg backdrop-blur-2xl"
           : "bg-transparent py-4"
       }`}
     >
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-3 sm:px-6 lg:px-8">
         <Link href="/" className="group flex items-center gap-2">
           <Logo variant="full" size={32} />
         </Link>
@@ -297,7 +299,7 @@ function Navbar({
           <button
             onClick={() => setMobileMenuOpen(true)}
             aria-label="Open menu"
-            className="dark:hover:bg-background/10 rounded-full p-2 transition-colors hover:bg-black/5 md:hidden"
+            className="dark:hover:bg-background/10 min-h-[44px] min-w-[44px] rounded-full p-2 transition-colors hover:bg-black/5 md:hidden"
           >
             <Menu className="text-foreground h-5 w-5" />
           </button>
@@ -326,9 +328,9 @@ const mockChartData = [
 function CustomTooltip({ active, payload, label }: any) {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-background/90 border-border/50 rounded-xl border p-3 shadow-xl backdrop-blur-md">
-        <p className="text-muted-foreground mb-1 text-sm font-medium">{label}</p>
-        <p className="from-primary bg-gradient-to-r to-purple-500 bg-clip-text text-xl font-bold text-transparent">
+      <div className="bg-background/90 border-border/50 rounded-xl border px-2 py-1.5 shadow-xl backdrop-blur-md sm:px-3 sm:py-2.5">
+        <p className="text-muted-foreground mb-1 text-[11px] font-medium whitespace-nowrap sm:text-sm">{label}</p>
+        <p className="from-primary bg-gradient-to-r to-purple-500 bg-clip-text text-sm font-bold text-transparent whitespace-nowrap min-[380px]:text-base sm:text-xl">
           ₹{payload[0].value.toLocaleString()}
         </p>
       </div>
@@ -381,7 +383,7 @@ function Hero3D() {
 
   return (
     <section
-      className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden pt-32 pb-20"
+      className="relative flex min-h-[calc(100vh-6rem)] flex-col items-center justify-center overflow-hidden pt-20 pb-12 md:min-h-screen md:pt-32 md:pb-20"
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >
@@ -403,7 +405,7 @@ function Hero3D() {
           initial={{ opacity: 0, y: 30, filter: "blur(12px)" }}
           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
           transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-          className="bg-background/40 text-foreground border-foreground/10 mb-12 inline-flex items-center gap-2 rounded-full border px-6 py-2 text-xs font-extrabold shadow-sm backdrop-blur-md"
+          className="bg-background/40 text-foreground border-foreground/10 mb-8 inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-[10px] font-extrabold shadow-sm backdrop-blur-md sm:mb-12 sm:px-6 sm:py-2 sm:text-xs"
         >
           <Sparkles className="text-primary h-4 w-4" />
           <span className="from-foreground to-foreground/50 bg-gradient-to-r bg-clip-text tracking-[0.15em] text-transparent uppercase">
@@ -415,7 +417,7 @@ function Hero3D() {
           initial={{ opacity: 0, y: 40, filter: "blur(16px)" }}
           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
           transition={{ duration: 1.2, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-          className="text-foreground mb-6 text-[clamp(3rem,8vw,5.5rem)] leading-[0.9] font-black tracking-[-0.04em]"
+          className="text-foreground mb-5 text-[clamp(2rem,9vw,4.8rem)] leading-[0.92] font-black tracking-[-0.04em] sm:mb-6 sm:leading-[0.9]"
         >
           Operations,
           <br />
@@ -431,7 +433,7 @@ function Hero3D() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-          className="text-muted-foreground mx-auto mb-10 max-w-7xl text-lg leading-relaxed font-medium md:text-xl"
+          className="text-muted-foreground mx-auto mb-8 max-w-2xl text-base leading-relaxed font-medium sm:mb-10 sm:text-lg md:text-xl"
         >
           The absolute pinnacle of service operations. Replace your entire fragmented stack with one
           beautifully unified engine.
@@ -441,13 +443,13 @@ function Hero3D() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.45, ease: [0.16, 1, 0.3, 1] }}
-          className="flex flex-col items-center justify-center gap-6 sm:flex-row"
+          className="flex w-full flex-col items-center justify-center gap-4 sm:w-auto sm:flex-row sm:gap-6"
         >
           <MagneticButton>
             <Link href="/register">
               <Button
                 size="lg"
-                className="bg-cta text-cta-foreground shadow-cta/20 hover:shadow-cta/30 h-16 rounded-full px-12 text-lg font-bold shadow-2xl transition-all duration-400 ease-out hover:scale-[1.04] active:scale-[0.96]"
+                className="bg-cta text-cta-foreground shadow-cta/20 hover:shadow-cta/30 min-h-[44px] h-12 w-full rounded-full px-6 text-base font-bold shadow-2xl transition-all duration-400 ease-out hover:scale-[1.04] active:scale-[0.96] sm:h-16 sm:w-auto sm:px-12 sm:text-lg"
               >
                 Start Free Trial
                 <ArrowRight className="ml-3 h-5 w-5" />
@@ -462,7 +464,7 @@ function Hero3D() {
         initial={{ opacity: 0, y: 150, rotateX: 20, scale: 0.9 }}
         animate={{ opacity: 1, y: 0, rotateX: 0, scale: 1 }}
         transition={{ duration: 1.5, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        className="relative mt-24 w-full max-w-7xl px-6"
+        className="relative mt-14 w-full max-w-7xl px-4 sm:mt-20 sm:px-6"
         style={{ perspective: 1500 }}
       >
         <motion.div
@@ -470,27 +472,27 @@ function Hero3D() {
             rotateX: prefersReducedMotion ? 0 : rotateX,
             rotateY: prefersReducedMotion ? 0 : rotateY,
           }}
-          className="bg-background/40 relative aspect-[16/10] w-full overflow-hidden rounded-[32px] border border-white/20 shadow-[0_40px_120px_-20px_rgba(0,0,0,0.2)] backdrop-blur-[40px] dark:border-white/10 dark:bg-black/40 dark:shadow-[0_40px_120px_-20px_rgba(0,0,0,0.6)]"
+          className="bg-background/40 relative aspect-[3/4] w-full overflow-hidden rounded-[24px] border border-white/20 shadow-[0_40px_120px_-20px_rgba(0,0,0,0.2)] backdrop-blur-[40px] sm:aspect-[4/5] sm:rounded-[28px] md:aspect-[3/2] lg:aspect-[16/10] lg:rounded-[32px] dark:border-white/10 dark:bg-black/40 dark:shadow-[0_40px_120px_-20px_rgba(0,0,0,0.6)]"
         >
           {/* Faux dashboard glowing grid lines */}
           <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+Cjwvc3ZnPg==')] opacity-[0.03] dark:opacity-[0.05]" />
 
-          <div className="pointer-events-none absolute inset-0 flex flex-col p-8">
+          <div className="pointer-events-none absolute inset-0 flex flex-col overflow-y-auto p-2.5 sm:overflow-visible sm:p-5 lg:p-8">
             {/* Dashboard Header */}
-            <div className="border-border/40 flex items-center justify-between border-b pb-4">
-              <div className="flex items-center gap-4">
+            <div className="border-border/40 flex flex-wrap items-center justify-between gap-2 border-b pb-3 sm:pb-4">
+              <div className="flex items-center gap-2 sm:gap-4">
                 <div className="flex gap-2">
                   <div className="h-3 w-3 rounded-full bg-red-400/80 shadow-[0_0_8px_rgba(248,113,113,0.5)]" />
                   <div className="h-3 w-3 rounded-full bg-yellow-400/80 shadow-[0_0_8px_rgba(250,204,21,0.5)]" />
                   <div className="h-3 w-3 rounded-full bg-green-400/80 shadow-[0_0_8px_rgba(74,222,128,0.5)]" />
                 </div>
-                <div className="bg-muted/30 border-border/20 flex h-8 w-48 items-center rounded-lg border px-3">
+                <div className="bg-muted/30 border-border/20 hidden h-8 w-32 items-center rounded-lg border px-2 sm:flex sm:w-48 sm:px-3">
                   <Search className="text-muted-foreground mr-2 h-4 w-4" />
                   <span className="text-muted-foreground text-xs">Search patients...</span>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="bg-muted/50 border-border/50 flex h-8 w-8 items-center justify-center rounded-full border transition-colors">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="bg-muted/50 border-border/50 hidden h-8 w-8 items-center justify-center rounded-full border transition-colors min-[380px]:flex">
                   <Bell className="text-foreground/70 h-4 w-4" />
                 </div>
                 <div className="from-primary h-8 w-8 rounded-full bg-gradient-to-tr to-purple-500 p-[2px]">
@@ -502,7 +504,7 @@ function Hero3D() {
             </div>
 
             {/* Dashboard Content */}
-            <div className="mt-6 flex flex-1 gap-6">
+            <div className="mt-3 flex min-h-0 flex-1 gap-2 sm:mt-6 sm:gap-6">
               {/* Sidebar List */}
               <div className="hidden w-48 flex-col gap-2 md:flex">
                 {[
@@ -525,9 +527,8 @@ function Hero3D() {
               </div>
 
               {/* Main Area */}
-              <div className="flex flex-1 flex-col gap-6">
-                {/* KPI Cards */}
-                <div className="grid grid-cols-3 gap-6">
+              <div className="flex min-h-0 flex-1 flex-col gap-2.5 sm:gap-6">
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-4">
                   {[
                     {
                       title: "Total Revenue",
@@ -556,19 +557,20 @@ function Hero3D() {
                   ].map((stat, i) => (
                     <div
                       key={i}
-                      className={`rounded-2xl bg-gradient-to-b ${stat.color} border-border/40 flex flex-col justify-between border p-5 shadow-sm ring-1 backdrop-blur-md ring-inset ${stat.ring}`}
+                      className={`rounded-xl bg-gradient-to-b ${stat.color} border-border/40 flex flex-col justify-between border p-2 shadow-sm ring-1 backdrop-blur-md ring-inset ${stat.ring} ${i === 2 ? "col-span-2 sm:col-span-1" : ""} sm:rounded-2xl sm:p-4`}
                     >
-                      <div className="mb-2 flex items-start justify-between">
-                        <span className="text-muted-foreground text-sm font-semibold">
-                          {stat.title}
+                      <div className="mb-1 flex items-start justify-between sm:mb-2">
+                        <span className="text-muted-foreground text-[10px] font-semibold sm:text-sm">
+                          <span className="sm:hidden">{stat.title === "Total Revenue" ? "Revenue" : stat.title === "New Bookings" ? "Bookings" : "Cancels"}</span>
+                          <span className="hidden sm:inline">{stat.title}</span>
                         </span>
                         <span
-                          className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${stat.trendColor}`}
+                          className={`rounded-full px-1.5 py-0.5 text-[8px] font-bold sm:px-2 sm:py-0.5 sm:text-[10px] ${stat.trendColor}`}
                         >
                           {stat.trend}
                         </span>
                       </div>
-                      <span className="text-foreground text-2xl font-black tracking-tight">
+                      <span className="text-foreground text-sm font-black tracking-tight min-[380px]:text-base sm:text-xl lg:text-2xl">
                         {stat.value}
                       </span>
                     </div>
@@ -576,17 +578,17 @@ function Hero3D() {
                 </div>
 
                 {/* Real Recharts Area */}
-                <div className="bg-muted/10 border-border/40 pointer-events-auto relative flex flex-1 flex-col overflow-hidden rounded-2xl border p-4 shadow-inner backdrop-blur-md">
-                  <div className="mb-2 flex items-center justify-between px-2">
-                    <h3 className="text-foreground text-sm font-bold">Revenue Overview</h3>
-                    <span className="text-muted-foreground text-xs font-medium">Last 7 Days</span>
+                <div className="bg-muted/10 border-border/40 pointer-events-auto relative flex h-[190px] flex-col overflow-visible rounded-xl border p-1.5 shadow-inner backdrop-blur-md min-[380px]:p-2 sm:h-auto sm:min-h-[220px] sm:flex-1 sm:rounded-2xl sm:p-4">
+                  <div className="mb-1 flex flex-col items-start justify-between gap-1 px-1 sm:mb-2 sm:flex-row sm:items-center sm:gap-0">
+                    <h3 className="text-foreground text-xs font-bold sm:text-sm">Revenue Overview</h3>
+                    <span className="text-muted-foreground text-[10px] font-medium sm:text-xs">Last 7 Days</span>
                   </div>
-                  <div className="min-h-[200px] w-full flex-1">
+                  <div className="h-full min-h-[132px] w-full flex-1 sm:min-h-[180px]">
                     {mounted && (
                       <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                         <AreaChart
                           data={mockChartData}
-                          margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+                          margin={{ top: 12, right: 12, left: 8, bottom: 4 }}
                         >
                           <defs>
                             <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
@@ -598,11 +600,16 @@ function Hero3D() {
                             dataKey="name"
                             axisLine={false}
                             tickLine={false}
-                            tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
-                            dy={10}
+                            tick={{ fontSize: 8, fill: "var(--muted-foreground)" }}
+                            interval="preserveStartEnd"
+                            minTickGap={12}
+                            tickMargin={8}
                           />
                           <Tooltip
                             content={<CustomTooltip />}
+                            allowEscapeViewBox={{ x: true, y: true }}
+                            wrapperStyle={{ zIndex: 20 }}
+                            offset={16}
                             cursor={{
                               stroke: "var(--primary)",
                               strokeWidth: 1,
@@ -613,10 +620,10 @@ function Hero3D() {
                             type="monotone"
                             dataKey="revenue"
                             stroke="var(--primary)"
-                            strokeWidth={3}
+                            strokeWidth={2.5}
                             fillOpacity={1}
                             fill="url(#colorRevenue)"
-                            activeDot={{ r: 6, strokeWidth: 0, fill: "var(--primary)" }}
+                            activeDot={{ r: 4, strokeWidth: 0, fill: "var(--primary)" }}
                             animationDuration={1500}
                           />
                         </AreaChart>
@@ -744,16 +751,16 @@ export default function LandingPage() {
         <Hero3D />
 
         {/* ─── FEATURES - Liquid Tiles ─── */}
-        <section id="features" className="bg-background relative z-10 py-32 lg:py-56">
+        <section id="features" className="bg-background relative z-10 py-14 sm:py-20 lg:py-32">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="mb-24 flex flex-col items-end justify-between gap-8 md:flex-row">
+            <div className="mb-12 flex flex-col items-start justify-between gap-6 md:mb-20 md:flex-row md:items-end md:gap-8">
               <div className="max-w-7xl">
                 <motion.h2
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-100px" }}
                   transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-                  className="text-5xl leading-[0.85] font-black tracking-[-0.05em] md:text-7xl lg:text-[100px]"
+                  className="text-4xl leading-[0.9] font-black tracking-[-0.04em] sm:text-5xl md:text-6xl lg:text-[84px]"
                 >
                   Unrivaled
                   <br />
@@ -765,88 +772,199 @@ export default function LandingPage() {
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 1, delay: 0.2 }}
-                className="text-muted-foreground mb-4 max-w-sm text-xl font-medium"
+                className="text-muted-foreground mb-2 max-w-sm text-base font-medium sm:text-lg md:mb-4 md:text-xl"
               >
                 Six powerful modules engineered for maximum efficiency.
               </motion.p>
             </div>
 
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-              {/* Large Card: Smart Bookings */}
-              <SpotlightCard className="group bg-background/40 flex min-h-[300px] flex-col justify-between overflow-hidden p-6 md:col-span-2 md:row-span-2 md:p-8 lg:min-h-[380px] lg:p-10">
+            <div className="grid grid-cols-1 gap-4 sm:gap-5 md:grid-cols-6 lg:auto-rows-fr">
+              <SpotlightCard className="group bg-background/70 dark:bg-background/40 flex flex-col justify-between overflow-hidden p-5 md:col-span-4 md:row-span-2 md:p-6 lg:p-8">
                 <div className="relative z-10">
-                  <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-[16px] border border-blue-500/20 bg-blue-500/10 shadow-[0_0_30px_rgba(59,130,246,0.1)] transition-transform duration-500 ease-out group-hover:scale-110">
-                    <Calendar className="text-primary h-6 w-6" />
-                  </div>
-                  <h3 className="mb-3 text-2xl font-bold tracking-tight">Smart Bookings</h3>
-                  <p className="text-muted-foreground max-w-sm text-base leading-relaxed font-medium">
-                    Public scheduling pages with real-time availability, automated confirmations,
-                    and flawless calendar sync.
+                  <motion.div whileHover={{ scale: 1.05, rotate: 5 }} className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl border border-blue-500/20 bg-blue-500/10 shadow-[0_0_30px_rgba(59,130,246,0.15)] transition-colors group-hover:bg-blue-500/20">
+                    <Calendar className="text-blue-500 h-6 w-6" />
+                  </motion.div>
+                  <h3 className="mb-3 text-xl font-bold tracking-tight md:text-2xl">Smart Bookings</h3>
+                  <p className="text-foreground/80 max-w-xl text-sm leading-relaxed font-medium md:text-base">
+                    Public scheduling pages with live availability, automated reminders, and conflict-free
+                    calendar sync across your entire team.
                   </p>
+                  <div className="mt-5 flex flex-wrap gap-2">
+                    {["24/7 self-scheduling", "No-show recovery", "Multi-location routing"].map((chip) => (
+                      <span key={chip} className="bg-background/80 border-border/60 text-foreground/85 rounded-full border px-3 py-1.5 text-xs font-semibold shadow-sm">
+                        {chip}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-
-                {/* Decorative background element for large card */}
-                <div className="absolute right-0 bottom-0 -z-10 h-2/3 w-2/3 bg-gradient-to-tl from-blue-500/10 to-transparent opacity-50 blur-3xl transition-opacity duration-500 group-hover:opacity-100" />
-                <div className="absolute -right-10 -bottom-10 -z-10 hidden h-48 w-48 rounded-full border border-blue-500/20 sm:flex" />
-                <div className="absolute -right-20 -bottom-20 -z-10 hidden h-64 w-64 rounded-full border border-blue-500/20 sm:flex" />
+                {/* Decorative animations */}
+                <motion.div
+                  className="pointer-events-none absolute right-6 bottom-6 z-10 hidden items-center gap-2 rounded-xl border border-blue-500/20 bg-blue-500/10 px-4 py-2.5 backdrop-blur-md md:flex"
+                  animate={{ y: [0, -8, 0], rotate: [0, 2, -1, 0] }}
+                  transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                >
+                  <span className="text-foreground/80 text-xs font-semibold uppercase tracking-wider">No-shows</span>
+                  <span className="text-foreground text-base font-black">-35%</span>
+                </motion.div>
+                <div className="absolute right-0 bottom-0 -z-10 h-3/4 w-3/4 bg-gradient-to-tl from-blue-500/15 to-transparent opacity-50 blur-3xl transition-all duration-700 group-hover:scale-110 group-hover:opacity-100" />
               </SpotlightCard>
 
-              {/* Small Card 1: Unified Inbox */}
-              <SpotlightCard className="group bg-background/40 flex min-h-[220px] flex-col justify-between overflow-hidden p-6 md:col-span-1 md:p-8">
+              <SpotlightCard className="group bg-background/70 dark:bg-background/40 flex flex-col justify-between overflow-hidden p-5 md:col-span-2 md:p-6 lg:p-7">
                 <div className="relative z-10">
-                  <div className="bg-primary/10 border-primary/20 mb-5 flex h-10 w-10 items-center justify-center rounded-[12px] border transition-transform duration-500 ease-out group-hover:scale-110">
-                    <MessageSquare className="text-primary h-5 w-5" />
-                  </div>
-                  <h3 className="mb-2 text-lg font-bold tracking-tight md:text-xl">
-                    Unified Inbox
-                  </h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed font-medium">
-                    Email, SMS, and AI responses organized in one interface.
-                  </p>
+                  <motion.div whileHover={{ scale: 1.05, rotate: -5 }} className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl border border-pink-500/20 bg-pink-500/10 transition-colors group-hover:bg-pink-500/20">
+                    <MessageSquare className="text-pink-500 h-6 w-6" />
+                  </motion.div>
+                  <h3 className="mb-2 text-lg font-bold tracking-tight md:text-xl">Unified Inbox</h3>
+                  <ul className="text-foreground/80 space-y-2 text-sm leading-relaxed font-medium">
+                    <li className="flex items-center gap-2"><div className="h-1.5 w-1.5 rounded-full bg-pink-500/50" />SMS, email, & chat timelines</li>
+                    <li className="flex items-center gap-2"><div className="h-1.5 w-1.5 rounded-full bg-pink-500/50" />AI suggested 1-click replies</li>
+                  </ul>
                 </div>
-                <div className="from-primary/10 absolute right-0 bottom-0 -z-10 h-1/2 w-1/2 bg-gradient-to-tl to-transparent opacity-50 blur-2xl transition-opacity duration-500 group-hover:opacity-100" />
+                <motion.div
+                  className="pointer-events-none absolute top-5 right-5 rounded-full border border-border/60 bg-background/90 px-3 py-1 text-xs font-bold text-foreground shadow-lg backdrop-blur-md"
+                  animate={{ y: [0, -5, 0], scale: [1, 1.05, 1] }}
+                  transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
+                >
+                  12 unread
+                </motion.div>
+                <div className="absolute right-0 bottom-0 -z-10 h-2/3 w-2/3 bg-gradient-to-tl from-pink-500/15 to-transparent opacity-50 blur-2xl transition-all duration-500 group-hover:scale-110 group-hover:opacity-100" />
               </SpotlightCard>
 
-              {/* Small Card 2: Dynamic Forms */}
-              <SpotlightCard className="group bg-background/40 flex min-h-[220px] flex-col justify-between overflow-hidden p-6 md:col-span-1 md:p-8">
+              <SpotlightCard className="group bg-background/70 dark:bg-background/40 flex flex-col justify-between overflow-hidden p-5 md:col-span-2 md:p-6 lg:p-7">
                 <div className="relative z-10">
-                  <div className="mb-5 flex h-10 w-10 items-center justify-center rounded-[12px] border border-purple-500/20 bg-purple-500/10 transition-transform duration-500 ease-out group-hover:scale-110">
-                    <FileText className="h-5 w-5 text-purple-500" />
-                  </div>
-                  <h3 className="mb-2 text-lg font-bold tracking-tight md:text-xl">
-                    Dynamic Forms
-                  </h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed font-medium">
-                    Intelligent intake workflows that adapt to user responses.
-                  </p>
+                  <motion.div whileHover={{ scale: 1.05, rotate: 5 }} className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl border border-purple-500/20 bg-purple-500/10 transition-colors group-hover:bg-purple-500/20">
+                    <FileText className="h-6 w-6 text-purple-500" />
+                  </motion.div>
+                  <h3 className="mb-2 text-lg font-bold tracking-tight md:text-xl">Dynamic Forms</h3>
+                  <ul className="text-foreground/80 space-y-2 text-sm leading-relaxed font-medium">
+                    <li className="flex items-center gap-2"><div className="h-1.5 w-1.5 rounded-full bg-purple-500/50" />Fields adapt to user input</li>
+                    <li className="flex items-center gap-2"><div className="h-1.5 w-1.5 rounded-full bg-purple-500/50" />Validated CRM handoffs</li>
+                  </ul>
                 </div>
-                <div className="absolute right-0 bottom-0 -z-10 h-1/2 w-1/2 bg-gradient-to-tl from-purple-500/10 to-transparent opacity-50 blur-2xl transition-opacity duration-500 group-hover:opacity-100" />
+                <motion.div
+                  className="pointer-events-none absolute right-5 bottom-6 h-1.5 w-24 overflow-hidden rounded-full bg-purple-500/20"
+                  initial={{ opacity: 0.8 }}
+                  animate={{ opacity: [0.4, 1, 0.4] }}
+                  transition={{ duration: 2.8, repeat: Infinity }}
+                >
+                  <motion.div
+                    className="h-full rounded-full bg-purple-500/80"
+                    animate={{ x: [-30, 90] }}
+                    transition={{ duration: 3.2, repeat: Infinity, ease: "linear" }}
+                    style={{ width: 30 }}
+                  />
+                </motion.div>
+                <div className="absolute right-0 bottom-0 -z-10 h-2/3 w-2/3 bg-gradient-to-tl from-purple-500/15 to-transparent opacity-50 blur-2xl transition-all duration-500 group-hover:scale-110 group-hover:opacity-100" />
               </SpotlightCard>
 
-              {/* Wide Card: Automation Engine */}
-              <SpotlightCard className="group bg-background/40 flex min-h-[200px] flex-col items-start justify-between overflow-hidden p-6 md:col-span-3 md:flex-row md:items-center md:p-8 lg:p-10">
-                <div className="relative z-10 max-w-xl">
-                  <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-[16px] border border-amber-500/20 bg-amber-500/10 transition-transform duration-500 ease-out group-hover:scale-110">
+              <SpotlightCard className="group bg-background/70 dark:bg-background/40 flex flex-col justify-between overflow-hidden p-5 md:col-span-2 md:row-span-2 xl:p-8">
+                <div className="relative z-10 flex h-full flex-col">
+                  <motion.div whileHover={{ scale: 1.05, y: -2 }} className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl border border-emerald-500/20 bg-emerald-500/10 transition-colors group-hover:bg-emerald-500/20">
+                    <BarChart3 className="h-6 w-6 text-emerald-500" />
+                  </motion.div>
+                  <h3 className="mb-2 text-lg font-bold tracking-tight md:text-xl">Live Analytics</h3>
+                  <p className="text-foreground/80 mb-6 text-sm flex-1 font-medium leading-[1.6]">
+                    Real-time metrics, predictive forecasting, and custom KPI tracking to optimize operational flow. Monitor staff utilization and revenue leaks instantly.
+                  </p>
+                  <div className="grid grid-cols-2 gap-3 text-center">
+                    {[
+                      { label: "Revenue", value: "+18%", trend: "up" },
+                      { label: "Dropoff", value: "-7%", trend: "down" },
+                      { label: "Bookings", value: "+11%", trend: "up" },
+                      { label: "Retention", value: "94%", trend: "up" },
+                    ].map((m, i) => (
+                      <motion.div
+                        key={m.label}
+                        className="flex flex-col items-center justify-center rounded-xl border border-border/60 bg-background/80 p-2.5 shadow-sm transition-colors group-hover:border-emerald-500/20"
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.4, delay: i * 0.1 }}
+                        viewport={{ once: true }}
+                        whileHover={{ y: -2 }}
+                      >
+                        <div className="text-foreground/70 mb-1 text-xs font-semibold uppercase tracking-wider">{m.label}</div>
+                        <div className={`text-base font-black sm:text-lg ${m.trend === 'up' ? 'text-emerald-500' : 'text-foreground'}`}>{m.value}</div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+                <div className="absolute right-0 bottom-0 -z-10 h-3/4 w-3/4 bg-gradient-to-tl from-emerald-500/15 to-transparent opacity-50 blur-3xl transition-all duration-700 group-hover:scale-110 group-hover:opacity-100" />
+              </SpotlightCard>
+
+              <SpotlightCard className="group bg-background/70 dark:bg-background/40 flex flex-col justify-between overflow-hidden p-5 md:col-span-2 md:row-span-2 xl:p-8">
+                <div className="relative z-10 flex h-full flex-col">
+                  <motion.div whileHover={{ scale: 1.05, rotate: -5 }} className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl border border-cyan-500/20 bg-cyan-500/10 transition-colors group-hover:bg-cyan-500/20">
+                    <ShieldCheck className="h-6 w-6 text-cyan-500" />
+                  </motion.div>
+                  <h3 className="mb-2 text-lg font-bold tracking-tight md:text-xl">Compliance Guardrails</h3>
+                  <p className="text-foreground/80 mb-6 text-sm flex-1 font-medium leading-[1.6]">
+                    HIPAA & SOC2 ready infrastructure. Implement strict role-based access controls, comprehensive activity logging, and automatic data retention policies for complete peace of mind.
+                  </p>
+                  <div className="flex flex-col gap-3">
+                    {[
+                      { text: "Role-based matrix", icon: Users },
+                      { text: "Detailed audit trail", icon: Search },
+                      { text: "Auto data retention", icon: CheckCheck },
+                    ].map((item, i) => (
+                      <motion.div
+                        key={item.text}
+                        initial={{ opacity: 0, x: -10 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        transition={{ delay: i * 0.15, duration: 0.4 }}
+                        viewport={{ once: true }}
+                        className="flex items-center gap-3 rounded-xl border border-border/40 bg-background/50 px-3 py-2.5 transition-colors group-hover:border-cyan-500/30"
+                      >
+                        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-cyan-500/10 text-cyan-500">
+                           <item.icon className="h-4 w-4" />
+                        </div>
+                        <span className="text-sm font-bold">{item.text}</span>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+                <div className="absolute right-0 bottom-0 -z-10 h-3/4 w-3/4 bg-gradient-to-tl from-cyan-500/15 to-transparent opacity-50 blur-3xl transition-all duration-700 group-hover:scale-110 group-hover:opacity-100" />
+              </SpotlightCard>
+
+              <SpotlightCard className="group bg-background/70 dark:bg-background/40 flex flex-col justify-between overflow-hidden p-5 md:col-span-2 md:row-span-2 xl:p-8">
+                <div className="relative z-10 flex h-full flex-col">
+                  <motion.div whileHover={{ scale: 1.05, rotate: 5 }} className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl border border-amber-500/20 bg-amber-500/10 transition-colors group-hover:bg-amber-500/20">
                     <Zap className="h-6 w-6 text-amber-500" />
-                  </div>
-                  <h3 className="mb-3 text-2xl font-bold tracking-tight">Automation Engine</h3>
-                  <p className="text-muted-foreground text-base leading-relaxed font-medium">
-                    Event-driven workflows for reminders, follow-ups, and notifications running
-                    silently in the background.
+                  </motion.div>
+                  <h3 className="mb-2 text-lg font-bold tracking-tight md:text-xl">Automation Engine</h3>
+                  <p className="text-foreground/80 mb-6 text-sm flex-1 font-medium leading-[1.6]">
+                    Visually map out complex sequences using our drag-and-drop workflow builder. Build timed and event-based flows for reminders, escalations, and automated follow-ups.
                   </p>
-                </div>
-
-                {/* Decorative abstract diagram or rings for wide card */}
-                <div className="pointer-events-none relative z-10 mt-6 flex w-full flex-1 justify-end md:mt-0 md:w-auto">
-                  <div className="relative h-32 w-32 opacity-80 transition-opacity duration-700 group-hover:opacity-100 md:h-40 md:w-40">
-                    <div className="absolute inset-0 animate-[spin_10s_linear_infinite] rounded-full border border-amber-500/30" />
-                    <div className="absolute inset-4 animate-[spin_15s_linear_infinite_reverse] rounded-full border border-dashed border-amber-500/30" />
-                    <div className="absolute inset-8 animate-[spin_8s_linear_infinite] rounded-full border border-amber-500/20" />
-                    <div className="absolute inset-0 m-auto h-10 w-10 rounded-full bg-amber-500/10 blur-md" />
+                  <div className="relative mt-auto">
+                    <div className="flex flex-col gap-2">
+                       <motion.div 
+                         className="h-2 w-full rounded-full bg-amber-500/10 overflow-hidden"
+                         initial={{ opacity: 0 }}
+                         whileInView={{ opacity: 1 }}
+                         viewport={{ once: true }}
+                       >
+                         <motion.div className="h-full bg-amber-500" animate={{ x: ["-100%", "100%"] }} transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }} />
+                       </motion.div>
+                       <motion.div 
+                         className="h-2 w-4/5 rounded-full bg-amber-500/10 overflow-hidden"
+                         initial={{ opacity: 0 }}
+                         whileInView={{ opacity: 1 }}
+                         viewport={{ once: true }}
+                       >
+                         <motion.div className="h-full bg-amber-400" animate={{ x: ["-100%", "100%"] }} transition={{ repeat: Infinity, duration: 2.5, ease: "easeInOut", delay: 0.2 }} />
+                       </motion.div>
+                       <motion.div 
+                         className="h-2 w-3/5 rounded-full bg-amber-500/10 overflow-hidden"
+                         initial={{ opacity: 0 }}
+                         whileInView={{ opacity: 1 }}
+                         viewport={{ once: true }}
+                       >
+                         <motion.div className="h-full bg-amber-300" animate={{ x: ["-100%", "100%"] }} transition={{ repeat: Infinity, duration: 3, ease: "easeInOut", delay: 0.4 }} />
+                       </motion.div>
+                    </div>
                   </div>
                 </div>
-
-                <div className="absolute top-1/2 left-1/2 -z-10 h-full w-full -translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-transparent via-amber-500/5 to-transparent opacity-50 blur-3xl transition-opacity duration-1000 group-hover:opacity-100" />
+                
+                <div className="absolute right-0 bottom-0 -z-10 h-3/4 w-3/4 bg-gradient-to-tl from-amber-500/15 to-transparent opacity-50 blur-3xl transition-all duration-700 group-hover:scale-110 group-hover:opacity-100" />
               </SpotlightCard>
             </div>
           </div>
@@ -855,7 +973,7 @@ export default function LandingPage() {
         {/* ─── INTEGRATIONS ─── */}
         <section
           id="integrations"
-          className="border-border/40 bg-secondary/30 relative overflow-hidden border-y py-24"
+          className="border-border/40 bg-secondary/30 relative overflow-hidden border-y py-14 sm:py-20 md:py-24"
         >
           <div className="from-background absolute inset-y-0 left-0 z-10 w-1/3 bg-gradient-to-r to-transparent" />
           <div className="from-background absolute inset-y-0 right-0 z-10 w-1/3 bg-gradient-to-l to-transparent" />
@@ -866,7 +984,7 @@ export default function LandingPage() {
             </h3>
           </div>
 
-          <div className="animate-marquee flex w-[200%] md:w-[150%]">
+          <div className="animate-marquee flex w-[260%] sm:w-[210%] md:w-[150%]">
             {/* Double the logos to create the infinite loop effect smoothly */}
             {[1, 2].map((set) => (
               <div key={set} className="flex flex-1 items-center justify-around px-4">
@@ -881,7 +999,7 @@ export default function LandingPage() {
                 ].map((logo, i) => (
                   <div
                     key={i}
-                    className="text-foreground/60 hover:text-foreground/80 cursor-default px-8 text-xl font-black whitespace-nowrap transition-colors md:text-2xl"
+                    className="text-foreground/60 hover:text-foreground/80 cursor-default px-4 text-base font-black whitespace-nowrap transition-colors sm:px-6 sm:text-lg md:px-8 md:text-2xl"
                   >
                     {logo}
                   </div>
@@ -892,9 +1010,9 @@ export default function LandingPage() {
         </section>
 
         {/* ─── SOCIAL PROOF - Minimal Numbers ─── */}
-        <section className="bg-foreground text-background py-32">
+        <section className="bg-foreground text-background py-14 sm:py-20 md:py-28">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-2 gap-16 text-center md:grid-cols-4">
+            <div className="grid grid-cols-2 gap-8 text-center sm:gap-12 md:grid-cols-4 md:gap-16">
               {[
                 { value: "6", suffix: "+", label: "Tools replaced" },
                 { value: "80", suffix: "%", label: "Time saved" },
@@ -908,7 +1026,7 @@ export default function LandingPage() {
                   viewport={{ once: true }}
                   transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
                 >
-                  <div className="from-background to-background/50 mb-4 bg-gradient-to-br bg-clip-text text-5xl font-black tracking-tighter text-transparent md:text-6xl">
+                  <div className="from-background to-background/50 mb-3 bg-gradient-to-br bg-clip-text text-3xl font-black tracking-tighter text-transparent sm:text-4xl md:mb-4 md:text-5xl">
                     <AnimatedCounter value={stat.value} suffix={stat.suffix} />
                   </div>
                   <div className="text-background/60 text-sm font-bold tracking-widest uppercase md:text-base">
@@ -921,19 +1039,19 @@ export default function LandingPage() {
         </section>
 
         {/* ─── PRICING ─── */}
-        <section id="pricing" className="bg-background relative overflow-hidden py-40 lg:py-64">
+        <section id="pricing" className="bg-background relative overflow-hidden py-14 sm:py-20 lg:py-32">
           <div className="absolute inset-0 z-0">
             <div className="from-primary/10 absolute top-1/2 left-1/2 h-[800px] w-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-r via-purple-500/10 to-transparent blur-[150px]" />
           </div>
 
           <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="mb-20 text-center">
+            <div className="mb-10 text-center sm:mb-16 md:mb-20">
               <motion.h2
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.8 }}
-                className="mb-6 text-5xl font-black tracking-tight md:text-7xl"
+                className="mb-4 text-4xl font-black tracking-tight sm:text-5xl md:mb-6 md:text-6xl"
               >
                 Simple, <span className="text-primary italic">transparent</span> pricing.
               </motion.h2>
@@ -942,13 +1060,13 @@ export default function LandingPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.8, delay: 0.1 }}
-                className="text-muted-foreground mx-auto max-w-2xl text-xl font-medium"
+                className="text-muted-foreground mx-auto max-w-2xl text-base font-medium sm:text-lg md:text-xl"
               >
                 No hidden fees. No complicated tiers. Pick a plan that scales with your growth.
               </motion.p>
             </div>
 
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-4">
               {[
                 {
                   id: "free",
@@ -1009,9 +1127,9 @@ export default function LandingPage() {
               ].map((plan) => (
                 <SpotlightCard
                   key={plan.name}
-                  className={`flex flex-col justify-between overflow-hidden p-8 shadow-none ${
+                  className={`flex flex-col justify-between overflow-hidden p-6 sm:p-8 shadow-none ${
                     plan.highlight
-                      ? "border-primary/40 bg-primary/5 shadow-primary/10 scale-105 shadow-2xl"
+                      ? "border-primary/40 bg-primary/5 shadow-primary/10 shadow-2xl lg:scale-105"
                       : "border-border/40 bg-background/20"
                   }`}
                 >
@@ -1026,7 +1144,7 @@ export default function LandingPage() {
                       {plan.description}
                     </p>
                     <div className="mb-8">
-                      <span className="text-4xl font-black">{plan.price}</span>
+                      <span className="text-3xl font-black sm:text-4xl">{plan.price}</span>
                       {plan.price !== "Free" && (
                         <span className="text-muted-foreground ml-2 text-sm">/{plan.period}</span>
                       )}
@@ -1070,7 +1188,7 @@ export default function LandingPage() {
         </section>
 
         {/* ─── Final CTA ─── */}
-        <section className="from-background to-primary/5 relative overflow-hidden bg-gradient-to-b py-40 lg:py-64">
+        <section className="from-background to-primary/5 relative overflow-hidden bg-gradient-to-b py-14 sm:py-20 lg:py-32">
           <div className="absolute inset-0 z-0">
             <div className="from-primary/10 animate-pulse-slow absolute top-1/2 left-1/2 h-[800px] w-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-r via-purple-500/10 to-transparent blur-[150px]" />
           </div>
@@ -1081,7 +1199,7 @@ export default function LandingPage() {
               whileInView={{ opacity: 1, y: 0, scale: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-              className="text-foreground mb-12 text-6xl leading-[0.9] font-black tracking-[-0.05em] md:text-8xl"
+              className="text-foreground mb-8 text-4xl leading-[0.95] font-black tracking-[-0.04em] sm:text-5xl md:mb-12 md:text-6xl"
             >
               The platform you
               <br />
@@ -1099,7 +1217,7 @@ export default function LandingPage() {
                 <Link href="/register">
                   <Button
                     size="lg"
-                    className="bg-foreground text-background shadow-foreground/20 group relative h-20 overflow-hidden rounded-full px-14 text-xl font-black shadow-2xl transition-all duration-500 ease-out hover:scale-[1.05] active:scale-[0.95]"
+                    className="bg-foreground text-background shadow-foreground/20 group relative min-h-[44px] h-14 overflow-hidden rounded-full px-8 text-base font-black shadow-2xl transition-all duration-500 ease-out hover:scale-[1.05] active:scale-[0.95] sm:h-16 sm:px-10 sm:text-lg"
                   >
                     <span className="relative z-10 flex items-center gap-3">
                       Start Building Now
@@ -1120,7 +1238,7 @@ export default function LandingPage() {
             <div className="flex items-center gap-3 opacity-100 transition-opacity">
               <Logo variant="full" size={24} />
             </div>
-            <div className="flex items-center gap-8">
+            <div className="flex flex-wrap items-center justify-center gap-5 sm:gap-8">
               <Link
                 href="/privacy"
                 className="text-muted-foreground hover:text-foreground text-sm font-semibold transition-colors"
