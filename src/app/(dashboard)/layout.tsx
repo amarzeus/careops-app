@@ -5,6 +5,7 @@ import { Sidebar } from "@/components/layout/sidebar";
 import { Footer } from "@/components/layout/footer";
 import { DashboardErrorBoundary } from "@/components/common";
 import { DashboardCopilot } from "@/components/dashboard/copilot";
+import { TrialBanner } from "@/components/dashboard/trial-banner";
 
 /**
  * Dashboard Layout
@@ -34,6 +35,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
       <Sidebar userName={user.name} userRole={user.role} workspaceName={user.workspace?.name} />
 
       <div className="flex min-h-screen flex-1 flex-col pl-16 lg:pl-64">
+        {user.workspaceId && <TrialBanner workspaceId={user.workspaceId} />}
         <main className="flex-1 overflow-y-auto">
           <DashboardErrorBoundary>{children}</DashboardErrorBoundary>
         </main>

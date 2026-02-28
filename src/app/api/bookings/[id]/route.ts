@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { updateBookingCalendarEvent, cancelBookingCalendarEvent } from "@/lib/google-calendar";
 import { triggerAutomation } from "@/lib/automation";
 import { logInventoryChange } from "@/lib/inventory-log";
+import { sendFeedbackRequest } from "@/lib/feedback";
 
 /**
  *
@@ -89,6 +90,9 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
   if (data.status === "COMPLETED") {
     decrementInventoryForBooking(id, user.workspaceId).catch((err) =>
       console.error("[Inventory] Decrement error:", err)
+    );
+    sendFeedbackRequest(id, user.workspaceId).catch((err) =>
+      console.error("[Feedback] Send error:", err)
     );
   }
 

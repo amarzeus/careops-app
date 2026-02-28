@@ -88,6 +88,7 @@ model Workspace {
   subscription               Subscription?
   usageRecords               UsageRecord[]
   platformPhoneNumbers       PlatformPhoneNumber[]
+  feedbacks                  Feedback[]
 }
 
 model Webhook {
@@ -137,6 +138,7 @@ model Contact {
   conversation    Conversation?
   formSubmissions FormSubmission[]
   voiceCalls      VoiceCall[]
+  feedbacks       Feedback[]
 
   @@unique([email, workspaceId])
   @@index([workspaceId, createdAt])
@@ -181,6 +183,7 @@ model Booking {
   staff                 User?            @relation("AssignedStaff", fields: [staffId], references: [id])
   workspace             Workspace        @relation(fields: [workspaceId], references: [id])
   formSubmissions       FormSubmission[]
+  feedback              Feedback?
 
   @@index([workspaceId, date])
   @@index([workspaceId, status])
@@ -526,6 +529,7 @@ model Subscription {
   currentPeriodStart     DateTime?
   currentPeriodEnd       DateTime?
   cancelAtPeriodEnd      Boolean   @default(false)
+  trialEndsAt            DateTime?
   lastPaymentAt          DateTime?
   cancelledAt            DateTime?
   createdAt              DateTime  @default(now())
@@ -595,4 +599,21 @@ model StaffSchedule {
   user        User    @relation(fields: [userId], references: [id])
 
   @@unique([userId, dayOfWeek])
+}
+
+model Feedback {
+  id          String    @id @default(cuid())
+  bookingId   String    @unique
+  contactId   String
+  workspaceId String
+  rating      Int
+  npsScore    Int?
+  comment     String?
+  token       String    @unique @default(cuid())
+  createdAt   DateTime  @default(now())
+  booking     Booking   @relation(fields: [bookingId], references: [id])
+  contact     Contact   @relation(fields: [contactId], references: [id])
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+
+  @@index([workspaceId, createdAt])
 }

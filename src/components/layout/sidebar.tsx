@@ -17,6 +17,7 @@ import {
   X,
   PhoneCall,
   Folder,
+  BarChart3,
   ChevronRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -34,6 +35,7 @@ const navItems = [
   { href: "/inventory", label: "Inventory", icon: Package, badgeKey: "lowStock" as const },
   { href: "/voice/calls", label: "Voice", icon: PhoneCall, badgeKey: null },
   { href: "/staff", label: "Staff", icon: Users, badgeKey: null },
+  { href: "/analytics", label: "Analytics", icon: BarChart3, badgeKey: null },
   { href: "/automation", label: "Automation", icon: Zap, badgeKey: null },
   { href: "/settings", label: "Settings", icon: Settings, badgeKey: null },
 ];

@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { useSSE } from "@/hooks/use-sse";
 import { ConversationDTO, MessageDTO } from "@/types/dto";
 import { ConversationList } from "@/components/inbox/conversation-list";
 import { MessageThread } from "@/components/inbox/message-thread";
@@ -44,59 +45,69 @@ export default function InboxPage() {
   const totalUnread = conversations.reduce((sum, c) => sum + c.unreadCount, 0);
 
   // 1. Fetch Conversations
-  useEffect(() => {
-    const fetchConversations = async () => {
-      try {
-        const res = await fetch("/api/inbox/conversations");
-        if (res.ok) {
-          const data = await res.json();
-          setConversations(data);
-          if (data.length > 0 && !activeId) {
-            setActiveId(data[0].id);
-          }
+  const fetchConversations = async () => {
+    try {
+      const res = await fetch("/api/inbox/conversations");
+      if (res.ok) {
+        const data = await res.json();
+        setConversations(data);
+        if (data.length > 0 && !activeId) {
+          setActiveId(data[0].id);
         }
-      } catch (error) {
-        console.error("Failed to load inbox", error);
-      } finally {
-        setLoading(false);
       }
-    };
+    } catch (error) {
+      console.error("Failed to load inbox", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchConversations();
-    const interval = setInterval(fetchConversations, 30000);
-    return () => clearInterval(interval);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // 2. Fetch Messages when Active ID changes
-  useEffect(() => {
+  // 2. Fetch Messages
+  const fetchMessages = async () => {
     if (!activeId) return;
+    setLoadingMessages(true);
+    try {
+      const res = await fetch(`/api/inbox/messages?conversationId=${activeId}`);
+      if (res.ok) {
+        const data = await res.json();
+        setMessages(data.messages);
+        // Mark read locally
+        setConversations((prev) =>
+          prev.map((c) => (c.id === activeId ? { ...c, unreadCount: 0 } : c))
+        );
 
-    const fetchMessages = async () => {
-      setLoadingMessages(true);
-      try {
-        const res = await fetch(`/api/inbox/messages?conversationId=${activeId}`);
-        if (res.ok) {
-          const data = await res.json();
-          setMessages(data.messages);
-          // Mark read locally
-          setConversations((prev) =>
-            prev.map((c) => (c.id === activeId ? { ...c, unreadCount: 0 } : c))
-          );
-
-          // Fetch Smart Replies
-          fetchSmartReplies(activeId);
-          // Fetch Sentiments
-          fetchSentiments(data.messages);
-        }
-      } catch (error) {
-        console.error("Failed to load messages", error);
-      } finally {
-        setLoadingMessages(false);
+        // Fetch Smart Replies
+        fetchSmartReplies(activeId);
+        // Fetch Sentiments
+        fetchSentiments(data.messages);
       }
-    };
+    } catch (error) {
+      console.error("Failed to load messages", error);
+    } finally {
+      setLoadingMessages(false);
+    }
+  };
+
+  useEffect(() => {
     fetchMessages();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeId]);
+
+  useSSE({
+    onEvent: (event) => {
+      if (event.type === "message.received") {
+        fetchConversations();
+        if (activeId) {
+          fetchMessages();
+        }
+      }
+    },
+  });
 
   const fetchSentiments = async (msgs: MessageDTO[]) => {
     const inboundMsgs = msgs.filter((m) => m.direction === "INBOUND");

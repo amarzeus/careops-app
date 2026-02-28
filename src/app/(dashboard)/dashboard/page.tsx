@@ -30,7 +30,9 @@ import { toast } from "@/hooks/use-toast";
 import Link from "next/link";
 import { HoverExpandCard } from "@/components/dashboard/hover-expand-card";
 import { WeeklyReportCard } from "@/components/dashboard/weekly-report";
+import { NPSCard } from "@/components/dashboard/nps-card";
 import { cn } from "@/lib/utils";
+import { useSSE } from "@/hooks/use-sse";
 
 /** Dashboard data shape from /api/dashboard/metrics */
 interface DashboardData {
@@ -51,6 +53,12 @@ interface DashboardData {
     lowStockItems: number;
     criticalItems: number;
     totalInventoryItems: number;
+    npsScore?: number;
+    totalFeedbacks?: number;
+    promoters?: number;
+    passives?: number;
+    detractors?: number;
+    averageRating?: number;
   };
   todaysBookings: Array<{
     id: string;
@@ -124,22 +132,41 @@ export default function DashboardPage() {
     }
   };
 
+  // Use real-time SSE instead of polling
+  useSSE({
+    onEvent: (event) => {
+      switch (event.type) {
+        case "booking.created":
+          toast({ title: "New Booking", description: "A new booking was just created." });
+          fetchMetrics(false);
+          break;
+        case "message.received":
+          toast({ title: "New Message", description: "You received a new message." });
+          fetchMetrics(false);
+          break;
+        case "inventory.low":
+          toast({
+            title: "Low Inventory",
+            description: "An item is running low.",
+            variant: "destructive",
+          });
+          fetchMetrics(false);
+          break;
+        default:
+          fetchMetrics(false);
+          break;
+      }
+    },
+  });
+
   useEffect(() => {
     // Initial fetch
     fetchMetrics();
 
-    // Set up polling interval (30 seconds for more real-time feel)
-    const interval = setInterval(() => {
-      if (isVisible && !document.hidden) {
-        fetchMetrics();
-      }
-    }, 30000);
-
-    // Handle visibility change (pause polling when tab not active)
+    // Handle visibility change (refresh when tab becomes active)
     const handleVisibilityChange = () => {
       setIsVisible(!document.hidden);
       if (!document.hidden) {
-        // Refresh immediately when coming back to tab
         fetchMetrics();
       }
     };
@@ -155,7 +182,6 @@ export default function DashboardPage() {
     window.addEventListener("online", handleOnline);
 
     return () => {
-      clearInterval(interval);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       window.removeEventListener("online", handleOnline);
     };
@@ -291,6 +317,19 @@ export default function DashboardPage() {
             icon={CheckCircle}
             color="gray"
             href="/bookings"
+          />
+        </section>
+
+        {/* ══════ NPS Card ══════ */}
+        <section>
+          <NPSCard
+            npsScore={data?.metrics?.npsScore ?? null}
+            totalFeedbacks={data?.metrics?.totalFeedbacks ?? 0}
+            promoters={data?.metrics?.promoters ?? 0}
+            passives={data?.metrics?.passives ?? 0}
+            detractors={data?.metrics?.detractors ?? 0}
+            averageRating={data?.metrics?.averageRating ?? null}
+            loading={loading}
           />
         </section>
 
