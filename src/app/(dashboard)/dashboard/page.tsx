@@ -29,6 +29,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "@/hooks/use-toast";
 import Link from "next/link";
 import { HoverExpandCard } from "@/components/dashboard/hover-expand-card";
+import { WeeklyReportCard } from "@/components/dashboard/weekly-report";
 import { cn } from "@/lib/utils";
 
 /** Dashboard data shape from /api/dashboard/metrics */
@@ -248,6 +249,7 @@ export default function DashboardPage() {
               <Zap className="h-3.5 w-3.5" /> Automations
             </Button>
           </Link>
+          <WeeklyReportCard />
         </section>
 
         {/* ══════ 1. Operational Metrics (Top Row) ══════ */}

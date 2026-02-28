@@ -38,6 +38,7 @@ import {
 } from "@/components/ui/select";
 import { AIChatCard } from "@/components/onboarding/ai-chat-card";
 import { cn } from "@/lib/utils";
+import { toast } from "@/hooks/use-toast";
 
 interface IncomingService {
   name?: string;
@@ -137,6 +138,10 @@ export default function OnboardingPage() {
     contactEmail: "",
     contactPhone: "",
   });
+  const [templates, setTemplates] = useState<any[]>([]);
+  const [selectedTemplate, setSelectedTemplate] = useState<string>("");
+  const [applyingTemplate, setApplyingTemplate] = useState(false);
+
   const [emailConfig, setEmailConfig] = useState({
     emailProvider: "smtp",
     emailFromName: "",
@@ -203,6 +208,13 @@ export default function OnboardingPage() {
 
   useEffect(() => {
     void fetchCurrentStepRef.current(true);
+    // Fetch available templates
+    fetch("/api/ai/vertical-templates")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.templates) setTemplates(data.templates);
+      })
+      .catch(console.error);
   }, []);
 
   // Scroll chat on new messages
@@ -1145,6 +1157,30 @@ export default function OnboardingPage() {
     }
   };
 
+  const handleApplyTemplate = async () => {
+    if (!selectedTemplate) return;
+    setApplyingTemplate(true);
+    try {
+      const res = await fetch("/api/ai/vertical-templates", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ templateKey: selectedTemplate }),
+      });
+      if (!res.ok) throw new Error("Failed to apply template");
+
+      toast({
+        title: "Template Applied",
+        description: "Services, inventory, and automations have been pre-filled!",
+      });
+      // Fetch fresh data
+      await fetchCurrentStepRef.current(false);
+    } catch (_err) {
+      toast({ title: "Error", description: "Could not apply template", variant: "destructive" });
+    } finally {
+      setApplyingTemplate(false);
+    }
+  };
+
   const renderStepContent = () => {
     switch (currentStep) {
       case 1:
@@ -1173,6 +1209,36 @@ export default function OnboardingPage() {
                   className="h-8 text-sm"
                 />
               </div>
+              <div className="space-y-1">
+                <Label className="text-muted-foreground text-[10px] font-bold uppercase">
+                  Industry Template (Optional)
+                </Label>
+                <div className="flex gap-2">
+                  <Select value={selectedTemplate} onValueChange={setSelectedTemplate}>
+                    <SelectTrigger className="h-8 flex-1 text-sm">
+                      <SelectValue placeholder="Select industry..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {templates.map((t) => (
+                        <SelectItem key={t.key} value={t.key}>
+                          <span className="mr-2">{t.emoji}</span> {t.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-8 text-xs"
+                    onClick={handleApplyTemplate}
+                    disabled={!selectedTemplate || applyingTemplate}
+                  >
+                    {applyingTemplate ? "Applying..." : "Apply"}
+                  </Button>
+                </div>
+              </div>
+            </div>
+            <div className="grid gap-2 sm:grid-cols-2">
               <div className="space-y-1">
                 <Label className="text-muted-foreground text-[10px] font-bold uppercase">
                   Timezone

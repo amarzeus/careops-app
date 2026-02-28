@@ -1501,3 +1501,127 @@ RULES:
     };
   }
 }
+
+// ──────────────────────────────────────────────
+// AI Weekly Business Report
+// ──────────────────────────────────────────────
+
+export interface WeeklyReportData {
+  businessName: string;
+  periodStart: string;
+  periodEnd: string;
+  bookingsTotal: number;
+  bookingsCompleted: number;
+  bookingsCancelled: number;
+  newContacts: number;
+  messagesReceived: number;
+  avgSentimentScore: number | null;
+  lowStockCount: number;
+  topServices: Array<{ name: string; count: number }>;
+  staffCount: number;
+}
+
+export interface WeeklyReport {
+  summary: string;
+  highlights: string[];
+  concerns: string[];
+  recommendations: string[];
+  performanceScore: number; // 0-100
+}
+
+/**
+ * Generates an AI-powered weekly business report.
+ * @param data - Aggregated 7-day workspace metrics
+ * @param model - Optional model ID
+ * @returns Structured WeeklyReport with narrative and actionable items
+ */
+export async function generateWeeklyReport(
+  data: WeeklyReportData,
+  model?: string
+): Promise<WeeklyReport> {
+  const schema = {
+    type: Type.OBJECT,
+    properties: {
+      summary: {
+        type: Type.STRING,
+        description: "A concise 2-3 sentence narrative summary of the week",
+      },
+      highlights: {
+        type: Type.ARRAY,
+        items: { type: Type.STRING },
+        description: "3-5 positive achievements or notable metrics",
+      },
+      concerns: {
+        type: Type.ARRAY,
+        items: { type: Type.STRING },
+        description: "1-3 areas needing attention (empty array if none)",
+      },
+      recommendations: {
+        type: Type.ARRAY,
+        items: { type: Type.STRING },
+        description: "2-4 actionable next steps for the coming week",
+      },
+      performanceScore: {
+        type: Type.NUMBER,
+        description: "Overall week performance score 0-100",
+      },
+    },
+    required: ["summary", "highlights", "concerns", "recommendations", "performanceScore"],
+  };
+
+  const prompt = `Generate a weekly business performance report for "${data.businessName}" covering ${data.periodStart} to ${data.periodEnd}.
+
+METRICS:
+- Bookings: ${data.bookingsTotal} total (${data.bookingsCompleted} completed, ${data.bookingsCancelled} cancelled)
+- Completion Rate: ${data.bookingsTotal > 0 ? Math.round((data.bookingsCompleted / data.bookingsTotal) * 100) : 0}%
+- New Contacts: ${data.newContacts}
+- Messages Received: ${data.messagesReceived}
+- Average Sentiment: ${data.avgSentimentScore !== null ? `${data.avgSentimentScore}/100` : "N/A"}
+- Low Stock Items: ${data.lowStockCount}
+- Top Services: ${data.topServices.length > 0 ? data.topServices.map((s) => `${s.name} (${s.count})`).join(", ") : "N/A"}
+- Staff: ${data.staffCount} members
+
+Be specific, reference actual numbers, and give actionable recommendations.`;
+
+  try {
+    return await withRetry(
+      () =>
+        callGemini<WeeklyReport>(
+          prompt,
+          schema,
+          "You are a business intelligence analyst for a service-based business. Generate insightful, data-driven weekly reports.",
+          model
+        ),
+      2,
+      1500
+    );
+  } catch {
+    // Fallback: generate a basic report from the raw data
+    const completionRate =
+      data.bookingsTotal > 0 ? Math.round((data.bookingsCompleted / data.bookingsTotal) * 100) : 0;
+
+    return {
+      summary: `This week ${data.businessName} had ${data.bookingsTotal} bookings with a ${completionRate}% completion rate. ${data.newContacts} new contacts were added.`,
+      highlights: [
+        `${data.bookingsCompleted} bookings completed successfully`,
+        `${data.newContacts} new contacts acquired`,
+        data.topServices.length > 0
+          ? `Top service: ${data.topServices[0].name} (${data.topServices[0].count} bookings)`
+          : "Services are operational",
+      ],
+      concerns: [
+        ...(data.bookingsCancelled > 0
+          ? [`${data.bookingsCancelled} booking cancellations this week`]
+          : []),
+        ...(data.lowStockCount > 0
+          ? [`${data.lowStockCount} inventory items below threshold`]
+          : []),
+      ],
+      recommendations: [
+        "Review booking patterns for optimization opportunities",
+        "Follow up with new contacts within 24 hours",
+      ],
+      performanceScore: Math.min(100, Math.max(0, completionRate)),
+    };
+  }
+}

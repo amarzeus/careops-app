@@ -8,27 +8,29 @@ datasource db {
 }
 
 model User {
-  id                 String     @id @default(cuid())
-  email              String     @unique
+  id                 String          @id @default(cuid())
+  email              String          @unique
   name               String
   passwordHash       String
-  role               String     @default("STAFF")
+  role               String          @default("STAFF")
   workspaceId        String?
   otpCode            String?
   otpExpires         DateTime?
   otpChannel         String?
   emailVerified      DateTime?
-  googleId           String?    @unique
+  googleId           String?         @unique
   phone              String?
   phoneVerified      DateTime?
-  canAccessInbox     Boolean    @default(true)
-  canAccessBookings  Boolean    @default(true)
-  canAccessForms     Boolean    @default(true)
-  canAccessInventory Boolean    @default(true)
-  createdAt          DateTime   @default(now())
-  updatedAt          DateTime   @updatedAt
+  canAccessInbox     Boolean         @default(true)
+  canAccessBookings  Boolean         @default(true)
+  canAccessForms     Boolean         @default(true)
+  canAccessInventory Boolean         @default(true)
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
   messages           Message[]
-  workspace          Workspace? @relation(fields: [workspaceId], references: [id])
+  schedule           StaffSchedule[]
+  assignedBookings   Booking[]       @relation("AssignedStaff")
+  workspace          Workspace?      @relation(fields: [workspaceId], references: [id])
 }
 
 model Workspace {
@@ -160,6 +162,7 @@ model Booking {
   notes                 String?
   serviceId             String
   contactId             String
+  staffId               String?
   workspaceId           String
   googleCalendarEventId String?
   createdAt             DateTime         @default(now())
@@ -167,6 +170,7 @@ model Booking {
   workspace             Workspace        @relation(fields: [workspaceId], references: [id])
   contact               Contact          @relation(fields: [contactId], references: [id])
   service               Service          @relation(fields: [serviceId], references: [id])
+  staff                 User?            @relation("AssignedStaff", fields: [staffId], references: [id])
   formSubmissions       FormSubmission[]
 }
 
@@ -431,4 +435,16 @@ model AIPreferences {
   createdAt                DateTime  @default(now())
   updatedAt                DateTime  @updatedAt
   workspace                Workspace @relation(fields: [workspaceId], references: [id])
+}
+
+model StaffSchedule {
+  id          String  @id @default(cuid())
+  userId      String
+  dayOfWeek   Int
+  startTime   String  @default("09:00")
+  endTime     String  @default("17:00")
+  isAvailable Boolean @default(true)
+  user        User    @relation(fields: [userId], references: [id])
+
+  @@unique([userId, dayOfWeek])
 }
