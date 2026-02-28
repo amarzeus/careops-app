@@ -21,6 +21,7 @@ model User {
   googleId           String?         @unique
   phone              String?
   phoneVerified      DateTime?
+  locationId         String?
   canAccessInbox     Boolean         @default(true)
   canAccessBookings  Boolean         @default(true)
   canAccessForms     Boolean         @default(true)
@@ -31,6 +32,9 @@ model User {
   schedule           StaffSchedule[]
   assignedBookings   Booking[]       @relation("AssignedStaff")
   workspace          Workspace?      @relation(fields: [workspaceId], references: [id])
+  location           Location?       @relation(fields: [locationId], references: [id])
+  timeOffs           TimeOff[]
+  commissionRate     Float           @default(0.0) // Percentage or flat rate
 }
 
 model Workspace {
@@ -89,6 +93,8 @@ model Workspace {
   usageRecords               UsageRecord[]
   platformPhoneNumbers       PlatformPhoneNumber[]
   feedbacks                  Feedback[]
+  locations                  Location[]
+  timeOffs                   TimeOff[]
 }
 
 model Webhook {
@@ -101,6 +107,23 @@ model Webhook {
   createdAt   DateTime             @default(now())
   workspace   Workspace            @relation(fields: [workspaceId], references: [id])
   deliveries  WebhookDeliveryLog[]
+}
+
+model Location {
+  id          String    @id @default(cuid())
+  name        String
+  address     String?
+  timezone    String    @default("UTC")
+  workspaceId String
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  bookings    Booking[]
+  staff       User[]
+  services    Service[]
+
+  @@index([workspaceId])
 }
 
 model WebhookDeliveryLog {
@@ -151,9 +174,10 @@ model Service {
   description    String?
   duration       Int
   price          Float                  @default(0.0)
-  location       String?
+  locationName   String?
   isActive       Boolean                @default(true)
   workspaceId    String
+  locationId     String?
   availableDays  String                 @default("1,2,3,4,5")
   startTime      String                 @default("09:00")
   endTime        String                 @default("17:00")
@@ -162,6 +186,7 @@ model Service {
   bookings       Booking[]
   linkedForms    IntakeForm[]
   workspace      Workspace              @relation(fields: [workspaceId], references: [id])
+  location       Location?              @relation(fields: [locationId], references: [id])
   inventoryLinks ServiceInventoryLink[]
 }
 
@@ -175,6 +200,7 @@ model Booking {
   contactId             String
   staffId               String?
   workspaceId           String
+  locationId            String?
   googleCalendarEventId String?
   createdAt             DateTime         @default(now())
   updatedAt             DateTime         @updatedAt
@@ -182,8 +208,11 @@ model Booking {
   service               Service          @relation(fields: [serviceId], references: [id])
   staff                 User?            @relation("AssignedStaff", fields: [staffId], references: [id])
   workspace             Workspace        @relation(fields: [workspaceId], references: [id])
+  location              Location?        @relation(fields: [locationId], references: [id])
   formSubmissions       FormSubmission[]
   feedback              Feedback?
+  recurringPattern      String?
+  recurringGroupId      String?
 
   @@index([workspaceId, date])
   @@index([workspaceId, status])
@@ -616,4 +645,21 @@ model Feedback {
   workspace   Workspace @relation(fields: [workspaceId], references: [id])
 
   @@index([workspaceId, createdAt])
+}
+
+model TimeOff {
+  id          String    @id @default(cuid())
+  staffId     String
+  workspaceId String
+  startDate   DateTime
+  endDate     DateTime
+  reason      String?
+  status      String    @default("APPROVED") // PENDING, APPROVED, REJECTED
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  staff       User      @relation(fields: [staffId], references: [id], onDelete: Cascade)
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([staffId])
+  @@index([workspaceId])
 }

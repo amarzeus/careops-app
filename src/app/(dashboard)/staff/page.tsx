@@ -3,9 +3,10 @@
 
 import { useEffect, useState } from "react";
 import { Plus, Users, CalendarClock } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Header } from "@/components/layout/header";
 import { toast } from "@/hooks/use-toast";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import { StaffList } from "@/components/staff/staff-list";
 import { InviteStaffDialog } from "@/components/staff/invite-staff-dialog";
 import { StaffScheduleEditor } from "@/components/staff/schedule-editor";
@@ -92,14 +93,21 @@ export default function StaffPage() {
   return (
     <div className="flex min-h-full flex-col">
       <Header title="Team & Permissions" subtitle="Manage staff access and schedules">
-        <Button
-          size="sm"
-          className="bg-primary hover:bg-primary/90 h-9 gap-2 text-white"
-          onClick={() => setDialogOpen(true)}
-        >
-          <Plus className="h-4 w-4" />
-          <span className="hidden sm:inline">Add Staff</span>
-        </Button>
+        <div className="flex items-center gap-2">
+          <Link href="/staff/performance">
+            <Button variant="outline" size="sm" className="h-9">
+              Performance Insights
+            </Button>
+          </Link>
+          <Button
+            size="sm"
+            className="bg-primary hover:bg-primary/90 h-9 gap-2 text-white"
+            onClick={() => setDialogOpen(true)}
+          >
+            <Plus className="h-4 w-4" />
+            <span className="hidden sm:inline">Add Staff</span>
+          </Button>
+        </div>
       </Header>
 
       <div className="mx-auto w-full max-w-7xl flex-1 space-y-4 p-4 sm:p-6">

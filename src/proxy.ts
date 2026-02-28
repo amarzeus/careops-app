@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { rateLimit } from "./lib/rate-limit";
 
 // ── Public Paths ─────────────────────────────────────────────────
 const publicRoutes = [
@@ -111,6 +112,16 @@ export function proxy(request: NextRequest) {
         },
       }
     );
+  }
+
+  // General Public API rate limiting
+  if (pathname.startsWith("/api/public") || pathname.startsWith("/api/webhooks")) {
+    const limitResponse = rateLimit(request, {
+      id: "public_api",
+      limit: 10, // 10 requests per minute
+      timeframe: 60,
+    });
+    if (limitResponse) return limitResponse;
   }
 
   // Public routes — allow without auth

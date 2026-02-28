@@ -162,7 +162,7 @@ export async function GET(req: Request) {
              <div style="background: #eff6ff; padding: 16px; border-radius: 8px; border: 1px solid #bfdbfe; margin: 16px 0;">
                <p style="margin: 0; font-weight: bold; color: #1e40af;">📅 ${appointmentTime}</p>
                <p style="margin: 4px 0 0; color: #1e40af;">Service: ${booking.service.name}</p>
-               ${booking.service.location ? `<p style="margin: 4px 0 0; color: #1e40af;">📍 ${booking.service.location}</p>` : ""}
+               ${booking.service.locationName ? `<p style="margin: 4px 0 0; color: #1e40af;">📍 ${booking.service.locationName}</p>` : ""}
              </div>
              ${rule.messageTemplate || "<p>We look forward to seeing you!</p>"}
              <p style="color: #6b7280; font-size: 12px;">— ${rule.workspace.name}</p>`

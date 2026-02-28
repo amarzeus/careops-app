@@ -37,6 +37,8 @@ const formSchema = z.object({
   date: z.date(),
   time: z.string().min(1, "Time is required"),
   notes: z.string().optional(),
+  recurringPattern: z.string().optional(),
+  occurrences: z.number().min(2).max(52).optional(),
 });
 
 interface BookingDialogProps {
@@ -91,6 +93,8 @@ export function BookingDialog({
           ? format(initialDate, "HH:mm")
           : "09:00",
       date: initialData ? new Date(initialData.date) : initialDate || new Date(),
+      recurringPattern: "NONE",
+      occurrences: 5,
     },
   });
 
@@ -107,6 +111,8 @@ export function BookingDialog({
             ? format(initialDate, "HH:mm")
             : "09:00",
         date: initialData ? new Date(initialData.date) : initialDate || new Date(),
+        recurringPattern: "NONE",
+        occurrences: 5,
       });
     }
   }, [open, initialData, initialDate, reset]);
@@ -247,6 +253,39 @@ export function BookingDialog({
               </label>
               <Textarea placeholder="Any special requests or notes..." {...register("notes")} />
             </div>
+
+            {!initialData && (
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <label className="text-sm leading-none font-medium">Repeat</label>
+                  <Select
+                    onValueChange={(val) => setValue("recurringPattern", val)}
+                    defaultValue="NONE"
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Does not repeat" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="NONE">Does not repeat</SelectItem>
+                      <SelectItem value="DAILY">Daily</SelectItem>
+                      <SelectItem value="WEEKLY">Weekly</SelectItem>
+                      <SelectItem value="MONTHLY">Monthly</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                {watch("recurringPattern") && watch("recurringPattern") !== "NONE" && (
+                  <div className="grid gap-2">
+                    <label className="text-sm leading-none font-medium">Occurrences</label>
+                    <Input
+                      type="number"
+                      min={2}
+                      max={52}
+                      {...register("occurrences", { valueAsNumber: true })}
+                    />
+                  </div>
+                )}
+              </div>
+            )}
 
             <DialogFooter>
               <Button type="submit" disabled={isSubmitting}>

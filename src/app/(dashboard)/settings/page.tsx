@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, Suspense } from "react";
-import { CreditCard, Link2, Settings, Shield, User, Sparkles } from "lucide-react";
+import { CreditCard, Link2, Settings, Shield, User, Sparkles, MapPin } from "lucide-react";
 import { Header } from "@/components/layout/header";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
@@ -13,6 +13,7 @@ import { SecurityTab } from "@/components/settings/security-tab";
 import { AIPreferencesTab } from "@/components/settings/ai-preferences-tab";
 import { VoiceSettingsTab } from "@/components/settings/voice-settings-tab";
 import { BillingTab } from "@/components/settings/billing-tab";
+import { LocationsTab } from "@/components/settings/locations-tab";
 import { WorkspaceSettingsDTO, UserProfileDTO } from "@/types/dto";
 
 /**
@@ -331,6 +332,9 @@ function SettingsContent() {
               <TabsTrigger value="workspace" className="flex items-center gap-2">
                 <Settings className="h-4 w-4" /> <span className="hidden sm:inline">Workspace</span>
               </TabsTrigger>
+              <TabsTrigger value="locations" className="flex items-center gap-2">
+                <MapPin className="h-4 w-4" /> <span className="hidden sm:inline">Locations</span>
+              </TabsTrigger>
               <TabsTrigger value="billing" className="flex items-center gap-2">
                 <CreditCard className="h-4 w-4" /> <span className="hidden sm:inline">Billing</span>
               </TabsTrigger>
@@ -364,6 +368,10 @@ function SettingsContent() {
               bookingUrl={bookingUrl}
               contactFormUrl={contactFormUrl}
             />
+          </TabsContent>
+
+          <TabsContent value="locations">
+            <LocationsTab />
           </TabsContent>
 
           <TabsContent value="billing">

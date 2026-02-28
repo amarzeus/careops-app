@@ -79,7 +79,7 @@ test.describe("Onboarding Flow", () => {
       data: {
         name: "General Checkup",
         duration: 30,
-        location: "Office",
+        locationName: "Office",
         availableDays: "1,2,3,4,5",
         startTime: "09:00",
         endTime: "17:00",

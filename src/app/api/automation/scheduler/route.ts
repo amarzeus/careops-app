@@ -78,7 +78,7 @@ export async function GET(req: Request) {
           ? {
               id: booking.service.id,
               name: booking.service.name,
-              location: booking.service.location,
+              location: booking.service.locationName,
             }
           : undefined,
       });

@@ -538,7 +538,7 @@ export async function syncBookingToCalendar(bookingId: string, workspaceId: stri
       ]
         .filter(Boolean)
         .join("\n"),
-      location: booking.service.location || undefined,
+      location: booking.service.locationName || undefined,
       startTime: booking.date,
       endTime: booking.endTime,
       timezone: booking.workspace.timezone,
@@ -591,7 +591,7 @@ export async function updateBookingCalendarEvent(
       startTime: booking.date,
       endTime: booking.endTime,
       timezone: booking.workspace.timezone,
-      location: booking.service.location || undefined,
+      location: booking.service.locationName || undefined,
     });
   } catch (error) {
     console.error("[Google Calendar] Update booking event error:", error);

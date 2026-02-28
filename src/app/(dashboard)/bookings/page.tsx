@@ -117,8 +117,11 @@ export default function BookingsPage() {
     }
   };
 
-  const handleBookingSubmit = async (data: unknown) => {
-    const url = selectedBooking ? `/api/bookings/${selectedBooking.id}` : "/api/bookings";
+  const handleBookingSubmit = async (data: Record<string, unknown>) => {
+    let url = selectedBooking ? `/api/bookings/${selectedBooking.id}` : "/api/bookings";
+    if (!selectedBooking && data.recurringPattern && data.recurringPattern !== "NONE") {
+      url = "/api/bookings/recurring";
+    }
     const method = selectedBooking ? "PATCH" : "POST";
 
     try {

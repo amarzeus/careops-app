@@ -75,7 +75,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
         data.service = {
           id: booking.serviceId,
           name: booking.service.name,
-          location: booking.service.location,
+          location: booking.service.locationName,
         };
       } else {
         // Fallback dummy data
