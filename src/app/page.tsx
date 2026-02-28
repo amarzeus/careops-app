@@ -1133,6 +1133,123 @@ export default function LandingPage() {
           </div>
         </section>
 
+        {/* ─── TESTIMONIALS ─── */}
+        <section className="bg-background relative overflow-hidden py-14 sm:py-20 lg:py-28">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="mb-12 text-center md:mb-16">
+              <motion.h2
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8 }}
+                className="mb-4 text-3xl font-black tracking-tight sm:text-4xl md:text-5xl"
+              >
+                Loved by <span className="text-primary">service teams</span>
+              </motion.h2>
+              <motion.p
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.2 }}
+                className="text-muted-foreground mx-auto max-w-lg text-base font-medium sm:text-lg"
+              >
+                Businesses across industries trust CareOps to streamline their operations.
+              </motion.p>
+            </div>
+
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-3 md:gap-6">
+              {[
+                {
+                  name: "Dr. Priya Sharma",
+                  role: "Dental Clinic Owner",
+                  quote:
+                    "CareOps cut our no-shows by 40% and automated appointment reminders we used to do manually. The AI insights actually predicted our busy days accurately.",
+                  rating: 5,
+                  color: "from-blue-500/10 to-blue-500/5",
+                },
+                {
+                  name: "Rahul Kapoor",
+                  role: "Salon Chain Manager",
+                  quote:
+                    "Managing 3 locations was chaos before CareOps. Now I have one dashboard for everything — bookings, inventory, staff schedules. Setup took under 10 minutes.",
+                  rating: 5,
+                  color: "from-purple-500/10 to-purple-500/5",
+                },
+                {
+                  name: "Sneha Desai",
+                  role: "Physiotherapy Studio",
+                  quote:
+                    "The voice AI assistant handles after-hours calls perfectly. Patients love the WhatsApp booking confirmations. It feels like having an extra receptionist.",
+                  rating: 5,
+                  color: "from-emerald-500/10 to-emerald-500/5",
+                },
+              ].map((t, i) => (
+                <motion.div
+                  key={t.name}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: i * 0.15 }}
+                  className={`bg-gradient-to-b ${t.color} border-border/40 relative flex flex-col justify-between rounded-2xl border p-6 backdrop-blur-sm sm:p-8`}
+                >
+                  {/* Stars */}
+                  <div className="mb-4 flex gap-1">
+                    {[...Array(t.rating)].map((_, s) => (
+                      <svg
+                        key={s}
+                        className="h-4 w-4 text-amber-400"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                      </svg>
+                    ))}
+                  </div>
+                  <p className="text-foreground/80 mb-6 flex-1 text-sm leading-relaxed font-medium italic sm:text-base">
+                    &ldquo;{t.quote}&rdquo;
+                  </p>
+                  <div className="flex items-center gap-3">
+                    <div className="from-primary flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br to-purple-500 text-sm font-bold text-white">
+                      {t.name
+                        .split(" ")
+                        .map((n) => n[0])
+                        .join("")}
+                    </div>
+                    <div>
+                      <div className="text-foreground text-sm font-bold">{t.name}</div>
+                      <div className="text-muted-foreground text-xs font-medium">{t.role}</div>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Trust Badges */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="mt-12 flex flex-wrap items-center justify-center gap-6 sm:gap-10 md:mt-16"
+            >
+              {[
+                { label: "HIPAA Ready", icon: "🏥" },
+                { label: "SOC2 Compliant", icon: "🛡️" },
+                { label: "256-bit Encryption", icon: "🔐" },
+                { label: "99.9% Uptime SLA", icon: "⚡" },
+              ].map((badge) => (
+                <div
+                  key={badge.label}
+                  className="text-muted-foreground flex items-center gap-2 text-xs font-bold tracking-wider uppercase sm:text-sm"
+                >
+                  <span className="text-base sm:text-lg">{badge.icon}</span>
+                  {badge.label}
+                </div>
+              ))}
+            </motion.div>
+          </div>
+        </section>
+
         {/* ─── PRICING ─── */}
         <section
           id="pricing"

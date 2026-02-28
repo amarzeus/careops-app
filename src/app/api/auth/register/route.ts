@@ -1,19 +1,28 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { hashPassword } from "@/lib/auth";
+import { withValidation } from "@/lib/api-validation";
+
+const registerSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  password: z
+    .string()
+    .min(8, "Password must be at least 8 characters")
+    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+    .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+    .regex(/[0-9]/, "Password must contain at least one number"),
+  name: z.string().min(1, "Name is required").max(100, "Name is too long"),
+});
 
 /**
- *
- * @param req
+ * POST /api/auth/register
+ * Registers a new user and workspace.
  */
-export async function POST(req: Request) {
+export const POST = withValidation(registerSchema, async (_req: NextRequest, data) => {
   try {
-    const { email, password, name } = await req.json();
-
-    if (!email || !password || !name) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
-    }
+    const { email, password, name } = data;
 
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
@@ -64,14 +73,15 @@ export async function POST(req: Request) {
       message: "Registration successful. Please check your email for the verification code.",
       userId: user.id,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const err = error as { code?: string; message?: string };
     console.error("[Register API] Critical failure:", error);
 
     // Check for Prisma/Database connection errors
     if (
-      error.code?.startsWith("P") ||
-      error.message?.includes("prisma") ||
-      error.message?.includes("database")
+      err.code?.startsWith("P") ||
+      err.message?.includes("prisma") ||
+      err.message?.includes("database")
     ) {
       return NextResponse.json(
         { error: "Database connection error. Please verify your DATABASE_URL." },
@@ -79,9 +89,6 @@ export async function POST(req: Request) {
       );
     }
 
-    return NextResponse.json(
-      { error: "Registration failed: " + (error.message || "Unknown error") },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Registration failed. Please try again." }, { status: 500 });
   }
-}
+});

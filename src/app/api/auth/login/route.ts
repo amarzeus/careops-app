@@ -1,18 +1,22 @@
 import { NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { verifyPassword, createToken, setAuthCookie } from "@/lib/auth";
+import { withValidation } from "@/lib/api-validation";
+
+const loginSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(1, "Password is required"),
+});
 
 /**
- *
- * @param req
+ * POST /api/auth/login
+ * Authenticates a user with email and password.
  */
-export async function POST(req: Request) {
+export const POST = withValidation(loginSchema, async (_req: NextRequest, data) => {
   try {
-    const { email, password } = await req.json();
-
-    if (!email || !password) {
-      return NextResponse.json({ error: "Missing credentials" }, { status: 400 });
-    }
+    const { email, password } = data;
 
     const user = await prisma.user.findUnique({
       where: { email },
@@ -66,4 +70,4 @@ export async function POST(req: Request) {
     console.error("Login error:", error);
     return NextResponse.json({ error: "Login failed" }, { status: 500 });
   }
-}
+});
