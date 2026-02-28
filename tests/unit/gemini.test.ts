@@ -99,3 +99,53 @@ describe("aiOnboardingAssistant (Function Calling)", () => {
     expect(result.extractedData).toBeNull();
   });
 });
+
+import { analyzeSentiment } from "@/lib/gemini";
+
+describe("analyzeSentiment", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("should return parsed sentiment on success", async () => {
+    mockGenerateContent.mockResolvedValue({
+      text: JSON.stringify({ score: 90, label: "positive" }),
+    });
+
+    const result = await analyzeSentiment("I am very happy with the service!");
+
+    expect(mockGenerateContent).toHaveBeenCalled();
+    expect(result.score).toBe(90);
+    expect(result.label).toBe("positive");
+    expect(result.emoji).toBe("😊");
+  });
+
+  it("should use heuristic fallback for urgent keywords if API fails", async () => {
+    mockGenerateContent.mockRejectedValue(new Error("API Quota Error"));
+
+    const result = await analyzeSentiment("This is an urgent emergency, help me ASAP!");
+
+    expect(result.label).toBe("urgent");
+    expect(result.emoji).toBe("🔴");
+    expect(result.score).toBe(15);
+  });
+
+  it("should use heuristic fallback for negative keywords if API fails", async () => {
+    mockGenerateContent.mockRejectedValue(new Error("API Quota Error"));
+
+    const result = await analyzeSentiment("This is terrible, I am very disappointed and angry.");
+
+    expect(result.label).toBe("negative");
+    expect(result.emoji).toBe("😞");
+    expect(result.score).toBe(25);
+  });
+
+  it("should return neutral for short messages", async () => {
+    const result = await analyzeSentiment("hi");
+
+    expect(mockGenerateContent).not.toHaveBeenCalled();
+    expect(result.label).toBe("neutral");
+    expect(result.emoji).toBe("😐");
+    expect(result.score).toBe(50);
+  });
+});

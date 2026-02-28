@@ -1250,3 +1250,254 @@ export async function generateWelcomeMessage(
 ): Promise<string> {
   return `Welcome to ${businessName}, ${contactName}! We're excited to have you. How can we help you today?`;
 }
+
+// ──────────────────────────────────────────────
+// Sentiment Analysis
+// ──────────────────────────────────────────────
+
+export type SentimentResult = {
+  score: number; // 0-100: 0=very negative, 50=neutral, 100=very positive
+  label: "positive" | "neutral" | "negative" | "urgent";
+  emoji: string;
+};
+
+/**
+ * Analyzes the sentiment of a message.
+ * @param message - The message text to analyze
+ * @param model - Optional model ID
+ * @returns Sentiment result with score, label, and emoji
+ */
+export async function analyzeSentiment(message: string, model?: string): Promise<SentimentResult> {
+  if (!message || message.trim().length < 3) {
+    return { score: 50, label: "neutral", emoji: "😐" };
+  }
+
+  const schema = {
+    type: Type.OBJECT,
+    properties: {
+      score: {
+        type: Type.NUMBER,
+        description: "Sentiment score 0-100. 0=angry/negative, 50=neutral, 100=positive/happy",
+      },
+      label: {
+        type: Type.STRING,
+        enum: ["positive", "neutral", "negative", "urgent"],
+      },
+    },
+    required: ["score", "label"],
+  };
+
+  try {
+    const result = await withRetry(
+      () =>
+        callGemini<{ score: number; label: string }>(
+          `Analyze the sentiment of this customer message. Consider tone, urgency, and emotional state.
+Message: "${message}"`,
+          schema,
+          "You are a sentiment analysis expert. Classify customer messages accurately. Use 'urgent' for messages indicating frustration or immediate help needed.",
+          model
+        ),
+      2,
+      1500
+    );
+
+    const emojiMap: Record<string, string> = {
+      positive: "😊",
+      neutral: "😐",
+      negative: "😞",
+      urgent: "🔴",
+    };
+
+    return {
+      score: Math.max(0, Math.min(100, result.score)),
+      label: result.label as SentimentResult["label"],
+      emoji: emojiMap[result.label] || "😐",
+    };
+  } catch {
+    // Fallback: basic keyword-based heuristic
+    const lower = message.toLowerCase();
+    const negativeWords = [
+      "angry",
+      "upset",
+      "terrible",
+      "worst",
+      "cancel",
+      "refund",
+      "complaint",
+      "disappointed",
+      "frustrated",
+      "unacceptable",
+    ];
+    const positiveWords = [
+      "thank",
+      "great",
+      "excellent",
+      "love",
+      "perfect",
+      "amazing",
+      "happy",
+      "wonderful",
+      "appreciate",
+    ];
+    const urgentWords = ["urgent", "emergency", "asap", "immediately", "help", "critical"];
+
+    if (urgentWords.some((w) => lower.includes(w))) {
+      return { score: 15, label: "urgent", emoji: "🔴" };
+    }
+    if (negativeWords.some((w) => lower.includes(w))) {
+      return { score: 25, label: "negative", emoji: "😞" };
+    }
+    if (positiveWords.some((w) => lower.includes(w))) {
+      return { score: 80, label: "positive", emoji: "😊" };
+    }
+    return { score: 50, label: "neutral", emoji: "😐" };
+  }
+}
+
+/**
+ * Batch analyze sentiments for multiple messages.
+ * @param messages - Array of messages with IDs
+ * @returns Map of messageId to SentimentResult
+ */
+export async function batchAnalyzeSentiment(
+  messages: Array<{ id: string; content: string }>
+): Promise<Map<string, SentimentResult>> {
+  const results = new Map<string, SentimentResult>();
+  // Process in parallel batches of 5
+  const batchSize = 5;
+  for (let i = 0; i < messages.length; i += batchSize) {
+    const batch = messages.slice(i, i + batchSize);
+    const promises = batch.map(async (msg) => {
+      const result = await analyzeSentiment(msg.content);
+      results.set(msg.id, result);
+    });
+    await Promise.allSettled(promises);
+  }
+  return results;
+}
+
+// ──────────────────────────────────────────────
+// Dashboard Co-pilot
+// ──────────────────────────────────────────────
+
+export type CopilotResponse = {
+  message: string;
+  data?: Record<string, unknown> | null;
+  suggestedActions?: Array<{ label: string; action: string }>;
+};
+
+/**
+ * Dashboard Co-pilot: answers operational questions using workspace data.
+ * @param userMessage - The user's question
+ * @param workspaceContext - Summary of workspace data
+ * @param conversationHistory - Previous messages
+ * @param model - Optional model ID
+ * @returns CopilotResponse with message and optional data/actions
+ */
+export async function aiDashboardCopilot(
+  userMessage: string,
+  workspaceContext: {
+    businessName: string;
+    totalBookings: number;
+    upcomingBookings: number;
+    completedBookings: number;
+    cancelledBookings: number;
+    totalContacts: number;
+    newContactsThisWeek: number;
+    unreadMessages: number;
+    lowStockItems: Array<{ name: string; quantity: number; threshold: number }>;
+    todaysBookings: Array<{ service: string; contact: string; time: string; status: string }>;
+    recentAlerts: Array<{ type: string; title: string; message: string }>;
+    pendingForms: number;
+    staffCount: number;
+  },
+  conversationHistory: Array<{ role: "user" | "assistant"; content: string }>,
+  model?: string
+): Promise<CopilotResponse> {
+  const schema = {
+    type: Type.OBJECT,
+    properties: {
+      message: { type: Type.STRING, description: "The AI response to the user's question" },
+      suggestedActions: {
+        type: Type.ARRAY,
+        items: {
+          type: Type.OBJECT,
+          properties: {
+            label: { type: Type.STRING },
+            action: { type: Type.STRING, description: "Navigation path or action ID" },
+          },
+          required: ["label", "action"],
+        },
+      },
+    },
+    required: ["message"],
+  };
+
+  const systemPrompt = `You are the CareOps Dashboard Co-pilot for "${workspaceContext.businessName}". You help the business owner and staff with operational questions.
+
+CAPABILITIES:
+- Answer questions about bookings, contacts, inventory, messages, and staff
+- Provide actionable recommendations
+- Surface important alerts and trends
+- Help with scheduling and inventory decisions
+
+CURRENT WORKSPACE DATA:
+- Total Bookings: ${workspaceContext.totalBookings} (${workspaceContext.upcomingBookings} upcoming, ${workspaceContext.completedBookings} completed, ${workspaceContext.cancelledBookings} cancelled)
+- Today's Schedule: ${workspaceContext.todaysBookings.length > 0 ? workspaceContext.todaysBookings.map((b) => `${b.time} - ${b.service} with ${b.contact} [${b.status}]`).join("; ") : "No bookings today"}
+- Contacts: ${workspaceContext.totalContacts} total, ${workspaceContext.newContactsThisWeek} new this week
+- Unread Messages: ${workspaceContext.unreadMessages}
+- Pending Forms: ${workspaceContext.pendingForms}
+- Staff: ${workspaceContext.staffCount} members
+- Low Stock Alerts: ${workspaceContext.lowStockItems.length > 0 ? workspaceContext.lowStockItems.map((i) => `${i.name}: ${i.quantity}/${i.threshold}`).join(", ") : "None"}
+- Recent Alerts: ${workspaceContext.recentAlerts.length > 0 ? workspaceContext.recentAlerts.map((a) => `[${a.type}] ${a.title}`).join("; ") : "None"}
+
+RULES:
+- Be concise and data-driven. Reference actual numbers.
+- Suggest 1-3 relevant actions when appropriate (e.g., "/inbox" to check messages, "/bookings" to view schedule).
+- If asked something outside your data, say so honestly.
+- Keep responses under 100 words unless complex analysis is needed.
+- Use the business name naturally.`;
+
+  const historyFormatted = conversationHistory
+    .slice(-6)
+    .map((m) => `${m.role === "user" ? "User" : "Co-pilot"}: ${m.content}`)
+    .join("\n");
+
+  try {
+    const result = await withRetry(
+      () =>
+        callGemini<CopilotResponse>(
+          `${historyFormatted ? `Previous conversation:\n${historyFormatted}\n\n` : ""}User question: "${userMessage}"`,
+          schema,
+          systemPrompt,
+          model
+        ),
+      2,
+      1500
+    );
+
+    return {
+      message: result.message,
+      suggestedActions: result.suggestedActions || [],
+    };
+  } catch (error) {
+    if (isQuotaError(error)) {
+      return {
+        message:
+          "I'm at capacity right now. Here's a quick snapshot: you have " +
+          `${workspaceContext.upcomingBookings} upcoming bookings and ${workspaceContext.unreadMessages} unread messages. ` +
+          "Try again in a moment for detailed analysis.",
+        suggestedActions: [
+          { label: "View Bookings", action: "/bookings" },
+          { label: "Check Inbox", action: "/inbox" },
+        ],
+      };
+    }
+    return {
+      message:
+        "I encountered an error processing your question. " +
+        `Quick overview: ${workspaceContext.upcomingBookings} upcoming bookings, ${workspaceContext.unreadMessages} unread messages.`,
+      suggestedActions: [{ label: "View Dashboard", action: "/dashboard" }],
+    };
+  }
+}

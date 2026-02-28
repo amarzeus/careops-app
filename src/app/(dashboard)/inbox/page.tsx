@@ -21,13 +21,16 @@ import { ChatInput } from "@/components/inbox/chat-input";
 import { OutboundCallDialog } from "@/components/inbox/outbound-call-dialog";
 import { toast } from "@/hooks/use-toast";
 
+type SentimentResult = { score: number; label: string; emoji: string };
+
 /**
- *
+ * Inbox Page for managing customer conversations.
  */
 export default function InboxPage() {
   const [conversations, setConversations] = useState<ConversationDTO[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [messages, setMessages] = useState<MessageDTO[]>([]);
+  const [sentiments, setSentiments] = useState<Record<string, SentimentResult>>({});
   const [inputText, setInputText] = useState("");
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
@@ -48,8 +51,8 @@ export default function InboxPage() {
         if (res.ok) {
           const data = await res.json();
           setConversations(data);
-          if (data.length > 0) {
-            setActiveId((prev) => prev || data[0].id);
+          if (data.length > 0 && !activeId) {
+            setActiveId(data[0].id);
           }
         }
       } catch (error) {
@@ -61,6 +64,7 @@ export default function InboxPage() {
     fetchConversations();
     const interval = setInterval(fetchConversations, 30000);
     return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // 2. Fetch Messages when Active ID changes
@@ -81,6 +85,8 @@ export default function InboxPage() {
 
           // Fetch Smart Replies
           fetchSmartReplies(activeId);
+          // Fetch Sentiments
+          fetchSentiments(data.messages);
         }
       } catch (error) {
         console.error("Failed to load messages", error);
@@ -89,7 +95,35 @@ export default function InboxPage() {
       }
     };
     fetchMessages();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeId]);
+
+  const fetchSentiments = async (msgs: MessageDTO[]) => {
+    const inboundMsgs = msgs.filter((m) => m.direction === "INBOUND");
+
+    // Only fetch for latest 5 messages to save quota
+    const recentMsgs = inboundMsgs.slice(-5);
+
+    const newSentiments = { ...sentiments };
+
+    for (const msg of recentMsgs) {
+      if (sentiments[msg.id]) continue; // Skip if already analyzed
+      try {
+        const res = await fetch("/api/ai/sentiment", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: msg.content }),
+        });
+        if (res.ok) {
+          const result = await res.json();
+          newSentiments[msg.id] = result;
+        }
+      } catch {
+        // fail silently
+      }
+    }
+    setSentiments(newSentiments);
+  };
 
   const fetchSmartReplies = async (conversationId: string) => {
     setLoadingSuggestions(true);
@@ -263,6 +297,7 @@ export default function InboxPage() {
                 messages={messages}
                 loading={loadingMessages}
                 contactName={activeConversation.contactName}
+                sentiments={sentiments}
               />
               {suggestions.length > 0 && (
                 <div className="border-t border-violet-100 bg-gradient-to-r from-violet-50 to-purple-50 px-4 py-3">

@@ -4,11 +4,10 @@ import { getCurrentUser } from "@/lib/auth";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Footer } from "@/components/layout/footer";
 import { DashboardErrorBoundary } from "@/components/common";
+import { DashboardCopilot } from "@/components/dashboard/copilot";
 
 /**
- *
- * @param root0
- * @param root0.children
+ * Dashboard Layout
  */
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const user = await getCurrentUser();
@@ -39,6 +38,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
           <DashboardErrorBoundary>{children}</DashboardErrorBoundary>
         </main>
         {showFooter && <Footer />}
+
+        {/* Global Dashboard AI Co-pilot */}
+        <DashboardCopilot />
       </div>
     </div>
   );

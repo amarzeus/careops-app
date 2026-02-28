@@ -7,20 +7,30 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { MessageDTO } from "@/types/dto";
 
+type SentimentResult = { score: number; label: string; emoji: string };
+
 interface MessageThreadProps {
   messages: MessageDTO[];
   loading: boolean;
   contactName: string;
+  sentiments?: Record<string, SentimentResult>;
 }
 
 /**
+ * Renders the conversation message thread.
  *
- * @param root0
- * @param root0.messages
- * @param root0.loading
- * @param root0.contactName
+ * @param props Props object
+ * @param props.messages Array of messages
+ * @param props.loading Loading state
+ * @param props.contactName Name of the contact
+ * @param props.sentiments Optional sentiment map
  */
-export function MessageThread({ messages, loading, contactName }: MessageThreadProps) {
+export function MessageThread({
+  messages,
+  loading,
+  contactName,
+  sentiments = {},
+}: MessageThreadProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -42,6 +52,8 @@ export function MessageThread({ messages, loading, contactName }: MessageThreadP
       {messages.map((msg, i) => {
         const showAvatar = i === 0 || messages[i - 1].direction !== msg.direction;
         const channel = msg.channel || "EMAIL";
+        const sentiment = sentiments[msg.id];
+
         return (
           <div
             key={msg.id}
@@ -95,7 +107,10 @@ export function MessageThread({ messages, loading, contactName }: MessageThreadP
                     )}
                     {channel}
                   </span>
-                  <span className="text-[10px] opacity-70">
+                  <span className="flex items-center gap-1 text-[10px] opacity-70">
+                    {sentiment && (
+                      <span title={`Sentiment: ${sentiment.label}`}>{sentiment.emoji}</span>
+                    )}
                     {format(new Date(msg.createdAt), "h:mm a")}
                     {msg.status === "FAILED" && " • Failed"}
                   </span>
