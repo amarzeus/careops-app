@@ -43,6 +43,9 @@ export default function RevenueAnalytics() {
   const [period, setPeriod] = useState<"week" | "month" | "quarter">("month");
 
   useEffect(() => {
+    /**
+     * Fetch the analytics data based on the selected period.
+     */
     async function fetchData() {
       setLoading(true);
       try {
@@ -60,6 +63,12 @@ export default function RevenueAnalytics() {
     fetchData();
   }, [period]);
 
+  /**
+   * Format a number as currency.
+   *
+   * @param {number} value The number to format.
+   * @returns {string} The formatted currency string.
+   */
   const formatCurrency = (value: number) =>
     new Intl.NumberFormat("en-US", {
       style: "currency",
