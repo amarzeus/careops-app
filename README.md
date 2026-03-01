@@ -286,10 +286,11 @@ This command executes the following sequentially:
 2.  **Type-checking**: Validates TypeScript integrity (`tsc`).
 3.  **Formatting**: Verifies Prettier compliance.
 4.  **Unit Tests**: Executes logic tests via Vitest.
-5.  **E2E Tests**: Launches Playwright to verify critical routing and user flows.
-6.  **Render Validation**: Validates deployment blueprints for Render.com.
-7.  **Security Audit**: Checks for critical vulnerabilities in dependencies.
-8.  **Production Build**: Confirms that the code compiles successfully for production.
+5.  **Penetration Tests**: Runs a static penetration test for IDOR, XSS, and SQLi vectors.
+6.  **E2E Tests**: Launches Playwright to verify critical routing and user flows.
+7.  **Render Validation**: Validates deployment blueprints for Render.com.
+8.  **Security Audit**: Checks for critical vulnerabilities in NPM dependencies.
+9.  **Production Build**: Confirms that the code compiles successfully for production.
 
 A detailed summary report will be generated at the end of the process to confirm your changes are ready for contribution.
 

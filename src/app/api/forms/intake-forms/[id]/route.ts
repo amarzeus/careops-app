@@ -18,8 +18,13 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
   const body = await req.json();
 
   try {
-    const form = await prisma.intakeForm.findUnique({ where: { id } });
-    if (!form || form.workspaceId !== user.workspaceId) {
+    const form = await prisma.intakeForm.findUnique({
+      where: {
+        id,
+        workspaceId: user.workspaceId,
+      },
+    });
+    if (!form) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 
@@ -53,8 +58,13 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
   const { id } = await params;
 
   try {
-    const form = await prisma.intakeForm.findUnique({ where: { id } });
-    if (!form || form.workspaceId !== user.workspaceId) {
+    const form = await prisma.intakeForm.findUnique({
+      where: {
+        id,
+        workspaceId: user.workspaceId,
+      },
+    });
+    if (!form) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 

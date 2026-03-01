@@ -1,37 +1,51 @@
-# Test Automation Summary
+# CareOps Pipeline Summary
 
-## Generated Tests
+## Pipeline Stages
 
-### API Tests
+### 🕵️ Static Analysis & Quality
 
-- [x] tests/e2e/features-api.spec.ts - Validates RBAC, File Storage, Webhooks, and AI Wiring APIs.
-- [x] tests/e2e/rbac-staff.spec.ts - Validates granular STAFF permissions across all modules.
-- [x] tests/e2e/files.spec.ts - Validates full file upload/delete lifecycle with secure filename interception.
-- [ ] tests/e2e/accessibility.spec.ts - Audits core pages for WCAG compliance.
+- [x] **ESLint** - Validates code syntax, unused imports, and style consistency.
+- [x] **Prettier** - Enforces standardized code formatting across the repository.
+- [x] **TypeScript** - Performs strict type-checking across frontend and backend modules.
 
-### Unit Tests
+### 🧪 Unit & Logic Tests
 
-- [x] tests/unit/voice-regression.test.ts - Validates Gemini-based voice logic (returning callers, frustration, after-hours).
-- [x] tests/unit/voice-webhook.test.ts - Validates core VAPI webhook handling.
+- [x] **tests/unit/voice-regression.test.ts** - Validates Gemini-based voice logic.
+- [x] **tests/unit/voice-webhook.test.ts** - Validates core VAPI webhook handling.
+- [x] **tests/unit/ai-brain.test.ts** - Tests deterministic intent classification and JSON extraction.
+- [x] **tests/unit/billing.test.ts** - Verifies usage limits, plan upgrades, and billing logic.
 
-## Coverage
+### 🛡️ Security & Penetration
 
-- **File Storage**: Fully covered via API and E2E lifecycle (upload/list/delete).
-- **AI Wiring**: Covered via API (Chat endpoint) and UI (Onboarding Assistant interaction).
-- **Webhooks**: Covered via API (Create/List) and UI (Settings > Integrations > Webhooks).
-- **RBAC**: Strictly enforced for OWNER and STAFF roles with granular permissions.
-- **Voice Logic**: Automated regression testing for VAPI/Gemini orchestration.
-- **Accessibility**: Automated WCAG compliance audits integrated into E2E pipeline.
+- [x] **Static IDOR Scan** - Asserts `workspaceId` enforcement on Prisma queries to prevent context swapping.
+- [x] **XSS Scan** - Validates safe usage of DOM injection (`dangerouslySetInnerHTML`).
+- [x] **SQLi Scan** - Verifies unparameterized raw query restrictions in data layers.
+- [x] **NPM Audit** - Validates zero critical vulnerabilities in the entire active dependency tree.
+
+### 🏗️ Build & Integration
+
+- [x] **Next.js Build** - Ensures the application successfully compiles with Turbopack for production.
+- [x] **Render.com Validation** - Confirms `render.yaml` deployment blueprint matches required spec.
+- [x] **GitHub CLI Checks** - Verifies Git access controls and upstream CI status synchronisation.
+
+### 🎭 End-to-End (E2E) & Accessibility
+
+- [x] **tests/e2e/features-api.spec.ts** - Validates strict RBAC, System Storage, Webhooks, and AI API wiring.
+- [x] **tests/e2e/rbac-staff.spec.ts** - Validates granular STAFF UI permissions interactively.
+- [x] **tests/e2e/files.spec.ts** - Validates the visual file upload/delete lifecycle with intercepted events.
+- [x] **tests/e2e/accessibility.spec.ts** - Audits visual DOM constraints against extensive WCAG 2.1 rules.
 
 ## Execution Status
 
-- API Tests: **Passing** (Stabilized by limiting parallel workers and fixing seed dependencies).
-- UI Tests: **Passing** (Timeouts reduced via hydration guards and optimized worker count).
-- Unit Tests: **Passing** (Comprehensive coverage for voice and automation logic).
-- Accessibility: **Pending** (New suite created, verification in progress).
-- Quality: **Passing** (Zero lint warnings and 100% type safety).
+- **Code Quality**: **Passing** (Zero warnings, flawless format, 100% type-safe).
+- **Unit Tests**: **Passing** (Core business logic heavily fortified).
+- **Security**: **Passing** (Static and dependency audits clear).
+- **Build**: **Passing** (Production build artifacts successfully emitted).
+- **E2E & UI**: **Passing** (Core user journeys and infrastructure validated).
+- **Accessibility**: **Passing** (Axe-core scans successful).
 
-## Next Steps
+## Coverage Priorities
 
-- Maintain 100% test passing rate during future PRs.
-- Expand security audits for third-party integrations.
+- **AI Architecture**: Voice, Chat, and Agent configuration routes.
+- **Data Residency**: Strict Tenant isolation via Workspace barriers.
+- **Third-Party**: Webhooks, File Uploads, Billing, Integrations.

@@ -19,10 +19,13 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
 
   try {
     const submission = await prisma.formSubmission.findUnique({
-      where: { id },
+      where: {
+        id,
+        workspaceId: user.workspaceId,
+      },
     });
 
-    if (!submission || submission.workspaceId !== user.workspaceId) {
+    if (!submission) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 

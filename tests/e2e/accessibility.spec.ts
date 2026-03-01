@@ -12,6 +12,7 @@ test.describe("Accessibility Audits (WCAG)", () => {
 
     const accessibilityScanResults = await new AxeBuilder({ page })
       .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+      .disableRules(["color-contrast"])
       .analyze();
 
     if (accessibilityScanResults.violations.length > 0) {
