@@ -95,6 +95,8 @@ model Workspace {
   feedbacks                  Feedback[]
   locations                  Location[]
   timeOffs                   TimeOff[]
+  referralsMade              Referral[]            @relation("ReferrerWorkspace")
+  referredBy                 Referral?             @relation("ReferredWorkspace")
 }
 
 model Webhook {
@@ -662,4 +664,23 @@ model TimeOff {
 
   @@index([staffId])
   @@index([workspaceId])
+}
+
+model Referral {
+  id                  String    @id @default(cuid())
+  referralCode        String    @unique
+  status              String    @default("PENDING") // PENDING, COMPLETED, REWARDED
+  rewardAmount        Int       @default(0) // Credits in smallest unit or arbitrary value
+  
+  referrerWorkspaceId String
+  referrer            Workspace @relation("ReferrerWorkspace", fields: [referrerWorkspaceId], references: [id])
+  
+  referredWorkspaceId String?   @unique
+  referred            Workspace? @relation("ReferredWorkspace", fields: [referredWorkspaceId], references: [id])
+  
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  @@index([referrerWorkspaceId])
+  @@index([referralCode])
 }

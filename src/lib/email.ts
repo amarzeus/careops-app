@@ -197,3 +197,48 @@ export function buildEmailTemplate(
     </html>
   `;
 }
+
+/**
+ * Generates an HTML payload for alerting users of resource consumption.
+ */
+export function usageWarningEmail(params: {
+  userName: string;
+  workspaceName: string;
+  categoryName: string;
+  used: number;
+  limit: number;
+}): string {
+  const percentage = Math.round((params.used / params.limit) * 100);
+
+  const content = `
+    <p style="margin-top: 0;">Hi ${params.userName},</p>
+    <p>This is an automated warning that your workspace <strong>${params.workspaceName}</strong> has reached <strong>${percentage}%</strong> of its monthly allocation for <strong>${params.categoryName}</strong>.</p>
+    
+    <div style="background-color: #ffffff; padding: 16px; border-radius: 8px; margin: 24px 0;">
+      <h3 style="margin-top: 0; font-size: 16px; color: #374151;">Usage Summary</h3>
+      <table style="width: 100%; border-collapse: collapse;">
+        <tr>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb; color: #6b7280;">Category</td>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb; font-weight: 600; text-align: right;">${params.categoryName}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb; color: #6b7280;">Current Usage</td>
+          <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb; font-weight: 600; text-align: right;">${params.used}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; color: #6b7280;">Monthly Limit</td>
+          <td style="padding: 8px 0; font-weight: 600; text-align: right;">${params.limit}</td>
+        </tr>
+      </table>
+    </div>
+    
+    <p>To ensure uninterrupted service, we recommend upgrading your plan or purchasing an add-on before you reach 100%.</p>
+  `;
+
+  return buildEmailTemplate(
+    "Usage Limit Warning",
+    content,
+    "Upgrade Plan",
+    "https://careops.io/dashboard/settings/billing"
+  );
+}

@@ -1,0 +1,15 @@
+.next
+node_modules
+dist
+build
+public/*.pdf
+public/*.png
+public/*.jpg
+public/*.jpeg
+public/*.svg
+public/*.ico
+*.db
+*.log
+coverage
+.env*
+tsconfig.tsbuildinfo

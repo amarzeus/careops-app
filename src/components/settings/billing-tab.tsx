@@ -125,19 +125,97 @@ const PLANS = [
   },
 ];
 
+interface BillingHistory {
+  id: string;
+  amount: number;
+  status: string;
+  date: string;
+  invoiceUrl: string;
+}
+
+interface ReferralHistory {
+  id: string;
+  status: string;
+  reward: number;
+  referredName: string;
+  date: string;
+}
+
 /**
  *
  */
 export function BillingTab() {
   const [billingStatus, setBillingStatus] = useState<BillingStatus | null>(null);
+  const [billingHistory, setBillingHistory] = useState<BillingHistory[]>([]);
+  const [referralHistory, setReferralHistory] = useState<ReferralHistory[]>([]);
+  const [referralCode, setReferralCode] = useState<string | null>(null);
+
   const [loading, setLoading] = useState(true);
   const [upgrading, setUpgrading] = useState<string | null>(null);
+  const [cancelling, setCancelling] = useState(false);
+  const [redeeming, setRedeeming] = useState(false);
+
+  const [inputReferralMode, setInputReferralMode] = useState("");
   const [razorpayLoaded, setRazorpayLoaded] = useState(false);
 
   useEffect(() => {
     loadBillingStatus();
+    loadBillingHistory();
+    loadReferralStatus();
     loadRazorpayScript();
   }, []);
+
+  const loadReferralStatus = async () => {
+    try {
+      const res = await fetch("/api/referrals/status");
+      if (res.ok) {
+        const data = await res.json();
+        setReferralCode(data.code);
+        setReferralHistory(data.history || []);
+      }
+    } catch (error) {
+      console.error("Failed to load referral status:", error);
+    }
+  };
+
+  const handleRedeemReferral = async () => {
+    if (!inputReferralMode) return;
+    setRedeeming(true);
+    try {
+      const res = await fetch("/api/referrals/redeem", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: inputReferralMode }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.error);
+
+      toast({ title: "Referral Applied", description: "Successfully redeemed $50 credit." });
+      setInputReferralMode("");
+      loadReferralStatus();
+    } catch (err) {
+      toast({
+        title: "Failed",
+        description: err instanceof Error ? err.message : "Code failed",
+        variant: "destructive",
+      });
+    } finally {
+      setRedeeming(false);
+    }
+  };
+
+  const loadBillingHistory = async () => {
+    try {
+      const res = await fetch("/api/billing/history");
+      if (res.ok) {
+        const data = await res.json();
+        setBillingHistory(data.history || []);
+      }
+    } catch (error) {
+      console.error("Failed to load billing history:", error);
+    }
+  };
 
   const loadRazorpayScript = () => {
     if (typeof window !== "undefined" && !(window as unknown as { Razorpay?: unknown }).Razorpay) {
@@ -250,6 +328,40 @@ export function BillingTab() {
     }
   };
 
+  const handleCancelSubscription = async () => {
+    if (
+      !confirm(
+        "Are you sure you want to cancel your subscription? It will remain active until the end of your billing cycle."
+      )
+    )
+      return;
+
+    setCancelling(true);
+    try {
+      const res = await fetch("/api/billing/cancel", {
+        method: "POST",
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to cancel subscription");
+      }
+
+      toast({
+        title: "Subscription Cancelled",
+        description: "Your subscription has been cancelled and will not renew.",
+      });
+      loadBillingStatus();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to cancel",
+        variant: "destructive",
+      });
+    } finally {
+      setCancelling(false);
+    }
+  };
+
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("en-IN", {
       style: "currency",
@@ -305,16 +417,31 @@ export function BillingTab() {
                   : `${formatPrice(currentPlan?.price || 0)}/${currentPlan?.period}`}
               </p>
             </div>
-            {currentPlanKey !== "enterprise" && (
-              <Button
-                onClick={() =>
-                  document.getElementById("plans-section")?.scrollIntoView({ behavior: "smooth" })
-                }
-              >
-                <Zap className="mr-2 h-4 w-4" />
-                Upgrade Plan
-              </Button>
-            )}
+
+            <div className="flex gap-2">
+              {currentPlanKey !== "enterprise" && (
+                <Button
+                  onClick={() =>
+                    document.getElementById("plans-section")?.scrollIntoView({ behavior: "smooth" })
+                  }
+                >
+                  <Zap className="mr-2 h-4 w-4" />
+                  Upgrade Plan
+                </Button>
+              )}
+
+              {currentPlanKey !== "free" && !billingStatus?.subscription?.cancelAtPeriodEnd && (
+                <Button
+                  variant="outline"
+                  onClick={handleCancelSubscription}
+                  disabled={cancelling}
+                  className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                >
+                  {cancelling ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                  Cancel Subscription
+                </Button>
+              )}
+            </div>
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -460,7 +587,11 @@ export function BillingTab() {
                       variant={plan.highlight ? "default" : "outline"}
                       className="w-full"
                       onClick={() => handleUpgrade(plan.key)}
-                      disabled={upgrading !== null || !razorpayLoaded}
+                      disabled={
+                        upgrading !== null ||
+                        !razorpayLoaded ||
+                        billingStatus?.subscription?.cancelAtPeriodEnd === true
+                      }
                     >
                       {upgrading === plan.key ? (
                         <>
@@ -480,6 +611,142 @@ export function BillingTab() {
           })}
         </div>
       </div>
+
+      {billingHistory.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Billing History</CardTitle>
+            <CardDescription>Your past payments and invoices</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="rounded-md border">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-muted/50 border-b">
+                    <th className="p-3 text-left font-medium">Date</th>
+                    <th className="p-3 text-left font-medium">Amount</th>
+                    <th className="p-3 text-left font-medium">Status</th>
+                    <th className="p-3 text-left font-medium">Invoice</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {billingHistory.map((history) => (
+                    <tr key={history.id} className="hover:bg-muted/20 border-b last:border-0">
+                      <td className="p-3">{new Date(history.date).toLocaleDateString()}</td>
+                      <td className="p-3 font-medium">{formatPrice(history.amount)}</td>
+                      <td className="p-3">
+                        <Badge variant={history.status === "paid" ? "default" : "secondary"}>
+                          {history.status}
+                        </Badge>
+                      </td>
+                      <td className="p-3">
+                        {history.invoiceUrl ? (
+                          <a
+                            href={history.invoiceUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-primary font-medium hover:underline"
+                          >
+                            Download
+                          </a>
+                        ) : (
+                          <span className="text-muted-foreground">-</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Referrals Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Referrals & Rewards</CardTitle>
+          <CardDescription>
+            Share CareOps to get credits applied toward your next invoice.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <div className="space-y-2">
+              <h3 className="text-sm font-medium">Your Referral Code</h3>
+              <div className="flex gap-2">
+                <div className="bg-muted flex flex-1 items-center justify-between rounded-md border p-2 font-mono text-sm">
+                  {referralCode || "Generating..."}
+                </div>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    if (referralCode) {
+                      navigator.clipboard.writeText(referralCode);
+                      toast({
+                        title: "Copied!",
+                        description: "Referral code copied to clipboard.",
+                      });
+                    }
+                  }}
+                >
+                  Copy
+                </Button>
+              </div>
+              <p className="text-muted-foreground text-xs">
+                Share this code with friends. You both get $50 credit when they upgrade to a paid
+                plan.
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <h3 className="text-sm font-medium">Have a referral code?</h3>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Enter code"
+                  value={inputReferralMode}
+                  onChange={(e) => setInputReferralMode(e.target.value)}
+                  className="flex-1 rounded-md border px-3 py-2 text-sm"
+                />
+                <Button onClick={handleRedeemReferral} disabled={redeeming || !inputReferralMode}>
+                  {redeeming ? "Verifying..." : "Redeem"}
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          {referralHistory.length > 0 && (
+            <div className="mt-6 border-t pt-6">
+              <h3 className="mb-4 text-sm font-medium">Your Invited Friends</h3>
+              <div className="rounded-md border">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="bg-muted/50 border-b">
+                      <th className="p-3 text-left font-medium">Invited Workspace</th>
+                      <th className="p-3 text-left font-medium">Date</th>
+                      <th className="p-3 text-left font-medium">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {referralHistory.map((ref) => (
+                      <tr key={ref.id} className="hover:bg-muted/20 border-b last:border-0">
+                        <td className="p-3 font-medium">{ref.referredName}</td>
+                        <td className="p-3">{new Date(ref.date).toLocaleDateString()}</td>
+                        <td className="p-3">
+                          <Badge variant={ref.status === "COMPLETED" ? "default" : "secondary"}>
+                            {ref.status}
+                          </Badge>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
